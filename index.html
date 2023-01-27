@@ -1,0 +1,17 @@
+<html><head><meta charset="utf-8"></meta><title>foo</title></head><body><h1>I am a fool.</h1><h2>Programs</h2><h3>Scheme</h3><h4>Greatest Common Divisor</h4><pre>
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+</pre><h4>Factorial</h4><pre>
+(define (fact n)
+  (if (= n 0)
+      1
+      (* n (fact (- n 1)))))
+</pre><h4>Fibonacci</h4><pre>
+(define (fib n)
+  (if (< n 2)
+      n
+      (+ (fib (- n 1))
+         (fib (- n 2)))))
+</pre><h2>Essays</h2><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
