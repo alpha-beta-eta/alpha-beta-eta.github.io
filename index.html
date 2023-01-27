@@ -8,10 +8,19 @@
   (if (= n 0)
       1
       (* n (fact (- n 1)))))
+(define (fact-cps n k)
+  (if (= n 0)
+      (k 1)
+      (fact-cps (- n 1) (lambda (v) (k (* n v))))))
 </pre><h4>Fibonacci</h4><pre>
 (define (fib n)
   (if (< n 2)
       n
       (+ (fib (- n 1))
          (fib (- n 2)))))
+(define (fib-iter n)
+  (let iter ((a 0) (b 1) (c 0))
+    (if (= c n)
+        a
+        (iter b (+ a b) (+ c 1)))))
 </pre><h2>Essays</h2><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
