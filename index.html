@@ -1,4 +1,4 @@
-<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>I am a fool.</h1><h2>Programs</h2><h3>Scheme</h3><h4>Greatest Common Divisor</h4><blockquote><pre>
+<html><head><meta charset="utf-8"></meta><title>foo</title></head><body><h1>I am a fool.</h1><h2>Programs</h2><h3>Scheme</h3><h4>Greatest Common Divisor</h4><pre>
 (define (gcd a b)
   (if (= b 0)
       a
@@ -10,7 +10,7 @@
             (r (remainder a b)))
         (let-values (((d m n) (ext-gcd b r)))
           (values d n (- m (* q n)))))))
-</pre></blockquote><h4>Factorial</h4><blockquote><pre>
+</pre><h4>Factorial</h4><pre>
 (define (fact n)
   (if (= n 0)
       1
@@ -19,7 +19,7 @@
   (if (= n 0)
       (k 1)
       (fact-cps (- n 1) (lambda (v) (k (* n v))))))
-</pre></blockquote><h4>Fibonacci</h4><blockquote><pre>
+</pre><h4>Fibonacci</h4><pre>
 (define (fib n)
   (if (< n 2)
       n
@@ -30,4 +30,4 @@
     (if (= c n)
         a
         (iter b (+ a b) (+ c 1)))))
-</pre></blockquote><h2>Essays</h2><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
+</pre><h2>Essays</h2><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
