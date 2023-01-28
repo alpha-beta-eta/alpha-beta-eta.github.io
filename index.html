@@ -3,6 +3,13 @@
   (if (= b 0)
       a
       (gcd b (remainder a b))))
+(define (ext-gcd a b)
+  (if (= b 0)
+      (values a 1 0)
+      (let ((q (quotient a b))
+            (r (remainder a b)))
+        (let-values (((d m n) (ext-gcd b r)))
+          (values d n (- m (* q n)))))))
 </pre><h4>Factorial</h4><pre>
 (define (fact n)
   (if (= n 0)
