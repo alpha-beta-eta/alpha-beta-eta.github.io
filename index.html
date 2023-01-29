@@ -30,4 +30,24 @@
     (if (= c n)
         a
         (iter b (+ a b) (+ c 1)))))
+</pre><h4>Match</h4><pre>
+(define-syntax match
+  (syntax-rules (guard)
+    ((_ v) (error 'match &quot;~s&quot; v))
+    ((_ v (pat (guard g ...) e ...) cs ...)
+     (let ((fk (lambda () (match v cs ...))))
+       (ppat v pat (if (and g ...) (let () e ...) (fk)) (fk))))
+    ((_ v (pat e ...) cs ...)
+     (let ((fk (lambda () (match v cs ...))))
+       (ppat v pat (let () e ...) (fk))))))
+(define-syntax ppat
+  (syntax-rules (unquote)
+    ((_ v () kt kf) (if (null? v) kt kf))
+    ((_ v (unquote var) kt kf) (let ((var v)) kt))
+    ((_ v (x . y) kt kf)
+     (if (pair? v)
+         (let ((vx (car v)) (vy (cdr v)))
+           (ppat vx x (ppat vy y kt kf) kf))
+         kf))
+    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
 </pre><h2>Essays</h2><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
