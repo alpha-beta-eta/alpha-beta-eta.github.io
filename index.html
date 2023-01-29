@@ -21,7 +21,7 @@
       (fact-cps (- n 1) (lambda (v) (k (* n v))))))
 </pre><h4>Fibonacci</h4><pre>
 (define (fib n)
-  (if (< n 2)
+  (if (&lt; n 2)
       n
       (+ (fib (- n 1))
          (fib (- n 2)))))
