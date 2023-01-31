@@ -1,5 +1,4 @@
-<html><head><meta charset="utf-8"></meta><title>foo</title></head><body><h1>I am a fool.</h1><h2>Programs</h2><h3>Scheme</h3><h4>Greatest Common Divisor</h4><pre>
-(define (gcd a b)
+<html><head><meta charset="utf-8"></meta><title>foo</title></head><body><h1>I am a fool.</h1><h2>Programs</h2><h3>Scheme</h3><h4>Greatest Common Divisor</h4><pre><code>(define (gcd a b)
   (if (= b 0)
       a
       (gcd b (remainder a b))))
@@ -9,18 +8,14 @@
       (let ((q (quotient a b))
             (r (remainder a b)))
         (let-values (((d m n) (ext-gcd b r)))
-          (values d n (- m (* q n)))))))
-</pre><h4>Factorial</h4><pre>
-(define (fact n)
+          (values d n (- m (* q n)))))))</code></pre><h4>Factorial</h4><pre><code>(define (fact n)
   (if (= n 0)
       1
       (* n (fact (- n 1)))))
 (define (fact-cps n k)
   (if (= n 0)
       (k 1)
-      (fact-cps (- n 1) (lambda (v) (k (* n v))))))
-</pre><h4>Fibonacci</h4><pre>
-(define (fib n)
+      (fact-cps (- n 1) (lambda (v) (k (* n v))))))</code></pre><h4>Fibonacci</h4><pre><code>(define (fib n)
   (if (&lt; n 2)
       n
       (+ (fib (- n 1))
@@ -29,9 +24,7 @@
   (let iter ((a 0) (b 1) (c 0))
     (if (= c n)
         a
-        (iter b (+ a b) (+ c 1)))))
-</pre><h4>Match</h4><pre>
-(define-syntax match
+        (iter b (+ a b) (+ c 1)))))</code></pre><h4>Match</h4><pre><code>(define-syntax match
   (syntax-rules (guard)
     ((_ v) (error 'match &quot;~s&quot; v))
     ((_ v (pat (guard g ...) e ...) cs ...)
@@ -49,5 +42,4 @@
          (let ((vx (car v)) (vy (cdr v)))
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
-    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
-</pre><h2>Essays</h2><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
+    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))</code></pre><h2>Essays</h2><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
