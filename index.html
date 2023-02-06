@@ -1,4 +1,11 @@
-<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>I am a fool.</h1><h2>Programs</h2><h3>Scheme</h3><h4>Greatest Common Divisor</h4><pre><code>(define (gcd a b)
+<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>I am a fool.</h1><h2>Programs</h2><h3>Standard ML</h3><h4>Greatest Common Divisor</h4><pre><code>fun gcd a 0 = a
+  | gcd a b = gcd b (a mod b)
+</code></pre><h4>Factorial</h4><pre><code>fun fact 0 = 1
+  | fact n = n * fact(n-1)
+</code></pre><h4>Fibonacci</h4><pre><code>fun fib 0 = 0
+  | fib 1 = 1
+  | fib n = fib(n-1) + fib(n-2)
+</code></pre><h3>Scheme</h3><h4>Greatest Common Divisor</h4><pre><code>(define (gcd a b)
   (if (= b 0)
       a
       (gcd b (remainder a b))))
@@ -61,13 +68,21 @@
       (* pi (square r))))
 > (area 5)
 78.5
-</code></pre><h5>Conditionals</h5><h5>And, Or, Not</h5><h5>Recursive Definitions</h5><h5>Local Definitions</h5><pre><code>(define (sqrt x)
+</code></pre><h5>Conditionals</h5><pre><code>(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))
+</code></pre><pre><code>(define (sgn x)
+  (cond ((&lt; x 0) -1)
+        ((= x 0) 0)
+        (else 1)))
+</code></pre><h5>And, Or, Not</h5><h5>Recursive Definitions</h5><h5>Local Definitions</h5><pre><code>(define (sqrt x)
   (define init 1.0)
   (define (square x)
     (* x x))
   (define tol 0.00001)
   (define (close-enough? a b)
-    (< (abs (- a b)) tol))
+    (&lt; (abs (- a b)) tol))
   (define (average a b)
     (/ (+ a b) 2))
   (define (improve guess)
@@ -82,7 +97,15 @@
     (if (= c n)
         a
         (iter b (+ a b) (+ c 1)))))
-</code></pre><h5>Higher-order Procedures</h5><h5>Recursive and Iterative Behaviors</h5><pre><code>   (fact 3)
+</code></pre><h5>Higher-order Procedures</h5><pre><code>(define (compose f g)
+  (lambda (x)
+    (f (g x))))
+</code></pre><pre><code>(define (Sigma f a b)
+  (if (> a b)
+      0
+      (+ (f a)
+         (Sigma f (+ a 1) b))))
+</code></pre><h5>Recursive and Iterative Behaviors</h5><pre><code>   (fact 3)
 -> (* 3 (fact 2))
 -> (* 3 (* 2 (fact 1)))
 -> (* 3 (* 2 (* 1 (fact 0))))
@@ -128,4 +151,18 @@
       init
       (proc (car lst)
             (fold-right proc init (cdr lst)))))
+</code></pre><pre><code>(define (map proc lst)
+  (fold-right (lambda (a d) (cons (proc a) d))
+              '()
+              lst))
+(define (filter pred lst)
+  (fold-right (lambda (a d) (if (pred a) (cons a d) d))
+              '()
+              lst))
+(define (append lst1 lst2)
+  (fold-right cons lst2 lst1))
+(define (reverse lst)
+  (fold-left (lambda (a d) (cons d a))
+             '()
+             lst))
 </code></pre><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
