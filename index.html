@@ -8,14 +8,16 @@
       (let ((q (quotient a b))
             (r (remainder a b)))
         (let-values (((d m n) (ext-gcd b r)))
-          (values d n (- m (* q n)))))))</code></pre><h4>Factorial</h4><pre><code>(define (fact n)
+          (values d n (- m (* q n)))))))
+</code></pre><h4>Factorial</h4><pre><code>(define (fact n)
   (if (= n 0)
       1
       (* n (fact (- n 1)))))
 (define (fact-cps n k)
   (if (= n 0)
       (k 1)
-      (fact-cps (- n 1) (lambda (v) (k (* n v))))))</code></pre><h4>Fibonacci</h4><pre><code>(define (fib n)
+      (fact-cps (- n 1) (lambda (v) (k (* n v))))))
+</code></pre><h4>Fibonacci</h4><pre><code>(define (fib n)
   (if (&lt; n 2)
       n
       (+ (fib (- n 1))
@@ -24,7 +26,8 @@
   (let iter ((a 0) (b 1) (c 0))
     (if (= c n)
         a
-        (iter b (+ a b) (+ c 1)))))</code></pre><h4>Match</h4><pre><code>(define-syntax match
+        (iter b (+ a b) (+ c 1)))))
+</code></pre><h4>Match</h4><pre><code>(define-syntax match
   (syntax-rules (guard)
     ((_ v) (error 'match &quot;~s&quot; v))
     ((_ v (pat (guard g ...) e ...) cs ...)
@@ -42,4 +45,87 @@
          (let ((vx (car v)) (vy (cdr v)))
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
-    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))</code></pre><h2>Essays</h2><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
+    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
+</code></pre><h2>Essays</h2><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
+       |  (&lt;symbol> (&lt;attr>+) &lt;xml>*)
+       |  (&lt;symbol> &lt;xml>*)
+&lt;attr> ::= (&lt;symbol> &lt;string>)
+</code></pre><h3>Quotes in Computer Science</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>耽迷于具体句法毫无意义, 而吾独爱S-exp.</li><li>程序主要是供人阅读的, 不能被读懂的程序毫无价值.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming</h3><h4>Elements of Programming</h4><h5>Read-Evaluate-Print Loops</h5><pre><code>> 42
+42</code></pre><h5>Literals</h5><h5>Variables</h5><pre><code>> (define three 3)
+> three
+3</code></pre><h5>Procedure Applications</h5><h5>Lambda Expressions</h5><h5>Definitions</h5><pre><code>> (define pi 3.14)
+> (define square
+    (lambda (x) (* x x)))
+> (define area
+    (lambda (r)
+      (* pi (square r))))
+> (area 5)
+78.5
+</code></pre><h5>Conditionals</h5><h5>And, Or, Not</h5><h5>Recursive Definitions</h5><h5>Local Definitions</h5><pre><code>(define (sqrt x)
+  (define init 1.0)
+  (define (square x)
+    (* x x))
+  (define tol 0.00001)
+  (define (close-enough? a b)
+    (< (abs (- a b)) tol))
+  (define (average a b)
+    (/ (+ a b) 2))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (iter guess)
+    (if (close-enough? (square guess) x)
+        guess
+        (iter (improve guess))))
+  (iter init))
+</code></pre><pre><code>(define (fib-iter n)
+  (let iter ((a 0) (b 1) (c 0))
+    (if (= c n)
+        a
+        (iter b (+ a b) (+ c 1)))))
+</code></pre><h5>Higher-order Procedures</h5><h5>Recursive and Iterative Behaviors</h5><pre><code>   (fact 3)
+-> (* 3 (fact 2))
+-> (* 3 (* 2 (fact 1)))
+-> (* 3 (* 2 (* 1 (fact 0))))
+-> (* 3 (* 2 (* 1 1)))
+-> (* 3 (* 2 1))
+-> (* 3 2)
+-> 6
+</code></pre><pre><code>   (gcd 9 6)
+-> (gcd 6 3)
+-> (gcd 3 0)
+-> 3
+</code></pre><h5>Complexity</h5><h4>List Processing</h4><h5>Pairs and Lists</h5><h5>Procedures on Lists</h5><pre><code>(define (length lst)
+  (if (null? lst)
+      0
+      (+ (length (cdr lst)) 1)))
+</code></pre><h5>A Toolbox for List Processing</h5><pre><code>(define (map proc lst)
+  (if (null? lst)
+      '()
+      (cons (proc (car lst))
+            (map proc (cdr lst)))))
+</code></pre><pre><code>(define (filter pred lst)
+  (cond ((null? lst) '())
+        ((pred (car lst))
+         (cons (car lst) (filter pred (cdr lst))))
+        (else (filter pred (cdr lst)))))
+</code></pre><pre><code>(define (append lst1 lst2)
+  (if (null? lst1)
+      lst2
+      (cons (car lst1)
+            (append (cdr lst1) lst2))))
+</code></pre><pre><code>(define (reverse lst)
+  (define (iter rest result)
+    (if (null? rest)
+        result
+        (iter (cdr rest) (cons (car rest) result))))
+  (iter lst '()))
+</code></pre><pre><code>(define (fold-left proc init lst)
+  (if (null? lst)
+      init
+      (fold-left proc (proc init (car lst)) (cdr lst))))
+(define (fold-right proc init lst)
+  (if (null? lst)
+      init
+      (proc (car lst)
+            (fold-right proc init (cdr lst)))))
+</code></pre><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
