@@ -1,4 +1,4 @@
-<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>I am a fool.</h1><h2>Programs</h2><h3>Standard ML</h3><h4>Greatest Common Divisor</h4><pre><code>fun gcd a 0 = a
+<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>高等游民</h1><h2>Programs</h2><h3>Standard ML</h3><h4>Greatest Common Divisor</h4><pre><code>fun gcd a 0 = a
   | gcd a b = gcd b (a mod b)
 </code></pre><h4>Factorial</h4><pre><code>fun fact 0 = 1
   | fact n = n * fact(n-1)
@@ -55,7 +55,7 @@
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
     ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
-</code></pre><h2>Essays</h2><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
+</code></pre><h2>Essays</h2><h3>Book Recommendations</h3><h4>Programming Languages</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
        |  (&lt;symbol> (&lt;attr>+) &lt;xml>*)
        |  (&lt;symbol> &lt;xml>*)
 &lt;attr> ::= (&lt;symbol> &lt;string>)
@@ -124,7 +124,20 @@
   (cond ((&lt; x 0) -1)
         ((= x 0) 0)
         (else 1)))
-</code></pre><h5>And, Or, Not</h5><h5>Recursive Definitions</h5><pre><code>(define (even? n)
+</code></pre><h5>And, Or, Not</h5><h5>Recursive Definitions</h5><pre><code>(define (fact n)
+  (if (= n 0)
+      1
+      (* n (fact (- n 1)))))
+</code></pre><pre><code>(define (fib n)
+  (if (&lt; n 2)
+      n
+      (+ (fib (- n 1))
+         (fib (- n 2)))))
+</code></pre><pre><code>(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+</code></pre><pre><code>(define (even? n)
   (if (= n 0)
       #t
       (odd? (- n 1))))
@@ -160,6 +173,15 @@
   (if (= n 0)
       (lambda (x) x)
       (compose f (repeated f (- n 1)))))
+</code></pre><pre><code>(define zero
+  (lambda (f)
+    (lambda (x) x)))
+(define one
+  (lambda (f)
+    (lambda (x) (f x))))
+(define two
+  (lambda (f)
+    (lambda (x) (f (f x)))))
 </code></pre><pre><code>(define (Sigma f a b)
   (if (> a b)
       0
