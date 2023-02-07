@@ -5,6 +5,8 @@
 </code></pre><h4>Fibonacci</h4><pre><code>fun fib 0 = 0
   | fib 1 = 1
   | fib n = fib(n-1) + fib(n-2)
+</code></pre><h4>Length</h4><pre><code>fun length[] = 0
+  | length(x::L) = length(L) + 1
 </code></pre><h3>Scheme</h3><h4>Greatest Common Divisor</h4><pre><code>(define (gcd a b)
   (if (= b 0)
       a
@@ -77,7 +79,21 @@
      (for-each Xml xml*)
      (printf &quot;&lt;/~s>&quot; sym))))
 </code></pre><h3>Quotes in Computer Science</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming</h3><h4>Elements of Programming</h4><h5>Read-Evaluate-Print Loops</h5><pre><code>> 42
-42</code></pre><h5>Literals</h5><h5>Variables</h5><pre><code>> (define three 3)
+42</code></pre><h5>Literals</h5><pre><code>> -7
+-7
+> 3/7
+3/7
+> 3.14
+3.14
+> 5+12i
+5+12i
+> #t
+#t
+> #f
+#f
+> &quot;hello, world&quot;
+&quot;hello, world&quot;
+</code></pre><h5>Variables</h5><pre><code>> (define three 3)
 > three
 3</code></pre><h5>Procedure Applications</h5><h5>Lambda Expressions</h5><pre><code>> (((lambda (f g)
       (lambda (x)
@@ -140,6 +156,10 @@
 </code></pre><h5>Higher-order Procedures</h5><pre><code>(define (compose f g)
   (lambda (x)
     (f (g x))))
+</code></pre><pre><code>(define (repeated f n)
+  (if (= n 0)
+      (lambda (x) x)
+      (compose f (repeated f (- n 1)))))
 </code></pre><pre><code>(define (Sigma f a b)
   (if (> a b)
       0
@@ -261,7 +281,18 @@
       '(())
       (let ((t* (power-set (cdr s))))
         (append t* (map (lambda (t) (cons (car s) t)) t*)))))
-</code></pre><h4>States and Objects</h4><pre><code>> (define counter
+</code></pre><h4>States and Objects</h4><pre><code>> (define x 0)
+> (set! x (+ x 1))
+> x
+1
+</code></pre><pre><code>> (define p (cons 1 2))
+> (set-car! p 'a)
+> p
+(a . 2)
+> (set-cdr! p 'b)
+> p
+(a . b)
+</code></pre><pre><code>> (define counter
     (let ((x 0))
       (lambda ()
         (set! x (+ x 1))
@@ -272,4 +303,31 @@
 2
 > (counter)
 3
+</code></pre><h3>An Invitation to Programming Languages</h3><h4>Syntax</h4><h5>Abstract Syntax Trees</h5><h5>BNF Grammars</h5><pre><code>&lt;exp> ::= &lt;int>
+       |  &lt;bool>
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (&lt;op> &lt;exp> &lt;exp>)
+&lt;op> ::= + | - | * | =
+</code></pre><h5>Interpreters</h5><pre><code>(define (interp exp)
+  (match exp
+    (,int (guard (integer? int)) int)
+    (,bool (guard (boolean? bool)) bool)
+    ((if ,e1 ,e2 ,e3)
+     (let ((v1 (interp e1)))
+       (if (true? v1)
+           (interp e2)
+           (interp e3))))
+    ((,op ,e1 ,e2)
+     (guard (memq op '(+ - * =)))
+     (let ((v1 (interp e1))
+           (v2 (interp e2)))
+       (case op
+         ((+) (+ v1 v2))
+         ((-) (- v1 v2))
+         ((*) (* v1 v2))
+         ((=) (= v1 v2)))))))
+(define (true? val)
+  (if (boolean? val)
+      val
+      (error 'interp &quot;the predicate of if is not of type bool&quot;)))
 </code></pre><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
