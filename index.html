@@ -231,7 +231,7 @@
   (fold-left (lambda (a d) (cons d a))
              '()
              lst))
-</code></pre><h5>More List Processing</h5><pre><code>(define (append-map proc lst)
+</code></pre><h5>More on List Processing</h5><pre><code>(define (append-map proc lst)
   (if (null? lst)
       '()
       (append (proc (car lst))
