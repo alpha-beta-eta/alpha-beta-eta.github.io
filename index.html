@@ -93,7 +93,7 @@
 #f
 > &quot;hello, world&quot;
 &quot;hello, world&quot;
-</code></pre><h5>Variables 变量</h5><pre><code>> (define three 3)
+</code></pre><p>Scheme用<code>#t</code>表示真, 用<code>#f</code>表示假.</p><h5>Variables 变量</h5><pre><code>> (define three 3)
 > three
 3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程应用即将过程应用于参数上.</p><h5>Lambda Expressions lambda表达式</h5><pre><code>> (((lambda (f g)
       (lambda (x)
@@ -245,7 +245,7 @@
     (if (null? rest)
         result
         (iter (cdr rest) (cons (car rest) result)))))
-</code></pre><pre><code>(define (fold-left proc init lst)
+</code></pre><p><code>fold-left</code>和<code>fold-right</code>是对于列表处理的抽象.</p><pre><code>(define (fold-left proc init lst)
   (if (null? lst)
       init
       (fold-left proc (proc init (car lst)) (cdr lst))))
