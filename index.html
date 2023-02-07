@@ -1,4 +1,4 @@
-<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>高等游民</h1><h2>Programs</h2><h3>Standard ML</h3><h4>Greatest Common Divisor</h4><pre><code>fun gcd a 0 = a
+<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>愚者/高等游民</h1><h2>Programs 程序</h2><h3>Standard ML</h3><h4>Greatest Common Divisor</h4><pre><code>fun gcd a 0 = a
   | gcd a b = gcd b (a mod b)
 </code></pre><h4>Factorial</h4><pre><code>fun fact 0 = 1
   | fact n = n * fact(n-1)
@@ -55,7 +55,7 @@
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
     ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
-</code></pre><h2>Essays</h2><h3>Book Recommendations</h3><h4>Programming Languages</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
+</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming Languages 编程语言</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
        |  (&lt;symbol> (&lt;attr>+) &lt;xml>*)
        |  (&lt;symbol> &lt;xml>*)
 &lt;attr> ::= (&lt;symbol> &lt;string>)
@@ -78,8 +78,8 @@
      (printf &quot;&lt;~s>&quot; sym)
      (for-each Xml xml*)
      (printf &quot;&lt;/~s>&quot; sym))))
-</code></pre><h3>Quotes in Computer Science</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming</h3><h4>Elements of Programming</h4><h5>Read-Evaluate-Print Loops</h5><pre><code>> 42
-42</code></pre><h5>Literals</h5><pre><code>> -7
+</code></pre><h3>Quotes in Computer Science 计算机科学妙语</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming 程序设计的邀请</h3><p>本书以Scheme编程语言介绍了程序设计的基本想法.</p><h4>Elements of Programming 编程基础</h4><h5>Read-Evaluate-Print Loops 读取求值输出循环</h5><pre><code>> 42
+42</code></pre><h5>Literals 字面量</h5><p>字面量是对其求值得到自身的表达式.</p><pre><code>> -7
 -7
 > 3/7
 3/7
@@ -93,16 +93,16 @@
 #f
 > &quot;hello, world&quot;
 &quot;hello, world&quot;
-</code></pre><h5>Variables</h5><pre><code>> (define three 3)
+</code></pre><h5>Variables 变量</h5><pre><code>> (define three 3)
 > three
-3</code></pre><h5>Procedure Applications</h5><h5>Lambda Expressions</h5><pre><code>> (((lambda (f g)
+3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程应用即将过程应用于参数上.</p><h5>Lambda Expressions lambda表达式</h5><pre><code>> (((lambda (f g)
       (lambda (x)
         (f (g x))))
     (lambda (x) (* x x))
     (lambda (x) (+ x 3)))
    13)
 256
-</code></pre><h5>Definitions</h5><pre><code>> (define pi 3.14)
+</code></pre><h5>Definitions 定义</h5><pre><code>> (define pi 3.14)
 > (define square
     (lambda (x) (* x x)))
 > (define area
@@ -116,7 +116,7 @@
     (* pi (square r)))
 > (area 5)
 78.5
-</code></pre><h5>Conditionals</h5><pre><code>(define (abs x)
+</code></pre><h5>Conditionals 条件分支</h5><pre><code>(define (abs x)
   (if (&lt; x 0)
       (- x)
       x))
@@ -124,7 +124,7 @@
   (cond ((&lt; x 0) -1)
         ((= x 0) 0)
         (else 1)))
-</code></pre><h5>And, Or, Not</h5><h5>Recursive Definitions</h5><pre><code>(define (fact n)
+</code></pre><h5>And, Or, Not</h5><h5>Recursive Definitions 递归定义</h5><p>递归定义在定义中直接或间接地引用自身.</p><pre><code>(define (fact n)
   (if (= n 0)
       1
       (* n (fact (- n 1)))))
@@ -145,7 +145,7 @@
   (if (= n 0)
       #f
       (even? (- n 1))))
-</code></pre><h5>Local Definitions</h5><pre><code>(define (sqrt x)
+</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><pre><code>(define (sqrt x)
   (define init 1.0)
   (define (square x)
     (* x x))
@@ -166,7 +166,7 @@
     (if (= c n)
         a
         (iter b (+ a b) (+ c 1)))))
-</code></pre><h5>Higher-order Procedures</h5><pre><code>(define (compose f g)
+</code></pre><h5>Higher-order Procedures 高阶过程</h5><p>高阶过程是以过程作为参数或返回值的过程.</p><pre><code>(define (compose f g)
   (lambda (x)
     (f (g x))))
 </code></pre><pre><code>(define (repeated f n)
@@ -187,7 +187,7 @@
       0
       (+ (f a)
          (Sigma f (+ a 1) b))))
-</code></pre><h5>Recursive and Iterative Behaviors</h5><pre><code>   (fact 3)
+</code></pre><h5>Recursive and Iterative Behaviors 递归和迭代行为</h5><p>递归过程产生的计算并不总是具有相同的行为.</p><pre><code>   (fact 3)
 -> (* 3 (fact 2))
 -> (* 3 (* 2 (fact 1)))
 -> (* 3 (* 2 (* 1 (fact 0))))
@@ -199,12 +199,12 @@
 -> (gcd 6 3)
 -> (gcd 3 0)
 -> 3
-</code></pre><h5>Complexity</h5><h4>List Processing</h4><h5>Pairs and Lists</h5><pre><code>> (define p (cons 1 2))
+</code></pre><h5>Complexity 复杂度</h5><p>复杂度是计算所需的代价.</p><h4>List Processing 列表处理</h4><p>Scheme是LISP方言, 而LISP代表LISt Processor, 即列表处理器之意.</p><h5>Pairs and Lists 序对和列表</h5><pre><code>> (define p (cons 1 2))
 > (car p)
 1
 > (cdr p)
 2
-</code></pre><h5>Procedures on Lists</h5><pre><code>(define (length lst)
+</code></pre><h5>Procedures on Lists 列表上的过程</h5><pre><code>(define (length lst)
   (if (null? lst)
       0
       (+ (length (cdr lst)) 1)))
@@ -220,22 +220,22 @@
   (cond ((null? alst) #f)
         ((eq? (caar alst) key) (car alst))
         (else (assq key (cdr alst)))))
-</code></pre><h5>A Toolbox for List Processing</h5><pre><code>(define (map proc lst)
+</code></pre><h5>A Toolbox for List Processing 列表处理工具箱</h5><pre><code>(define (map proc lst)
   (if (null? lst)
       '()
       (cons (proc (car lst))
             (map proc (cdr lst)))))
-</code></pre><pre><code>(define (filter pred lst)
+</code></pre><p><code>filter</code>从列表中过滤出满足谓词的元素.</p><pre><code>(define (filter pred lst)
   (cond ((null? lst) '())
         ((pred (car lst))
          (cons (car lst) (filter pred (cdr lst))))
         (else (filter pred (cdr lst)))))
-</code></pre><pre><code>(define (append lst1 lst2)
+</code></pre><p><code>append</code>合并两个列表.</p><pre><code>(define (append lst1 lst2)
   (if (null? lst1)
       lst2
       (cons (car lst1)
             (append (cdr lst1) lst2))))
-</code></pre><pre><code>(define (reverse lst)
+</code></pre><p><code>reverse</code>反转一个列表.</p><pre><code>(define (reverse lst)
   (if (null? lst)
       '()
       (append (reverse (cdr lst))
@@ -273,7 +273,7 @@
   (fold-left (lambda (a d) (cons d a))
              '()
              lst))
-</code></pre><h5>More on List Processing</h5><pre><code>(define (append-map proc lst)
+</code></pre><h5>More on List Processing 更多的列表处理</h5><pre><code>(define (append-map proc lst)
   (if (null? lst)
       '()
       (append (proc (car lst))
@@ -303,7 +303,7 @@
       '(())
       (let ((t* (power-set (cdr s))))
         (append t* (map (lambda (t) (cons (car s) t)) t*)))))
-</code></pre><h4>States and Objects</h4><pre><code>> (define x 0)
+</code></pre><h4>States and Objects 状态和对象</h4><pre><code>> (define x 0)
 > (set! x (+ x 1))
 > x
 1
@@ -325,12 +325,12 @@
 2
 > (counter)
 3
-</code></pre><h3>An Invitation to Programming Languages</h3><h4>Syntax</h4><h5>Abstract Syntax Trees</h5><h5>BNF Grammars</h5><pre><code>&lt;exp> ::= &lt;int>
+</code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><h5>BNF Grammars BNF文法</h5><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
        |  (&lt;op> &lt;exp> &lt;exp>)
 &lt;op> ::= + | - | * | =
-</code></pre><h5>Interpreters</h5><pre><code>(define (interp exp)
+</code></pre><h5>Interpreters 解释器</h5><pre><code>(define (interp exp)
   (match exp
     (,int (guard (integer? int)) int)
     (,bool (guard (boolean? bool)) bool)
@@ -352,4 +352,4 @@
   (if (boolean? val)
       val
       (error 'interp &quot;the predicate of if is not of type bool&quot;)))
-</code></pre><h2>Quotes</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p></body></html>
+</code></pre><h2>Quotes 摘抄</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>人不居于国家之中, 而居于语言之中. - 萧沆</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p><p>因此, 程序必须写来供人阅读而仅是顺带供机器执行. - Alan Perlis</p></body></html>
