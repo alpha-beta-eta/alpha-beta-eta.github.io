@@ -1,2 +1,2 @@
-code {font-family: consolas, monospace;}
-pre:has(>code) {background-color: #D3C2C2;}
+code {font-family: consolas, monospace;color: white;background-color: black;}
+pre:has(>code) {background-color: black;}
