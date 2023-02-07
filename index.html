@@ -145,7 +145,17 @@
   (if (= n 0)
       #f
       (even? (- n 1))))
-</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><pre><code>(define (sqrt x)
+</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><pre><code>> (letrec ((even? (lambda (n)
+                    (if (= n 0)
+                        #t
+                        (odd? (- n 1)))))
+           (odd? (lambda (n)
+                   (if (= n 0)
+                       #f
+                       (even? (- n 1))))))
+    (even? 88))
+#t
+</code></pre><pre><code>(define (sqrt x)
   (define init 1.0)
   (define (square x)
     (* x x))
@@ -259,7 +269,7 @@
     (if (null? rest)
         result
         (iter (cdr rest) (proc (car rest) result)))))
-</code></pre><pre><code>(define (map proc lst)
+</code></pre><p>以<code>fold-left</code>和<code>fold-right</code>表示<code>map</code>, <code>filter</code>, <code>append</code>, <code>reverse</code>.</p><pre><code>(define (map proc lst)
   (fold-right (lambda (a d) (cons (proc a) d))
               '()
               lst))
@@ -325,6 +335,25 @@
 2
 > (counter)
 3
+</code></pre><pre><code>> (define (make-counter)
+    (let ((x 0))
+      (lambda ()
+        (set! x (+ x 1))
+        x)))
+> (define c1 (make-counter))
+> (define c2 (make-counter))
+> (c1)
+1
+> (c2)
+1
+> (c1)
+2
+> (c2)
+2
+> (c1)
+3
+> (c2)
+3
 </code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><h5>BNF Grammars BNF文法</h5><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
@@ -352,4 +381,4 @@
   (if (boolean? val)
       val
       (error 'interp &quot;the predicate of if is not of type bool&quot;)))
-</code></pre><h2>Quotes 摘抄</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>人不居于国家之中, 而居于语言之中. - 萧沆</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p><p>因此, 程序必须写来供人阅读而仅是顺带供机器执行. - Alan Perlis</p></body></html>
+</code></pre><h2>Quotes 摘抄</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>人不居于国家之中, 而居于语言之中. - 萧沆</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p><p>因此, 程序必须写来供人阅读而仅是顺带供机器执行. - Alan Perlis</p><p>苦海十年为亲卖身的游女的绘姿使我泣. 凭倚竹窗茫然看着流水的艺妓的姿态使我喜. 卖宵夜面的纸灯寂寞地停留着的河边的夜景使我醉. 雨夜啼月的杜鹃, 阵雨中散落的秋天树叶, 落花飘风的钟声, 途中日暮的山路的雪, 凡是无常无告无望的, 使人无端嗟叹此世只是一梦的, 这样的一切东西于我都是可亲, 于我都是可怀. - 永井荷风, 周作人译</p></body></html>
