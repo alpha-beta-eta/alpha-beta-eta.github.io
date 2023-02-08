@@ -1,4 +1,4 @@
-<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>愚者/高等游民</h1><h2>Programs 程序</h2><h3>Standard ML</h3><h4>Greatest Common Divisor</h4><pre><code>fun gcd a 0 = a
+<html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>愚者/高等游民</h1><h2>Programs 程序</h2><h3>Standard ML</h3><p>Standard ML是ML的一种方言.</p><h4>Greatest Common Divisor</h4><pre><code>fun gcd a 0 = a
   | gcd a b = gcd b (a mod b)
 </code></pre><h4>Factorial</h4><pre><code>fun fact 0 = 1
   | fact n = n * fact(n-1)
@@ -7,7 +7,7 @@
   | fib n = fib(n-1) + fib(n-2)
 </code></pre><h4>Length</h4><pre><code>fun length[] = 0
   | length(x::L) = length(L) + 1
-</code></pre><h3>Scheme</h3><h4>Greatest Common Divisor</h4><pre><code>(define (gcd a b)
+</code></pre><h3>Scheme</h3><p>Scheme是Lisp的一种方言.</p><h4>Greatest Common Divisor</h4><pre><code>(define (gcd a b)
   (if (= b 0)
       a
       (gcd b (remainder a b))))
@@ -36,6 +36,13 @@
     (if (= c n)
         a
         (iter b (+ a b) (+ c 1)))))
+</code></pre><h4>Symbolic Differentiation</h4><pre><code>(define (diff exp var)
+  (match exp
+    (,num (guard (number? num)) 0)
+    (,var^ (guard (symbol? var^)) (if (eq? var var^) 1 0))
+    ((+ ,e1 ,e2) `(+ ,(diff e1 var) ,(diff e2 var)))
+    ((* ,e1 ,e2) `(+ (* ,e1 ,(diff e2 var))
+                     (* ,e2 ,(diff e1 var))))))
 </code></pre><h4>Match</h4><pre><code>(define-syntax match
   (syntax-rules (guard)
     ((_ v) (error 'match &quot;~s&quot; v))
@@ -55,7 +62,7 @@
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
     ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
-</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming Languages 编程语言</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
+</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Programming in Standard ML</li></ol><h4>Programming Languages 编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
        |  (&lt;symbol> (&lt;attr>+) &lt;xml>*)
        |  (&lt;symbol> &lt;xml>*)
 &lt;attr> ::= (&lt;symbol> &lt;string>)
@@ -128,12 +135,14 @@
   (cond ((&lt; x 0) -1)
         ((= x 0) 0)
         (else 1)))
-</code></pre><h5>And, Or, Not</h5><pre><code>   (and 1 2 3)
+</code></pre><h5>And, Or, Not</h5><p><code>and</code>, <code>or</code>, <code>not</code>在概念上对应于合取, 析取, 否定. 然而, <code>and</code>和<code>or</code>遵循短路求值的原则, 因而并非过程.</p><pre><code>   (and 1 2 3)
 -> (and 2 3)
 -> (and 3)
 -> 3
 </code></pre><pre><code>   (or 1 2 3)
 -> 1
+</code></pre><pre><code>(define (abs x)
+  (or (and (< x 0) (- x)) x))
 </code></pre><h5>Recursive Definitions 递归定义</h5><p>递归定义在定义中直接或间接地引用自身.</p><pre><code>(define (fact n)
   (if (= n 0)
       1
@@ -372,7 +381,7 @@
 3
 > (c2)
 3
-</code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><h5>BNF Grammars BNF文法</h5><pre><code>&lt;exp> ::= &lt;int>
+</code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><p>本书以Scheme程序, 介绍了编程语言的基本想法.</p><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><p>句法是描述如何由较小的语言成分构成较大的语言成分之规则. 这暗示了, 在最理想的情况下, 句法具有树的结构, 即抽象句法树.</p><h5>BNF Grammars BNF文法</h5><p>BNF文法是描述句法的标准工具.</p><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
        |  (&lt;op> &lt;exp> &lt;exp>)
