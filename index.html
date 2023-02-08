@@ -93,9 +93,13 @@
 #f
 > &quot;hello, world&quot;
 &quot;hello, world&quot;
-</code></pre><p>Scheme用<code>#t</code>表示真, 用<code>#f</code>表示假.</p><h5>Variables 变量</h5><pre><code>> (define three 3)
+</code></pre><p>Scheme用<code>#t</code>表示真, 用<code>#f</code>表示假.</p><h5>Variables 变量</h5><p>变量在字面上是符号, 但它不代表其字面, 而是引用一个值.</p><p>我们可以通过<code>define</code>形式引入变量和值的绑定.</p><pre><code>> (define three 3)
 > three
-3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程应用即将过程应用于参数上.</p><h5>Lambda Expressions lambda表达式</h5><pre><code>> (((lambda (f g)
+3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程应用即将过程应用于参数上.</p><pre><code>> (+ 1/2 1/4 1/8)
+7/8
+> (* (- 3 4) (+ 3 4))
+-7
+</code></pre><h5>Lambda Expressions lambda表达式</h5><pre><code>> (((lambda (f g)
       (lambda (x)
         (f (g x))))
     (lambda (x) (* x x))
@@ -124,7 +128,13 @@
   (cond ((&lt; x 0) -1)
         ((= x 0) 0)
         (else 1)))
-</code></pre><h5>And, Or, Not</h5><h5>Recursive Definitions 递归定义</h5><p>递归定义在定义中直接或间接地引用自身.</p><pre><code>(define (fact n)
+</code></pre><h5>And, Or, Not</h5><pre><code>   (and 1 2 3)
+-> (and 2 3)
+-> (and 3)
+-> 3
+</code></pre><pre><code>   (or 1 2 3)
+-> 1
+</code></pre><h5>Recursive Definitions 递归定义</h5><p>递归定义在定义中直接或间接地引用自身.</p><pre><code>(define (fact n)
   (if (= n 0)
       1
       (* n (fact (- n 1)))))
@@ -235,6 +245,14 @@
       '()
       (cons (proc (car lst))
             (map proc (cdr lst)))))
+</code></pre><pre><code>   (map square '(1 2 3))
+-> (cons 1 (map square '(2 3)))
+-> (cons 1 (cons 4 (map square '(3))))
+-> (cons 1 (cons 4 (cons 9 (map square '()))))
+-> (cons 1 (cons 4 (cons 9 '())))
+-> (cons 1 (cons 4 '(9)))
+-> (cons 1 '(4 9))
+-> '(1 4 9)
 </code></pre><p><code>filter</code>从列表中过滤出满足谓词的元素.</p><pre><code>(define (filter pred lst)
   (cond ((null? lst) '())
         ((pred (car lst))
