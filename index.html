@@ -222,6 +222,8 @@
       0
       (+ (f a)
          (Sigma f (+ a 1) b))))
+</code></pre><pre><code>> (Sigma square 1 100)
+338350
 </code></pre><h5>Recursive and Iterative Behaviors 递归和迭代行为</h5><p>递归过程产生的计算并不总是具有相同的行为.</p><pre><code>   (fact 3)
 -> (* 3 (fact 2))
 -> (* 3 (* 2 (fact 1)))
@@ -261,6 +263,12 @@
   (cond ((null? alst) #f)
         ((eq? (caar alst) key) (car alst))
         (else (assq key (cdr alst)))))
+</code></pre><pre><code>> (assq 'y '((x 1) (y 2) (z 3)))
+(y 2)
+> (assq 'y '((x 1) (y 2) (y 3) (z 3)))
+(y 2)
+> (assq 'y '((x 1) (z 3)))
+#f
 </code></pre><p>类似地, <code>assv</code>和<code>assoc</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><h5>A Toolbox for List Processing 列表处理工具箱</h5><pre><code>(define (map proc lst)
   (if (null? lst)
       '()
