@@ -238,7 +238,9 @@
   (if (= n 0)
       (k 1)
       (fact-cps (- n 1) (lambda (v) (k (* n v))))))
-</code></pre><h5>Complexity 复杂度</h5><p>复杂度是计算所需的代价.</p><h4>List Processing 列表处理</h4><p>Scheme是LISP方言, 而LISP代表LISt Processor, 即列表处理器之意.</p><h5>Pairs and Lists 序对和列表</h5><pre><code>> (define p (cons 1 2))
+</code></pre><p>cps是continuation-passing style的缩写.</p><h5>Complexity 复杂度</h5><p>复杂度是计算所需的代价.</p><h4>List Processing 列表处理</h4><p>Scheme是LISP方言, 而LISP代表LISt Processor, 即列表处理器之意.</p><h5>Pairs and Lists 序对和列表</h5><p><code>cons</code>构造一个序对, <code>car</code>和<code>cdr</code>分别代表第一投影和第二投影.</p><pre><code>> (define p (cons 1 2))
+> p
+(1 . 2)
 > (car p)
 1
 > (cdr p)
@@ -251,11 +253,11 @@
   (if (= n 0)
       (car lst)
       (list-ref (cdr lst) (- n 1))))
-</code></pre><pre><code>(define (memq x lst)
+</code></pre><p><code>memq</code>, <code>memv</code>, <code>member</code>判断一个元素是否在一个列表之中.</p><pre><code>(define (memq x lst)
   (cond ((null? lst) #f)
         ((eq? x (car lst)) lst)
         (else (memq x (cdr lst)))))
-</code></pre><p><code>memv</code>和<code>member</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><pre><code>(define (assq key alst)
+</code></pre><p><code>memv</code>和<code>member</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><p><code>assq</code>, <code>assv</code>, <code>assoc</code>根据键对于关联列表进行索引.</p><pre><code>(define (assq key alst)
   (cond ((null? alst) #f)
         ((eq? (caar alst) key) (car alst))
         (else (assq key (cdr alst)))))
@@ -378,11 +380,11 @@
       '(())
       (let ((t* (power-set (cdr s))))
         (append t* (map (lambda (t) (cons (car s) t)) t*)))))
-</code></pre><h4>States and Objects 状态和对象</h4><pre><code>> (define x 0)
+</code></pre><h4>States and Objects 状态和对象</h4><p><code>set!</code>形式可用来改变一个变量被绑定至的值.</p><pre><code>> (define x 0)
 > (set! x (+ x 1))
 > x
 1
-</code></pre><pre><code>> (define p (cons 1 2))
+</code></pre><p><code>set-car!</code>和<code>set-cdr!</code>过程可用来改变序对本身.</p><pre><code>> (define p (cons 1 2))
 > (set-car! p 'a)
 > p
 (a . 2)
