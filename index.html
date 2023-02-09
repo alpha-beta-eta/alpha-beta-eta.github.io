@@ -85,7 +85,7 @@
      (printf &quot;&lt;~s>&quot; sym)
      (for-each Xml xml*)
      (printf &quot;&lt;/~s>&quot; sym))))
-</code></pre><h3>Quotes in Computer Science 计算机科学妙语</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming 程序设计的邀请</h3><p>本书以Scheme编程语言介绍了程序设计的基本想法.</p><h4>Elements of Programming 编程基础</h4><h5>Read-Evaluate-Print Loops 读取求值输出循环</h5><pre><code>> 42
+</code></pre><h3>Quotes in Computer Science 计算机科学妙语</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming 程序设计的邀请</h3><p>本书以Scheme编程语言介绍了程序设计的基本想法.</p><h4>Elements of Programming 编程基础</h4><h5>Read-Evaluate-Print Loops 读取求值输出循环</h5><p>在REPL中, 用户输入一个表达式, 按下回车, 系统就会对于该表达式求值, 并将结果输出于下方, 接着等待用户的下一次输入.</p><pre><code>> 42
 42</code></pre><h5>Literals 字面量</h5><p>字面量是对其求值得到自身的表达式.</p><pre><code>> -7
 -7
 > 3/7
@@ -102,7 +102,7 @@
 &quot;hello, world&quot;
 </code></pre><p>Scheme用<code>#t</code>表示真, 用<code>#f</code>表示假.</p><h5>Variables 变量</h5><p>变量在字面上是符号, 但它不代表其字面, 而是引用一个值.</p><p>我们可以通过<code>define</code>形式引入变量和值的绑定.</p><pre><code>> (define three 3)
 > three
-3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程应用即将过程应用于参数上.</p><pre><code>> (+ 1/2 1/4 1/8)
+3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程应用即将过程应用于参数上. 数学里函数应用的句法多种多样, 但Scheme只有一种过程应用的句法, 即全加括号的前缀记号.</p><pre><code>> (+ 1/2 1/4 1/8)
 7/8
 > (* (- 3 4) (+ 3 4))
 -7
