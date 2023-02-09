@@ -135,13 +135,13 @@
   (cond ((&lt; x 0) -1)
         ((= x 0) 0)
         (else 1)))
-</code></pre><h5>And, Or, Not</h5><p><code>and</code>, <code>or</code>, <code>not</code>在概念上对应于合取, 析取, 否定. 然而, <code>and</code>和<code>or</code>遵循短路求值的原则, 因而并非过程.</p><pre><code>   (and 1 2 3)
+</code></pre><p>Scheme将<code>#f</code>视为假, 而将其他的值均视为真.</p><h5>And, Or, Not</h5><p><code>and</code>, <code>or</code>, <code>not</code>在概念上对应于合取, 析取, 否定. 然而, <code>and</code>和<code>or</code>遵循短路求值的原则, 因而并非过程.</p><pre><code>   (and 1 2 3)
 -> (and 2 3)
 -> (and 3)
 -> 3
 </code></pre><pre><code>   (or 1 2 3)
 -> 1
-</code></pre><pre><code>(define (abs x)
+</code></pre><p>如下定义的<code>abs</code>虽然是正确的, 但却是丑陋的, 不应该这么编写程序.</p><pre><code>(define (abs x)
   (or (and (< x 0) (- x)) x))
 </code></pre><h5>Recursive Definitions 递归定义</h5><p>递归定义在定义中直接或间接地引用自身.</p><pre><code>(define (fact n)
   (if (= n 0)
@@ -152,11 +152,11 @@
       n
       (+ (fib (- n 1))
          (fib (- n 2)))))
-</code></pre><pre><code>(define (gcd a b)
+</code></pre><p><code>gcd</code>计算两个不同时为零的自然数的最大公因数.</p><pre><code>(define (gcd a b)
   (if (= b 0)
       a
       (gcd b (remainder a b))))
-</code></pre><pre><code>(define (even? n)
+</code></pre><p><code>even?</code>和<code>odd?</code>是互递归的过程, <code>even?</code>判断一个自然数是否是偶数, <code>odd?</code>判断一个自然数是否是奇数.</p><pre><code>(define (even? n)
   (if (= n 0)
       #t
       (odd? (- n 1))))
@@ -164,7 +164,13 @@
   (if (= n 0)
       #f
       (even? (- n 1))))
-</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><pre><code>> (letrec ((even? (lambda (n)
+</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><pre><code>> (define x 0)
+> (let ((x 3))
+    (* x x))
+9
+> x
+0
+</code></pre><p><code>letrec</code>一般用于引入递归过程.</p><pre><code>> (letrec ((even? (lambda (n)
                     (if (= n 0)
                         #t
                         (odd? (- n 1)))))
@@ -190,7 +196,7 @@
         guess
         (iter (improve guess))))
   (iter init))
-</code></pre><pre><code>(define (fib-iter n)
+</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fib-iter n)</code>等于<code>(fib n)</code>.</p><pre><code>(define (fib-iter n)
   (let iter ((a 0) (b 1) (c 0))
     (if (= c n)
         a
@@ -228,12 +234,16 @@
 -> (gcd 6 3)
 -> (gcd 3 0)
 -> 3
+</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fact-cps n (lambda (v) v))</code>等于<code>(fact n)</code>.</p><pre><code>(define (fact-cps n k)
+  (if (= n 0)
+      (k 1)
+      (fact-cps (- n 1) (lambda (v) (k (* n v))))))
 </code></pre><h5>Complexity 复杂度</h5><p>复杂度是计算所需的代价.</p><h4>List Processing 列表处理</h4><p>Scheme是LISP方言, 而LISP代表LISt Processor, 即列表处理器之意.</p><h5>Pairs and Lists 序对和列表</h5><pre><code>> (define p (cons 1 2))
 > (car p)
 1
 > (cdr p)
 2
-</code></pre><h5>Procedures on Lists 列表上的过程</h5><pre><code>(define (length lst)
+</code></pre><h5>Procedures on Lists 列表上的过程</h5><p><code>length</code>返回列表的长度.</p><pre><code>(define (length lst)
   (if (null? lst)
       0
       (+ (length (cdr lst)) 1)))
@@ -245,11 +255,11 @@
   (cond ((null? lst) #f)
         ((eq? x (car lst)) lst)
         (else (memq x (cdr lst)))))
-</code></pre><pre><code>(define (assq key alst)
+</code></pre><p><code>memv</code>和<code>member</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><pre><code>(define (assq key alst)
   (cond ((null? alst) #f)
         ((eq? (caar alst) key) (car alst))
         (else (assq key (cdr alst)))))
-</code></pre><h5>A Toolbox for List Processing 列表处理工具箱</h5><pre><code>(define (map proc lst)
+</code></pre><p>类似地, <code>assv</code>和<code>assoc</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><h5>A Toolbox for List Processing 列表处理工具箱</h5><pre><code>(define (map proc lst)
   (if (null? lst)
       '()
       (cons (proc (car lst))
@@ -267,11 +277,23 @@
         ((pred (car lst))
          (cons (car lst) (filter pred (cdr lst))))
         (else (filter pred (cdr lst)))))
-</code></pre><p><code>append</code>合并两个列表.</p><pre><code>(define (append lst1 lst2)
+</code></pre><pre><code>> (filter even? '(1 2 3 4 5 6))
+(2 4 6)
+> (filter odd? '(1 2 3 4 5 6))
+(1 3 5)
+</code></pre><p><code>append</code>合并两个列表. 根据<code>append</code>的定义可知, 第二个参数并非一定是列表.</p><pre><code>(define (append lst1 lst2)
   (if (null? lst1)
       lst2
       (cons (car lst1)
             (append (cdr lst1) lst2))))
+</code></pre><pre><code>> (append '(1 2 3) '(4 5 6))
+(1 2 3 4 5 6)
+> (append '(1 2 3) '())
+(1 2 3)
+> (append '() '(4 5 6))
+(4 5 6)
+> (append '(1 2 3) '4)
+(1 2 3 . 4)
 </code></pre><p><code>reverse</code>反转一个列表.</p><pre><code>(define (reverse lst)
   (if (null? lst)
       '()
@@ -282,6 +304,14 @@
     (if (null? rest)
         result
         (iter (cdr rest) (cons (car rest) result)))))
+</code></pre><pre><code>> (reverse '())
+()
+> (reverse '(1))
+(1)
+> (reverse '(1 2))
+(2 1)
+> (reverse '(1 2 3))
+(3 2 1)
 </code></pre><p><code>fold-left</code>和<code>fold-right</code>是对于列表处理的抽象.</p><pre><code>(define (fold-left proc init lst)
   (if (null? lst)
       init
@@ -327,7 +357,7 @@
                     (map (lambda (a) (cons a d))
                          (car lst*)))
                   (apply product (cdr lst*)))))
-</code></pre><pre><code>(define (product . lst*)
+</code></pre><p>亦可以<code>fold-right</code>表<code>product</code>.</p><pre><code>(define (product . lst*)
   (fold-right (lambda (a* d*)
                 (append-map
                  (lambda (d)
@@ -335,7 +365,15 @@
                  d*))
               '(())
               lst*))
-</code></pre><pre><code>(define (power-set s)
+</code></pre><pre><code>> (product)
+(())
+> (product '(1 2))
+((1) (2))
+> (product '(1 2) '(a b))
+((1 a) (2 a) (1 b) (2 b))
+> (product '(1 2) '(a b) '(x y))
+((1 a x) (2 a x) (1 b x) (2 b x) (1 a y) (2 a y) (1 b y) (2 b y))
+</code></pre><p>若以列表表示有限集合, 那么<code>power-set</code>计算一个集合的幂集.</p><pre><code>(define (power-set s)
   (if (null? s)
       '(())
       (let ((t* (power-set (cdr s))))
