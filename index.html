@@ -437,6 +437,18 @@ c
 > (set! x (+ x 1))
 > x
 1
+</code></pre><p>对比以下两段交互, 它们有什么不同?</p><pre><code>> (define x 0)
+> (define (add1! x)
+    (set! x (+ x 1)))
+> (add1! x)
+> x
+0
+</code></pre><pre><code>> (define x 0)
+> (define (add1!)
+    (set! x (+ x 1)))
+> (add1!)
+> x
+1
 </code></pre><p><code>set-car!</code>和<code>set-cdr!</code>过程可用来改变序对本身.</p><pre><code>> (define p (cons 1 2))
 > (set-car! p 'a)
 > p
@@ -444,7 +456,18 @@ c
 > (set-cdr! p 'b)
 > p
 (a . b)
-</code></pre><pre><code>> (define counter
+</code></pre><pre><code>> (define p (cons 1 2))
+> (define (set-car-a! p)
+    (set-car! p 'a))
+> (define (set-cdr-b! p)
+    (set-cdr! p 'b))
+> (set-car-a! p)
+> p
+(a . 2)
+> (set-cdr-b! p)
+> p
+(a . b)
+</code></pre><p><code>counter</code>是带有局部状态的过程.</p><pre><code>> (define counter
     (let ((x 0))
       (lambda ()
         (set! x (+ x 1))
