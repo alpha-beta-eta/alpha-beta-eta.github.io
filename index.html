@@ -43,6 +43,8 @@
     ((+ ,e1 ,e2) `(+ ,(diff e1 var) ,(diff e2 var)))
     ((* ,e1 ,e2) `(+ (* ,e1 ,(diff e2 var))
                      (* ,e2 ,(diff e1 var))))))
+</code></pre><pre><code>> (diff '(* (+ x a) (+ x b)) 'x)
+(+ (* (+ x a) (+ 1 0)) (* (+ x b) (+ 1 0)))
 </code></pre><h4>Match</h4><pre><code>(define-syntax match
   (syntax-rules (guard)
     ((_ v) (error 'match &quot;~s&quot; v))
@@ -110,7 +112,7 @@
 1/4
 > ((lambda (x y) (* (- x y) (+ x y))) 3 4)
 -7
-</code></pre><pre><code>> (((lambda (f g)
+</code></pre><p>以下例子更复杂一些.</p><pre><code>> (((lambda (f g)
       (lambda (x)
         (f (g x))))
     (lambda (x) (* x x))
@@ -535,6 +537,15 @@ c
 (define (apply-env env var)
   (cond ((assq var env) => cdr)
         (else (error 'apply-env &quot;unbound variable ~s&quot; var))))
+</code></pre><pre><code>(define (empty-env)
+  (lambda (var)
+    (error 'apply-env &quot;unbound variable ~s&quot; var)))
+(define (extend-env var val env)
+  (lambda (var^)
+    (if (eq? var^ var)
+        val
+        (apply-env env var^))))
+(define (apply-env env var) (env var))
 </code></pre><h4>Procedures 过程</h4><h5>Lexical Addressing 词法寻址</h5><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  &lt;var>
