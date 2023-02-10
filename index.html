@@ -106,14 +106,18 @@
 7/8
 > (* (- 3 4) (+ 3 4))
 -7
-</code></pre><h5>Lambda Expressions lambda表达式</h5><pre><code>> (((lambda (f g)
+</code></pre><h5>Lambda Expressions lambda表达式</h5><p>Scheme以<code>lambda</code>表达式表达过程.</p><pre><code>> ((lambda (x) (* x x)) 1/2)
+1/4
+> ((lambda (x y) (* (- x y) (+ x y))) 3 4)
+-7
+</code></pre><pre><code>> (((lambda (f g)
       (lambda (x)
         (f (g x))))
     (lambda (x) (* x x))
     (lambda (x) (+ x 3)))
    13)
 256
-</code></pre><h5>Definitions 定义</h5><pre><code>> (define pi 3.14)
+</code></pre><p><code>(lambda (f g) (lambda (x) (f (g x))))</code>即(单参数)过程的复合.</p><h5>Definitions 定义</h5><p>定义即命名.</p><pre><code>> (define pi 3.14)
 > (define square
     (lambda (x) (* x x)))
 > (define area
@@ -121,7 +125,7 @@
       (* pi (square r))))
 > (area 5)
 78.5
-</code></pre><pre><code>> (define pi 3.14)
+</code></pre><p>鉴于过程定义频繁出现, Scheme提供了相应的句法糖.</p><pre><code>> (define pi 3.14)
 > (define (square x) (* x x))
 > (define (area r)
     (* pi (square r)))
@@ -164,12 +168,17 @@
   (if (= n 0)
       #f
       (even? (- n 1))))
-</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><pre><code>> (define x 0)
+</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><p><code>let</code>可用于引入局部绑定.</p><pre><code>> (define x 0)
 > (let ((x 3))
     (* x x))
 9
 > x
 0
+</code></pre><p><code>let*</code>可用于引入逐次局部绑定.</p><pre><code>> (let* ((x 0)
+         (x (+ x 1))
+         (x (+ x 1)))
+    (+ x 1))
+3
 </code></pre><p><code>letrec</code>一般用于引入递归过程.</p><pre><code>> (letrec ((even? (lambda (n)
                     (if (= n 0)
                         #t
@@ -196,6 +205,12 @@
         guess
         (iter (improve guess))))
   (iter init))
+</code></pre><pre><code>> (sqrt 2)
+1.4142156862745097
+> (sqrt 3)
+1.7320508100147274
+> (sqrt 5)
+2.2360688956433634
 </code></pre><p>证明对于每个自然数<code>n</code>, <code>(fib-iter n)</code>等于<code>(fib n)</code>.</p><pre><code>(define (fib-iter n)
   (let iter ((a 0) (b 1) (c 0))
     (if (= c n)
@@ -251,14 +266,34 @@
   (if (null? lst)
       0
       (+ (length (cdr lst)) 1)))
+</code></pre><pre><code>> (length '())
+0
+> (length '(1))
+1
+> (length '((())))
+1
+> (length '(1 2 3))
+3
 </code></pre><pre><code>(define (list-ref lst n)
   (if (= n 0)
       (car lst)
       (list-ref (cdr lst) (- n 1))))
+</code></pre><pre><code>> (list-ref '(a b c) 0)
+a
+> (list-ref '(a b c) 1)
+b
+> (list-ref '(a b c) 2)
+c
 </code></pre><p><code>memq</code>, <code>memv</code>, <code>member</code>判断一个元素是否在一个列表之中.</p><pre><code>(define (memq x lst)
   (cond ((null? lst) #f)
         ((eq? x (car lst)) lst)
         (else (memq x (cdr lst)))))
+</code></pre><pre><code>> (memq 'y '(x y z))
+(y z)
+> (memq 'y '(x z))
+#f
+> (memq 'y '(x y y z))
+(y y z)
 </code></pre><p><code>memv</code>和<code>member</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><p><code>assq</code>, <code>assv</code>, <code>assoc</code>根据键对于关联列表进行索引.</p><pre><code>(define (assq key alst)
   (cond ((null? alst) #f)
         ((eq? (caar alst) key) (car alst))
@@ -269,7 +304,7 @@
 (y 2)
 > (assq 'y '((x 1) (z 3)))
 #f
-</code></pre><p>类似地, <code>assv</code>和<code>assoc</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><h5>A Toolbox for List Processing 列表处理工具箱</h5><pre><code>(define (map proc lst)
+</code></pre><p>类似地, <code>assv</code>和<code>assoc</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><h5>A Toolbox for List Processing 列表处理工具箱</h5><p><code>map</code>施行一个过程于列表的每个元素, 其结果仍是一个列表.</p><pre><code>(define (map proc lst)
   (if (null? lst)
       '()
       (cons (proc (car lst))
@@ -291,12 +326,12 @@
 (2 4 6)
 > (filter odd? '(1 2 3 4 5 6))
 (1 3 5)
-</code></pre><p><code>append</code>合并两个列表. 根据<code>append</code>的定义可知, 第二个参数并非一定是列表.</p><pre><code>(define (append lst1 lst2)
+</code></pre><p><code>append</code>合并两个列表.</p><pre><code>(define (append lst1 lst2)
   (if (null? lst1)
       lst2
       (cons (car lst1)
             (append (cdr lst1) lst2))))
-</code></pre><pre><code>> (append '(1 2 3) '(4 5 6))
+</code></pre><p>根据<code>append</code>的定义可知, 第二个参数并非一定是列表.</p><pre><code>> (append '(1 2 3) '(4 5 6))
 (1 2 3 4 5 6)
 > (append '(1 2 3) '())
 (1 2 3)
@@ -304,12 +339,12 @@
 (4 5 6)
 > (append '(1 2 3) '4)
 (1 2 3 . 4)
-</code></pre><p><code>reverse</code>反转一个列表.</p><pre><code>(define (reverse lst)
+</code></pre><p><code>reverse</code>反转一个列表.</p><p>以下写法是效率低下的.</p><pre><code>(define (reverse lst)
   (if (null? lst)
       '()
       (append (reverse (cdr lst))
               (list (car lst)))))
-</code></pre><pre><code>(define (reverse lst)
+</code></pre><p>这是更正确的写法.</p><pre><code>(define (reverse lst)
   (let iter ((rest lst) (result '()))
     (if (null? rest)
         result
@@ -331,7 +366,7 @@
       init
       (proc (car lst)
             (fold-right proc init (cdr lst)))))
-</code></pre><pre><code>(define (fold-right proc init lst)
+</code></pre><p>以下是呈现迭代行为的<code>fold-right</code>.</p><pre><code>(define (fold-right proc init lst)
   (let iter ((rest (reverse lst)) (result init))
     (if (null? rest)
         result
@@ -355,6 +390,8 @@
       '()
       (append (proc (car lst))
               (append-map proc (cdr lst)))))
+</code></pre><pre><code>> (append-map (lambda (x) (list x x)) '(1 2 3))
+(1 1 2 2 3 3)
 </code></pre><pre><code>(define (product lst1 lst2)
   (append-map
    (lambda (y)
@@ -388,6 +425,14 @@
       '(())
       (let ((t* (power-set (cdr s))))
         (append t* (map (lambda (t) (cons (car s) t)) t*)))))
+</code></pre><pre><code>> (power-set '())
+(())
+> (power-set '(1))
+(() (1))
+> (power-set '(1 2))
+(() (2) (1) (1 2))
+> (power-set '(1 2 3))
+(() (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
 </code></pre><h4>States and Objects 状态和对象</h4><p><code>set!</code>形式可用来改变一个变量被绑定至的值.</p><pre><code>> (define x 0)
 > (set! x (+ x 1))
 > x
