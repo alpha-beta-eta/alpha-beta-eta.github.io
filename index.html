@@ -603,7 +603,46 @@ c
         val
         (apply-env env var^))))
 (define (apply-env env var) (env var))
-</code></pre><h4>Procedures 过程</h4><h5>Lexical Addressing 词法寻址</h5><pre><code>&lt;exp> ::= &lt;int>
+</code></pre><h5>A Language with Bindings 一个带有绑定的语言</h5><pre><code>&lt;exp> ::= &lt;int>
+       |  &lt;bool>
+       |  &lt;var>
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (let &lt;var> &lt;exp> &lt;exp>)
+       |  (&lt;op> &lt;exp> &lt;exp>)
+&lt;op> ::= + | - | * | =
+</code></pre><pre><code>(define (interp exp env)
+  (match exp
+    (,int (guard (integer? int)) int)
+    (,bool (guard (boolean? bool)) bool)
+    (,var (guard (symbol? var)) (apply-env env var))
+    ((if ,e1 ,e2 ,e3)
+     (let ((v1 (interp e1 env)))
+       (if (true? v1)
+           (interp e2 env)
+           (interp e3 env))))
+    ((let ,x ,e ,body)
+     (let* ((v (interp e env))
+            (env^ (extend-env x v env)))
+       (interp body env^)))
+    ((,op ,e1 ,e2)
+     (guard (memq op '(+ - * =)))
+     (let ((v1 (interp e1 env))
+           (v2 (interp e2 env)))
+       (case op
+         ((+) (+ v1 v2))
+         ((-) (- v1 v2))
+         ((*) (* v1 v2))
+         ((=) (= v1 v2)))))))
+</code></pre><h4>Procedures 过程</h4><pre><code>&lt;exp> ::= &lt;int>
+       |  &lt;bool>
+       |  &lt;var>
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (lambda &lt;var> &lt;exp>)
+       |  (let &lt;var> &lt;exp> &lt;exp>)
+       |  (&lt;op> &lt;exp> &lt;exp>)
+       |  (&lt;exp> &lt;exp>)
+&lt;op> ::= + | - | * | =
+</code></pre><h5>Lexical Addressing 词法寻址</h5><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  &lt;var>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
@@ -652,4 +691,64 @@ c
            (error 'apply-senv &quot;unbound variable ~s&quot; var))
           ((eq? (car rest) var) depth)
           (else (iter (cdr rest) (+ depth 1))))))
+</code></pre><h4>Types 类型</h4><pre><code>&lt;type> ::= int
+        |  bool
+        |  (-> &lt;type> &lt;type>)
+&lt;exp> ::= &lt;int>
+       |  &lt;bool>
+       |  &lt;var>
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (lambda (&lt;var> : &lt;type>) &lt;exp>)
+       |  (let &lt;var> &lt;exp> &lt;exp>)
+       |  (&lt;exp> &lt;exp>)
+</code></pre><pre><code>+ : (-> int (-> int int))
+- : (-> int (-> int int))
+* : (-> int (-> int int))
+zero? : (-> int bool)
+</code></pre><pre><code>(define (infer exp env)
+  (match exp
+    (,int (guard (integer? int)) 'int)
+    (,bool (guard (boolean? bool)) 'bool)
+    (,var (guard (symbol? var)) (apply-env env var))
+    ((if ,e1 ,e2 ,e3)
+     (let ((t1 (infer e1 env)))
+       (unless (eq? t1 'bool)
+         (error 'infer &quot;the predicate of if is not of type bool&quot;))
+       (let ((t2 (infer e2 env))
+             (t3 (infer e3 env)))
+         (unless (equal? t2 t3)
+           (error
+            'infer
+            &quot;the consequent and alternative of if are not of the same type&quot;))
+         t2)))
+    ((lambda (,x : ,t) ,body)
+     (let* ((env^ (extend-env x t env))
+            (t^ (infer body env^)))
+       `(-> ,t ,t^)))
+    ((let ,x ,e ,body)
+     (let* ((t (infer e env))
+            (env^ (extend-env x t env)))
+       (infer body env^)))
+    ((,rator ,rand)
+     (let ((t1 (infer rator env))
+           (t2 (infer rand env)))
+       (match t1
+         ((-> ,t3 ,t4)
+          (unless (equal? t2 t3)
+            (error 'infer &quot;the rand is not of the right type&quot;))
+          t4)
+         (,else
+          (error 'infer &quot;the rator is not of a function type&quot;)))))))
+</code></pre><pre><code>(define prim-env
+  (extend-env
+   '+ '(-> int (-> int int))
+   (extend-env
+    '- '(-> int (-> int int))
+    (extend-env
+     '* '(-> int (-> int int))
+     (extend-env
+      'zero? '(-> int bool)
+      (empty-env))))))
+(define (!- exp)
+  (infer exp prim-env))
 </code></pre><h2>Quotes 摘抄</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>人不居于国家之中, 而居于语言之中. - 萧沆</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p><p>因此, 程序必须写来供人阅读而仅是顺带供机器执行. - Alan Perlis</p><p>苦海十年为亲卖身的游女的绘姿使我泣. 凭倚竹窗茫然看着流水的艺妓的姿态使我喜. 卖宵夜面的纸灯寂寞地停留着的河边的夜景使我醉. 雨夜啼月的杜鹃, 阵雨中散落的秋天树叶, 落花飘风的钟声, 途中日暮的山路的雪, 凡是无常无告无望的, 使人无端嗟叹此世只是一梦的, 这样的一切东西于我都是可亲, 于我都是可怀. - 江户艺术论, 永井荷风, 周作人译</p><p>主义要自家选择的, 大凡我们选一种主义的时候, 总要把我们的环境和将来的利益仔细研究一下才行. 考察不周到的时候, 有时你以为这种主义一定会流行的, 才去用它. 后来局面一变, 你反不得不吃那主义的亏. 所以到了那时候, 那主义若是你自家选的呢, 就同哑了吃黄连一样, 自打自的嘴巴罢了, 若是人家劝你选的呢, 那你就不得不大抱怨于那劝你选的人. 所以代人选择主义是很危险的. - 血泪, 郁达夫</p></body></html>
