@@ -64,7 +64,7 @@
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
     ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
-</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Physics 物理</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
+</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Physics 物理</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
        |  (&lt;symbol> (&lt;attr>+) &lt;xml>*)
        |  (&lt;symbol> &lt;xml>*)
 &lt;attr> ::= (&lt;symbol> &lt;string>)
@@ -257,14 +257,48 @@
   (if (= n 0)
       (k 1)
       (fact-cps (- n 1) (lambda (v) (k (* n v))))))
-</code></pre><p>cps是continuation-passing style的缩写.</p><h5>Complexity 复杂度</h5><p>复杂度是计算所需的代价.</p><h4>List Processing 列表处理</h4><p>Scheme是LISP方言, 而LISP代表LISt Processor, 即列表处理器之意.</p><h5>Pairs and Lists 序对和列表</h5><p><code>cons</code>构造一个序对, <code>car</code>和<code>cdr</code>分别代表第一投影和第二投影.</p><pre><code>> (define p (cons 1 2))
+</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fib-cps n (lambda (v) v))</code>等于<code>(fib n)</code>.</p><pre><code>(define (fib-cps n k)
+  (if (&lt; n 2)
+      (k n)
+      (fib-cps (- n 1)
+               (lambda (v1)
+                 (fib-cps (- n 2)
+                          (lambda (v2)
+                            (k (+ v1 v2))))))))
+</code></pre><p>cps是continuation-passing style的缩写.</p><h5>Complexity 复杂度</h5><p>复杂度是计算所需的代价.</p><pre><code>(define (expt x n)
+  (if (= n 0)
+      1
+      (* x (expt x (- n 1)))))
+</code></pre><p>首先证明对于每个整数<code>x</code>和每个自然数<code>n</code>, <code>(expt^ x n)</code>等于<code>(expt x n)</code>; 接着分析<code>expt</code>和<code>expt^</code>的时间复杂度.</p><pre><code>(define (expt^ x n)
+  (let iter ((x x) (n n) (r 1))
+    (cond ((= n 0) r)
+          ((even? n)
+           (iter (* x x) (/ n 2) r))
+          (else
+           (iter x (- n 1) (* x r))))))
+</code></pre><p>首先证明对于每个自然数<code>n</code>, <code>(fib-iter^ n)</code>等于<code>(fib n)</code>; 接着分析<code>fib</code>, <code>fib-iter</code>, <code>fib-iter^</code>的时间复杂度.</p><pre><code>(define (fib-iter^ n)
+  (let iter ((a 0) (b 1) (p 0) (q 1) (c n))
+    (cond ((= c 0) a)
+          ((even? c)
+           (iter a
+                 b
+                 (+ (* p p) (* q q))
+                 (+ (* 2 p q) (* q q))
+                 (/ c 2)))
+          (else
+           (iter (+ (* p a) (* q b))
+                 (+ (* p b) (* q a) (* q b))
+                 p
+                 q
+                 (- c 1))))))
+</code></pre><p>Lamé定理 (暂略)</p><h4>List Processing 列表处理</h4><p>Scheme是LISP方言, 而LISP代表LISt Processor, 即列表处理器之意.</p><h5>Pairs and Lists 序对和列表</h5><p><code>cons</code>构造一个序对, <code>car</code>和<code>cdr</code>分别代表第一投影和第二投影.</p><pre><code>> (define p (cons 1 2))
 > p
 (1 . 2)
 > (car p)
 1
 > (cdr p)
 2
-</code></pre><pre><code>(define (cons a d)
+</code></pre><p>以下实现满足序对的公理.</p><pre><code>(define (cons a d)
   (lambda (m)
     (m a d)))
 (define (car p)
