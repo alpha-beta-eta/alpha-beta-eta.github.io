@@ -1,13 +1,9 @@
 <html><head><meta charset="utf-8"></meta><title>foo</title><link rel="stylesheet" href="styles.css"></link></head><body><h1>愚者/高等游民</h1><h2>Programs 程序</h2><h3>Standard ML</h3><p>Standard ML是ML的一种方言.</p><h4>Greatest Common Divisor</h4><pre><code>fun gcd a 0 = a
-  | gcd a b = gcd b (a mod b)
-</code></pre><h4>Factorial</h4><pre><code>fun fact 0 = 1
-  | fact n = n * fact(n-1)
-</code></pre><h4>Fibonacci</h4><pre><code>fun fib 0 = 0
+  | gcd a b = gcd b (a mod b)</code></pre><h4>Factorial</h4><pre><code>fun fact 0 = 1
+  | fact n = n * fact(n-1)</code></pre><h4>Fibonacci</h4><pre><code>fun fib 0 = 0
   | fib 1 = 1
-  | fib n = fib(n-1) + fib(n-2)
-</code></pre><h4>Length</h4><pre><code>fun length[] = 0
-  | length(x::L) = length(L) + 1
-</code></pre><h3>Scheme</h3><p>Scheme是Lisp的一种方言.</p><h4>Greatest Common Divisor</h4><pre><code>(define (gcd a b)
+  | fib n = fib(n-1) + fib(n-2)</code></pre><h4>Length</h4><pre><code>fun length[] = 0
+  | length(x::L) = length(L) + 1</code></pre><h3>Scheme</h3><p>Scheme是Lisp的一种方言.</p><h4>Greatest Common Divisor</h4><pre><code>(define (gcd a b)
   (if (= b 0)
       a
       (gcd b (remainder a b))))
@@ -17,16 +13,14 @@
       (let ((q (quotient a b))
             (r (remainder a b)))
         (let-values (((d m n) (ext-gcd b r)))
-          (values d n (- m (* q n)))))))
-</code></pre><h4>Factorial</h4><pre><code>(define (fact n)
+          (values d n (- m (* q n)))))))</code></pre><h4>Factorial</h4><pre><code>(define (fact n)
   (if (= n 0)
       1
       (* n (fact (- n 1)))))
 (define (fact-cps n k)
   (if (= n 0)
       (k 1)
-      (fact-cps (- n 1) (lambda (v) (k (* n v))))))
-</code></pre><h4>Fibonacci</h4><pre><code>(define (fib n)
+      (fact-cps (- n 1) (lambda (v) (k (* n v))))))</code></pre><h4>Fibonacci</h4><pre><code>(define (fib n)
   (if (&lt; n 2)
       n
       (+ (fib (- n 1))
@@ -35,17 +29,14 @@
   (let iter ((a 0) (b 1) (c 0))
     (if (= c n)
         a
-        (iter b (+ a b) (+ c 1)))))
-</code></pre><h4>Symbolic Differentiation</h4><pre><code>(define (diff exp var)
+        (iter b (+ a b) (+ c 1)))))</code></pre><h4>Symbolic Differentiation</h4><pre><code>(define (diff exp var)
   (match exp
     (,num (guard (number? num)) 0)
     (,var^ (guard (symbol? var^)) (if (eq? var var^) 1 0))
     ((+ ,e1 ,e2) `(+ ,(diff e1 var) ,(diff e2 var)))
     ((* ,e1 ,e2) `(+ (* ,e1 ,(diff e2 var))
-                     (* ,e2 ,(diff e1 var))))))
-</code></pre><pre><code>> (diff '(* (+ x a) (+ x b)) 'x)
-(+ (* (+ x a) (+ 1 0)) (* (+ x b) (+ 1 0)))
-</code></pre><h4>Match</h4><pre><code>(define-syntax match
+                     (* ,e2 ,(diff e1 var))))))</code></pre><pre><code>> (diff '(* (+ x a) (+ x b)) 'x)
+(+ (* (+ x a) (+ 1 0)) (* (+ x b) (+ 1 0)))</code></pre><h4>Match</h4><pre><code>(define-syntax match
   (syntax-rules (guard)
     ((_ v) (error 'match &quot;~s&quot; v))
     ((_ v (pat (guard g ...) e ...) cs ...)
@@ -63,12 +54,10 @@
          (let ((vx (car v)) (vy (cdr v)))
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
-    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
-</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Scheme and the Art of Programming</li><li>ML for the Working Programmer</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Classical Artificial Intelligence 古典人工智能</h4><ol><li>Building Problem Solvers</li><li>Turtle Geometry</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Mechanics 力学</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>枕草子 (林文月译)</li><li>十三夜</li><li>疑雨集</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>机械复制时代的艺术作品</li><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>月姬</li><li>Fate/Stay Night</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
+    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Scheme and the Art of Programming</li><li>ML for the Working Programmer</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Classical Artificial Intelligence 古典人工智能</h4><ol><li>Building Problem Solvers</li><li>Turtle Geometry</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Mechanics 力学</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>枕草子 (林文月译)</li><li>十三夜</li><li>疑雨集</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>机械复制时代的艺术作品</li><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>月姬</li><li>Fate/Stay Night</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
        |  (&lt;symbol> (&lt;attr>+) &lt;xml>*)
        |  (&lt;symbol> &lt;xml>*)
-&lt;attr> ::= (&lt;symbol> &lt;string>)
-</code></pre><p>将Lisp-flavored XML转换为XML的过程如下:</p><pre><code>(define (Attr* attr*)
+&lt;attr> ::= (&lt;symbol> &lt;string>)</code></pre><p>将Lisp-flavored XML转换为XML的过程如下:</p><pre><code>(define (Attr* attr*)
   (for-each
    (lambda (attr)
      (printf &quot; ~s=~s&quot; (car attr) (cadr attr)))
@@ -86,8 +75,7 @@
     ((,sym . ,xml*)
      (printf &quot;&lt;~s>&quot; sym)
      (for-each Xml xml*)
-     (printf &quot;&lt;/~s>&quot; sym))))
-</code></pre><h3>Quotes in Computer Science 计算机科学妙语</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming 程序设计的邀请</h3><p>本书以Scheme编程语言介绍了程序设计的基本想法.</p><h4>Elements of Programming 编程基础</h4><h5>Read-Evaluate-Print Loops 读取求值输出循环</h5><p>在REPL中, 用户输入一个表达式, 按下回车, 系统就会对于该表达式求值, 并将结果输出于下方, 接着等待用户的下一次输入.</p><pre><code>> 42
+     (printf &quot;&lt;/~s>&quot; sym))))</code></pre><h3>Quotes in Computer Science 计算机科学妙语</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming 程序设计的邀请</h3><p>本书以Scheme编程语言介绍了程序设计的基本想法.</p><h4>Elements of Programming 编程基础</h4><h5>Read-Evaluate-Print Loops 读取求值输出循环</h5><p>在REPL中, 用户输入一个表达式, 按下回车, 系统就会对于该表达式求值, 并将结果输出于下方, 接着等待用户的下一次输入.</p><pre><code>> 42
 42</code></pre><h5>Literals 字面量</h5><p>字面量是对其求值得到自身的表达式.</p><pre><code>> -7
 -7
 > 3/7
@@ -101,87 +89,70 @@
 > #f
 #f
 > &quot;hello, world&quot;
-&quot;hello, world&quot;
-</code></pre><p>Scheme用<code>#t</code>表示真, 用<code>#f</code>表示假.</p><h5>Variables 变量</h5><p>变量在字面上是符号, 但它不代表其字面, 而是引用一个值.</p><p>我们可以通过<code>define</code>形式引入变量和值的绑定.</p><pre><code>> (define three 3)
+&quot;hello, world&quot;</code></pre><p>Scheme用<code>#t</code>表示真, 用<code>#f</code>表示假.</p><h5>Variables 变量</h5><p>变量在字面上是符号, 但它不代表其字面, 而是引用一个值.</p><p>我们可以通过<code>define</code>形式引入变量和值的绑定.</p><pre><code>> (define three 3)
 > three
 3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程应用即将过程应用于参数上. 数学里函数应用的句法多种多样, 但Scheme只有一种过程应用的句法, 即全加括号的前缀记号.</p><pre><code>> (+ 1/2 1/4 1/8)
 7/8
 > (* (- 3 4) (+ 3 4))
--7
-</code></pre><h5>Lambda Expressions lambda表达式</h5><p>Scheme以<code>lambda</code>表达式表达过程.</p><pre><code>> ((lambda (x) (* x x)) 1/2)
+-7</code></pre><h5>Lambda Expressions lambda表达式</h5><p>Scheme以<code>lambda</code>表达式表达过程.</p><pre><code>> ((lambda (x) (* x x)) 1/2)
 1/4
 > ((lambda (x y) (* (- x y) (+ x y))) 3 4)
--7
-</code></pre><p>以下例子更复杂一些.</p><pre><code>> (((lambda (f g)
+-7</code></pre><p>以下例子更复杂一些.</p><pre><code>> (((lambda (f g)
       (lambda (x)
         (f (g x))))
     (lambda (x) (* x x))
     (lambda (x) (+ x 3)))
    13)
-256
-</code></pre><p><code>(lambda (f g) (lambda (x) (f (g x))))</code>即(单参数)过程的复合.</p><h5>Definitions 定义</h5><p>定义即命名.</p><pre><code>> (define pi 3.14)
+256</code></pre><p><code>(lambda (f g) (lambda (x) (f (g x))))</code>即(单参数)过程的复合.</p><h5>Definitions 定义</h5><p>定义即命名.</p><pre><code>> (define pi 3.14)
 > (define square
     (lambda (x) (* x x)))
 > (define area
     (lambda (r)
       (* pi (square r))))
 > (area 5)
-78.5
-</code></pre><p>鉴于过程定义频繁出现, Scheme提供了相应的句法糖.</p><pre><code>> (define pi 3.14)
+78.5</code></pre><p>鉴于过程定义频繁出现, Scheme提供了相应的句法糖.</p><pre><code>> (define pi 3.14)
 > (define (square x) (* x x))
 > (define (area r)
     (* pi (square r)))
 > (area 5)
-78.5
-</code></pre><h5>Conditionals 条件分支</h5><pre><code>(define (abs x)
+78.5</code></pre><h5>Conditionals 条件分支</h5><pre><code>(define (abs x)
   (if (&lt; x 0)
       (- x)
-      x))
-</code></pre><pre><code>(define (sgn x)
+      x))</code></pre><pre><code>(define (sgn x)
   (cond ((&lt; x 0) -1)
         ((= x 0) 0)
-        (else 1)))
-</code></pre><p>Scheme将<code>#f</code>视为假, 而将其他的值均视为真.</p><h5>And, Or, Not</h5><p><code>and</code>, <code>or</code>, <code>not</code>在概念上对应于合取, 析取, 否定. 然而, <code>and</code>和<code>or</code>遵循短路求值的原则, 因而并非过程.</p><pre><code>   (and 1 2 3)
+        (else 1)))</code></pre><p>Scheme将<code>#f</code>视为假, 而将其他的值均视为真.</p><h5>And, Or, Not</h5><p><code>and</code>, <code>or</code>, <code>not</code>在概念上对应于合取, 析取, 否定. 然而, <code>and</code>和<code>or</code>遵循短路求值的原则, 因而并非过程.</p><pre><code>   (and 1 2 3)
 -> (and 2 3)
 -> (and 3)
--> 3
-</code></pre><pre><code>   (or 1 2 3)
--> 1
-</code></pre><p>如下定义的<code>abs</code>虽然是正确的, 但却是丑陋的, 不应该这么编写程序.</p><pre><code>(define (abs x)
-  (or (and (< x 0) (- x)) x))
-</code></pre><h5>Recursive Definitions 递归定义</h5><p>递归定义在定义中直接或间接地引用自身.</p><pre><code>(define (fact n)
+-> 3</code></pre><pre><code>   (or 1 2 3)
+-> 1</code></pre><p>如下定义的<code>abs</code>虽然是正确的, 但却是丑陋的, 不应该这么编写程序.</p><pre><code>(define (abs x)
+  (or (and (< x 0) (- x)) x))</code></pre><h5>Recursive Definitions 递归定义</h5><p>递归定义在定义中直接或间接地引用自身.</p><pre><code>(define (fact n)
   (if (= n 0)
       1
-      (* n (fact (- n 1)))))
-</code></pre><pre><code>(define (fib n)
+      (* n (fact (- n 1)))))</code></pre><pre><code>(define (fib n)
   (if (&lt; n 2)
       n
       (+ (fib (- n 1))
-         (fib (- n 2)))))
-</code></pre><p><code>gcd</code>计算两个不同时为零的自然数的最大公因数.</p><pre><code>(define (gcd a b)
+         (fib (- n 2)))))</code></pre><p><code>gcd</code>计算两个不同时为零的自然数的最大公因数.</p><pre><code>(define (gcd a b)
   (if (= b 0)
       a
-      (gcd b (remainder a b))))
-</code></pre><p><code>even?</code>和<code>odd?</code>是互递归的过程, <code>even?</code>判断一个自然数是否是偶数, <code>odd?</code>判断一个自然数是否是奇数.</p><pre><code>(define (even? n)
+      (gcd b (remainder a b))))</code></pre><p><code>even?</code>和<code>odd?</code>是互递归的过程, <code>even?</code>判断一个自然数是否是偶数, <code>odd?</code>判断一个自然数是否是奇数.</p><pre><code>(define (even? n)
   (if (= n 0)
       #t
       (odd? (- n 1))))
 (define (odd? n)
   (if (= n 0)
       #f
-      (even? (- n 1))))
-</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><p><code>let</code>可用于引入局部绑定.</p><pre><code>> (define x 0)
+      (even? (- n 1))))</code></pre><h5>Local Definitions 局部定义</h5><p>局部定义的作用范围是局部的.</p><p><code>let</code>可用于引入局部绑定.</p><pre><code>> (define x 0)
 > (let ((x 3))
     (* x x))
 9
 > x
-0
-</code></pre><p><code>let*</code>可用于引入逐次局部绑定.</p><pre><code>> (let* ((x 0)
+0</code></pre><p><code>let*</code>可用于引入逐次局部绑定.</p><pre><code>> (let* ((x 0)
          (x (+ x 1))
          (x (+ x 1)))
     (+ x 1))
-3
-</code></pre><p><code>letrec</code>一般用于引入递归过程.</p><pre><code>> (letrec ((even? (lambda (n)
+3</code></pre><p><code>letrec</code>一般用于引入递归过程.</p><pre><code>> (letrec ((even? (lambda (n)
                     (if (= n 0)
                         #t
                         (odd? (- n 1)))))
@@ -190,8 +161,7 @@
                        #f
                        (even? (- n 1))))))
     (even? 88))
-#t
-</code></pre><pre><code>(define (sqrt x)
+#t</code></pre><pre><code>(define (sqrt x)
   (define init 1.0)
   (define (square x)
     (* x x))
@@ -206,26 +176,21 @@
     (if (close-enough? (square guess) x)
         guess
         (iter (improve guess))))
-  (iter init))
-</code></pre><pre><code>> (sqrt 2)
+  (iter init))</code></pre><pre><code>> (sqrt 2)
 1.4142156862745097
 > (sqrt 3)
 1.7320508100147274
 > (sqrt 5)
-2.2360688956433634
-</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fib-iter n)</code>等于<code>(fib n)</code>.</p><pre><code>(define (fib-iter n)
+2.2360688956433634</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fib-iter n)</code>等于<code>(fib n)</code>.</p><pre><code>(define (fib-iter n)
   (let iter ((a 0) (b 1) (c 0))
     (if (= c n)
         a
-        (iter b (+ a b) (+ c 1)))))
-</code></pre><h5>Higher-order Procedures 高阶过程</h5><p>高阶过程是以过程作为参数或返回值的过程.</p><pre><code>(define (compose f g)
+        (iter b (+ a b) (+ c 1)))))</code></pre><h5>Higher-order Procedures 高阶过程</h5><p>高阶过程是以过程作为参数或返回值的过程.</p><pre><code>(define (compose f g)
   (lambda (x)
-    (f (g x))))
-</code></pre><pre><code>(define (repeated f n)
+    (f (g x))))</code></pre><pre><code>(define (repeated f n)
   (if (= n 0)
       (lambda (x) x)
-      (compose f (repeated f (- n 1)))))
-</code></pre><pre><code>(define zero
+      (compose f (repeated f (- n 1)))))</code></pre><pre><code>(define zero
   (lambda (f)
     (lambda (x) x)))
 (define one
@@ -233,50 +198,41 @@
     (lambda (x) (f x))))
 (define two
   (lambda (f)
-    (lambda (x) (f (f x)))))
-</code></pre><pre><code>(define (Sigma f a b)
+    (lambda (x) (f (f x)))))</code></pre><pre><code>(define (Sigma f a b)
   (if (> a b)
       0
       (+ (f a)
-         (Sigma f (+ a 1) b))))
-</code></pre><pre><code>> (Sigma square 1 100)
-338350
-</code></pre><h5>Recursive and Iterative Behaviors 递归和迭代行为</h5><p>递归过程产生的计算并不总是具有相同的行为.</p><pre><code>   (fact 3)
+         (Sigma f (+ a 1) b))))</code></pre><pre><code>> (Sigma square 1 100)
+338350</code></pre><h5>Recursive and Iterative Behaviors 递归和迭代行为</h5><p>递归过程产生的计算并不总是具有相同的行为.</p><pre><code>   (fact 3)
 -> (* 3 (fact 2))
 -> (* 3 (* 2 (fact 1)))
 -> (* 3 (* 2 (* 1 (fact 0))))
 -> (* 3 (* 2 (* 1 1)))
 -> (* 3 (* 2 1))
 -> (* 3 2)
--> 6
-</code></pre><pre><code>   (gcd 9 6)
+-> 6</code></pre><pre><code>   (gcd 9 6)
 -> (gcd 6 3)
 -> (gcd 3 0)
--> 3
-</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fact-cps n (lambda (v) v))</code>等于<code>(fact n)</code>.</p><pre><code>(define (fact-cps n k)
+-> 3</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fact-cps n (lambda (v) v))</code>等于<code>(fact n)</code>.</p><pre><code>(define (fact-cps n k)
   (if (= n 0)
       (k 1)
-      (fact-cps (- n 1) (lambda (v) (k (* n v))))))
-</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fib-cps n (lambda (v) v))</code>等于<code>(fib n)</code>.</p><pre><code>(define (fib-cps n k)
+      (fact-cps (- n 1) (lambda (v) (k (* n v))))))</code></pre><p>证明对于每个自然数<code>n</code>, <code>(fib-cps n (lambda (v) v))</code>等于<code>(fib n)</code>.</p><pre><code>(define (fib-cps n k)
   (if (&lt; n 2)
       (k n)
       (fib-cps (- n 1)
                (lambda (v1)
                  (fib-cps (- n 2)
                           (lambda (v2)
-                            (k (+ v1 v2))))))))
-</code></pre><p>cps是continuation-passing style的缩写.</p><h5>Complexity 复杂度</h5><p>复杂度是计算所需的代价.</p><pre><code>(define (expt x n)
+                            (k (+ v1 v2))))))))</code></pre><p>cps是continuation-passing style的缩写.</p><h5>Complexity 复杂度</h5><p>复杂度是计算所需的代价.</p><pre><code>(define (expt x n)
   (if (= n 0)
       1
-      (* x (expt x (- n 1)))))
-</code></pre><p>首先证明对于每个整数<code>x</code>和每个自然数<code>n</code>, <code>(expt^ x n)</code>等于<code>(expt x n)</code>; 接着分析<code>expt</code>和<code>expt^</code>的时间复杂度.</p><pre><code>(define (expt^ x n)
+      (* x (expt x (- n 1)))))</code></pre><p>首先证明对于每个整数<code>x</code>和每个自然数<code>n</code>, <code>(expt^ x n)</code>等于<code>(expt x n)</code>; 接着分析<code>expt</code>和<code>expt^</code>的时间复杂度.</p><pre><code>(define (expt^ x n)
   (let iter ((x x) (n n) (r 1))
     (cond ((= n 0) r)
           ((even? n)
            (iter (* x x) (/ n 2) r))
           (else
-           (iter x (- n 1) (* x r))))))
-</code></pre><p>首先证明对于每个自然数<code>n</code>, <code>(fib-iter^ n)</code>等于<code>(fib n)</code>; 接着分析<code>fib</code>, <code>fib-iter</code>, <code>fib-iter^</code>的时间复杂度.</p><pre><code>(define (fib-iter^ n)
+           (iter x (- n 1) (* x r))))))</code></pre><p>首先证明对于每个自然数<code>n</code>, <code>(fib-iter^ n)</code>等于<code>(fib n)</code>; 接着分析<code>fib</code>, <code>fib-iter</code>, <code>fib-iter^</code>的时间复杂度.</p><pre><code>(define (fib-iter^ n)
   (let iter ((a 0) (b 1) (p 0) (q 1) (c n))
     (cond ((= c 0) a)
           ((even? c)
@@ -290,141 +246,117 @@
                  (+ (* p b) (* q a) (* q b))
                  p
                  q
-                 (- c 1))))))
-</code></pre><p>Lamé定理 (暂略)</p><h4>List Processing 列表处理</h4><p>Scheme是LISP方言, 而LISP代表LISt Processor, 即列表处理器之意.</p><h5>Pairs and Lists 序对和列表</h5><p><code>cons</code>构造一个序对, <code>car</code>和<code>cdr</code>分别代表第一投影和第二投影.</p><pre><code>> (define p (cons 1 2))
+                 (- c 1))))))</code></pre><p>Lamé定理 (暂略)</p><h4>List Processing 列表处理</h4><p>Scheme是LISP方言, 而LISP代表LISt Processor, 即列表处理器之意.</p><h5>Pairs and Lists 序对和列表</h5><p>序对是最基本的组合手段, 因为它可以将任意两个对象合成为一个对象.</p><p><code>cons</code>构造一个序对, <code>car</code>和<code>cdr</code>分别代表第一投影和第二投影.</p><pre><code>> (define p (cons 1 2))
 > p
 (1 . 2)
 > (car p)
 1
 > (cdr p)
-2
-</code></pre><p>以下实现满足序对的公理.</p><pre><code>(define (cons a d)
+2</code></pre><p>以下实现满足序对的公理.</p><pre><code>(define (cons a d)
   (lambda (m)
     (m a d)))
 (define (car p)
   (p (lambda (a d) a)))
 (define (cdr p)
-  (p (lambda (a d) d)))
-</code></pre><p>空表是一个列表, 表达式<code>(quote ())</code>的值是一个空表, 但表达式<code>()</code>不是字面量.</p><p>如果<code>lst</code>是一个列表, 而<code>x</code>是一个任意的值, 那么<code>(cons x lst)</code>是一个列表.</p><pre><code>> (quote ())
+  (p (lambda (a d) d)))</code></pre><p>空表是一个列表, 表达式<code>(quote ())</code>的值是一个空表, 但表达式<code>()</code>不是字面量.</p><p>如果<code>lst</code>是一个列表, 而<code>x</code>是一个任意的值, 那么<code>(cons x lst)</code>是一个列表.</p><pre><code>> (quote ())
 ()
 > (cons 1 (quote ()))
 (1)
 > (cons 1 (cons 2 (quote ())))
 (1 2)
 > (cons 1 (cons 2 (cons 3 (quote ()))))
-(1 2 3)
-</code></pre><p><code>list</code>过程可以用来方便地构造列表.</p><pre><code>> (list)
+(1 2 3)</code></pre><p><code>list</code>过程可以用来方便地构造列表.</p><pre><code>> (list)
 ()
 > (list 1)
 (1)
 > (list 1 2)
 (1 2)
 > (list 1 2 3)
-(1 2 3)
-</code></pre><p><code>quote</code>是一种特殊形式, 它可以用来避免求值, 于是自然也可以用于构造列表, 这在列表的结构比较复杂时非常有用.</p><pre><code>> (+ 1 (* 2 3))
+(1 2 3)</code></pre><p><code>quote</code>是一种特殊形式, 它可以用来避免求值, 于是自然也可以用于构造列表, 这在列表的结构比较复杂时非常有用.</p><pre><code>> (+ 1 (* 2 3))
 7
 > (quote (+ 1 (* 2 3)))
-(+ 1 (* 2 3))
-</code></pre><p>实际上此时我们引入了一种新的数据类型, 即符号. 符号和字符串具有诸多不同, 不应该混淆.</p><p>像<code>(quote (+ 1 (* 2 3)))</code>这样的表达式可以简写成<code>'(+ 1 (* 2 3))</code>. 尽管它看上去不符合Scheme一般的句法规则, 但读入的时候系统会将<code>'(+ 1 (* 2 3))</code>转换为<code>(quote (+ 1 (* 2 3)))</code>, 因而不存在概念上的问题. 之后用到<code>quote</code>形式时, 一般均以简写形式出现.</p><p><code>'(+ 1 (* 2 3))</code>足见<code>quote</code>形式构造列表的便利之处, 不然的话, 就要写成下面的样子.</p><pre><code>> (cons '+ (cons 1 (cons (cons '* (cons 2 (cons 3 '()))) '())))
+(+ 1 (* 2 3))</code></pre><p>实际上此时我们引入了一种新的数据类型, 即符号. 符号和字符串具有诸多不同, 不应该混淆.</p><p>像<code>(quote (+ 1 (* 2 3)))</code>这样的表达式可以简写成<code>'(+ 1 (* 2 3))</code>. 尽管它看上去不符合Scheme一般的句法规则, 但读入的时候系统会将<code>'(+ 1 (* 2 3))</code>转换为<code>(quote (+ 1 (* 2 3)))</code>, 因而不存在概念上的问题. 之后用到<code>quote</code>形式时, 一般均以简写形式出现.</p><p><code>'(+ 1 (* 2 3))</code>足见<code>quote</code>形式构造列表的便利之处, 不然的话, 就要写成下面的样子.</p><pre><code>> (cons '+ (cons 1 (cons (cons '* (cons 2 (cons 3 '()))) '())))
 (+ 1 (* 2 3))
 > (list '+ 1 (list '* 2 3))
-(+ 1 (* 2 3))
-</code></pre><h5>Procedures on Lists 列表上的过程</h5><p>本节是一些关于列表的基本过程.</p><p><code>length</code>返回列表的长度.</p><pre><code>(define (length lst)
+(+ 1 (* 2 3))</code></pre><h5>Procedures on Lists 列表上的过程</h5><p>本节是一些关于列表的基本过程.</p><p><code>length</code>返回列表的长度.</p><pre><code>(define (length lst)
   (if (null? lst)
       0
-      (+ (length (cdr lst)) 1)))
-</code></pre><pre><code>> (length '())
+      (+ (length (cdr lst)) 1)))</code></pre><pre><code>> (length '())
 0
 > (length '(1))
 1
 > (length '((())))
 1
 > (length '(1 2 3))
-3
-</code></pre><p><code>list-ref</code>从列表中取出指定位置的元素.</p><pre><code>(define (list-ref lst n)
+3</code></pre><p><code>list-ref</code>从列表中取出指定位置的元素.</p><pre><code>(define (list-ref lst n)
   (if (= n 0)
       (car lst)
-      (list-ref (cdr lst) (- n 1))))
-</code></pre><pre><code>> (list-ref '(a b c) 0)
+      (list-ref (cdr lst) (- n 1))))</code></pre><pre><code>> (list-ref '(a b c) 0)
 a
 > (list-ref '(a b c) 1)
 b
 > (list-ref '(a b c) 2)
-c
-</code></pre><p><code>memq</code>, <code>memv</code>, <code>member</code>判断一个元素是否在一个列表之中.</p><pre><code>(define (memq x lst)
+c</code></pre><p><code>memq</code>, <code>memv</code>, <code>member</code>判断一个元素是否在一个列表之中.</p><pre><code>(define (memq x lst)
   (cond ((null? lst) #f)
         ((eq? x (car lst)) lst)
-        (else (memq x (cdr lst)))))
-</code></pre><pre><code>> (memq 'y '(x y z))
+        (else (memq x (cdr lst)))))</code></pre><pre><code>> (memq 'y '(x y z))
 (y z)
 > (memq 'y '(x z))
 #f
 > (memq 'y '(x y y z))
-(y y z)
-</code></pre><p><code>memv</code>和<code>member</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><p><code>assq</code>, <code>assv</code>, <code>assoc</code>根据键对于关联列表进行索引.</p><pre><code>(define (assq key alst)
+(y y z)</code></pre><p><code>memv</code>和<code>member</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><p><code>assq</code>, <code>assv</code>, <code>assoc</code>根据键对于关联列表进行索引, 关联列表指的是每个元素均为序对的列表.</p><pre><code>(define (assq key alst)
   (cond ((null? alst) #f)
         ((eq? (caar alst) key) (car alst))
-        (else (assq key (cdr alst)))))
-</code></pre><pre><code>> (assq 'y '((x 1) (y 2) (z 3)))
+        (else (assq key (cdr alst)))))</code></pre><pre><code>> (assq 'y '((x 1) (y 2) (z 3)))
 (y 2)
 > (assq 'y '((x 1) (y 2) (y 3) (z 3)))
 (y 2)
 > (assq 'y '((x 1) (z 3)))
-#f
-</code></pre><p>类似地, <code>assv</code>和<code>assoc</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><h5>A Toolbox for List Processing 列表处理工具箱</h5><p>列表可以作为表示有限序列的媒介. 围绕这一媒介, 我们可以设计各种各样的工具. 它们很容易组合起来, 这正是列表处理的&quot;表达力&quot;所在.</p><p><code>map</code>施行一个过程于列表的每个元素, 其结果仍是一个列表.</p><pre><code>(define (map proc lst)
+#f</code></pre><p>类似地, <code>assv</code>和<code>assoc</code>分别使用<code>eqv?</code>和<code>equal?</code>比较相等.</p><h5>A Toolbox for List Processing 列表处理工具箱</h5><p>列表可以作为表示有限序列的媒介. 围绕这一媒介, 我们可以设计各种各样的工具. 它们很容易组合起来, 这正是列表处理的&quot;表达力&quot;所在.</p><p><code>map</code>施行一个过程于列表的每个元素, 其结果仍是一个列表.</p><pre><code>(define (map proc lst)
   (if (null? lst)
       '()
       (cons (proc (car lst))
-            (map proc (cdr lst)))))
-</code></pre><p>动笔计算一个实际的例子.</p><pre><code>   (map square '(1 2 3))
+            (map proc (cdr lst)))))</code></pre><p>动笔计算一个实际的例子.</p><pre><code>   (map square '(1 2 3))
 -> (cons 1 (map square '(2 3)))
 -> (cons 1 (cons 4 (map square '(3))))
 -> (cons 1 (cons 4 (cons 9 (map square '()))))
 -> (cons 1 (cons 4 (cons 9 '())))
 -> (cons 1 (cons 4 '(9)))
 -> (cons 1 '(4 9))
--> '(1 4 9)
-</code></pre><p><code>filter</code>从列表中过滤出满足谓词的元素.</p><pre><code>(define (filter pred lst)
+-> '(1 4 9)</code></pre><p><code>filter</code>从列表中过滤出满足谓词的元素.</p><pre><code>(define (filter pred lst)
   (cond ((null? lst) '())
         ((pred (car lst))
          (cons (car lst) (filter pred (cdr lst))))
-        (else (filter pred (cdr lst)))))
-</code></pre><pre><code>> (filter even? '(1 2 3 4 5 6))
+        (else (filter pred (cdr lst)))))</code></pre><pre><code>> (filter even? '(1 2 3 4 5 6))
 (2 4 6)
 > (filter odd? '(1 2 3 4 5 6))
-(1 3 5)
-</code></pre><p><code>append</code>合并两个列表.</p><pre><code>(define (append lst1 lst2)
+(1 3 5)</code></pre><p><code>append</code>合并两个列表.</p><pre><code>(define (append lst1 lst2)
   (if (null? lst1)
       lst2
       (cons (car lst1)
-            (append (cdr lst1) lst2))))
-</code></pre><p>根据<code>append</code>的定义可知, 第二个参数并非一定是列表.</p><pre><code>> (append '(1 2 3) '(4 5 6))
+            (append (cdr lst1) lst2))))</code></pre><p>根据<code>append</code>的定义可知, 第二个参数并非一定是列表.</p><pre><code>> (append '(1 2 3) '(4 5 6))
 (1 2 3 4 5 6)
 > (append '(1 2 3) '())
 (1 2 3)
 > (append '() '(4 5 6))
 (4 5 6)
 > (append '(1 2 3) '4)
-(1 2 3 . 4)
-</code></pre><p><code>reverse</code>反转一个列表.</p><p>以下写法是效率低下的.</p><pre><code>(define (reverse lst)
+(1 2 3 . 4)</code></pre><p><code>reverse</code>反转一个列表.</p><p>以下写法是效率低下的.</p><pre><code>(define (reverse lst)
   (if (null? lst)
       '()
       (append (reverse (cdr lst))
-              (list (car lst)))))
-</code></pre><p>这是更正确的写法.</p><pre><code>(define (reverse lst)
+              (list (car lst)))))</code></pre><p>这是更正确的写法.</p><pre><code>(define (reverse lst)
   (let iter ((rest lst) (result '()))
     (if (null? rest)
         result
-        (iter (cdr rest) (cons (car rest) result)))))
-</code></pre><pre><code>> (reverse '())
+        (iter (cdr rest) (cons (car rest) result)))))</code></pre><pre><code>> (reverse '())
 ()
 > (reverse '(1))
 (1)
 > (reverse '(1 2))
 (2 1)
 > (reverse '(1 2 3))
-(3 2 1)
-</code></pre><p><code>fold-left</code>和<code>fold-right</code>是对于列表处理的抽象.</p><pre><code>(define (fold-left proc init lst)
+(3 2 1)</code></pre><p><code>fold-left</code>和<code>fold-right</code>是对于列表处理的抽象.</p><pre><code>(define (fold-left proc init lst)
   (if (null? lst)
       init
       (fold-left proc (proc init (car lst)) (cdr lst))))
@@ -432,13 +364,11 @@ c
   (if (null? lst)
       init
       (proc (car lst)
-            (fold-right proc init (cdr lst)))))
-</code></pre><p>以下是呈现迭代行为的<code>fold-right</code>.</p><pre><code>(define (fold-right proc init lst)
+            (fold-right proc init (cdr lst)))))</code></pre><p>以下是呈现迭代行为的<code>fold-right</code>.</p><pre><code>(define (fold-right proc init lst)
   (let iter ((rest (reverse lst)) (result init))
     (if (null? rest)
         result
-        (iter (cdr rest) (proc (car rest) result)))))
-</code></pre><p>以<code>fold-left</code>和<code>fold-right</code>表示<code>map</code>, <code>filter</code>, <code>append</code>, <code>reverse</code>.</p><pre><code>(define (map proc lst)
+        (iter (cdr rest) (proc (car rest) result)))))</code></pre><p>以<code>fold-left</code>和<code>fold-right</code>表示<code>map</code>, <code>filter</code>, <code>append</code>, <code>reverse</code>.</p><pre><code>(define (map proc lst)
   (fold-right (lambda (a d) (cons (proc a) d))
               '()
               lst))
@@ -451,84 +381,70 @@ c
 (define (reverse lst)
   (fold-left (lambda (a d) (cons d a))
              '()
-             lst))
-</code></pre><h5>More on List Processing 更多的列表处理</h5><pre><code>(define (append-map proc lst)
+             lst))</code></pre><h5>More on List Processing 更多的列表处理</h5><pre><code>(define (append-map proc lst)
   (if (null? lst)
       '()
       (append (proc (car lst))
-              (append-map proc (cdr lst)))))
-</code></pre><pre><code>> (append-map (lambda (x) (list x x)) '(1 2 3))
-(1 1 2 2 3 3)
-</code></pre><pre><code>(define (product lst1 lst2)
+              (append-map proc (cdr lst)))))</code></pre><pre><code>> (append-map (lambda (x) (list x x)) '(1 2 3))
+(1 1 2 2 3 3)</code></pre><pre><code>(define (product lst1 lst2)
   (append-map
    (lambda (y)
      (map (lambda (x) (list x y)) lst1))
-   lst2))
-</code></pre><pre><code>(define (product . lst*)
+   lst2))</code></pre><pre><code>(define (product . lst*)
   (if (null? lst*)
       '(())
       (append-map (lambda (d)
                     (map (lambda (a) (cons a d))
                          (car lst*)))
-                  (apply product (cdr lst*)))))
-</code></pre><p>亦可以<code>fold-right</code>表<code>product</code>.</p><pre><code>(define (product . lst*)
+                  (apply product (cdr lst*)))))</code></pre><p>亦可以<code>fold-right</code>表<code>product</code>.</p><pre><code>(define (product . lst*)
   (fold-right (lambda (a* d*)
                 (append-map
                  (lambda (d)
                    (map (lambda (a) (cons a d)) a*))
                  d*))
               '(())
-              lst*))
-</code></pre><pre><code>> (product)
+              lst*))</code></pre><pre><code>> (product)
 (())
 > (product '(1 2))
 ((1) (2))
 > (product '(1 2) '(a b))
 ((1 a) (2 a) (1 b) (2 b))
 > (product '(1 2) '(a b) '(x y))
-((1 a x) (2 a x) (1 b x) (2 b x) (1 a y) (2 a y) (1 b y) (2 b y))
-</code></pre><p>若以列表表示有限集合, 那么<code>power-set</code>计算一个集合的幂集.</p><pre><code>(define (power-set s)
+((1 a x) (2 a x) (1 b x) (2 b x) (1 a y) (2 a y) (1 b y) (2 b y))</code></pre><p>若以列表表示有限集合, 那么<code>power-set</code>计算一个集合的幂集.</p><pre><code>(define (power-set s)
   (if (null? s)
       '(())
       (let ((t* (power-set (cdr s))))
-        (append t* (map (lambda (t) (cons (car s) t)) t*)))))
-</code></pre><pre><code>> (power-set '())
+        (append t* (map (lambda (t) (cons (car s) t)) t*)))))</code></pre><pre><code>> (power-set '())
 (())
 > (power-set '(1))
 (() (1))
 > (power-set '(1 2))
 (() (2) (1) (1 2))
 > (power-set '(1 2 3))
-(() (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
-</code></pre><h4>States and Objects 状态和对象</h4><p><code>set!</code>形式可用来改变一个变量被绑定至的值.</p><pre><code>> (define x 0)
+(() (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))</code></pre><h4>States and Objects 状态和对象</h4><p><code>set!</code>形式可用来改变一个变量被绑定至的值.</p><pre><code>> (define x 0)
 > (set! x (+ x 1))
 > x
-1
-</code></pre><p>对比以下两段交互, 它们有什么不同?</p><pre><code>> (define x 0)
+1</code></pre><p>对比以下两段交互, 它们有什么不同?</p><pre><code>> (define x 0)
 > (define (add1! x)
     (set! x (+ x 1)))
 > (add1! x)
 > x
-0
-</code></pre><pre><code>> (define x 0)
+0</code></pre><pre><code>> (define x 0)
 > (define (add1!)
     (set! x (+ x 1)))
 > (add1!)
 > x
-1
-</code></pre><p><code>set-car!</code>和<code>set-cdr!</code>过程可用来改变序对本身.</p><pre><code>> (define p (cons 1 2))
+1</code></pre><p><code>set-car!</code>和<code>set-cdr!</code>过程可用来改变序对本身.</p><pre><code>> (define p (cons 1 2))
 > (set-car! p 'a)
 > p
 (a . 2)
 > (set-cdr! p 'b)
 > p
-(a . b)
-</code></pre><pre><code>> (define p (cons 1 2))
+(a . b)</code></pre><pre><code>> (define p (cons 1 2))
 > (define q (cons p p))
 > (set-car! p 'a)
 > q
-((a . 2) a . 2)
-</code></pre><pre><code>> (define p (cons 1 2))
+((a . 2) a . 2)</code></pre><pre><code>> (define p (cons 1 2))
 > (define (set-car-a! p)
     (set-car! p 'a))
 > (define (set-cdr-b! p)
@@ -538,19 +454,16 @@ c
 (a . 2)
 > (set-cdr-b! p)
 > p
-(a . b)
-</code></pre><pre><code>(define (list-set! lst n x)
+(a . b)</code></pre><pre><code>(define (list-set! lst n x)
   (if (= n 0)
       (set-car! lst x)
-      (list-set! (cdr lst) (- n 1) x)))
-</code></pre><pre><code>> (define l '(a b))
+      (list-set! (cdr lst) (- n 1) x)))</code></pre><pre><code>> (define l '(a b))
 > (list-set! l 0 'x)
 > l
 (x b)
 > (list-set! l 1 'y)
 > l
-(x y)
-</code></pre><p><code>counter</code>是带有局部状态的过程, 类似的过程有时被称为let over lambda.</p><pre><code>> (define counter
+(x y)</code></pre><p><code>counter</code>是带有局部状态的过程, 类似的过程有时被称为let over lambda.</p><pre><code>> (define counter
     (let ((x 0))
       (lambda ()
         (set! x (+ x 1))
@@ -560,8 +473,7 @@ c
 > (counter)
 2
 > (counter)
-3
-</code></pre><pre><code>> (define (make-counter)
+3</code></pre><pre><code>> (define (make-counter)
     (let ((x 0))
       (lambda ()
         (set! x (+ x 1))
@@ -579,50 +491,43 @@ c
 > (c1)
 3
 > (c2)
-3
-</code></pre><p>向量类似于列表, 都可以用来表示有限的序列.</p><pre><code>> (vector)
+3</code></pre><p>向量类似于列表, 都可以用来表示有限的序列.</p><pre><code>> (vector)
 #()
 > (vector 1)
 #(1)
 > (vector 1 2)
 #(1 2)
 > (vector 1 2 3)
-#(1 2 3)
-</code></pre><pre><code>> (vector-length (vector))
+#(1 2 3)</code></pre><pre><code>> (vector-length (vector))
 0
 > (vector-length (vector 1))
 1
 > (vector-length (vector 1 2))
 2
 > (vector-length (vector 1 2 3))
-3
-</code></pre><pre><code>> (define v (vector 'a 'b 'c))
+3</code></pre><pre><code>> (define v (vector 'a 'b 'c))
 > (vector-ref v 0)
 a
 > (vector-ref v 1)
 b
 > (vector-ref v 2)
-c
-</code></pre><pre><code>> (define v (vector 'a 'b))
+c</code></pre><pre><code>> (define v (vector 'a 'b))
 > (vector-set! v 0 'x)
 > v
 #(x b)
 > (vector-set! v 1 'y)
 > v
-#(x y)
-</code></pre><pre><code>(define (vector-map! proc vec)
+#(x y)</code></pre><pre><code>(define (vector-map! proc vec)
   (let ((l (vector-length vec)))
     (let iter ((i 0))
       (if (= i l)
           vec
           (begin (vector-set! vec i (proc (vector-ref vec i)))
-                 (iter (+ i 1)))))))
-</code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><p>本书以Scheme程序, 介绍了编程语言的基本想法.</p><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><p>句法是描述如何由较小的语言成分构成较大的语言成分之规则. 这暗示了, 在最理想的情况下, 句法具有树的结构, 即抽象句法树.</p><h5>BNF Grammars BNF文法</h5><p>BNF文法是描述句法的标准工具.</p><pre><code>&lt;exp> ::= &lt;int>
+                 (iter (+ i 1)))))))</code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><p>本书以Scheme程序, 介绍了编程语言的基本想法.</p><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><p>句法是描述如何由较小的语言成分构成较大的语言成分之规则. 这暗示了, 在最理想的情况下, 句法具有树的结构, 即抽象句法树.</p><h5>BNF Grammars BNF文法</h5><p>BNF文法是描述句法的标准工具.</p><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
        |  (&lt;op> &lt;exp> &lt;exp>)
-&lt;op> ::= + | - | * | =
-</code></pre><h5>Interpreters 解释器</h5><pre><code>(define (interp exp)
+&lt;op> ::= + | - | * | =</code></pre><h5>Interpreters 解释器</h5><pre><code>(define (interp exp)
   (match exp
     (,int (guard (integer? int)) int)
     (,bool (guard (boolean? bool)) bool)
@@ -643,14 +548,12 @@ c
 (define (true? val)
   (if (boolean? val)
       val
-      (error 'interp &quot;the predicate of if is not of type bool&quot;)))
-</code></pre><p>以上是一个句法导向的结构递归.</p><h4>Bindings 绑定</h4><h5>Environments 环境</h5><pre><code>(define (empty-env) '())
+      (error 'interp &quot;the predicate of if is not of type bool&quot;)))</code></pre><p>以上是一个句法导向的结构递归.</p><h4>Bindings 绑定</h4><h5>Environments 环境</h5><pre><code>(define (empty-env) '())
 (define (extend-env var val env)
   (cons (cons var val) env))
 (define (apply-env env var)
   (cond ((assq var env) => cdr)
-        (else (error 'apply-env &quot;unbound variable ~s&quot; var))))
-</code></pre><pre><code>(define (empty-env)
+        (else (error 'apply-env &quot;unbound variable ~s&quot; var))))</code></pre><pre><code>(define (empty-env)
   (lambda (var)
     (error 'apply-env &quot;unbound variable ~s&quot; var)))
 (define (extend-env var val env)
@@ -658,15 +561,13 @@ c
     (if (eq? var^ var)
         val
         (apply-env env var^))))
-(define (apply-env env var) (env var))
-</code></pre><h5>A Language with Bindings 一个带有绑定的语言</h5><pre><code>&lt;exp> ::= &lt;int>
+(define (apply-env env var) (env var))</code></pre><h5>A Language with Bindings 一个带有绑定的语言</h5><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  &lt;var>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
        |  (let &lt;var> &lt;exp> &lt;exp>)
        |  (&lt;op> &lt;exp> &lt;exp>)
-&lt;op> ::= + | - | * | =
-</code></pre><pre><code>(define (interp exp env)
+&lt;op> ::= + | - | * | =</code></pre><pre><code>(define (interp exp env)
   (match exp
     (,int (guard (integer? int)) int)
     (,bool (guard (boolean? bool)) bool)
@@ -688,15 +589,13 @@ c
          ((+) (+ v1 v2))
          ((-) (- v1 v2))
          ((*) (* v1 v2))
-         ((=) (= v1 v2)))))))
-</code></pre><pre><code>> (interp
+         ((=) (= v1 v2)))))))</code></pre><pre><code>> (interp
    '(let x 0
       (let x (+ x 1)
         (let x (+ x 2)
           (+ x 3))))
    (empty-env))
-6
-</code></pre><h4>Procedures 过程</h4><pre><code>&lt;exp> ::= &lt;int>
+6</code></pre><h4>Procedures 过程</h4><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  &lt;var>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
@@ -704,8 +603,7 @@ c
        |  (let &lt;var> &lt;exp> &lt;exp>)
        |  (&lt;op> &lt;exp> &lt;exp>)
        |  (&lt;exp> &lt;exp>)
-&lt;op> ::= + | - | * | =
-</code></pre><pre><code>(define (interp exp env)
+&lt;op> ::= + | - | * | =</code></pre><pre><code>(define (interp exp env)
   (match exp
     (,int (guard (integer? int)) int)
     (,bool (guard (boolean? bool)) bool)
@@ -732,15 +630,13 @@ c
          ((*) (* v1 v2))
          ((=) (= v1 v2)))))
     ((,rator ,rand)
-     ((interp rator env) (interp rand env)))))
-</code></pre><pre><code>> (interp
+     ((interp rator env) (interp rand env)))))</code></pre><pre><code>> (interp
    '(let two 2
       (let double (lambda x (* two x))
         (let two 3
           (double 4))))
    (empty-env))
-8
-</code></pre><h5>Lexical Addressing 词法寻址</h5><pre><code>&lt;exp> ::= &lt;int>
+8</code></pre><h5>Lexical Addressing 词法寻址</h5><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  &lt;var>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
@@ -749,8 +645,7 @@ c
        |  (&lt;op> &lt;exp> &lt;exp>)
        |  (&lt;exp> &lt;exp>)
 &lt;var> ::= (var &lt;int>)
-&lt;op> ::= + | - | * | =
-</code></pre><pre><code>(define (compil exp senv)
+&lt;op> ::= + | - | * | =</code></pre><pre><code>(define (compil exp senv)
   (match exp
     (,int (guard (integer? int)) int)
     (,bool (guard (boolean? bool)) bool)
@@ -779,8 +674,7 @@ c
     ((,rator ,rand)
      (let ((rator^ (compil rator senv))
            (rand^ (compil rand senv)))
-       `(,rator^ ,rand^)))))
-</code></pre><pre><code>(define (empty-senv) '())
+       `(,rator^ ,rand^)))))</code></pre><pre><code>(define (empty-senv) '())
 (define (extend-senv var senv)
   (cons var senv))
 (define (apply-senv senv var)
@@ -788,8 +682,7 @@ c
     (cond ((null? rest)
            (error 'apply-senv &quot;unbound variable ~s&quot; var))
           ((eq? (car rest) var) depth)
-          (else (iter (cdr rest) (+ depth 1))))))
-</code></pre><h4>Types 类型</h4><pre><code>&lt;type> ::= int
+          (else (iter (cdr rest) (+ depth 1))))))</code></pre><h4>Types 类型</h4><pre><code>&lt;type> ::= int
         |  bool
         |  (-> &lt;type> &lt;type>)
 &lt;exp> ::= &lt;int>
@@ -798,12 +691,10 @@ c
        |  (if &lt;exp> &lt;exp> &lt;exp>)
        |  (lambda (&lt;var> : &lt;type>) &lt;exp>)
        |  (let &lt;var> &lt;exp> &lt;exp>)
-       |  (&lt;exp> &lt;exp>)
-</code></pre><pre><code>+ : (-> int (-> int int))
+       |  (&lt;exp> &lt;exp>)</code></pre><pre><code>+ : (-> int (-> int int))
 - : (-> int (-> int int))
 * : (-> int (-> int int))
-zero? : (-> int bool)
-</code></pre><pre><code>(define (infer exp env)
+zero? : (-> int bool)</code></pre><pre><code>(define (infer exp env)
   (match exp
     (,int (guard (integer? int)) 'int)
     (,bool (guard (boolean? bool)) 'bool)
@@ -836,8 +727,7 @@ zero? : (-> int bool)
             (error 'infer &quot;the rand is not of the right type&quot;))
           t4)
          (,else
-          (error 'infer &quot;the rator is not of a function type&quot;)))))))
-</code></pre><pre><code>(define prim-env
+          (error 'infer &quot;the rator is not of a function type&quot;)))))))</code></pre><pre><code>(define prim-env
   (extend-env
    '+ '(-> int (-> int int))
    (extend-env
@@ -848,5 +738,4 @@ zero? : (-> int bool)
       'zero? '(-> int bool)
       (empty-env))))))
 (define (!- exp)
-  (infer exp prim-env))
-</code></pre><h2>Quotes 摘抄</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>人不居于国家之中, 而居于语言之中. - 萧沆</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p><p>因此, 程序必须写来供人阅读而仅是顺带供机器执行. - Alan Perlis</p><p>苦海十年为亲卖身的游女的绘姿使我泣. 凭倚竹窗茫然看着流水的艺妓的姿态使我喜. 卖宵夜面的纸灯寂寞地停留着的河边的夜景使我醉. 雨夜啼月的杜鹃, 阵雨中散落的秋天树叶, 落花飘风的钟声, 途中日暮的山路的雪, 凡是无常无告无望的, 使人无端嗟叹此世只是一梦的, 这样的一切东西于我都是可亲, 于我都是可怀. - 江户艺术论, 永井荷风, 周作人译</p><p>主义要自家选择的, 大凡我们选一种主义的时候, 总要把我们的环境和将来的利益仔细研究一下才行. 考察不周到的时候, 有时你以为这种主义一定会流行的, 才去用它. 后来局面一变, 你反不得不吃那主义的亏. 所以到了那时候, 那主义若是你自家选的呢, 就同哑了吃黄连一样, 自打自的嘴巴罢了, 若是人家劝你选的呢, 那你就不得不大抱怨于那劝你选的人. 所以代人选择主义是很危险的. - 血泪, 郁达夫</p></body></html>
+  (infer exp prim-env))</code></pre><h2>Quotes 摘抄</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>人不居于国家之中, 而居于语言之中. - 萧沆</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p><p>因此, 程序必须写来供人阅读而仅是顺带供机器执行. - Alan Perlis</p><p>苦海十年为亲卖身的游女的绘姿使我泣. 凭倚竹窗茫然看着流水的艺妓的姿态使我喜. 卖宵夜面的纸灯寂寞地停留着的河边的夜景使我醉. 雨夜啼月的杜鹃, 阵雨中散落的秋天树叶, 落花飘风的钟声, 途中日暮的山路的雪, 凡是无常无告无望的, 使人无端嗟叹此世只是一梦的, 这样的一切东西于我都是可亲, 于我都是可怀. - 江户艺术论, 永井荷风, 周作人译</p><p>主义要自家选择的, 大凡我们选一种主义的时候, 总要把我们的环境和将来的利益仔细研究一下才行. 考察不周到的时候, 有时你以为这种主义一定会流行的, 才去用它. 后来局面一变, 你反不得不吃那主义的亏. 所以到了那时候, 那主义若是你自家选的呢, 就同哑了吃黄连一样, 自打自的嘴巴罢了, 若是人家劝你选的呢, 那你就不得不大抱怨于那劝你选的人. 所以代人选择主义是很危险的. - 血泪, 郁达夫</p></body></html>
