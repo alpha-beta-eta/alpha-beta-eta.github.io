@@ -64,7 +64,7 @@
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
     ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
-</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Scheme and the Art of Programming</li><li>ML for the Working Programmer</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Physics 物理</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>机械复制时代的艺术作品</li><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>月姬</li><li>Fate/Stay Night</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
+</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Scheme and the Art of Programming</li><li>ML for the Working Programmer</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Mechanics 力学</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>枕草子 (林文月译)</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>机械复制时代的艺术作品</li><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>月姬</li><li>Fate/Stay Night</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
        |  (&lt;symbol> (&lt;attr>+) &lt;xml>*)
        |  (&lt;symbol> &lt;xml>*)
 &lt;attr> ::= (&lt;symbol> &lt;string>)
@@ -531,6 +531,10 @@ c
 > (set-cdr-b! p)
 > p
 (a . b)
+</code></pre><pre><code>(define (list-set! lst n x)
+  (if (= n 0)
+      (set-car! lst x)
+      (list-set! (cdr lst) (- n 1) x)))
 </code></pre><p><code>counter</code>是带有局部状态的过程, 类似的过程有时被称为let over lambda.</p><pre><code>> (define counter
     (let ((x 0))
       (lambda ()
