@@ -64,7 +64,7 @@
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
     ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))
-</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Scheme and the Art of Programming</li><li>ML for the Working Programmer</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Physics 物理</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>机械复制时代的艺术作品</li><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
+</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Scheme and the Art of Programming</li><li>ML for the Working Programmer</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Physics 物理</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>机械复制时代的艺术作品</li><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>月姬</li><li>Fate/Stay Night</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml> ::= &lt;string>
        |  (&lt;symbol> (&lt;attr>+) &lt;xml>*)
        |  (&lt;symbol> &lt;xml>*)
 &lt;attr> ::= (&lt;symbol> &lt;string>)
@@ -333,7 +333,7 @@
 1
 > (length '(1 2 3))
 3
-</code></pre><pre><code>(define (list-ref lst n)
+</code></pre><p><code>list-ref</code>从列表中取出指定位置的元素.</p><pre><code>(define (list-ref lst n)
   (if (= n 0)
       (car lst)
       (list-ref (cdr lst) (- n 1))))
@@ -531,7 +531,7 @@ c
 > (set-cdr-b! p)
 > p
 (a . b)
-</code></pre><p><code>counter</code>是带有局部状态的过程.</p><pre><code>> (define counter
+</code></pre><p><code>counter</code>是带有局部状态的过程, 类似的过程有时被称为let over lambda.</p><pre><code>> (define counter
     (let ((x 0))
       (lambda ()
         (set! x (+ x 1))
@@ -561,6 +561,43 @@ c
 3
 > (c2)
 3
+</code></pre><p>向量类似于列表, 都可以用来表示有限的序列.</p><pre><code>> (vector)
+#()
+> (vector 1)
+#(1)
+> (vector 1 2)
+#(1 2)
+> (vector 1 2 3)
+#(1 2 3)
+</code></pre><pre><code>> (vector-length (vector))
+0
+> (vector-length (vector 1))
+1
+> (vector-length (vector 1 2))
+2
+> (vector-length (vector 1 2 3))
+3
+</code></pre><pre><code>> (define v (vector 'a 'b 'c))
+> (vector-ref v 0)
+a
+> (vector-ref v 1)
+b
+> (vector-ref v 2)
+c
+</code></pre><pre><code>> (define v (vector 'a 'b))
+> (vector-set! v 0 'x)
+> v
+#(x b)
+> (vector-set! v 1 'y)
+> v
+#(x y)
+</code></pre><pre><code>(define (vector-map! proc vec)
+  (let ((l (vector-length vec)))
+    (let iter ((i 0))
+      (if (= i l)
+          vec
+          (begin (vector-set! vec i (proc (vector-ref vec i)))
+                 (iter (+ i 1)))))))
 </code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><p>本书以Scheme程序, 介绍了编程语言的基本想法.</p><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><p>句法是描述如何由较小的语言成分构成较大的语言成分之规则. 这暗示了, 在最理想的情况下, 句法具有树的结构, 即抽象句法树.</p><h5>BNF Grammars BNF文法</h5><p>BNF文法是描述句法的标准工具.</p><pre><code>&lt;exp> ::= &lt;int>
        |  &lt;bool>
        |  (if &lt;exp> &lt;exp> &lt;exp>)
@@ -588,7 +625,7 @@ c
   (if (boolean? val)
       val
       (error 'interp &quot;the predicate of if is not of type bool&quot;)))
-</code></pre><h4>Bindings 绑定</h4><h5>Environments 环境</h5><pre><code>(define (empty-env) '())
+</code></pre><p>以上是一个句法导向的结构递归.</p><h4>Bindings 绑定</h4><h5>Environments 环境</h5><pre><code>(define (empty-env) '())
 (define (extend-env var val env)
   (cons (cons var val) env))
 (define (apply-env env var)
