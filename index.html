@@ -191,7 +191,7 @@
                  (apply match-sequence matcher*)))
           ((list) (let ((matcher* (map compile0 (cdr pattern0))))
                     (apply match-list matcher*))))))
-  (compile pattern))</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Scheme and the Art of Programming</li><li>ML for the Working Programmer</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic</li><li>Proofs and Types</li></ol><h4>Classical Artificial Intelligence 古典人工智能</h4><ol><li>Building Problem Solvers</li><li>Turtle Geometry</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Mechanics 力学</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>枕草子 (林文月译)</li><li>十三夜</li><li>荆楚岁时记</li><li>疑雨集</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>机械复制时代的艺术作品</li><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>月姬</li><li>Fate/Stay Night</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml&gt; ::= &lt;string&gt;
+  (compile pattern))</code></pre><h2>Essays 文章</h2><h3>Book Recommendations 书籍推荐</h3><h4>Programming 程序设计</h4><ol><li>Structure and Interpretation of Computer Programs</li><li>How to Design Programs</li><li>Scheme and the Art of Programming</li><li>ML for the Working Programmer</li><li>Programming in Standard ML</li></ol><h4>Logic and Programming Languages 逻辑和编程语言</h4><ol><li>Essentials of Programming Languages</li><li>Types and Programming Languages</li><li>Practical Foundations for Programming Languages</li><li>Semantics Engineering with PLT Redex</li><li>Computability and Complexity (Neil Jones)</li><li>Beginning Mathematical Logic (Peter Smith)</li><li>Proofs and Types</li></ol><h4>Classical Artificial Intelligence 古典人工智能</h4><ol><li>Building Problem Solvers</li><li>Turtle Geometry</li></ol><h4>Linear Algebra 线性代数</h4><ol><li>Hoffman &amp; Kunze</li><li>Finite-Dimensional Vector Spaces</li><li>Linear Algebra Problem Book</li></ol><h4>Analysis 分析</h4><ol><li>微积分学教程</li><li>Amann &amp; Escher</li></ol><h4>Mechanics 力学</h4><ol><li>Structure and Interpretation of Classical Mechanics</li><li>力学概论 (方励之, 李淑娴)</li></ol><h4>Literature 文学</h4><ol><li>痴人之爱</li><li>食蓼之虫</li><li>春琴抄</li><li>美利坚物语</li><li>法兰西物语</li><li>枕草子 (林文月译)</li><li>十三夜 (樋口一叶著, 林文月译)</li><li>惜别 (太宰治)</li><li>心 (夏目漱石)</li><li>独断</li><li>荆楚岁时记</li><li>疑雨集</li><li>The Picture of Dorian Gray</li></ol><h4>Art Criticism 艺术批评</h4><ol><li>机械复制时代的艺术作品</li><li>动物化的后现代</li></ol><h4>Lightnovels 轻小说</h4><ol><li>文学少女</li><li>狼与香辛料</li><li>圣母在上</li><li>全部成为F</li><li>空之境界</li><li>Fate/Zero</li><li>池袋西口公园</li><li>波上的魔术师</li><li>魔法科高校的劣等生</li><li>欢迎光临galgame世界</li><li>龙王的工作</li></ol><h4>Galgames</h4><ol><li>魔法使之夜</li><li>月姬</li><li>Fate/Stay Night</li><li>苍之彼方的四重奏</li><li>白色相簿2</li><li>近月少女的礼仪系列</li><li>黑暗圣经</li></ol><h3>Lisp-flavored XML</h3><p>这个网页是通过Lisp-flavored XML编制的, 其句法如下:</p><pre><code>&lt;xml&gt; ::= &lt;string&gt;
        |  (&lt;symbol&gt; (&lt;attr&gt;+) &lt;xml&gt;*)
        |  (&lt;symbol&gt; &lt;xml&gt;*)
 &lt;attr&gt; ::= (&lt;symbol&gt; &lt;string&gt;)</code></pre><p>将Lisp-flavored XML转换为XML的过程如下:</p><pre><code>(define (Attr* attr*)
@@ -212,7 +212,7 @@
     ((,sym . ,xml*)
      (printf &quot;&lt;~s&gt;&quot; sym)
      (for-each Xml xml*)
-     (printf &quot;&lt;/~s&gt;&quot; sym))))</code></pre><h3>Quotes in Computer Science 计算机科学妙语</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之. 视情况而定, 有时简单更重要, 有时效率更重要.</li><li>不懂递归, 等于不懂计算.</li><li>编译将一种编程语言写成的程序转换为另一种编程语言写成的程序, 并保持语义.</li></ol><h3>An Invitation to Programming 程序设计的邀请</h3><p>本书以Scheme编程语言介绍了程序设计的基本想法.</p><h4>Elements of Programming 编程基础</h4><h5>Read-Evaluate-Print Loops 读取求值输出循环</h5><p>在REPL中, 用户输入一个表达式, 按下回车, 系统就会对于该表达式求值, 并将结果输出于下方, 接着等待用户的下一次输入.</p><pre><code>&gt; 42
+     (printf &quot;&lt;/~s&gt;&quot; sym))))</code></pre><h3>Quotes in Computer Science 计算机科学妙语</h3><ol><li>计算机科学是抽象的工程学, 它的核心议题是对于复杂度的控制, 而控制复杂的最根本方法是抽象.</li><li>任何编程语言都必须提供组合和抽象的手段: 通过组合, 简单的想法形成复合的想法; 通过抽象, 复合的想法被当作简单的想法.</li><li>正确最为重要, 简单和效率次之.</li><li>编程这一活动迫使人类审视自己思想的一切不精确之处.</li></ol><h3>Game Reviews 游戏评论</h3><h4>Persona 3 Portable 女神异闻录3携带版</h4><p>女神异闻录3携带版是两类游戏的混合: 传统JRPG和Galgame.</p><h4>Danganronpa 弹丸论破 (枪弹辩驳)</h4><p>弹丸论破本质上是传统的推理游戏. 尽管它拥有一些包装, 但吸引玩家的仍然是游戏的剧情和素质.</p><h4>Metal Gear Solid V 潜龙谍影V (合金装备5, 合计装备V)</h4><p>潜龙谍影V包含一些令人生畏的情节, 或者应该说是隐喻, 例如声带虫.</p><h4>Reigns 王权</h4><h4>80 Days 八十天环游世界</h4><h4>Zork</h4><p>Zork是历史上最早的interactive fiction之一.</p><h3>An Invitation to Programming 程序设计的邀请</h3><p>本书以Scheme编程语言介绍了程序设计的基本想法.</p><h4>Elements of Programming 编程基础</h4><h5>Read-Evaluate-Print Loops 读取求值输出循环</h5><p>在REPL中, 用户输入一个表达式, 按下回车, 系统就会对于该表达式求值, 并将结果输出于下方, 接着等待用户的下一次输入.</p><pre><code>&gt; 42
 42</code></pre><h5>Literals 字面量</h5><p>字面量是对其求值得到自身的表达式.</p><pre><code>&gt; -7
 -7
 &gt; 3/7
@@ -628,33 +628,41 @@ c</code></pre><p><code>memq</code>, <code>memv</code>, <code>member</code>判断
 &gt; (c1)
 3
 &gt; (c2)
-3</code></pre><p>向量类似于列表, 都可以用来表示有限的序列.</p><pre><code>&gt; (vector)
+3</code></pre><p>向量类似于列表, 都可以用来表示有限的序列.</p><p><code>vector</code>类似于<code>list</code>.</p><pre><code>&gt; (vector)
 #()
 &gt; (vector 1)
 #(1)
 &gt; (vector 1 2)
 #(1 2)
 &gt; (vector 1 2 3)
-#(1 2 3)</code></pre><pre><code>&gt; (vector-length (vector))
+#(1 2 3)</code></pre><p><code>vector-length</code>类似于<code>length</code>.</p><pre><code>&gt; (vector-length (vector))
 0
 &gt; (vector-length (vector 1))
 1
 &gt; (vector-length (vector 1 2))
 2
 &gt; (vector-length (vector 1 2 3))
-3</code></pre><pre><code>&gt; (define v (vector 'a 'b 'c))
+3</code></pre><p><code>vector-ref</code>类似于<code>list-ref</code>.</p><pre><code>&gt; (define v (vector 'a 'b 'c))
 &gt; (vector-ref v 0)
 a
 &gt; (vector-ref v 1)
 b
 &gt; (vector-ref v 2)
-c</code></pre><pre><code>&gt; (define v (vector 'a 'b))
+c</code></pre><p><code>vector-set!</code>类似于<code>list-set!</code>.</p><pre><code>&gt; (define v (vector 'a 'b))
 &gt; (vector-set! v 0 'x)
 &gt; v
 #(x b)
 &gt; (vector-set! v 1 'y)
 &gt; v
-#(x y)</code></pre><p>向量和列表的不同之处在于, 向量是随机可达的, 列表是顺序可达的.</p><pre><code>(define (vector-map! proc vec)
+#(x y)</code></pre><p>向量和列表的不同之处在于, 向量是随机可达的, 列表是顺序可达的.</p><pre><code>(define (vector-map proc vec)
+  (let* ((l (vector-length vec))
+         (v (make-vector l)))
+    (let iter ((i 0))
+      (if (= i l)
+          v
+          (begin (vector-set! v i (proc (vector-ref vec i)))
+                 (iter (+ i 1)))))))
+(define (vector-map! proc vec)
   (let ((l (vector-length vec)))
     (let iter ((i 0))
       (if (= i l)
@@ -819,7 +827,7 @@ c</code></pre><pre><code>&gt; (define v (vector 'a 'b))
     (cond ((null? rest)
            (error 'apply-senv &quot;unbound variable ~s&quot; var))
           ((eq? (car rest) var) depth)
-          (else (iter (cdr rest) (+ depth 1))))))</code></pre><h4>Types 类型</h4><pre><code>&lt;type&gt; ::= int
+          (else (iter (cdr rest) (+ depth 1))))))</code></pre><h4>Continuations 延续</h4><p>延续是对于剩余的计算的抽象. 换言之, 延续是求值的控制上下文.</p><h4>Types 类型</h4><pre><code>&lt;type&gt; ::= int
         |  bool
         |  (-&gt; &lt;type&gt; &lt;type&gt;)
 &lt;exp&gt; ::= &lt;int&gt;
@@ -875,4 +883,4 @@ zero? : (-&gt; int bool)</code></pre><pre><code>(define (infer exp env)
       'zero? '(-&gt; int bool)
       (empty-env))))))
 (define (!- exp)
-  (infer exp prim-env))</code></pre><h2>Quotes 摘抄</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>人不居于国家之中, 而居于语言之中. - 萧沆</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p><p>因此, 程序必须写来供人阅读而仅是顺带供机器执行. - Alan Perlis</p><p>苦海十年为亲卖身的游女的绘姿使我泣. 凭倚竹窗茫然看着流水的艺妓的姿态使我喜. 卖宵夜面的纸灯寂寞地停留着的河边的夜景使我醉. 雨夜啼月的杜鹃, 阵雨中散落的秋天树叶, 落花飘风的钟声, 途中日暮的山路的雪, 凡是无常无告无望的, 使人无端嗟叹此世只是一梦的, 这样的一切东西于我都是可亲, 于我都是可怀. - 江户艺术论, 永井荷风, 周作人译</p><p>主义要自家选择的, 大凡我们选一种主义的时候, 总要把我们的环境和将来的利益仔细研究一下才行. 考察不周到的时候, 有时你以为这种主义一定会流行的, 才去用它. 后来局面一变, 你反不得不吃那主义的亏. 所以到了那时候, 那主义若是你自家选的呢, 就同哑了吃黄连一样, 自打自的嘴巴罢了, 若是人家劝你选的呢, 那你就不得不大抱怨于那劝你选的人. 所以代人选择主义是很危险的. - 血泪, 郁达夫</p></body></html>
+  (infer exp prim-env))</code></pre><h3>An Invitation to Compiler Construction 编译器构造的邀请</h3><p>编译将一种语言写成的程序转换为另一种语言写成的程序, 并保持语义. 显然, 编译器中的过程操纵的不是程序本身, 而是程序的表示.</p><h2>Quotes 摘抄</h2><p>One does not inhabit a country; one inhabits a language. - Emil Cioran</p><p>人不居于国家之中, 而居于语言之中. - 萧沆</p><p>Thus, programs must be written for people to read and only incidentally for machines to execute. - Alan Perlis</p><p>因此, 程序必须写来供人阅读而仅是顺带供机器执行. - Alan Perlis</p><p>苦海十年为亲卖身的游女的绘姿使我泣. 凭倚竹窗茫然看着流水的艺妓的姿态使我喜. 卖宵夜面的纸灯寂寞地停留着的河边的夜景使我醉. 雨夜啼月的杜鹃, 阵雨中散落的秋天树叶, 落花飘风的钟声, 途中日暮的山路的雪, 凡是无常无告无望的, 使人无端嗟叹此世只是一梦的, 这样的一切东西于我都是可亲, 于我都是可怀. - 江户艺术论, 永井荷风著, 周作人译</p><p>主义要自家选择的, 大凡我们选一种主义的时候, 总要把我们的环境和将来的利益仔细研究一下才行. 考察不周到的时候, 有时你以为这种主义一定会流行的, 才去用它. 后来局面一变, 你反不得不吃那主义的亏. 所以到了那时候, 那主义若是你自家选的呢, 就同哑了吃黄连一样, 自打自的嘴巴罢了, 若是人家劝你选的呢, 那你就不得不大抱怨于那劝你选的人. 所以代人选择主义是很危险的. - 血泪, 郁达夫</p></body></html>
