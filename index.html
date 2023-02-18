@@ -706,7 +706,7 @@ c</code></pre><p><code>vector-set!</code>类似于<code>list-set!</code>.</p><pr
       (if (= i l)
           vec
           (begin (vector-set! vec i (proc (vector-ref vec i)))
-                 (iter (+ i 1)))))))</code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><p>本书以Scheme程序, 介绍了编程语言的基本想法.</p><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><p>句法是描述如何由较小的语言成分构成较大的语言成分之规则. 这暗示了, 在最理想的情况下, 句法具有树的结构, 即抽象句法树.</p><h5>BNF Grammars BNF文法</h5><p>BNF文法是描述句法的标准工具.</p><pre><code>&lt;exp&gt; ::= &lt;int&gt;
+                 (iter (+ i 1)))))))</code></pre><h3>An Invitation to Programming Languages 编程语言的邀请</h3><p>编程语言是对于编程语言的研究. 编程语言的核心是语义学, 任何对于编程语言的学习都应该从描述编程语言的语义开始. 本书以Scheme程序呈现了古典操作语义, 它源于John McCarthy为了表现Lisp的表达力而编写的元解释器.</p><h4>Syntax 句法</h4><h5>Abstract Syntax Trees 抽象句法树</h5><p>我们的程序往往以程序文本作为输入和输出, 实际上是程序文本的表示. 至于如何表示程序, 让我们回想一下句法的定义. 句法是描述如何由较小的语言成分构造较大的语言成分之规则. 这暗示了, 在最理想的情况下, 程序文本具有上下文无关的树的结构, 其被称为抽象句法树. 程序文本常以字符序列的形式输入和呈现, 其被称为具体句法. 将程序文本从具体句法转换为抽象句法树的过程被称为句法分析, 它不是语义学的内容, 因而被省略了.</p><h5>BNF Grammars BNF文法</h5><p>BNF文法是描述句法的标准工具.</p><pre><code>&lt;exp&gt; ::= &lt;int&gt;
        |  &lt;bool&gt;
        |  (if &lt;exp&gt; &lt;exp&gt; &lt;exp&gt;)
        |  (&lt;op&gt; &lt;exp&gt; &lt;exp&gt;)
