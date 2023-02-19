@@ -93,7 +93,7 @@
          (let ((vx (car v)) (vy (cdr v)))
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
-    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))</code></pre><h4>Matcher Combinators</h4><p>鉴于matcher combinators的系统是extensible的, 以下句法只是ad hoc的.</p><pre><code>&lt;pattern&gt; ::= &lt;constant&gt;
+    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))</code></pre><h4>Matcher Combinators</h4><p>模式匹配器在古典人工智能中是常见的, 因为它是用来表达规则导向程序的最佳伴侣.</p><p>鉴于matcher combinators的系统是extensible的, 以下句法只是ad hoc的.</p><pre><code>&lt;pattern&gt; ::= &lt;constant&gt;
            |  &lt;variable&gt;
            |  (% &lt;pattern&gt;*)
            |  (list &lt;pattern0&gt;*)
@@ -266,7 +266,7 @@
 &gt; &quot;hello, world&quot;
 &quot;hello, world&quot;</code></pre><p>Scheme用<code>#t</code>表示真, 用<code>#f</code>表示假.</p><h5>Variables 变量</h5><p>变量在字面上是符号, 但它不代表其字面, 而是引用一个值.</p><p>我们可以通过<code>define</code>形式引入变量和值的绑定.</p><pre><code>&gt; (define three 3)
 &gt; three
-3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程应用即将过程应用于参数上. 数学里函数应用的句法多种多样, 但Scheme只有一种过程应用的句法, 即全加括号的前缀记号.</p><pre><code>&gt; (+ 1/2 1/4 1/8)
+3</code></pre><h5>Procedure Applications 过程应用</h5><p>过程和函数是近义词, 我们将交换地使用这两个术语, 尽管它们的确有一些区别. 就现代数学意义下的函数, 函数的外延被视为函数本身. 也就是说, 函数只是输入和输出的对应, 和算术算法几何没有任何联系. 过程则不同, 它是内涵性的观念, 包含了如何从输入计算得到输出的规则.</p><p>过程应用即将过程应用于参数上. 数学里函数应用的句法多种多样, 但Scheme只有一种过程应用的句法, 即全加括号的前缀记号.</p><pre><code>&gt; (+ 1/2 1/4 1/8)
 7/8
 &gt; (* (- 3 4) (+ 3 4))
 -7</code></pre><h5>Lambda Expressions lambda表达式</h5><p>Scheme以<code>lambda</code>表达式表达过程.</p><pre><code>&gt; ((lambda (x) (* x x)) 1/2)
