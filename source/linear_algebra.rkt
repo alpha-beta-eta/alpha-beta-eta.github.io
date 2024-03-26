@@ -7520,7 +7520,19 @@
     "令" (setE $f_1 $..h $f_n) "是" V* "的一个有序基, 其对偶于" $V "的基"
     (setE $beta_1 $..h $beta_n) ". 对于每个向量" (&in $alpha $V) ", 我们有"
     (MB (&= $alpha (LC0 (app $f_1 $alpha) $beta_1 (app $f_n $alpha) $beta_n)) ".")
-    
+    "现在我们进行例子11所施行的计算. 如果" $L "是" $V "上的一个" $r "线性形式而"
+    (&cm $alpha_1 $..h $alpha_r) "是" $V "的元素, 那么"
+    (MB (&= (appl $L $alpha_1 $..h $alpha_r)
+            (sum (&cm $j_1 $..h $j_r) $
+                 (&i* (app (_ $f $j_1) $alpha_1) $..c (app (_ $f $j_r) $alpha_r)
+                      (appl $L (_ $beta $j_1) $..h (_ $beta $j_r))))) ".")
+    "换言之, 即"
+    (MB (&= $L (sum (&cm $j_1 $..h $j_r) $
+                    (&i* (appl $L (_ $beta $j_1) $..h (_ $beta $j_r))
+                         (&t* (_ $f $j_1) $..c (_ $f $j_r))))) ".")
+    "这表明由" $r "元组" (&= $J (tu0 $j_1 $..h $j_r)) "给出的" $n^r "个张量积"
+    (MB (&= $E_J (&t* (_ $f $j_1) $..c (_ $f $j_r))))
+    "可以张成模" (app $M^r $V) ". "
     )
    (H3 "第5.7节 Grassman环")
    
