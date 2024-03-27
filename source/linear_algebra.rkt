@@ -7563,9 +7563,16 @@
     "换言之, " (Alt $n $K^n) "是一个秩为" $1 "的自由" $K "模. 我们也建立了" $D "的显式公式. "
     "基于我们现在所使用的记号, 其可以记成"
     (MB (&= $D (sum $sigma $ (&i* (@sgn $sigma) (&t* (_ $f σ1) $..c (_ $f σn))))))
-    "其中" (&cm $f_1 $..h $f_n) "是" $K^n "上的标准坐标函数而其和布于所有集合" (setE $1 $..h $n)
-    "的" (&fact $n) "个不同置换" $sigma "之上. "
-    )
+    "其中" (&cm $f_1 $..h $f_n) "是" $K^n "上的标准坐标函数而其和布于集合" (setE $1 $..h $n)
+    "的所有" (&fact $n) "个不同置换" $sigma "之上. 如果我们将一个矩阵" $A "的行列式写成"
+    (MB (&= (&det $A) (sum $sigma $ (&i* (@sgn $sigma) (appl $A σ1 $1) $..c (appl $A σn $n)))))
+    "那么我们就得到了" $D "的一个不同的表达式:"
+    (MB (deriv (appl $D $alpha_1 $..h $alpha_n)
+               (sum $sigma $ (&i* (@sgn $sigma) (app $f_1 (_ $alpha σ1)) $..c (app $f_n (_ $alpha σn))))
+               (sum $sigma $ (&i* (@sgn $sigma) (appl $L (_ $alpha σ1) $..h (_ $alpha σn))))))
+    "其中" (&= $L (&t* $f_1 $..c $f_n)) ".")
+   (P "存在一种一般性的方法将一个交错形式与一个多线性形式联系起来. "
+      )
    (H3 "第5.7节 Grassman环")
    
    (H2 "第6章 初等标准形式")
