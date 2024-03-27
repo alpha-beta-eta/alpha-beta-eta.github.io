@@ -1,6 +1,10 @@
 #lang racket
 (provide (all-defined-out))
 (require SMathML)
+(define Alt
+  (case-lambda
+    ((r V) (app (^ $Lambda:normal r) V))
+    ((r) (Alt r $V))))
 (define (&assoc & a b c)
   (&= (& (@ (& a b)) c)
       (& a (@ (& b c)))))

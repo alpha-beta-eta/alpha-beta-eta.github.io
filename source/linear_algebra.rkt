@@ -7547,8 +7547,25 @@
     "令" $L "是" $K "模" $V "上的一个" $r "线性形式. 我们称" $L "是交错的, 如果每当"
     (&cm (&= $alpha_i $alpha_j) (&!= $i $j)) "时有" (&= (appl $L $alpha_1 $..h $alpha_r) $0) ".")
    (P "如果" $L "是" $V^r "上的一个交错多线性函数, 那么"
-      
-      )
+      (MB (&= (appl $L $alpha_1 $..h $alpha_i $..h $alpha_j $..h $alpha_r)
+              (&- (appl $L $alpha_1 $..h $alpha_j $..h $alpha_i $..h $alpha_r))) ".")
+      "换言之, 交换" $r "元组" (tu0 $alpha_1 $..h $alpha_r) "中两个(不同下标的)向量, 那么与之关联的"
+      $L "的值会改变符号 (sign). 既然每个置换" $sigma "都是交换之积, 我们看出"
+      (&= (appl $L (_ $alpha σ1) $..h (_ $alpha (ap $sigma $r)))
+          (&i* (@sgn $sigma) (appl $L $alpha_1 $..h $alpha_r))) ".")
+   (P "我们用" (Alt $r) "表示" $V "上所有交错" $r "线性形式构成的集合. 显然" (Alt $r) "是"
+      (app $M^r $V) "的一个子模.")
+   ((example #:n "12")
+    "本章的早些时候, 我们证明了模" $K^n "上恰存在一个交错" $n "线性形式" $D "满足性质"
+    (&= (appl $D $epsilon_1 $..h $epsilon_n) $1) ". 我们也在定理2中证明了如果形式" (∈ $L (Alt $n $K^n))
+    ", 那么"
+    (MB (&= $L (&i* (appl $L $epsilon_1 $..h $epsilon_n) $D)) ".")
+    "换言之, " (Alt $n $K^n) "是一个秩为" $1 "的自由" $K "模. 我们也建立了" $D "的显式公式. "
+    "基于我们现在所使用的记号, 其可以记成"
+    (MB (&= $D (sum $sigma $ (&i* (@sgn $sigma) (&t* (_ $f σ1) $..c (_ $f σn))))))
+    "其中" (&cm $f_1 $..h $f_n) "是" $K^n "上的标准坐标函数而其和布于所有集合" (setE $1 $..h $n)
+    "的" (&fact $n) "个不同置换" $sigma "之上. "
+    )
    (H3 "第5.7节 Grassman环")
    
    (H2 "第6章 初等标准形式")
