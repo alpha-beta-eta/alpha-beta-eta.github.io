@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>矩阵乘法</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>矩阵乘法</h1>
+    <p>这里是对于Oleg Kiselyov关于矩阵乘法的博客的笔记.</p>
+    <h2>第1章 基本想法</h2>
+    <p>矩阵乘法通常被形式化地定义为
+      <math display="block">
+        <mrow>
+          <msub><mi>C</mi>
+            <mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow>
+          </msub>
+          <mo>=</mo>
+          <mrow>
+            <munder><mo>&sum;</mo><mi>k</mi></munder>
+            <mrow>
+              <msub><mi>A</mi>
+                <mrow><mi>i</mi><mo>,</mo><mi>k</mi></mrow>
+              </msub>
+              <mo>&it;</mo>
+              <msub><mi>B</mi>
+                <mrow><mi>k</mi><mo>,</mo><mi>j</mi></mrow>
+              </msub>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其中的<math><mi>i</mi></math>遍历矩阵<math><mi>A</mi></math>的行的索引, <math><mi>j</mi></math>遍历矩阵<math><mi>B</mi></math>的列的索引, 而<math><mi>k</mi></math>遍历矩阵<math><mi>A</mi></math>的列或者矩阵<math><mi>B</mi></math>的行的索引, 这两者应该是相同的. 如果加上这些附注, 我大概会写成
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>C</mi>
+              <mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow>
+            </msub>
+            <mo>=</mo>
+            <mrow>
+              <munder><mo>&sum;</mo><mi>k</mi></munder>
+              <mrow>
+                <msub><mi>A</mi>
+                  <mrow><mi>i</mi><mo>,</mo><mi>k</mi></mrow>
+                </msub>
+                <mo>&it;</mo>
+                <msub><mi>B</mi>
+                  <mrow><mi>k</mi><mo>,</mo><mi>j</mi></mrow>
+                </msub>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mo>,</mo>
+          <mrow><mi>i</mi><mo>&in;</mo><mi>I</mi></mrow>
+          <mo>,</mo>
+          <mrow><mi>j</mi><mo>&in;</mo><mi>J</mi></mrow>
+          <mo>,</mo>
+          <mrow><mi>k</mi><mo>&in;</mo><mi>K</mi></mrow>
+        </mrow>
+      </math>
+      不过, 从命令式的角度来看, 如果我们引入形式如下的语句 (statement):
+      <math display="block">
+        <mrow>
+          <msub><mi>C</mi>
+            <mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow>
+          </msub>
+          <mo>+=</mo>
+          <mrow>
+            <msub><mi>A</mi>
+              <mrow><mi>i</mi><mo>,</mo><mi>k</mi></mrow>
+            </msub>
+            <mo>&it;</mo>
+            <msub><mi>B</mi>
+              <mrow><mi>k</mi><mo>,</mo><mi>j</mi></mrow>
+            </msub>
+          </mrow>
+        </mrow>
+      </math>
+      那么矩阵乘法可以写成
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>C</mi>
+              <mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow>
+            </msub>
+            <mo>+=</mo>
+            <mrow>
+              <msub><mi>A</mi>
+                <mrow><mi>i</mi><mo>,</mo><mi>k</mi></mrow>
+              </msub>
+              <mo>&it;</mo>
+              <msub><mi>B</mi>
+                <mrow><mi>k</mi><mo>,</mo><mi>j</mi></mrow>
+              </msub>
+            </mrow>
+          </mrow>
+          <mo>,</mo>
+          <mrow><mi>i</mi><mo>&in;</mo><mi>I</mi></mrow>
+          <mo>,</mo>
+          <mrow><mi>j</mi><mo>&in;</mo><mi>J</mi></mrow>
+          <mo>,</mo>
+          <mrow><mi>k</mi><mo>&in;</mo><mi>K</mi></mrow>
+        </mrow>
+      </math>
+      我们需要不重复不遗漏地遍历这些索引集, 但是这种命令式描述的优雅之处在于我们可以任意地排列语句的执行顺序.</p>
+  </body>
+</html>

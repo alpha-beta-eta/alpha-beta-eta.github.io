@@ -1,0 +1,38 @@
+#lang racket
+(provide plan.html)
+(require SMathML)
+(define plan.html
+  (Prelude
+   #:title "计划"
+   #:css "styles.css"
+   (H1 "学习计划")
+   (Ol (Li "序与格论基础")
+       (Li "Category Theory (Steve Awodey)")
+       (Li "微分学 (嘉当)")
+       (Li "Category Theory in Context")
+       (Li "Handbook (John Harrison)")
+       (Li "Aczel 1997")
+       (Li "Introduction to Coalgebra")
+       (Li "Modal Logic")
+       (Li "Stone Spaces")
+       (Li "Proof Theory and Algebra in Logic")
+       (Li "Lecture Notes on Denotational Semantics")
+       (Li "Control structures in programming languages")
+       (Li "Proof Theory and Logic Programming")
+       (Li "Frank Pfenning's Courses on Logics")
+       (Li "Propositional Lax Logic")
+       (Li "Logical Relations相关内容")
+       (Li "Homotopy Theory")
+       (Li "The Locally Nameless Representation")
+       (Li "概率论教程 (钟开莱)")
+       )
+   (H1 "工作学习计划")
+   (Ol (Li "CSAPP")
+       (Li "Verus验证器")
+       (Li "Rust")
+       (Li "Hoare逻辑和分离逻辑")
+       (Li "Coq")
+       (Li "Iris")
+       (Li "LLM"))
+   
+   ))

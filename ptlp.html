@@ -1,0 +1,286 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>证明论和逻辑编程</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>证明论和逻辑编程</h1>
+    <h2>前言</h2>
+    <p>本书发展了经典逻辑, 直觉主义逻辑与线性逻辑的证明论, 并展示了其在逻辑编程语言的设计与使用中的应用. 我们利用Gentzen的相继式演算 (sequent calculus), 为基于一阶和高阶的经典逻辑, 直觉主义逻辑与线性逻辑的逻辑编程语言建立了一个证明论基础. 这一进路为若干著名语言提供了根基, 包括Prolog (在经典逻辑中采用一阶Horn子句) 和λProlog (在直觉主义逻辑中使用高阶遗传Harrop公式), 以及线性逻辑编程语言Lolli和Forum. 正如我们将要说明的, 这些表达能力不断增强的逻辑编程语言, 使逻辑编程范式能够刻画模块化编程, 高阶编程, 抽象数据类型, 状态封装以及并发等诸多核心方面.</p>
+    <p>本书围绕三个主要主题展开.
+      <ol>
+        <li>证明搜索: 相继式演算为形式化逻辑编程提供了一个自然的框架, 并通过逻辑公式对证明构造过程的影响, 阐明了将公式作为程序的操作性解释. 我们将借助一致证明 (uniform proofs) 与聚焦证明 (focused proofs) 这两个概念, 对一种基于目标归约和反向链接的两阶段证明构造方法予以形式化.</li>
+        <li>证明论: 我们给出经典逻辑, 直觉主义逻辑与线性逻辑的相继式演算证明系统, 其中包含一阶量化与高阶量化. 聚焦证明的完全性, 将通过对这些证明直接给出切消定理的证明来确立.</li>
+        <li>逻辑编程: 本书提供了大量利用高阶量化和线性逻辑的逻辑程序实例. 我们将展示如何运用聚焦证明的理论来直接对这类程序进行推理.</li>
+      </ol>
+    </p>
+    <p>本书假定读者已具备一阶逻辑与(简单类型)<math><mi>&lambda;</mi></math>演算的句法性质方面的基础知识. 虽然并不要求读者事先接触过形式化的证明表示 (例如自然演绎和相继式演算), 但有此经验会有所助益. 我们将不时给出一些逻辑程序的例子, 采用λProlog的句法约定来呈现, 以阐明证明论中的概念. 熟悉Prolog或λProlog或许有助于理解这些例子, 但不具备此类背景的读者同样应能读懂它们, 因为λProlog的程序成分与所讨论逻辑中的公式是直接对应的.</p>
+    <p>本书的第一部分至第9章结束, 详细论述相继式演算如何既能设计, 又能分析基于经典逻辑, 直觉主义逻辑与线性逻辑的逻辑编程语言. 主要关注逻辑编程之设计与应用层面的读者, 可以放心跳过5.5节和第7章, 这两处给出的是聚焦证明若干关键性质的形式化证明. 本书的第二部分从第10章开始, 探讨逻辑编程的各种应用. 第二部分中的各章彼此独立, 因此读者若不熟悉某一章所涉及的应用领域, 可以跳过该章而不影响对其他各章的理解.</p>
+    <p>多数章节都配有习题, 旨在澄清并拓展正文中提出的思想. 标有(‡)的习题在本书末尾给出了部分或完整的解答.</p>
+    <p>鉴于计算逻辑与逻辑编程的领域极为广阔, 有必要指出本书未予涵盖的若干主题. 其中之一是Curry-Howard对应 (即<q>证明即程序</q>范式). 把计算与证明搜索联系起来, 为逻辑与证明在计算中的作用提供了一个与Curry-Howard对应截然不同的维度. 对这一对应及其作为函数式编程之基础的作用感兴趣的读者, 仍可能发现书中所呈现的许多底层证明论是有价值的, 尤其是它向线性逻辑的推广. 此外, 本书所讨论的逻辑编程范式还可用于刻画类型检查, 类型推断以及函数式程序的操作语义. 逻辑编程社群当前流行的其他一些主题, 例如失败即否定, 回答集编程, 稳定模型和约束编程, 本书也未加探讨.</p>
+    <p>本书是作者, 其合作者以及许多其他人数十年研究工作的综合成果. 本书部分内容的早期版本曾用于巴黎, 哥本哈根, 威尼斯, 贝尔蒂诺罗和比萨的研究生 (M2) 课程. 我谨向研习过这些材料的众多学生致谢, 同时也感谢Arunava Gantait, Gopalan Nadathur和Aarrya Saraf对早期草稿提出的宝贵意见. 我还要感谢我的女儿Nadia Miller为本书创作的封面画作.</p>
+    <h2>第1章 引论</h2>
+    <p>定义计算并对其进行推理的方式有很多. Church, Turing, Gödel, Curry等人的开创性工作表明, 若干形式化的刻画, 例如<math><mi>&lambda;</mi></math>演算, Turing机以及递归方程, 所描述的是同一类可计算函数. 与此类似, 人们已经发明了大量编程语言 (例如LISP, C, Pascal和Ada), 它们在理论上都能够实现这一类函数.</p>
+    <p>鉴于逻辑在数学与哲学中的基础性地位, 一个引人入胜的设想是: 在这幅丰富的图景之上, 再添加一种以逻辑表达式作为程序的计算框架. 逻辑编程范式正是从直接面对下述问题中产生的: 如何能把逻辑直接用作一种编程语言? 这样的语言能达到何种程度的表达能力? 把程序的句法与语义建立在成熟的逻辑技术和概念之上, 又能带来哪些好处?</p>
+    <p>我们将在下一章更深入地探讨这些问题. 在考察各种逻辑如何能够充当基于逻辑的编程之基础之前, 本引言的余下部分将把其中的一些逻辑及其相关的证明概念, 组织进本书通篇所使用的框架之中.</p>
+    <h3>第1.1节 逻辑的谱系</h3>
+    <p>项与公式的句法将在第2章中给出, 所采用的框架是Church [1940] 在其简单类型论中提出的: 具体而言, 项与公式都是简单类型的<math><mi>&lambda;</mi></math>项, 而项与公式的相等性就等同于这类<math><mi>&lambda;</mi></math>项的相等性 (即由<math><mrow><mi>&alpha;</mi><mo>,</mo><mi>&beta;</mi><mo>,</mo><mi>&eta;</mi></mrow></math>转换的等式所刻画). 具有某个特定基本类型的项&mdash;&mdash;希腊字母omicron <math><mi>&omicron;</mi></math> (沿用Church [1940] 的记法)&mdash;&mdash;被归类为公式. 符号<math><mrow><mo>&and;</mo><mo>,</mo><mo>&or;</mo><mo>,</mo><mo>&sup;</mo></mrow></math>以中缀方式书写, 分别表示合取, 析取和推出. 否定写作前缀算子<math><mo>&not;</mo></math>.</p>
+    <p>本书沿两条主轴对逻辑进行分类. 第一条轴涉及全称量词<math><mo>&forall;</mo></math>与存在量词<math><mo>&exist;</mo></math>. 不含量词的逻辑称为命题逻辑. 含有量词的逻辑称为量化逻辑. 本书中的量词约束带类型的变元 (同样沿用Church [1940] 的做法). 若被量化变元的类型仅限于基本的, 非命题的类型, 则该逻辑是一阶的. 高阶逻辑则允许在一切类型上进行量化, 包括命题类型和函数类型.</p>
+    <p>第二条轴由以下三种逻辑构成.
+      <ol>
+        <li>经典逻辑是一种关于真值的逻辑. 例如, 命题公式的真假取决于其中所含命题变元的真值. 这样的真值可以用真值表计算出来. 例如, 无论给<math><mi>p</mi></math>和<math><mi>q</mi></math>赋予什么真值, 公式<math><mrow><mi>p</mi><mo>&or;</mo><mrow><mo>&not;</mo><mi>p</mi></mrow></mrow></math>与<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>p</mi><mo>&sup;</mo><mi>q</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&sup;</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&sup;</mo><mi>p</mi></mrow></math>都为真.</li>
+        <li>直觉主义逻辑可以看作一种基于构造性证明观的逻辑. 例如, 要证明公式<math><mrow><mo>&exist;</mo><mi>x</mi><mo lspace="0">.</mo><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>是定理, 证明中必须包含一个具体的项, 比如<math><mi>t</mi></math>, 以及<math><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></math>是定理的一个证明. 同样地, 要证明<math><mrow><msub><mi>B</mi><mn>1</mn></msub><mo>&or;</mo><msub><mi>B</mi><mn>2</mn></msub></mrow></math>是定理, 证明中要包含<math><mrow><mi>i</mi><mo>&in;</mo><mrow><mo stretchy="false">{</mo><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow><mo stretchy="false">}</mo></mrow></mrow></math>的一个具体取值以及<math><msub><mi>B</mi><mi>i</mi></msub></math>的一个证明. 正因如此, 公式<math><mrow><mi>p</mi><mo>&or;</mo><mrow><mo>&not;</mo><mi>p</mi></mrow></mrow></math>未必是定理: 在缺乏关于<math><mi>p</mi></math>的更多信息时, 我们可能既无法给出<math><mi>p</mi></math>的证明, 也无法给出<math><mrow><mo>&not;</mo><mi>p</mi></mrow></math>的证明. 如果<math><mi>p</mi></math>是诸如<math><mrow><mn>3</mn><mo>=</mo><mn>4</mn></mrow></math>这样的陈述, 那么我们能够证明<math><mrow><mi>p</mi><mo>&or;</mo><mrow><mo>&not;</mo><mi>p</mi></mrow></mrow></math>, 因为我们大概可以证明<math><mrow><mo>&not;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>=</mo><mn>4</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 但若我们对<math><mi>p</mi></math>一无所知, 则这两个析取支都无法证明.</li>
+        <li>线性逻辑由Girard [1987] 提出, 可以看作一种关于资源的逻辑. 例如, 拥有一个<math><mi>p</mi></math>与拥有两个<math><mi>p</mi></math> (如<math><mrow><mi>p</mi><mo>&and;</mo><mi>p</mi></mrow></math>) 可能是不同的. 正因如此, 它能够刻画自动售货机 (例如两枚50分硬币换取一杯咖啡), Petri网以及进程演算.</li>
+      </ol>
+    </p>
+    <p>Gentzen [1935] 引入相继式演算, 作为在经典逻辑与直觉主义逻辑中表示证明的技术手段. 相继式演算同样为描述线性逻辑的证明提供了理想的场所. 因此, 我们在此采用相继式演算, 并着重强调它能以模块化而直截了当的方式刻画这三种逻辑中的可证性. 我们这里的进路并不试图把经典逻辑, 直觉主义逻辑与线性逻辑合并为一种逻辑: 相反, 我们把这些逻辑视为拥有各不相同却又密切相关的证明系统. 事实上, 这些证明系统之间的联系如此紧密, 以至于其中一种逻辑中的结果往往只需稍加改动, 便可提升为另一种逻辑中的结果.</p>
+    <h3>第1.2节 逻辑和对于计算的描述</h3>
+    <p>逻辑可以通过若干方式应用于计算的规范描述. 我们对逻辑的这些角色作一个概览, 以便确定本书所关注的特定领域.</p>
+    <p>在计算的规范描述中, 逻辑通常以两种途径之一被使用. 在计算即模型 (computation-as-model) 的途径中, 计算被编码为包含节点, 转移和状态等要素的数学结构. 逻辑则从外部被用来对这些结构作出陈述. 也就是说, 计算被用作逻辑公式的模型. 内涵算子 (intensional operators), 例如Hoare逻辑中的三元组, 或时序逻辑与动态逻辑中的模态词, 常被用来表达关于状态变化的命题. 这种用逻辑来表示计算并对计算进行推理的方式, 是逻辑规范描述与计算相结合最为广泛成功的用法.</p>
+    <p>计算即演绎 (computation-as-deduction) 的途径则把逻辑句法中的构件 (例如公式, 项, 类型和证明) 用作被规范描述的计算的组成元素. 在这一更为精微的设定下, 对计算的建模又有两种不同的途径.</p>
+    <p>证明规范化 (proof-normalization) 途径把计算的状态看作一个证明项, 而把计算过程看作规范化 (它有多种称谓, 如<math><mi>&beta;</mi></math>归约或切消). 函数式编程可以用证明规范化作为其理论基础来加以解释 (例如遵循Martin-Löf [1982] 的做法). 证明规范化已被用于为新的函数式编程语言的设计提供依据: 参见Abramsky [1993].</p>
+    <p>证明搜索 (proof-search) 途径把计算的状态看作一个相继式 (即公式的一种结构化集合), 而把计算过程看作搜索该相继式之证明的过程: 相继式中发生的变化刻画了计算的动态特征. 本书的主题正是这一计算视角.</p>
+    <p>这两种基于演绎的编程范型都必须在其计算机制中处理非确定性. 当函数式编程语言基于证明规范化来设计时, 对可约式重写次序的显式控制通常用传值调用或传名调用的求值次序来描述. 当逻辑编程语言 (如Prolog和λProlog) 基于证明搜索来设计时, 非确定性的成分往往通过强加深度优先搜索与回溯而被消除.</p>
+    <p>上文对证明规范化与证明搜索所作的区分是非形式化的, 只具启发意义. 这样的划分有助于指出这两大途径所代表的不同关切. 例如, 证明规范化侧重于描述重写及其合流性, 而证明搜索则侧重于非确定性以及对推理规则的反向解读. 计算逻辑与证明论中的新进展, 或许会让我们得以合并或重组这一分类.</p>
+    <h3>第1.3节 证明搜索和逻辑编程</h3>
+    <p>逻辑编程最早的理论框架并非建立在证明分析之上, 而是建立在归结反驳之上 (例如参见Robinson [1965]), 尤其是SLD归结. 将归结反驳作为逻辑编程的基础, 至少存在以下几方面的不足.
+      <ol>
+        <li>归结的用途是反驳: 即试图推导出矛盾. 这一选择有悖直觉, 因为逻辑编程看起来应当是从一组公式 (即逻辑程序) 出发去证明某个目标公式.</li>
+        <li>大多数反驳系统处理的是合取范式和Skolem范式的公式. 然而, 在我们希望研究的各种逻辑中, 只有经典逻辑才允许将公式限制为这些范式. 此外, 当高阶谓词变量被替换为含有量词和联结词的表达式时, 这些范式不被保持.</li>
+        <li>归结中的一个关键推理步骤是计算最一般合一子. 在很多方面, 合一实际上是对量化与等词之间相互作用的一种实现. 在尝试实现这种相互作用之前, 先理解其本质似乎更为自然. 在本书中, 合一这一实现技术并不占据核心地位.</li>
+      </ol>
+    </p>
+    <h3>第1.4节 设计逻辑编程语言</h3>
+    <p>Prolog发展早期的一个核心关注点在于如何在Prolog解释器中最好地控制搜索. 例如, Kowalski [1979]提出了如下等式
+      <math display="block">
+        <mrow><mtext>算法</mtext><mo>=</mo>
+          <mrow><mtext>逻辑</mtext><mo>+</mo><mtext>控制</mtext></mrow>
+        </mrow>
+      </math>
+      这一等式揭示了一个重要观点, 即逻辑 (此处指一阶Horn子句描述) 与算法之间存在差距. 例如, Fibonacci数列的朴素Horn子句描述既可以产生指数时间算法, 也可以产生线性时间算法, 这取决于采用的是自顶向下 (目标导向) 还是自底向上 (程序导向) 的证明搜索策略. 显然, 程序员必须能够对从这一单一逻辑描述最终产生哪种算法施加某种控制. Prolog中还引入了若干非逻辑特性&mdash;&mdash;例如切算子<code>!</code>和否定即失败&mdash;&mdash;以实现对搜索的某种显式控制.</p>
+    <p>{原注: 本书将不再提及Prolog的切算子<code>!</code>: 实际上, 这里的<q>切</q>和<q><math><mi>!</mi></math></q>将会有着截然不同的含义.}</p>
+    <p>鉴于Prolog的逻辑基础相当薄弱 (参见第5.12节的讨论), 新的逻辑编程语言的设计加入了诸多扩展, 由此产生了一个更接近如下形式的等式.
+      <math display="block">
+        <mtable columnalign="left">
+          <mtr>
+            <mtd><mtext>编程</mtext></mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mtext>逻辑</mtext></mtd>
+            <mtd><mo>+</mo></mtd>
+            <mtd>
+              <mrow><mtext>控制</mtext><mo>+</mo><mtext>输入/输出</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>+</mo></mtd>
+            <mtd><mtext>高阶编程</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>+</mo></mtd>
+            <mtd><mtext>数据抽象</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>+</mo></mtd>
+            <mtd><mtext>模块</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>+</mo></mtd>
+            <mtd>
+              <mrow><mtext>并发</mtext><mo>+</mo><mo>&ctdot;</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      这些扩展通常是以临时性的方式引入的, 而逻辑&mdash;&mdash;作为Prolog这类语言的初衷和引人入胜的出发点&mdash;&mdash;被从舞台的中心位置移开了. 采用这种方式设计编程语言, 为解决高阶编程而添加的特性可能会与为解决模块而添加的特性以复杂的方式相互影响. 描述这种特性间的相互作用会极大地增加编程语言在设计, 实现和语义描述方面的复杂性.</p>
+    <p>一个值得探索的有趣课题是, 考察如何满足以下等式
+      <math display="block">
+        <mrow><mtext>编程</mtext><mo>=</mo><mtext>逻辑</mtext></mrow>
+      </math>
+      如果这一等式确实可行, 那么人们很可能需要重新审视<q>编程</q>和<q>逻辑</q>的含义. 在本书中, <q>编程</q>一般被理解为对计算的高层次描述: 构建高效的底层程序不在讨论范围之内. 本书还探索了对<q>逻辑</q>的重新诠释, 从一阶经典逻辑和Horn子句转向直觉主义逻辑和线性逻辑, 并可能采用高阶量化. 目标导向的控制将被内建于我们最终采用的证明系统之中. 第10章至第13章提供了若干详细的扩展示例, 展示了如何利用这些更丰富的逻辑来进行描述计算.</p>
+    <h3>第1.5节 为什么使用逻辑编写程序?</h3>
+    <p>将程序编写为逻辑公式并将计算视为证明的构造, 这样做会带来诸多好处. 我们在此列举其中几项.
+      <ol>
+        <li>逻辑公式具有多种运算, 这些运算通常满足一些有价值的性质. 例如, 对公式施加替换或用等价的子公式替换某个子公式, 在逻辑上都是有意义的; 我们也可以期望这类运算能够产生保持语义的程序变换.</li>
+        <li>逻辑中的核心概念通常可以通过多种方式来描述. 例如, 定理集合既可以被描述为所有可证公式的集合, 也可以被描述为所有真公式的集合 (基于某种适当的模型论). 此外, 可证性也可以通过截然不同的方式来刻画: 例如通过相继式演算证明, 自然演绎, 归结反驳以及语义表列等方法. 因此, 逻辑程序可以采用不同的执行模型, 同时保持程序原有的语义.</li>
+        <li>证明论通常配备各种抽象机制, 而设计得当的逻辑编程语言可以充分利用这些机制. 例如, 高阶直觉主义逻辑可以为逻辑程序提供抽象数据类型, 以及模块化编程和高阶编程能力. 更重要的是, 某一种抽象机制不会与其他抽象机制产生未定义的交互.</li>
+        <li>我们在此讨论的逻辑具有被普遍接受的描述. 因此, 逻辑程序在未来许多年后仍然是有意义的, 即使当今用来执行这些程序的某个特定编译器或解释器在将来已不复存在.</li>
+      </ol>
+      将逻辑用作编程语言所带来的这些好处是引人注目的, 值得进一步探索.</p>
+    <h3>第1.6节 本书的结构</h3>
+    <p>本书分为两个部分.</p>
+    <p>第一部分包含第1至9章, 介绍了基于经典逻辑, 直觉主义逻辑和线性逻辑, 并涵盖一阶和高阶量化的各种逻辑编程语言的证明论基础与设计. 最终, 我们所有的逻辑编程语言 (包括一阶Horn子句和高阶遗传Harrop公式) 都将被纳入高阶线性逻辑的框架之中. 这一部分的各章内容逐步递进, 应按照所呈现的顺序阅读. 在初次阅读时, 可以跳过各种元理论结果的证明 (例如第5.5节和第7章中的内容).</p>
+    <p>第二部分包含第10至13章, 提供了第一部分所描述的逻辑编程语言的应用实例. 这几章之间没有显著的依赖关系, 因此可以按任意顺序阅读.</p>
+    <h3>第1.7节 参考文献注记</h3>
+    <p><em>斯坦福哲学百科全书</em>收录了若干优秀的综述文章, 包括Rathjen和Sieg [2020] 关于证明论的综述, von Plato [2018] 关于证明论发展历程的综述, Moschovakis [2024] 关于直觉主义逻辑的综述, Di Cosmo和Miller [2019] 关于线性逻辑的综述, 以及Benzmüller和Andrews [2019] 关于Church简单类型论的综述.</p>
+    <p>关于使用归结和SLD归结来描述基于一阶经典逻辑中Horn子句的逻辑编程, 可参阅Apt和Emden [1982] 以及Emden和Kowalski [1976] 的早期论文, 还有Gallier [1986] 和Lloyd [1987] 的教科书.</p>
+    <p>本书作者在Miller [2021] 中讨论了逻辑编程与证明论之间的相互影响, 并在Miller [2022b] 中综述了证明论作为逻辑编程基础的若干应用.</p>
+    <h2>第2章 项, 公式, 和相继式</h2>
+    <p>本书涵盖一阶逻辑和高阶逻辑的相关主题. 第3章至第8章仅使用一阶量化, 而其余大部分章节将使用高阶量化. 本章提供了高阶量化和高阶替换的基本句法定义与运算: 一阶量化和替换可以被视为对一般框架的自然限制.</p>
+    <p>Church [1940] 在其开创性的论文中引入了简单类型论. 这一经典逻辑的高阶版本依赖简单类型<math><mi>&lambda;</mi></math>演算作为其句法结构. 由于Church的目标是为数学建立逻辑基础, 他在其系统中纳入了具有数学动机的选择公理, 外延性公理和无穷公理. 去除这些公理后便得到基本类型论, 这一术语由Andrews [1974] 引入. 我们将使用后者作为模板, 在经典逻辑, 直觉主义逻辑和线性逻辑中构造一阶和高阶量化.</p>
+    <h3>第2.1节 无类型<math><mi>&lambda;</mi></math>项</h3>
+    <p>在本书中, 我们将主要使用简单类型<math><mi>&lambda;</mi></math>项. 不过, 我们首先简要讨论无类型<math><mi>&lambda;</mi></math>演算, 因为它与简单类型项共享相同的等式理论.</p>
+    <p>我们首先假定存在一个固定的可数无穷的token (或者说标识符) 集合. 本节将交替使用<q>token</q>和<q>变量</q>这两个术语. 稍后, 当我们讨论为token声明类型和绑定作用域的不同方式时, 将区分用作变量的token和用作常量的token.</p>
+    <p>构建<math><mi>&lambda;</mi></math>项有三种方式:
+      <ol>
+        <li>如上所述, 充当变量的token是<math><mi>&lambda;</mi></math>项.</li>
+        <li>给定两个项<math><mi>M</mi></math>和<math><mi>N</mi></math>, 它们的应用为<math><mrow><mo stretchy="false">(</mo><mrow><mi>M</mi><mspace width="1ex"/><mi>N</mi></mrow><mo stretchy="false">)</mo></mrow></math>. 应用是一种中缀并置运算, 且满足左结合律.</li>
+        <li>给定一个项<math><mi>M</mi></math>和一个token <math><mi>x</mi></math>, <math><mi>x</mi></math>对<math><mi>M</mi></math>的抽象为<math><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>M</mi></mrow><mo stretchy="false">)</mo></mrow></math>. 其中, token <math><mi>x</mi></math>是一个绑定变量, 其作用域为<math><mi>M</mi></math>. 为提高可读性, 我们通常省略最外层的括号.</li>
+      </ol>
+      我们假定读者熟悉<math><mi>&lambda;</mi></math>项中变量的自由出现和绑定出现的概念. </p>
+    <h2>第3章 相继式演算证明规则</h2>
+    <p>一种常见的形式证明方法, 通常归功于Frege和Hilbert, 它接受特定的公式作为公理 (例如, <math><mrow><mo stretchy="false">(</mo><mrow><mi>p</mi><mo>&sup;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>q</mi><mo>&sup;</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math>和<math><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>p</mi><mo>&sup;</mo><mi>q</mi><mo>&sup;</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&sup;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>p</mi><mo>&sup;</mo><mi>q</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&sup;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>p</mi><mo>&sup;</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math>), 并采用某些推理规则 (例如, 由<math><mi>p</mi></math>和<math><mrow><mo stretchy="false">(</mo><mrow><mi>p</mi><mo>&sup;</mo><mi>q</mi></mrow><mo stretchy="false">)</mo></mrow></math>可得出<math><mi>q</mi></math>). 一个形式化的Frege证明是一个公式列表, 其中每个出现的公式要么是一条公理, 要么是对列表中先前公式应用推理规则所得到的结果. 这种证明结构是简单的结构, 而且可以适当选取公理和推理规则, 从而为经典逻辑或直觉主义逻辑提供一个证明系统. 虽然Frege证明易于验证其正确性, 但将其作为自动化证明搜索算法的基础则颇具挑战. 图3.1给出了一个Frege证明的示例. 正如我们即将看到的, 相继式演算证明提供了一种结构化程度更高的形式证明方法. 我们将使用相继式演算证明来为逻辑编程范式提供抽象的执行模型.</p>
+    <h3>第3.1节 相继式演算和证明搜索</h3>
+    <p>相继式演算与Frege证明相比, 至少有两个重大不同. 首先, Frege证明中的推理规则作用于公式, 而在相继式演算中, 推理规则作用于相继式&mdash;&mdash;一种更为复杂的结构. 其次, 在我们所研究的相继式演算证明系统中, 不使用任何公理: 证明的全部负担完全落在关于相继式的推理规则之上.</p>
+    <p>在第2.5节中, 我们将相继式作为包含一个或多个公式集合的形式化句法结构加以介绍. 在第3.2节正式给出使用相继式的推理规则之前, 我们先对双侧相继式给出一种非形式化的解读, 其中右侧是一个恰好包含一个公式出现的集合. 例如, 考虑证明: 对于每个自然数<math><mi>n</mi></math>, 乘积<math><mrow><mi>n</mi><mo>&it;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是偶数. 对这一事实的非形式化证明可以组织如下. 为了证明这对所有自然数成立, 任取一个自然数, 比如<math><mi>m</mi></math>. 那么, <math><mi>m</mi></math>要么是偶数, 要么是奇数. 如果<math><mi>m</mi></math>是偶数, 则乘积<math><mrow><mi>m</mi><mo>&it;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是偶数. 如果<math><mi>m</mi></math>是奇数, 则<math><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math>是偶数, 因此乘积<math><mrow><mi>m</mi><mo>&it;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>同样是偶数. 于是, 在两种情况下, 该乘积都是偶数.</p>
+    <p>将这一证明形式化的第一步, 是识别(并命名)该论证中所默认已经证明的三个关于自然数的引理.
+      <math display="block">
+        <mtable columnalign="left">
+          <mtr>
+            <mtd>
+              <msub><mi>L</mi><mn>1</mn></msub>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo><mi>n</mi><mo lspace="0">.</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>even</mi><mspace width="1ex"/><mi>n</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&or;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>odd</mi><mspace width="1ex"/><mi>n</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>L</mi><mn>2</mn></msub>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo><mi>n</mi><mo lspace="0">.</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>even</mi><mspace width="1ex"/><mi>n</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&sup;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>odd</mi><mspace width="1ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>s</mi><mspace width="1ex"/><mi>n</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>L</mi><mn>3</mn></msub>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo><mi>n</mi><mo lspace="0">.</mo>
+                <mrow><mo>&forall;</mo><mi>m</mi><mo lspace="0">.</mo>
+                  <mrow><mo>&forall;</mo><mi>p</mi><mo lspace="0">.</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow><mi>even</mi><mspace width="1ex"/><mi>n</mi></mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                          <mo>&or;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow><mi>even</mi><mspace width="1ex"/><mi>m</mi></mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&sup;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>times</mi><mspace width="1ex"/><mi>n</mi><mspace width="1ex"/><mi>m</mi><mspace width="1ex"/><mi>p</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&sup;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>even</mi><mspace width="1ex"/><mi>p</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      为了使这些引理成为前一章中所定义的合式公式, 我们必须假设sort集<math><mi mathvariant="script">S</mi></math>包含一个基本类型, 即<math><mi>nat</mi></math>, </p>
+    <h3>第3.2节 推理规则</h3>
+    <h3>第3.3节 加性和乘性推理规则</h3>
+    <h3>第3.4节 相继式演算证明</h3>
+    <h3>第3.5节 推理规则的置换</h3>
+    <h3>第3.6节 聚焦和非聚焦证明系统</h3>
+    <h3>第3.7节 切消及其推论</h3>
+    <h3>第3.8节 参考文献注记</h3>
+    <h2>第4章 经典和直觉主义逻辑</h2>
+    <h2>第5章 两种抽象逻辑编程语言</h2>
+    <p>现在我们应用<math><mi mathvariant="bold">C</mi></math>和<math><mi mathvariant="bold">I</mi></math>证明系统以用高层次和实现无关的方式来描述逻辑编程.</p>
+    <h3>第5.1节 目标导向证明搜索</h3>
+    <p>一种建模逻辑编程的方法是将逻辑程序视为假设, 将目标视为针对逻辑程序提出的查询, 而将计算视为从程序出发尝试证明目标的过程. 一个理想化解释器的状态可以表示为双侧相继式<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><mi>G</mi></mrow></mrow></math>, 其中<math><mi mathvariant="normal">&Sigma;</mi></math>是声明一集特征变量的签名, <math><mi mathvariant="script">P</mi></math>是一集<math><mi mathvariant="normal">&Sigma;</mi></math>-公式, 表示程序, <math><mi>G</mi></math>是一个<math><mi mathvariant="normal">&Sigma;</mi></math>-公式, 表示我们希望从<math><mi mathvariant="script">P</mi></math>中证明的目标.</p>
+    <p>一个引人注目的观点是, 将逻辑编程中的计算视为基于以下受限形式的证明搜索. 如果<math><mi>G</mi></math>不是原子公式, 那么它的顶层逻辑联结词应决定使用哪些推理规则来证明<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><mi>G</mi></mrow></mrow></math>. 具体而言, 必须尝试一个右引入规则. 因此, 位于目标头部的逻辑联结词的搜索语义由证明系统固定, 与程序无关. 只有当目标是原子的 (即其顶层符号是非逻辑的) 时, 才会查阅程序<math><mi mathvariant="script">P</mi></math>: 程序的作用是为原子公式头部的非逻辑谓词常量提供含义.</p>
+    <p>如果我们使用图4.1中给出的引入规则来实例化上述计算观点, 就可以推导出以下一组证明搜索策略.
+      <ol>
+        <li>将证明<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><mrow><msub><mi>B</mi><mn>1</mn></msub><mo>&and;</mo><msub><mi>B</mi><mn>2</mn></msub></mrow></mrow></mrow></math>的尝试归约为证明两个相继式<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><msub><mi>B</mi><mn>1</mn></msub></mrow></mrow></math>和<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><msub><mi>B</mi><mn>2</mn></msub></mrow></mrow></math>的尝试.</li>
+        <li>将证明<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><mrow><msub><mi>B</mi><mn>1</mn></msub><mo>&or;</mo><msub><mi>B</mi><mn>2</mn></msub></mrow></mrow></mrow></math>的尝试归约为证明<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><msub><mi>B</mi><mn>1</mn></msub></mrow></mrow></math>或<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><msub><mi>B</mi><mn>2</mn></msub></mrow></mrow></math>其中之一的尝试.</li>
+        <li>将证明<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><mrow><mo>&exist;</mo><mi>x</mi><mo lspace="0">.</mo><mi>B</mi></mrow></mrow></mrow></math>的尝试归约为证明<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><mrow><mi>B</mi><mrow><mo stretchy="false">[</mo><mrow><mi>t</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></mrow></mrow></math>的尝试, 其中<math><mi>t</mi></math>是某个类型为<math><mi>&tau;</mi></math>的<math><mi mathvariant="normal">&Sigma;</mi></math>-项.</li>
+        <li>将证明<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mi mathvariant="script">P</mi><mo>&vdash;</mo><mrow><msub><mi>B</mi><mn>1</mn></msub><mo>&sup;</mo><msub><mi>B</mi><mn>2</mn></msub></mrow></mrow></mrow></math>的尝试归约为证明<math><mrow><mi mathvariant="normal">&Sigma;</mi><mo>::</mo><mrow><mrow><mi mathvariant="script">P</mi><mo>,</mo><msub><mi>B</mi><mn>1</mn></msub></mrow><mo>&vdash;</mo><msub><mi>B</mi><mn>2</mn></msub></mrow></mrow></math>的尝试.</li>
+        <li></li>
+      </ol>
+    </p>
+    <h2>第6章 线性逻辑</h2>
+    <p>从证明论的角度来看, 第5章中对经典逻辑和直觉主义逻辑的目标导向证明搜索分析至少存在以下三个问题.</p>
+    <h2>第7章 线性逻辑聚焦证明的形式性质</h2>
+    <h2>第8章 线性逻辑编程</h2>
+    <h3>第8.1节 将多重集编码为公式</h3>
+    <h3>第8.2节 Lolli程序的一种句法</h3>
+    <h2>第9章 高阶量化</h2>
+    <h2>第10章 使用多重集描述计算</h2>
+    <h2>第11章 Horn子句的collection analysis</h2>
+    <h2>第12章 编码安全协议</h2>
+    <h2>第13章 对于操作语义形式化</h2>
+  </body>
+</html>
