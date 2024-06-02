@@ -1,0 +1,90 @@
+#lang racket
+(provide linearlisp.html)
+(require SMathML)
+(define linearlisp.html
+  (TnTmPrelude
+   #:title "线性Lisp"
+   #:css "styles.css"
+   (H1. "线性Lisp")
+   (H2 "摘要")
+   (P "线性逻辑被提出作为解决垃圾回收问题的一种方案, "
+      "并在更偏函数式的语言中提供高效的" (Q "原地更新")
+      "能力. 线性逻辑保持可访问性的守恒, "
+      "因而提供了一种更适合分布式内存并行处理器的机械隐喻, "
+      "在这种处理器中复制是显式的. 然而, "
+      "线性逻辑缺乏共享, 这可能引入其自身的显著低效.")
+   (P "我们展示了一种称为线性Lisp的线性逻辑高效实现, "
+      "其运行效率与非线性逻辑仅相差一个常数因子. "
+      "该线性Lisp允许RPLACX操作, "
+      "并能像非线性Lisp一样安全地管理存储, 但不需要垃圾回收器. "
+      "由于它提供赋值但不提供共享, "
+      "它处于函数式语言与命令式语言之间的模糊地带. "
+      "我们的线性Lisp机器提供了与组合子/图归约机器许多相同的能力, "
+      "但没有它们的复制和垃圾回收问题.")
+   (H2. "引论")
+   (P "数据结构的共享可以是高效的, 因为共享可以替代复制, "
+      "但它造成了关于谁负责管理这些数据结构的歧义. "
+      "这种歧义很难通过静态方法消除 "
+      "[Barth77] [Bloss89] [Chase87] [Hederman88] "
+      "[Inoue88] [Jones89] [Ruggieri88], "
+      "而且我们已经证明 [Baker90], 静态共享分析" --
+      "即使对于纯函数式语言" --
+      "可能与ML类型推断一样困难, "
+      "而后者已知具有指数级复杂度 [Mairson90]. "
+      "我们在此表明, 一个利用偶然共享而非必要共享的系统, "
+      "可以在不引入通常与共享相关的歧义的情况下提供效率.")
+   (P "线性逻辑由Girard [Girard87] 发明, "
+      "用于处理不应被随意共享或复制的对象. "
+      "Wadler [Wadler91] 提出使用引用计数为一的数据结构, "
+      "以避免垃圾回收问题并实现O(1)的数组更新. "
+      "Wakeling [Wakeling91] 实现了线性逻辑, "
+      "但发现其运行极为缓慢, 原因在于它要求进行繁琐的复制. "
+      "我们的线性Lisp机器实现引用计数为一的数据结构"
+      "比Wakeling的机器更为高效, "
+      "并且应当能够与传统的组合子/图归约机器实现"
+      (Q "相竞争") ".")
+   (H2. "一个线性Lisp机器")
+   (P "在本节中, 我们引入一个Lisp机器的自动机理论模型, "
+      "其中所有cons单元的引用计数恰好为1, "
+      "这意味着所有数据结构都是树" --
+      "即它们没有共享或环. 例如, 在我们的线性Lisp中, "
+      (Code "NREVERSE") "与" (Code "REVERSE")
+      "是同构的.")
+   (P "我们的机器由一个有限状态控制器和" $n
+      "个指针寄存器组成, "
+      "这些寄存器可以保存原子或指向cons单元的指针. 原子要么是"
+      (Code "NIL") ", 要么是符号. 其中一个寄存器" --
+      (Code "fr") -- "被指定为" (Q "空闲列表")
+      "寄存器, 并被初始化为指向一个无限的" (Code "NIL")
+      "列表. 另一个寄存器" -- (Code "sp")
+      -- "被指定为" (Q "栈指针")
+      "寄存器. 该机器可以执行以下任意一种原子操作:"
+      (CodeB "r1&lt;->r2; /* swap r1,r2. */
+r1&lt;->CAR(r2); /* r1,r2 distinct; precondition(not ATOM(r2)) */
+r1&lt;->CDR(r2); /* r1,r2 distinct; precondition(not ATOM(r2)) */
+NULL(r1); /* predicate for r1=NIL */
+ATOM(r1); /* predicate for r1=NIL or symbolp(r1) */
+EQ(r1,r2); /* defined only for atomic r1,r2; see [Baker93ER] */
+r1:='foo; /* precondition(ATOM(r1) and ATOM('foo)) constant 'foo */
+r1:=r2; /* precondition(ATOM(r1) and ATOM(r2)) */
+CONS(r1,r2): /* r1,r2 distinct; r2&lt;-CONS(r1,r2) and set r1=NIL */
+{r1&lt;->CAR(fr); r2&lt;->fr; fr&lt;->CDR(r2);};
+PUSH(r1,r2): /* r1,r2 distinct; Push r1 onto r2 and set r1=NIL */
+CONS(r1,r2);
+POP(r1,r2): /* r1,r2 distinct; Pop CAR(r2) into r1 if r1=NIL */
+if NULL(r1) and not ATOM(r2)
+   then {fr&lt;->CDR(r2); r2&lt;->fr; r1&lt;->CAR(fr);}
+   else die;"))
+   ((proposition #:n "1")
+    "列表单元的引用计数是守恒的, 且始终恒为1.")
+   ((proof)
+    "通过归纳法证明 [Suzuki82, 第4节]. "
+    "所有cons单元初始时具有为一的引用计数, "
+    "且仅通过保持引用计数不变的交换操作来操纵.")
+   ((proposition #:n "2")
+    "所有列表单元始终是可访问的" --
+    "即存活的, 不会产生垃圾.")
+   ((proof)
+    
+    )
+   ))
