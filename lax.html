@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>命题松弛逻辑</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>命题松弛逻辑</h1>
+    <p>我们研究一种颇为奇特的直觉主义模态逻辑, 称为命题松弛逻辑 (Propositional Lax Logic, PLL), 它在计算机硬件的形式验证方面很有应用前景. 该逻辑源于这样一种尝试: 把<q>在行为约束意义下的正确性</q>&mdash;&mdash;硬件验证中的一个核心概念&mdash;&mdash;表达为一个逻辑模态. 作为一种模态逻辑, 它的特别之处在于只配备了单一的模态算子<math><mo lspace="0" rspace="0">○</mo></math>, 而该算子同时带有可能性与必然性两种意味. 本文给出PLL的研究动机, 并给出若干技术性结果. 我们考察了它的一些证明论性质, 针对该逻辑的标准Gentzen式相继式系统给出了一个切消定理. 随后, 我们为PLL定义了一类新的可谬 (fallible) 双框架Kripke模型. 这类模型很不寻常, 因为其中出现了带有不一致信息的世界; 此外, 所施加的唯一框架条件是: <math><mo lspace="0" rspace="0">○</mo></math>-框架是<math><mo>&sup;</mo></math>-框架的一个子关系. 我们给出了一个自然的翻译, 把这类模型转化为以Goldblatt的<math><mi mathvariant="script">J</mi></math>-空间给出的PLL模型. 针对这类模型的完备性定理给出了PLL到<math><mrow><mo stretchy="false">(</mo><mrow><mi>S4</mi><mo>,</mo><mi>S4</mi></mrow><mo stretchy="false">)</mo></mrow></math>型经典双模态理论的一个Gödel式嵌入, 也为有限模型性质的一个简单证明奠定了基础. 我们进而针对若干特殊的模型类, 证明了相应理论的可靠性与完备性. 最后, 我们简要考察了硬件验证中两类具体而相当自然的模型, 在其中模态算子<math><mo lspace="0" rspace="0">○</mo></math>所刻画的正是相对于时序约束的正确性. 对于第一类模型, 我们证明了其逻辑的无<math><mo lspace="0" rspace="0">○</mo></math>片段是可判定的, 而该片段恰好就是Maksimova的中间逻辑<math><mi>LΠ</mi></math>的稳定形式.</p>
+    <h2>第1章 引论</h2>
+    <p>本文的研究对象是相当奇特的模态算子<math><mo lspace="0" rspace="0">○</mo></math>, 它由以下公理模式刻画:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>○R</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>M</mi><mo>&sup;</mo>
+                <mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo><mi>M</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>○M</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo>
+                  <mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo><mi>M</mi></mrow>
+                </mrow>
+                <mo>&sup;</mo>
+                <mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo><mi>M</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>○S</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo><mi>M</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo><mi>N</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&sup;</mo>
+                <mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>M</mi><mo>&and;</mo><mi>N</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      带有Modus Ponens和<q>由<math><mrow><mi>M</mi><mo>&sup;</mo><mi>N</mi></mrow></math>推出<math><mrow><mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo><mi>M</mi></mrow><mo>&sup;</mo><mrow><mo lspace="0" rspace="0">○</mo><mo>&af;</mo><mi>N</mi></mrow></mrow></math></q>这两条推理规则. 从经典的观点看, 这三条公理放在一起并没有太大意义, 尽管单看每一条都显得人畜无害. 事实上, <math><mo lspace="0" rspace="0">○</mo></math>兼具可能性与必然性的意味, 却又不属于其中任何一方. </p>
+  </body>
+</html>

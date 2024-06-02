@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>可扩展指称性语言描述</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>可扩展指称性语言描述</h1>
+    <p>当前状态: 试译, 以机翻为主.</p>
+    <h2>摘要</h2>
+    <p>传统的指称语义为同一个phrase赋予截然不同的意义, 具体取决于编程语言的其余部分. 如果语言是纯函数式的, 一个numeral的指称是从环境到整数的函数. 但在具有命令式控制算子的函数式语言中, 一个numeral的指称是从环境和延续到整数的函数. 本文引入了一种新的格式用于指称性语言描述, 即<em>扩展直接语义</em>, 它能够容纳语言的正交扩展, 而无需改变既有phrase的指称. 扩展直接语义始终将一个numeral映射到相同的指称: 即将相应的数字inject到值域中. 一般而言, 一个phrase在函数式语言中的指称始终是同一phrase在一个扩展语言的语义中的指称的投影&mdash;&mdash;不论扩展是什么. 基于扩展直接语义, 还可以通过组合语言片段的解释器来构造完整语言的解释器.</p>
+    <h2>第1章 复杂语言的指称性描述</h2>
+    <p>像Scheme [25], Common LISP [32] 或ML [19] 这样的编程语言, 由一个丰富的函数式核心组成, 并辅以对数据对象的destructive operation, 控制构造, 以及可能的其他命令式算子. 传统的指称性语言描述 [1, 15, 27, 35] 通过将程序phrase解释为从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi><mo>&times;</mo><mi>continuations</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的函数来应对这些构造. 然而, 程序员在推理程序phrase时依赖的是更简单的语义描述. 大多数程序phrase并不利用语言的全部一般性, 因此可以用更简单的语义模型来分析. 例如, 如果一个程序phrase是纯函数式的, 且其自由变量始终绑定到无副作用的过程, 那么它可以被解释为从<math><mi>environments</mi></math>到<math><mi>values</mi></math>的函数. 类似地, 如果一个命令式程序phrase不使用像<span><code>callcc</code>, <code>goto</code>, <code>catch</code></span>这样的一般性控制算子, 且其自由变量始终绑定到满足相同约束的值和过程, 那么它可以被解释为从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的函数. 遗憾的是, 实际编程语言的指称定义所采用的形式使得很难为一个有纪律的子集提取出简化的定义&mdash;&mdash;更不用说证明这些定义在受限语言上是等价的了.</p>
+    <p>描述同一问题的另一种方式是观察当语言被扩展时, 像numeral <code>5</code>这样的简单程序phrase的意义会发生什么变化. 在函数式语言中, numeral <code>5</code>的指称正是程序员所期望的: 一个从环境到整数<math><mn>5</mn></math>的函数. 但如果我们向语言中添加引用单元 (reference cell), <code>5</code>就变成指称一个从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的常函数. 此外, 如果我们再添加控制算子 (如<code>goto</code>或<code>callcc</code>), <code>5</code>的意义就变成了一个从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi><mo>&times;</mo><mi>continuations</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的常函数. 指称语义的这一恼人性质在语言研究者中是众所周知的. 事实上, 在最近的一篇综述论文中, Peter Mosses [23] 指出, 这一现象一直是指称语义作为定义编程语言的实用工具被广泛接受的主要障碍.</p>
+    <h2>第2章 可扩展的操作语义</h2>
+    <h2>第3章 可扩展的指称性描述</h2>
+    <h3>第3.1节 语义框架: 扩展了的直接语义</h3>
+    <h3>第3.2节 纯Scheme</h3>
+    <h3>第3.3节 状态Scheme</h3>
+    <h3>第3.4节 控制Scheme</h3>
+    <h3>第3.5节 稳定指称</h3>
+    <h2>第4章 将解释器复合</h2>
+    <h2>第5章 相关工作</h2>
+    <h2>第6章 结论</h2>
+    <h2>附录A. domain描述的记号</h2>
+    <p>本篇论文所呈现的语义定义依赖于domain构造子<math><mo>&otimes;</mo></math> (smash product), <math><mo>&oplus;</mo></math> (coalesced sum), <math><msub><mo>&sdot;</mo><mi>&bottom;</mi></msub></math> (lifting), <math><mo>&xrarr;</mo></math> (连续函数), </p>
+  </body>
+</html>

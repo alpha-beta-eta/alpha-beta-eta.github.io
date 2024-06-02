@@ -1,0 +1,89 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>上下文中的范畴论</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>上下文中的范畴论</h1>
+    <h2>前言</h2>
+    <p>Atiyah将数学描述为<q>类比的科学</q>. 沿此脉络, 那么范畴论的研究范围就是<em>数学类比</em>. 范畴论为数学提供了跨学科的语言, 其设计用以描绘一般的现象, 这使得将想法从一个研究领域转移到另一个领域成为可能. 范畴论视角可以充当简化抽象, 将出于形式原因成立的命题和那些证明需要特定于某个数学分支的技巧的命题分离开来.</p>
+    <p>视角的微妙转变允许数学内容以相对于所考虑的对象的多样性的不变的语言进行描述. 与其直接刻画对象, 范畴论方法强调相同一般类型的对象之间的变换. 范畴论中的一个基本引理可以推出任何数学对象都可由其<em>泛性质</em>进行刻画&mdash;&mdash;</p>
+    <h2>第1章 范畴, 函子, 自然变换</h2>
+    <p>一个abel群<math><mi>H</mi></math>经由一个abel群<math><mi>G</mi></math>的一个<b>群扩张</b>由一个群<math><mi>E</mi></math>连带着作为正规子群的一个嵌入 (inclusion) <math><mrow><mi>G</mi><mo>&rarrhk;</mo><mi>E</mi></mrow></math>和将<math><mi>H</mi></math>展现为商群<math><mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>G</mi></mrow></math>的一个满同态<math><mrow><mi>E</mi><mo>&Rarr;</mo><mi>H</mi></mrow></math>构成. 这个数据通常呈现于以下群同态的图表之中:
+      <math display="block">
+        <mrow><mn>0</mn><mo>&rarr;</mo><mi>G</mi><mo>&rarr;</mo><mi>E</mi><mo>&rarr;</mo><mi>H</mi><mo>&rarr;</mo><mn>0</mn></mrow>
+        <mtext>.</mtext></math>
+      <math><mi>G</mi></math>和<math><mi>H</mi></math>的一对群扩张<math><mi>E</mi></math>和<math><msup><mi>E</mi><mo>&prime;</mo></msup></math>被认为是等价的, 每当存在一个同构<math><mrow><mi>E</mi><mo>&cong;</mo><msup><mi>E</mi><mo>&prime;</mo></msup></mrow></math>, 其与<math><mi>G</mi></math>的嵌入和到<math><mi>H</mi></math>的商映射<em>交换</em>, 这里的含义将于第1.6节精确化. <math><mi>H</mi></math>经由<math><mi>G</mi></math>的abel群扩张的等价类集合定义了一个abel群<math><mrow><mi>Ext</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>H</mi><mo>,</mo><mi>G</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>.</p>
+    <h3>第1.1节 抽象和具体范畴</h3>
+    <div class="definition"><b>定义1.1.1. </b>一个<b>范畴</b>由以下资料构成:
+      <ul>
+        <li>一个<b>对象</b><math><mrow><mi>X</mi><mo>,</mo><mi>Y</mi><mo>,</mo><mi>Z</mi><mo>,</mo><mo>&hellip;</mo></mrow></math>的合集</li>
+        <li>一个<b>态射</b><math><mrow><mi>f</mi><mo>,</mo><mi>g</mi><mo>,</mo><mi>h</mi><mo>,</mo><mo>&hellip;</mo></mrow></math>的合集</li>
+      </ul>
+      其满足:
+      <ul>
+        <li>每个态射都有指定的<b>定义域</b>和<b>陪域</b>对象; 记号<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow></mrow></math>指称<math><mi>f</mi></math>是一个以<math><mi>X</mi></math>为定义域而<math><mi>Y</mi></math>为陪域的态射.</li>
+        <li>每个对象都有一个指定的<b>恒等态射</b><math><mrow><msub><mn>1</mn><mi>X</mi></msub><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>X</mi></mrow></mrow></math>.</li>
+        <li>对于任意的一对态射<math><mi>f</mi></math>和<math><mi>g</mi></math>满足<math><mi>f</mi></math>的陪域等于<math><mi>g</mi></math>的定义域, 存在一个指定的<b>复合态射</b><math><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow></math>, 其定义域等于<math><mi>f</mi></math>的定义域, 其陪域等于<math><mi>g</mi></math>的陪域, 即
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mrow><mi>f</mi><mo>:</mo>
+                  <mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow>
+                </mrow>
+                <mo>,</mo>
+                <mrow><mi>g</mi><mo>:</mo>
+                  <mrow><mi>Y</mi><mo>&rarr;</mo><mi>Z</mi></mrow>
+                </mrow>
+              </mrow>
+              <mo>&dzigrarr;</mo>
+              <mrow>
+                <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+                <mo>:</mo>
+                <mrow><mi>X</mi><mo>&rarr;</mo><mi>Z</mi></mrow>
+              </mrow>
+            </mrow>
+            <mtext>.</mtext></math>
+        </li>
+      </ul>
+      这些资料服从于如下两条公理:
+      <ul>
+        <li>对于任意的<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow></mrow></math>, 复合<math><mrow><msub><mn>1</mn><mi>Y</mi></msub><mo>&it;</mo><mi>f</mi></mrow></math>和<math><mrow><mi>f</mi><mo>&it;</mo><msub><mn>1</mn><mi>X</mi></msub></mrow></math>均等于<math><mi>f</mi></math>.</li>
+        <li>对于任意的可复合态射三元组<math><mrow><mi>f</mi><mo>,</mo><mi>g</mi><mo>,</mo><mi>h</mi></mrow></math>, 复合<math><mrow><mi>h</mi><mo>&it;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>和<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>h</mi><mo>&it;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&it;</mo><mi>f</mi></mrow></math>是相等的, 因而以<math><mrow><mi>h</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow></math>指称:
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mrow><mi>f</mi><mo>:</mo>
+                  <mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow>
+                </mrow>
+                <mo>,</mo>
+                <mrow><mi>g</mi><mo>:</mo>
+                  <mrow><mi>Y</mi><mo>&rarr;</mo><mi>Z</mi></mrow>
+                </mrow>
+                <mo>,</mo>
+                <mrow><mi>h</mi><mo>:</mo>
+                  <mrow><mi>Z</mi><mo>&rarr;</mo><mi>W</mi></mrow>
+                </mrow>
+              </mrow>
+              <mo>&dzigrarr;</mo>
+              <mrow>
+                <mrow><mi>h</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+                <mo>:</mo>
+                <mrow><mi>X</mi><mo>&rarr;</mo><mi>W</mi></mrow>
+              </mrow>
+            </mrow>
+            <mtext>.</mtext></math>
+        </li>
+      </ul>
+      也就是说, 复合律 (composition law) 是结合性的和幺元性的 (unital), 恒等态射充当了两侧的恒元.</div>
+    <div class="remark"><b>评注1.1.2. </b>一个范畴的对象与其恒等态射之间具有双射对应, </div>
+    <p>传统上我们以范畴的对象对于范畴进行命名; 通常而言, 与之相伴的结构保持态射的更受偏爱的选择是清晰的. 然而, 这种实践在某种意义上违背了范畴论的基本哲学: </p>
+    <h2>第2章 泛性质, 可表性, 以及米田引理</h2>
+    <h2>第3章 极限和余极限</h2>
+    <h2>第4章 伴随</h2>
+    <h2>第5章 单子和代数</h2>
+    <h2>第6章 所有概念都是Kan扩张</h2>
+    <h2>尾声: 范畴论中的定理</h2>
+  </body>
+</html>

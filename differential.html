@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>微分学</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>微分学</h1>
+    <p>微分学深妙精微.</p>
+    <h2>第1章 Banach空间中的微分学</h2>
+    <h3>第1.1节 关于Banach空间和连续线性映射之概念的回顾</h3>
+    <p>下面的基域<math><mi>&Kopf;</mi></math>是<math><mi>&Ropf;</mi></math>或<math><mi>&Copf;</mi></math>. 如果<math><mi>E</mi></math>是复向量空间, 那么<math><mi>E</mi></math>具有隐式的实向量空间结构, 限于考虑向量<math><mrow><mi>x</mi><mo>&in;</mo><mi>E</mi></mrow></math>和标量<math><mrow><mi>&lambda;</mi><mo>&in;</mo><mi>&Ropf;</mi></mrow></math>之数乘<math><mrow><mi>&lambda;</mi><mo>&it;</mo><mi>x</mi></mrow></math>时.</p>
+    <h4>第1.1.1小节 向量空间<math><mi>E</mi></math>上的范数</h4>
+    <p>范数是满足如下条件的映射<math><mrow><mi>&rho;</mi><mo>:</mo><mrow><mi>E</mi><mo>&rarr;</mo><msup><mi>&Ropf;</mi><mo>+</mo></msup></mrow></mrow></math>:
+      <ol type="i">
+        <li><math><mrow><mrow><mi>&rho;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mn>0</mn></mrow></math>; <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>&rho;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow><mo>&rArr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mrow><mi>&rho;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mrow><mi>&rho;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>+</mo><mrow><mi>&rho;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo>&forall;</mo><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>E</mi></mrow></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mrow><mi>&rho;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mo>&it;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mo stretchy="false">|</mo><mi>&lambda;</mi><mo stretchy="false">|</mo></mrow><mo>&sdot;</mo><mrow><mi>&rho;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo>&forall;</mo><mrow><mrow><mi>x</mi><mo>&in;</mo><mi>E</mi></mrow><mo>,</mo><mrow><mi>&lambda;</mi><mo>&in;</mo><mi>&Kopf;</mi></mrow></mrow></mrow></mrow></math>.</li>
+      </ol>
+      带有给定范数的向量空间称为赋范向量空间. 当范数<math><mi>&rho;</mi></math>给定时, 往往将向量<math><mi>x</mi></math>的范数<math><mrow><mi>&rho;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>记为<math><mrow><mo stretchy="false">&Vert;</mo><mi>x</mi><mo stretchy="false">&Vert;</mo></mrow></math>. 采用这种记号, 上述条件可以写成:
+      <ol type="i">
+        <li><math><mrow><mrow><mo stretchy="false">&Vert;</mo><mn>0</mn><mo stretchy="false">&Vert;</mo></mrow><mo>=</mo><mn>0</mn></mrow></math>; <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">&Vert;</mo><mi>x</mi><mo stretchy="false">&Vert;</mo></mrow><mo>=</mo><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow><mo>&rArr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mrow><mo stretchy="false">&Vert;</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo stretchy="false">&Vert;</mo></mrow><mo>&le;</mo><mrow><mrow><mo stretchy="false">&Vert;</mo><mi>x</mi><mo stretchy="false">&Vert;</mo></mrow><mo>+</mo><mrow><mo stretchy="false">&Vert;</mo><mi>y</mi><mo stretchy="false">&Vert;</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo>&forall;</mo><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>E</mi></mrow></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mrow><mo stretchy="false">&Vert;</mo><mrow><mi>&lambda;</mi><mo>&it;</mo><mi>x</mi></mrow><mo stretchy="false">&Vert;</mo></mrow><mo>=</mo><mrow><mrow><mo stretchy="false">|</mo><mi>&lambda;</mi><mo stretchy="false">|</mo></mrow><mo>&sdot;</mo><mrow><mo stretchy="false">&Vert;</mo><mi>x</mi><mo stretchy="false">&Vert;</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo>&forall;</mo><mrow><mrow><mi>x</mi><mo>&in;</mo><mi>E</mi></mrow><mo>,</mo><mrow><mi>&lambda;</mi><mo>&in;</mo><mi>&Kopf;</mi></mrow></mrow></mrow></mrow></math>.</li>
+      </ol>
+    </p>
+    <div class="tcomment"><b>译者注记. </b>i可以合并为<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">&Vert;</mo><mi>x</mi><mo stretchy="false">&Vert;</mo></mrow><mo>=</mo><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow><mo>&hArr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>.</div>
+    <p>设<math><mi>E</mi></math>是一个赋范向量空间, 定义<math><mi>E</mi></math>中两点<math><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow></math>之距离如下:
+      <math display="block">
+        <mrow>
+          <mrow><mi>d</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">&Vert;</mo>
+            <mrow><mi>x</mi><mo>&minus;</mo><mi>y</mi></mrow>
+            <mo stretchy="false">&Vert;</mo></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      由iii可得<math><mrow><mrow><mo stretchy="false">&Vert;</mo><mrow><mi>x</mi><mo>&minus;</mo><mi>y</mi></mrow><mo stretchy="false">&Vert;</mo></mrow><mo>=</mo><mrow><mo stretchy="false">&Vert;</mo><mrow><mi>y</mi><mo>&minus;</mo><mi>x</mi></mrow><mo stretchy="false">&Vert;</mo></mrow></mrow></math>, 于是我们有<math><mrow><mrow><mi>d</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>d</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>y</mi><mo>,</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 又由ii立即可以推出
+      <math display="block">
+        <mrow>
+          <mrow><mi>d</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo>,</mo><mi>z</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&le;</mo>
+          <mrow>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>+</mo>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>y</mi><mo>,</mo><mi>z</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      最后, <math><mrow><mrow><mi>d</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mn>0</mn></mrow></math>当且仅当<math><mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>. 因此, <math><mi>E</mi></math>是一个度量空间. 并且和其他度量空间一样, <math><mi>E</mi></math>有拓扑结构. 对于这种拓扑, 范数<math><mrow><mi>u</mi><mo>&mapsto;</mo><mrow><mo stretchy="false">&Vert;</mo><mi>u</mi><mo stretchy="false">&Vert;</mo></mrow></mrow></math>是连续映射<math><mrow><mi>E</mi><mo>&rarr;</mo><mi>&Ropf;</mi></mrow></math>, 因为<math><mrow><mrow><mo stretchy="false">|</mo><mrow><mrow><mo stretchy="false">&Vert;</mo><mi>u</mi><mo stretchy="false">&Vert;</mo></mrow><mo>&minus;</mo><mrow><mo stretchy="false">&Vert;</mo><mi>v</mi><mo stretchy="false">&Vert;</mo></mrow></mrow><mo stretchy="false">|</mo></mrow><mo>&le;</mo><mrow><mo stretchy="false">&Vert;</mo><mrow><mi>u</mi><mo>&minus;</mo><mi>v</mi></mrow><mo stretchy="false">&Vert;</mo></mrow></mrow></math>.</p>
+    <div class="tcomment"><b>译者注记. </b><math><mrow><mi>u</mi><mo>&mapsto;</mo><mrow><mo stretchy="false">&Vert;</mo><mi>u</mi><mo stretchy="false">&Vert;</mo></mrow></mrow></math>更是一致连续的.</div>
+    <p>对于<math><mrow><mi>a</mi><mo>&in;</mo><mi>E</mi></mrow></math>和<math><mrow><mi>r</mi><mo>></mo><mn>0</mn></mrow></math>, <math><mrow><msup><mi>B</mi><mo>&prime;</mo></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是心为<math><mi>a</mi></math>, 半径为<math><mi>r</mi></math>的球, 其定义如下:
+      <math display="block">
+        <mrow><mo stretchy="false">{</mo>
+          <mrow>
+            <mrow><mi>x</mi><mo>&in;</mo><mi>E</mi></mrow>
+            <mo>|</mo>
+            <mrow>
+              <mrow><mi>d</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>,</mo><mi>a</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&le;</mo><mi>r</mi></mrow>
+          </mrow>
+          <mo stretchy="false">}</mo></mrow>
+      </math>
+      或者说
+      <math display="block">
+        <mrow><mo stretchy="false">{</mo>
+          <mrow>
+            <mrow><mi>x</mi><mo>&in;</mo><mi>E</mi></mrow>
+            <mo>|</mo>
+            <mrow>
+              <mrow><mo stretchy="false">&Vert;</mo>
+                <mrow><mi>x</mi><mo>&minus;</mo><mi>a</mi></mrow>
+                <mo stretchy="false">&Vert;</mo></mrow>
+              <mo>&le;</mo><mi>r</mi></mrow>
+          </mrow>
+          <mo stretchy="false">}</mo></mrow>
+      </math>
+      考虑一个子集<math><mrow><mi>U</mi><mo>&sub;</mo><mi>E</mi></mrow></math>, </p>
+  </body>
+</html>

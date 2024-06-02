@@ -1,0 +1,549 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>模块化单子语义和编译</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>模块化单子语义和编译</h1>
+    <h2>第1章 引论</h2>
+    <h3>第1.1节 概览</h3>
+    <p>指称语义 [Stoy, 1977] 是编程语言理论中最重要的发展之一. 它为编程语言提供了精确的数学描述, 可用于语言的设计与实现以及程序的推理. 例如, 指称语义的进展促进了语言特性的澄清, 推动了更一致的编程语言设计, 并催生了新的编程构造.</p>
+    <p>然而, 人们很早就认识到, 传统的指称语义缺乏模块性和可扩展性 [Mosses, 1984] [Lee, 1989]. 这被视为将指称语义应用于实际编程语言的一大障碍.</p>
+    <p>在本论文中, 我们利用编程语言理论中的一项新发展&mdash;&mdash;单子方法 [Moggi, 1990]&mdash;&mdash;来构建结构化的指称语义. 由此产生的模块化单子语义实现了高度的模块性和可扩展性. 它能够将各个编程语言特性封装为可重用的构建模块, 并通过组合所需的特性来定义编程语言.</p>
+    <p>由于模块化单子语义本质上就是一种结构化的指称语义, 所有的等式推理方法均可适用. 此外, 我们将展示模块化单子语义如何进一步促进推理, 它允许我们为编程语言特性指定公理, 并构造可重用的模块化证明.</p>
+    <p>模块化单子语义可以使用现代编程语言来实现, 例如Haskell [Hudak et al., 1992], ML [Milner et al., 1990] 或Scheme [Clinger and Rees, 1991]. 其结果是一个模块化的解释器. 我们发现, Gofer (以及Haskell 1.3) 中相对较新的<em>构造子类</em>概念特别适合于表示模块化解释器中一些相当复杂的类型关系.</p>
+    <p>我们的工作可直接应用于语义导向的编译器构造. 我们将提出一种基于单子语义和单子程序变换的编译方法, 并通过重新定向一个Haskell编译器来验证我们的想法.</p>
+    <p>在介绍模块化单子语义之前, 我们将在下一节给出一个示例, 以说明传统指称语义缺乏模块性. 本文的表述遵循传统的指称语义风格, 并辅以类似于Haskell或ML的类型声明句法. 我们假设读者具备指称语义和函数式编程的基本知识.</p>
+    <h3>第1.2节 指称语义的模块性缺乏</h3>
+    <p>让我们首先来看一个简单算术语言的语义:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>E</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>Term</mi><mo>&rarr;</mo><mi>Value</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>n</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>n</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>+</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>E</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+                <mo>+</mo>
+                <mrow><mi>E</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>指称语义将源语言中的项映射为元语言中的值. 源语言的项用<q><math><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mrow/><mo stretchy="false">&RightDoubleBracket;</mo></mrow></math></q>括起来. 右侧的<math><mi>n</mi></math>和<math><mo>+</mo></math>符号对应于元语言中的数字和加法算术运算的概念.</p>
+    <div class="tcomment"><b>译者注记. </b>其实就指称语义而言, <math><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mrow/><mo stretchy="false">&RightDoubleBracket;</mo></mrow></math>记号一般就相当于指称函数本身了. 不过指称函数可能不止一个, 所以有时可能需要某种手段进行标记. 有的人选择下标, 有的人选择在前面加上符号. 当然, 像本文一样理解也没有任何问题.</div>
+    <p>模块性的一个重要度量方式是语义描述能否被扩展以纳入新的编程语言特性. 例如, 如果我们用变量和函数来扩展源语言, 就需要引入一个环境&mdash;&mdash;即从变量名到值的映射:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>E</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>Term</mi><mo>&rarr;</mo><mi>Env</mi><mo>&rarr;</mo><mi>Value</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>n</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&lambda;</mi><mi>&rho;</mi><mo lspace="0">.</mo><mi>n</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>+</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&lambda;</mi><mi>&rho;</mi><mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mi>E</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>e</mi><mn>1</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                    <mo>&af;</mo><mi>&rho;</mi></mrow>
+                  <mo>+</mo>
+                  <mrow>
+                    <mrow><mi>E</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>e</mi><mn>2</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                    <mo>&af;</mo><mi>&rho;</mi></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>v</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&lambda;</mi><mi>&rho;</mi><mo lspace="0">.</mo>
+                <mrow><mi>&rho;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>v</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>尽管数字与环境无关, 我们仍然必须修改数字的语义, 以适应新引入的环境参数. {译注: 此处说的数字是源语言中的, 一个更好的名字或许是numeral.} 同样, 环境参数必须递归地传递给<math><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>+</mo><msub><mi>e</mi><mn>2</mn></msub></mrow></math>的子表达式, 即便算术运算本身与环境无关.</p>
+    <p>如果我们进一步在语义中加入延续 (例如, 为了支持顺序运算符<q><math><mo>;</mo></math></q>), 就必须再次修改数字的语义:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>E</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>Term</mi><mo>&rarr;</mo><mi>Env</mi><mo>&rarr;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>Value</mi><mo>&rarr;</mo><mi>Ans</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&rarr;</mo><mi>Ans</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>n</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&lambda;</mi><mi>&rho;</mi><mo lspace="0">.</mo>
+                <mrow><mi>&lambda;</mi><mi>k</mi><mo lspace="0">.</mo>
+                  <mrow><mi>k</mi><mo>&af;</mo><mi>n</mi></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>+</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&lambda;</mi><mi>&rho;</mi><mo lspace="0">.</mo>
+                <mrow><mi>&lambda;</mi><mi>k</mi><mo lspace="0">.</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mi>E</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      </mrow>
+                      <mo>&af;</mo><mi>&rho;</mi></mrow>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>&lambda;</mi><mi>i</mi><mo lspace="0">.</mo>
+                        <mrow>
+                          <mrow>
+                            <mrow><mi>E</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                                <msub><mi>e</mi><mn>2</mn></msub>
+                                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                            </mrow>
+                            <mo>&af;</mo><mi>&rho;</mi></mrow>
+                          <mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow><mi>&lambda;</mi><mi>j</mi><mo lspace="0">.</mo>
+                              <mrow><mi>k</mi><mo>&af;</mo>
+                                <mrow><mo stretchy="false">(</mo>
+                                  <mrow><mi>i</mi><mo>+</mo><mi>j</mi></mrow>
+                                  <mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                            </mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>;</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&lambda;</mi><mi>&rho;</mi><mo lspace="0">.</mo>
+                <mrow><mi>&lambda;</mi><mi>k</mi><mo lspace="0">.</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mi>E</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      </mrow>
+                      <mo>&af;</mo><mi>&rho;</mi></mrow>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo>
+                        <mrow>
+                          <mrow>
+                            <mrow><mi>E</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                                <msub><mi>e</mi><mn>2</mn></msub>
+                                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                            </mrow>
+                            <mo>&af;</mo><mi>&rho;</mi></mrow>
+                          <mo>&af;</mo><mi>k</mi></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <div class="tcomment"><b>译者注记. </b>为了完整性, 我们加上原文可能是忘了的变量的语义.
+      <math display="block">
+        <mrow>
+          <mrow><mi>E</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>v</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>&lambda;</mi><mi>&rho;</mi><mo lspace="0">.</mo>
+            <mrow><mi>&lambda;</mi><mi>k</mi><mo lspace="0">.</mo>
+              <mrow><mi>k</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&rho;</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>v</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </div>
+    <p>总而言之, 为了向源语言添加新特性, 我们必须对传统指称语义进行全局修改. 传统指称语义缺乏模块性这一问题早已被人们所认识 [Mosses, 1984] [Lee, 1989]. 它被视为将指称语义应用于现实编程语言的最大障碍.</p>
+    <p>在下一节中, 我们将展示如何通过使用一种称为<em>单子</em>的抽象机制来增强模块性.</p>
+    <h3>第1.3节 单子&mdash;&mdash;一种抽象机制</h3>
+    <p>我们将使用一个类型构造子<math><mi>M</mi></math>和两个函数:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>return</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>a</mi><mo>&rarr;</mo>
+                <mrow><mi>M</mi><mspace width="2ex"/><mi>a</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>bind</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>M</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>&rarr;</mo>
+                    <mrow><mi>M</mi><mspace width="2ex"/><mi>b</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi>M</mi><mspace width="2ex"/><mi>b</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>这些构造的直觉性含义如下:
+      <ul>
+        <li><math><mrow><mi>M</mi><mspace width="2ex"/><mi>a</mi></mrow></math>: 返回类型为<math><mi>a</mi></math>的值的<em>计算</em>.</li>
+        <li><math><mrow><mi>bind</mi><mspace width="2ex"/><msub><mi>c</mi><mn>1</mn></msub><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mi>v</mi><mo lspace="0">.</mo><msub><mi>c</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></math>: 首先计算<math><msub><mi>c</mi><mn>1</mn></msub></math>, 将结果绑定至<math><mi>v</mi></math>, 然后计算<math><msub><mi>c</mi><mn>2</mn></msub></math>的计算.</li>
+        <li><math><mrow><mi>return</mi><mspace width="2ex"/><mi>v</mi></mrow></math>: 平凡的计算, 其直接返回<math><mi>v</mi></math>作为结果.</li>
+      </ul>
+    </p>
+    <p>接下来, 我们使用<math><mi>M</mi></math>, <math><mi>bind</mi></math>和<math><mi>return</mi></math>为算术表达式写下一个<em>参数化语义</em>:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>E</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>Term</mi><mo>&rarr;</mo>
+                <mrow><mi>M</mi><mspace width="2ex"/><mi>Value</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>n</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>return</mi><mspace width="2ex"/><mi>n</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>+</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>bind</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>E</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <msub><mi>e</mi><mn>1</mn></msub>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&lambda;</mi><mi>i</mi><mo lspace="0">.</mo>
+                    <mrow><mi>bind</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>E</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                            <msub><mi>e</mi><mn>2</mn></msub>
+                            <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&lambda;</mi><mi>j</mi><mo lspace="0">.</mo>
+                          <mrow><mi>return</mi><mspace width="2ex"/>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi>i</mi><mo>+</mo><mi>j</mi></mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      语义函数<math><mi>E</mi></math>将项映射为计算 (其具有类型<math><mrow><mi>M</mi><mspace width="2ex"/><mi>Value</mi></mrow></math>). <math><mrow><mi>E</mi><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>n</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>的语义是返回<math><mi>n</mi></math>作为结果的平凡计算. <math><mrow><mi>E</mi><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>+</mo><msub><mi>e</mi><mn>2</mn></msub></mrow><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>的语义是先计算<math><mrow><mi>E</mi><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>, 将其结果绑定至<math><mi>i</mi></math>, 然后计算<math><mrow><mi>E</mi><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>, 将其结果绑定至<math><mi>j</mi></math>, 最终返回<math><mrow><mi>i</mi><mo>+</mo><mi>j</mi></mrow></math>的计算.</p>
+    <div class="tcomment"><b>译者注记. </b>对于原文这里的<q><math><mrow><mi>E</mi><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>n</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>和<math><mrow><mi>E</mi><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>+</mo><msub><mi>e</mi><mn>2</mn></msub></mrow><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>的语义 (semantics)</q>, 个人认为使用<q>意义 (meaning)</q>更为贴切.</div>
+    <p>参数化语义的优势在于, 根据我们如何实例化<math><mi>M</mi></math>, <math><mi>bind</mi></math>和<math><mi>return</mi></math>, 可以得到我们所选择的不同语义. 图1.1展示了如何将算术语义实例化为上一节中描述的平凡语义和基于环境的语义. 在本论文的后续部分, 我们将看到, 对<math><mi>M</mi></math>, <math><mi>bind</mi></math>和<math><mi>return</mi></math>进行适当的定义, 还可以导出其他语义 (例如, 基于延续的语义).</p>
+    <p>类型构造子<math><mi>M</mi></math>连同两个函数<math><mi>return</mi></math>和<math><mi>bind</mi></math>, 被称为一个单子 (monad). 上面为算术表达式定义的参数化语义被称为单子语义 (monadic semantics). 单子语义可以使用不同的<em>潜在单子 (underlying monad)</em>来实例化. 要向单子语义中添加一个新特性, 我们只需添加该新特性的语义描述, 并更改潜在单子, 而无需修改现有特性的语义描述.</p>
+    <h3>第1.4节 论文的背景和组织方式</h3>
+    <p>本论文在前人工作的基础上, 探讨单子和单子语义的理论与实际应用. 单子的概念源于范畴论 [Mac Lane, 1971]. 使用三元组 (<math><mi>bind</mi></math>, <math><mi>return</mi></math>和类型构造子) 来表述单子的方式归功于Kleisli. Moggi [Moggi, 1990] 最先提出单子是构造指称语义的有用工具. Wadler的早期工作 [Wadler, 1990] 展示了单子与函数式编程之间的关系. 近来, 人们对使用单子来构造模块化语义和模块化解释器产生了极大的兴趣 [Wadler, 1992] [Jones and Duponcheel, 1993] [Espinosa, 1993] [Steele Jr., 1994].</p>
+    <p>在第2章中, 我们将为广泛的编程语言特性呈现模块化单子语义. 我们将展示单子转换器 (monad transformer) 如何捕获各个特性, 以及提升 (lifting) 如何捕获不同特性之间的交互.</p>
+    <p>在第3章中, 我们将研究单子和单子转换器的理论. 这包括例如单子转换器和提升的形式化性质. 我们将使用单子律和公理, 在比传统指称语义更高的层次上进行等式推理.</p>
+    <p>在第4章中, 我们将展示单子和单子转换器的形式化概念如何自然地融入Gofer [Jones, 1991] 的类型系统. 通过在Gofer中实现模块化单子语义, 我们可以获得一个模块化解释器.</p>
+    <p>在第5章中, 我们将把单子语义应用于语义导向的编译. 我们将展示如何利用单子框架的模块性和推理能力, 推导出一个有效且可证明正确的编译方案. 我们将通过构建一个可重定向的Haskell编译器来检验我们的一些想法.</p>
+    <p>在整篇论文中, 我们将使用一种共同的源语言来讨论单子语义, 模块化解释器和编译中的各种问题. 这个源语言将于下一节引入.</p>
+    <h3>第1.5节 源语言</h3>
+    <p>本论文中所考虑的源语言具有多种特性, 包括不同的函数调用机制, 命令式特性, 第一级延续, 追踪 (用于调试), 以及非确定性.</p>
+    <h3>第1.6节 记号</h3>
+    <p>为清晰起见, 我们采用以下缩略形式:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>E</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>Term</mi><mo>&rarr;</mo>
+                <mrow><mi>M</mi><mspace width="2ex"/><mi>Value</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>+</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>bind</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>E</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <msub><mi>e</mi><mn>1</mn></msub>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&lambda;</mi><mi>i</mi><mo lspace="0">.</mo>
+                    <mrow><mi>bind</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>E</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                            <msub><mi>e</mi><mn>2</mn></msub>
+                            <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&lambda;</mi><mi>j</mi><mo lspace="0">.</mo>
+                          <mrow><mi>return</mi><mspace width="2ex"/>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi>i</mi><mo>+</mo><mi>j</mi></mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block"><mo>&dArr;</mo></math>
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>E</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>Term</mi><mo>&rarr;</mo>
+                <mrow><mi>M</mi><mspace width="2ex"/><mi>Value</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>E</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>+</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>i</mi><mo>&larr;</mo>
+                    <mrow><mi>E</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>e</mi><mn>1</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>;</mo>
+                  <mrow><mi>j</mi><mo>&larr;</mo>
+                    <mrow><mi>E</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>e</mi><mn>2</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>;</mo>
+                  <mrow><mi>return</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>i</mi><mo>+</mo><mi>j</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>这种记号类似于Haskell中的<q>do</q>语法 [Peterson and Hammond, 1996], 也与单子概括式 (monad comprehension) [Wadler, 1990] 有一定的相似之处. 需要注意的是, 尽管具有命令式的外观, 单子语义仍然是由lambda表达式和函数应用所构成的. 我们将以可互换的方式使用<math><mi>bind</mi></math>和这种缩略形式, 完全取决于哪一种更为方便.</p>
+    <h2>第2章 模块化单子语义</h2>
+    <p>在本章中, 我们将介绍源语言的模块化单子语义. 与传统的指称语义相比, 我们的方法使用模块化的构建块来捕获各个编程语言特性.</p>
+  </body>
+</html>

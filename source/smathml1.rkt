@@ -1,0 +1,421 @@
+#lang racket
+(provide smathml1.html)
+(require SMathML)
+(define smathml1.html
+  (TnTmPrelude
+   #:title "SMathML Reference"
+   #:css "styles.css"
+   (H1. "SMathML Reference")
+   (P "This reference is a direct translation of its "
+      (A "Chinese version"
+         #:attr* '((href "smathml0.html"))) ".")
+   (H2. "Introduction")
+   (P "SMathML is not a typesetting engine; "
+      "currently, it delegates all layout tasks to the browser. "
+      "In essence, typesetting work can be delegated not only to the browser "
+      "but also to other backends like LaTeX through transformation or output processes "
+      "(where output itself is a form of transformation). "
+      "However, its model is fundamentally browser-based. "
+      "That is to say, it provides the means to express HTML and MathML. "
+      "(Additionally, it accounts for CSS and SVG, "
+      "though these are far from complete and nearly unusable.) "
+      "Even if someone were to design and implement other backends, "
+      "they would be indirect and beyond the author's original intent.")
+   (P "The purpose of SMathML is to provide "
+      "a mature way of writing mathematical content for the web. "
+      "Nevertheless, the prevalence of other software and libraries "
+      "like MathJax makes SMathML appear unnecessary. "
+      "The problem lies in the fact that almost none of these popular choices "
+      "provide the necessary means for abstraction and combination. "
+      "This issue has not received much attention because LaTeX, "
+      "the de facto standard for mathematical typesetting, "
+      "already leaves much to be desired in terms of abstraction and combination. "
+      "(Furthermore, most libraries provide only a restricted simulation of LaTeX, "
+      "which further weakens these capabilities.) "
+      "However, this problem is real, "
+      "which is why the author designed and implemented SMathML.")
+   (P "Currently, SMathML is a DSL (Domain-Specific Language) embedded in Racket. "
+      "In other words, users can freely enjoy Racket's full ecosystem, "
+      "which stands in stark contrast to certain other typesetting systems such as Typst. "
+      "While embedding it in other Scheme implementations might be possible, "
+      "a compatibility layer would not be easy to implement because "
+      "SMathML makes unrestricted use of Racket's unique keyword mechanism. "
+      "Alternatively, users could choose to start fresh and "
+      "modify some of SMathML's own expression mechanisms.")
+   (P "SMathML is based on SXML, "
+      "which can be understood as a direct list-based representation of "
+      "XML within Scheme/Lisp. Additionally, "
+      "SXML could be interpreted as a syntax, "
+      "but such an interpretation is neither necessary nor helpful, "
+      "as it is far too restrictive; therefore, we do not use it. "
+      "This is because the expressive power of SMathML stems from "
+      "its ability to directly manipulate and transform SXML. "
+      "Our version of SXML is not exactly the same as Oleg Kiselyov's, "
+      "whereas the SXML library provided by Racket follows Kiselyov's design. "
+      "The difference is that in SMathML, attributes are mandatory; "
+      "if there are no attributes, an empty list is used instead. "
+      "This makes the structure more consistent, "
+      "though it does make writing raw SXML more cumbersome. "
+      "However, by providing a vast array of primitive functions, "
+      "this is not an issue in practical use. "
+      "SMathML also provides a transformation mechanism "
+      "similar to Oleg Kiselyov's SXSLT, "
+      "but it only implements a small subset of its features. "
+      "For the time being, the author considers this to be sufficient.")
+   (H2. "Basic Functions")
+   (P "In this chapter, we provide a reference for the most basic functions "
+      "used to express MathML and HTML in their SXML forms. "
+      "There are no surprises in this chapter, "
+      "and readers can fully master it with just a quick skim.")
+   (H3. "MathML Part")
+   (P (CodeB "(define (Math #:attr* [attr* '()] . mathml*)
+  `(math ,attr* . ,mathml*))")
+      "Let us first take a look at this procedure; "
+      "the remaining procedures in this chapter "
+      "follow exactly the same pattern. "
+      "It has a keyword argument for attributes, "
+      "which defaults to empty. Additionally, "
+      "our naming convention is that "
+      "the names of the corresponding procedures "
+      "in SMathML for all MathML and HTML elements are "
+      "simply the capitalized versions of their original element names. "
+      "That is all that needs to be explained.")
+   (P "Below are all the basic functions for the MathML part."
+      (CodeB "(define (Math #:attr* [attr* '()] . mathml*)
+  `(math ,attr* . ,mathml*))
+(define (Merror #:attr* [attr* '()] . mathml*)
+  `(merror ,attr* . ,mathml*))
+(define (Mfrac #:attr* [attr* '()] . mathml*)
+  `(mfrac ,attr* . ,mathml*))
+(define (Mi #:attr* [attr* '()] . mathml*)
+  `(mi ,attr* . ,mathml*))
+(define (Mmultiscripts #:attr* [attr* '()] . mathml*)
+  `(mmultiscripts ,attr* . ,mathml*))
+(define (Mprescripts #:attr* [attr* '()] . mathml*)
+  `(mprescripts ,attr* . ,mathml*))
+(define (Mn #:attr* [attr* '()] . mathml*)
+  `(mn ,attr* . ,mathml*))
+(define (Mo #:attr* [attr* '()] . mathml*)
+  `(mo ,attr* . ,mathml*))
+(define (Mover #:attr* [attr* '()] . mathml*)
+  `(mover ,attr* . ,mathml*))
+(define (Mpadded #:attr* [attr* '()] . mathml*)
+  `(mpadded ,attr* . ,mathml*))
+(define (Mphantom #:attr* [attr* '()] . mathml*)
+  `(mphantom ,attr* . ,mathml*))
+(define (Mroot #:attr* [attr* '()] . mathml*)
+  `(mroot ,attr* . ,mathml*))
+(define (Mrow #:attr* [attr* '()] . mathml*)
+  `(mrow ,attr* . ,mathml*))
+(define (Ms #:attr* [attr* '()] . mathml*)
+  `(ms ,attr* . ,mathml*))
+(define (Mspace #:attr* [attr* '()] . mathml*)
+  `(mspace ,attr* . ,mathml*))
+(define (Msqrt #:attr* [attr* '()] . mathml*)
+  `(msqrt ,attr* . ,mathml*))
+(define (Mstyle #:attr* [attr* '()] . mathml*)
+  `(mstyle ,attr* . ,mathml*))
+(define (Msub #:attr* [attr* '()] . mathml*)
+  `(msub ,attr* . ,mathml*))
+(define (Msubsup #:attr* [attr* '()] . mathml*)
+  `(msubsup ,attr* . ,mathml*))
+(define (Msup #:attr* [attr* '()] . mathml*)
+  `(msup ,attr* . ,mathml*))
+(define (Mtable #:attr* [attr* '()] . mathml*)
+  `(mtable ,attr* . ,mathml*))
+(define (Mtd #:attr* [attr* '()] . mathml*)
+  `(mtd ,attr* . ,mathml*))
+(define (Mtext #:attr* [attr* '()] . mathml*)
+  `(mtext ,attr* . ,mathml*))
+(define (Mtr #:attr* [attr* '()] . mathml*)
+  `(mtr ,attr* . ,mathml*))
+(define (Munder #:attr* [attr* '()] . mathml*)
+  `(munder ,attr* . ,mathml*))
+(define (Munderover #:attr* [attr* '()] . mathml*)
+  `(munderover ,attr* . ,mathml*))
+(define (Maction #:attr* [attr* '()] . mathml*)
+  `(maction ,attr* . ,mathml*))
+(define (Menclose #:attr* [attr* '()] . mathml*)
+  `(menclose ,attr* . ,mathml*))
+(define (Mfenced #:attr* [attr* '()] . mathml*)
+  `(mfenced ,attr* . ,mathml*))")
+      "In fact, they are not entirely handwritten, but rather generated. "
+      "However, from a software engineering perspective, "
+      "macros should be employed for abstraction, "
+      "and the current implementation is not entirely satisfactory. "
+      "Nevertheless, the current definitions are "
+      "at least sufficiently clear and amenable to modification.")
+   (H4. "Some Useful Supplementary Definitions")
+   (P "There are several useful supplementary definitions "
+      "that merit inclusion in this chapter."
+      (CodeB "(define (MathB #:attr* [attr* '()] . mathml*)
+  `(math ((display &quot;block&quot;) . ,attr*) . ,mathml*))
+(define M Math)
+(define MB MathB)
+(define (MBL label . exp*)
+  (MB (Mtable #:attr*
+              '((columnalign &quot;left center right&quot;)
+                (displaystyle &quot;true&quot;)
+                (width &quot;100%&quot;))
+              (Mtr (Mtd (Mphantom label))
+                   (apply Mtd exp*)
+                   (Mtd label)))))")
+      "Here, " (Code "MathB")
+      " sets the " (Code "display")
+      " attribute to block, "
+      "while " (Code "M") " and " (Code "MB")
+      " serve as abbreviations for "
+      (Code "Math") " and " (Code "MathB")
+      ", respectively. "
+      "It should be noted that the " (Code "Math")
+      " element supports two rendering modes: "
+      (Code "inline") " and " (Code "block")
+      ", with " (Code "inline")
+      " being the default. "
+      "Those familiar with LaTeX should find "
+      "this distinction straightforward. As for "
+      (Code "MBL") ", it extends "
+      (Code "MB") " by appending a label to the formula.")
+   (P (CodeB "(define $ (Mrow))
+(define ^ Msup)
+(define _ Msub)
+(define _^ Msubsup)
+(define __ Munder)
+(define ^^ Mover)
+(define __^^ Munderover)
+(define ~ Mfrac)
+(define % Mtext)")
+      "With the exception of " (Code "$")
+      ", the remaining definitions are "
+      "concise aliases for certain basic elements. As for "
+      (Code "$") ", its sole function is to "
+      "serve as a placeholder, and nothing more.")
+   (H3. "HTML Part")
+   (P "The HTML part is essentially analogous to the MathML part."
+      (CodeB "(define (A #:attr* [attr* '()] . html*)
+  `(a ,attr* . ,html*))
+(define (Abbr #:attr* [attr* '()] . html*)
+  `(abbr ,attr* . ,html*))
+(define (Address #:attr* [attr* '()] . html*)
+  `(address ,attr* . ,html*))
+(define (Area #:attr* [attr* '()] . html*)
+  `(area ,attr* . ,html*))
+(define (Article #:attr* [attr* '()] . html*)
+  `(article ,attr* . ,html*))
+(define (Aside #:attr* [attr* '()] . html*)
+  `(aside ,attr* . ,html*))
+(define (Audio #:attr* [attr* '()] . html*)
+  `(audio ,attr* . ,html*))
+(define (B #:attr* [attr* '()] . html*)
+  `(b ,attr* . ,html*))
+(define (Base #:attr* [attr* '()] . html*)
+  `(base ,attr* . ,html*))
+(define (Bdi #:attr* [attr* '()] . html*)
+  `(bdi ,attr* . ,html*))
+(define (Bdo #:attr* [attr* '()] . html*)
+  `(bdo ,attr* . ,html*))
+(define (Blockquote #:attr* [attr* '()] . html*)
+  `(blockquote ,attr* . ,html*))
+(define (Body #:attr* [attr* '()] . html*)
+  `(body ,attr* . ,html*))
+(define (Br #:attr* [attr* '()] . html*)
+  `(br ,attr* . ,html*))
+(define (Button #:attr* [attr* '()] . html*)
+  `(button ,attr* . ,html*))
+(define (Canvas #:attr* [attr* '()] . html*)
+  `(canvas ,attr* . ,html*))
+(define (Caption #:attr* [attr* '()] . html*)
+  `(caption ,attr* . ,html*))
+(define (Cite #:attr* [attr* '()] . html*)
+  `(cite ,attr* . ,html*))
+(define (Code #:attr* [attr* '()] . html*)
+  `(code ,attr* . ,html*))
+(define (Col #:attr* [attr* '()] . html*)
+  `(col ,attr* . ,html*))
+(define (Colgroup #:attr* [attr* '()] . html*)
+  `(colgroup ,attr* . ,html*))
+(define (Data #:attr* [attr* '()] . html*)
+  `(data ,attr* . ,html*))
+(define (Datalist #:attr* [attr* '()] . html*)
+  `(datalist ,attr* . ,html*))
+(define (Dd #:attr* [attr* '()] . html*)
+  `(dd ,attr* . ,html*))
+(define (Del #:attr* [attr* '()] . html*)
+  `(del ,attr* . ,html*))
+(define (Details #:attr* [attr* '()] . html*)
+  `(details ,attr* . ,html*))
+(define (Dfn #:attr* [attr* '()] . html*)
+  `(dfn ,attr* . ,html*))
+(define (Dialog #:attr* [attr* '()] . html*)
+  `(dialog ,attr* . ,html*))
+(define (Div #:attr* [attr* '()] . html*)
+  `(div ,attr* . ,html*))
+(define (Dl #:attr* [attr* '()] . html*)
+  `(dl ,attr* . ,html*))
+(define (Dt #:attr* [attr* '()] . html*)
+  `(dt ,attr* . ,html*))
+(define (Em #:attr* [attr* '()] . html*)
+  `(em ,attr* . ,html*))
+(define (Embed #:attr* [attr* '()] . html*)
+  `(embed ,attr* . ,html*))
+(define (Fieldset #:attr* [attr* '()] . html*)
+  `(fieldset ,attr* . ,html*))
+(define (Figcaption #:attr* [attr* '()] . html*)
+  `(figcaption ,attr* . ,html*))
+(define (Figure #:attr* [attr* '()] . html*)
+  `(figure ,attr* . ,html*))
+(define (Footer #:attr* [attr* '()] . html*)
+  `(footer ,attr* . ,html*))
+(define (Form #:attr* [attr* '()] . html*)
+  `(form ,attr* . ,html*))
+(define (H1 #:attr* [attr* '()] . html*)
+  `(h1 ,attr* . ,html*))
+(define (H2 #:attr* [attr* '()] . html*)
+  `(h2 ,attr* . ,html*))
+(define (H3 #:attr* [attr* '()] . html*)
+  `(h3 ,attr* . ,html*))
+(define (H4 #:attr* [attr* '()] . html*)
+  `(h4 ,attr* . ,html*))
+(define (H5 #:attr* [attr* '()] . html*)
+  `(h5 ,attr* . ,html*))
+(define (H6 #:attr* [attr* '()] . html*)
+  `(h6 ,attr* . ,html*))
+(define (Head #:attr* [attr* '()] . html*)
+  `(head ,attr* . ,html*))
+(define (Header #:attr* [attr* '()] . html*)
+  `(header ,attr* . ,html*))
+(define (Hgroup #:attr* [attr* '()] . html*)
+  `(hgroup ,attr* . ,html*))
+(define (Hr #:attr* [attr* '()] . html*)
+  `(hr ,attr* . ,html*))
+(define (Html #:attr* [attr* '()] . html*)
+  `(html ,attr* . ,html*))
+(define (I #:attr* [attr* '()] . html*)
+  `(i ,attr* . ,html*))
+(define (Iframe #:attr* [attr* '()] . html*)
+  `(iframe ,attr* . ,html*))
+(define (Img #:attr* [attr* '()] . html*)
+  `(img ,attr* . ,html*))
+(define (Input #:attr* [attr* '()] . html*)
+  `(input ,attr* . ,html*))
+(define (Ins #:attr* [attr* '()] . html*)
+  `(ins ,attr* . ,html*))
+(define (Kbd #:attr* [attr* '()] . html*)
+  `(kbd ,attr* . ,html*))
+(define (Label #:attr* [attr* '()] . html*)
+  `(label ,attr* . ,html*))
+(define (Legend #:attr* [attr* '()] . html*)
+  `(legend ,attr* . ,html*))
+(define (Li #:attr* [attr* '()] . html*)
+  `(li ,attr* . ,html*))
+(define (Link #:attr* [attr* '()] . html*)
+  `(link ,attr* . ,html*))
+(define (Main #:attr* [attr* '()] . html*)
+  `(main ,attr* . ,html*))
+(define (Map #:attr* [attr* '()] . html*)
+  `(map ,attr* . ,html*))
+(define (Mark #:attr* [attr* '()] . html*)
+  `(mark ,attr* . ,html*))
+(define (Menu #:attr* [attr* '()] . html*)
+  `(menu ,attr* . ,html*))
+(define (Meta #:attr* [attr* '()] . html*)
+  `(meta ,attr* . ,html*))
+(define (Meter #:attr* [attr* '()] . html*)
+  `(meter ,attr* . ,html*))
+(define (Nav #:attr* [attr* '()] . html*)
+  `(nav ,attr* . ,html*))
+(define (Noscript #:attr* [attr* '()] . html*)
+  `(noscript ,attr* . ,html*))
+(define (Object #:attr* [attr* '()] . html*)
+  `(object ,attr* . ,html*))
+(define (Ol #:attr* [attr* '()] . html*)
+  `(ol ,attr* . ,html*))
+(define (Optgroup #:attr* [attr* '()] . html*)
+  `(optgroup ,attr* . ,html*))
+(define (Option #:attr* [attr* '()] . html*)
+  `(option ,attr* . ,html*))
+(define (Output #:attr* [attr* '()] . html*)
+  `(output ,attr* . ,html*))
+(define (P #:attr* [attr* '()] . html*)
+  `(p ,attr* . ,html*))
+(define (Picture #:attr* [attr* '()] . html*)
+  `(picture ,attr* . ,html*))
+(define (Pre #:attr* [attr* '()] . html*)
+  `(pre ,attr* . ,html*))
+(define (Progress #:attr* [attr* '()] . html*)
+  `(progress ,attr* . ,html*))
+(define (Q #:attr* [attr* '()] . html*)
+  `(q ,attr* . ,html*))
+(define (Rp #:attr* [attr* '()] . html*)
+  `(rp ,attr* . ,html*))
+(define (Rt #:attr* [attr* '()] . html*)
+  `(rt ,attr* . ,html*))
+(define (Ruby #:attr* [attr* '()] . html*)
+  `(ruby ,attr* . ,html*))
+(define (S #:attr* [attr* '()] . html*)
+  `(s ,attr* . ,html*))
+(define (Samp #:attr* [attr* '()] . html*)
+  `(samp ,attr* . ,html*))
+(define (Script #:attr* [attr* '()] . html*)
+  `(script ,attr* . ,html*))
+(define (Search #:attr* [attr* '()] . html*)
+  `(search ,attr* . ,html*))
+(define (Section #:attr* [attr* '()] . html*)
+  `(section ,attr* . ,html*))
+(define (Select #:attr* [attr* '()] . html*)
+  `(select ,attr* . ,html*))
+(define (Slot #:attr* [attr* '()] . html*)
+  `(slot ,attr* . ,html*))
+(define (Small #:attr* [attr* '()] . html*)
+  `(small ,attr* . ,html*))
+(define (Source #:attr* [attr* '()] . html*)
+  `(source ,attr* . ,html*))
+(define (Span #:attr* [attr* '()] . html*)
+  `(span ,attr* . ,html*))
+(define (Strong #:attr* [attr* '()] . html*)
+  `(strong ,attr* . ,html*))
+(define (Style #:attr* [attr* '()] . html*)
+  `(style ,attr* . ,html*))
+(define (Sub #:attr* [attr* '()] . html*)
+  `(sub ,attr* . ,html*))
+(define (Summary #:attr* [attr* '()] . html*)
+  `(summary ,attr* . ,html*))
+(define (Sup #:attr* [attr* '()] . html*)
+  `(sup ,attr* . ,html*))
+(define (Table #:attr* [attr* '()] . html*)
+  `(table ,attr* . ,html*))
+(define (Tbody #:attr* [attr* '()] . html*)
+  `(tbody ,attr* . ,html*))
+(define (Td #:attr* [attr* '()] . html*)
+  `(td ,attr* . ,html*))
+(define (Template #:attr* [attr* '()] . html*)
+  `(template ,attr* . ,html*))
+(define (Textarea #:attr* [attr* '()] . html*)
+  `(textarea ,attr* . ,html*))
+(define (Tfoot #:attr* [attr* '()] . html*)
+  `(tfoot ,attr* . ,html*))
+(define (Th #:attr* [attr* '()] . html*)
+  `(th ,attr* . ,html*))
+(define (Thead #:attr* [attr* '()] . html*)
+  `(thead ,attr* . ,html*))
+(define (Time #:attr* [attr* '()] . html*)
+  `(time ,attr* . ,html*))
+(define (Title #:attr* [attr* '()] . html*)
+  `(title ,attr* . ,html*))
+(define (Tr #:attr* [attr* '()] . html*)
+  `(tr ,attr* . ,html*))
+(define (Track #:attr* [attr* '()] . html*)
+  `(track ,attr* . ,html*))
+(define (U #:attr* [attr* '()] . html*)
+  `(u ,attr* . ,html*))
+(define (Ul #:attr* [attr* '()] . html*)
+  `(ul ,attr* . ,html*))
+(define (Var #:attr* [attr* '()] . html*)
+  `(var ,attr* . ,html*))
+(define (Video #:attr* [attr* '()] . html*)
+  `(video ,attr* . ,html*))
+(define (Wbr #:attr* [attr* '()] . html*)
+  `(wbr ,attr* . ,html*))"))
+   (H4. "Some Useful Supplementary Definitions")
+   
+   ))

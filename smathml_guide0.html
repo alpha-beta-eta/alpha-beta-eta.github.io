@@ -1,0 +1,76 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>SMathML指南</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>SMathML指南</h1>
+    <p>和<a href="smathml0.html">SMathML参考</a>相比, SMathML指南意在提供即时上手的指引, 以及菜谱式的解决方案.</p>
+    <p>读者应该具备最基本的Racket程序的阅读和编写能力.</p>
+    <h2>第1章 初等数学中的例子</h2>
+    <h3>第1.1节 二项式定理</h3>
+    <pre><code>(MB (&amp;= (^ (@+ $x $y) $n)
+        (sum (&amp;= $k $0) $n
+             (&amp;i* (comb $n $k)
+                  (^ $x (&amp;- $n $k))
+                  $y^k))))</code></pre>
+    <math display="block">
+      <mrow>
+        <msup>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mi>n</mi></msup>
+        <mo>=</mo>
+        <mrow>
+          <munderover><mo>&sum;</mo>
+            <mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow>
+            <mi>n</mi></munderover>
+          <mrow>
+            <mrow><mo>(</mo>
+              <mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac>
+              <mo>)</mo></mrow>
+            <mo>&it;</mo>
+            <msup><mi>x</mi>
+              <mrow><mi>n</mi><mo>&minus;</mo><mi>k</mi></mrow>
+            </msup>
+            <mo>&it;</mo>
+            <msup><mi>y</mi><mi>k</mi></msup>
+          </mrow>
+        </mrow>
+      </mrow>
+    </math>
+    <details>
+      <summary>MathML输出参照</summary>
+      <pre><code>&lt;math display=&quot;block&quot;>
+  &lt;mrow>
+    &lt;msup>
+      &lt;mrow>&lt;mo stretchy=&quot;false&quot;>(&lt;/mo>
+        &lt;mrow>&lt;mi>x&lt;/mi>&lt;mo>+&lt;/mo>&lt;mi>y&lt;/mi>&lt;/mrow>
+        &lt;mo stretchy=&quot;false&quot;>)&lt;/mo>&lt;/mrow>
+      &lt;mi>n&lt;/mi>&lt;/msup>
+    &lt;mo>=&lt;/mo>
+    &lt;mrow>
+      &lt;munderover>&lt;mo>&amp;sum;&lt;/mo>
+        &lt;mrow>&lt;mi>k&lt;/mi>&lt;mo>=&lt;/mo>&lt;mn>0&lt;/mn>&lt;/mrow>
+        &lt;mi>n&lt;/mi>&lt;/munderover>
+      &lt;mrow>
+        &lt;mrow>&lt;mo>(&lt;/mo>
+          &lt;mfrac linethickness=&quot;0&quot;>&lt;mi>n&lt;/mi>&lt;mi>k&lt;/mi>&lt;/mfrac>
+          &lt;mo>)&lt;/mo>&lt;/mrow>
+        &lt;mo>&amp;it;&lt;/mo>
+        &lt;msup>&lt;mi>x&lt;/mi>
+          &lt;mrow>&lt;mi>n&lt;/mi>&lt;mo>&amp;minus;&lt;/mo>&lt;mi>k&lt;/mi>&lt;/mrow>
+        &lt;/msup>
+        &lt;mo>&amp;it;&lt;/mo>
+        &lt;msup>&lt;mi>y&lt;/mi>&lt;mi>k&lt;/mi>&lt;/msup>
+      &lt;/mrow>
+    &lt;/mrow>
+  &lt;/mrow>
+&lt;/math></code></pre></details>
+    <h2>第2章 分析学中的例子</h2>
+    <h3>第2.1节 一些简单极限</h3>
+    <h2>第3章 代数学中的例子</h2>
+  </body>
+</html>
