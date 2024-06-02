@@ -1,0 +1,144 @@
+<html><head><meta charset="utf-8"/><title>游戏编程</title><link href="styles.css" rel="stylesheet"/></head><body><h1>(从第一性原理出发的)游戏编程</h1><p>其实作者也不懂游戏编程, 但是作者希望探索游戏编程, 寻找隐藏在各种编程语言和游戏引擎之下的<q>不变量</q>. 基本上作者会采用Racket这种非主流编程语言, 这将有助于抛开既有的套路和成见.</p><h2>第1章 游戏编程的基本概念</h2><h3>第1.1节 游戏世界</h3><p>游戏世界即玩家游玩或者与之交互的世界. 一般来说, 游戏世界需要响应玩家的操作, 也需要响应时间的流逝. 一些古早的命令行游戏并非如此, 它们往往以命令或者有效命令的数目作为时间的度量. 游戏世界的表示并没有什么魔法, 只是存在于计算机器之中的数据结构. 当然了, 存在不同的表示策略, 其中最为人熟知也最为重要的想法大概就是面向对象了. 不过, 面向对象也带来了一些世界观 (或者说架构) 和性能的挑战, 因而人们也开始考虑诸如ECS的替代方案. 虽然ECS常被称为解决游戏性能问题的灵丹妙药, 但我想强调的是, 它也带来了另一种描述世界的方式.</p><h3>第1.2节 游戏循环</h3><p>不论命令行游戏还是图形游戏, 一般的话游戏运行于一个循环之中, 其被称为游戏循环. 游戏循环需要响应玩家的输入, 由此改变世界的状态, 并给玩家提出反馈. 这里的话, 实时游戏和非实时游戏稍有不同 (虽然有时它们也约等于图形游戏和命令行游戏), 在于其要随着一个时钟不停地更新世界状态, 并且要不停地更新反馈, 当然对于图形游戏而言就是不停地渲染画面. 以下是一个简单的非实时游戏循环的例子, 虽然很难称得上是一个游戏就是了.</p><pre><code>(define (game-begin)
+  (let ((world 0))
+    (let loop ()
+      (define input
+        (read-line))
+      (cond
+        ((string=? input &quot;add1&quot;)
+         (set! world (add1 world)))
+        ((string=? input &quot;sub1&quot;)
+         (set! world (sub1 world)))
+        (else
+         (printf &quot;unknown input\n&quot;)))
+      (printf &quot;current world: ~s\n&quot; world)
+      (loop))))</code></pre><pre><code>> (game-begin)
+add1
+current world: 1
+add1
+current world: 2
+sub1
+current world: 1
+add1
+current world: 2
+foo
+unknown input
+current world: 2
+bar
+unknown input
+current world: 2
+sub1
+current world: 1
+sub1
+current world: 0</code></pre><h3>第1.3节 游戏对象</h3><p>传统上游戏中的各种实体 (可能不仅是角色和物品, 还包含其他各种各样的东西, 例如<q>法术</q>) 总是被表示为对象, 这不仅是组织程序的策略. 实际上, 即便在面向对象还不流行的时候, 虽然很多游戏并没有使用技术意义上的面向对象 (例如, 使用超长的record表示角色), 但是仍然是围绕面向对象的观念来设计和实现游戏的.</p><pre><code>(define make-obj
+  (let ((id* '()))
+    (define (add-id! id)
+      (unless (symbol? id)
+        (error 'make-obj &quot;id [~s] should be a symbol.&quot; id))
+      (if (memq id id*)
+          (error 'make-obj &quot;id [~s] has been used.&quot; id)
+          (set! id* (cons id id*))))
+    (lambda (id)
+      (add-id! id)
+      (lambda (msg)
+        (case msg
+          ((get-id) (lambda (self) id))
+          (else #f))))))
+(define (method? x) (procedure? x))
+(define (tell obj msg . arg*)
+  (define method (obj msg))
+  (unless (method? method)
+    (error (get-id obj) &quot;unknown message [~s]&quot; msg))
+  (apply method obj arg*))
+(define (get-id obj) (tell obj 'get-id))</code></pre><h3>第1.4节 状态机</h3><p>状态机的概念提供了一套设计和实现游戏交互的方法论, 并且也附带可以视为一种对于边界条件的防御措施. 简而言之, 状态机规定了从一个状态怎么转移到其他状态.</p><pre><code>(define world (void))
+(define state (void))
+(define input (void))
+(define highest (void))
+(define (game-begin)
+  (set! state 'menu)
+  (game-loop))
+(define (game-loop)
+  (set! input (read-line))
+  (dispatch))
+(define (dispatch)
+  (case state
+    ((menu) (handle-menu))
+    ((highest) (handle-highest))
+    ((game) (handle-game))
+    (else
+     (error 'dispatch
+            &quot;unknown state ~s&quot;
+            state))))
+(define (handle-menu)
+  (cond
+    ((string=? input &quot;exit&quot;)
+     (set! state 'exit)
+     (printf &quot;you exit the whole game.\n&quot;))
+    ((string=? input &quot;highest&quot;)
+     (if (eq? highest (void))
+         (printf &quot;there is no record.\n&quot;)
+         (printf &quot;HIGHEST SCORE: ~s\n&quot; highest))
+     (set! state 'highest)
+     (game-loop))
+    ((string=? input &quot;start&quot;)
+     (set! world 0)
+     (set! state 'game)
+     (printf &quot;you enter a new game.\n&quot;)
+     (game-loop))
+    (else
+     (printf &quot;unknown input\n&quot;)
+     (game-loop))))
+(define (handle-highest)
+  (cond
+    ((string=? input &quot;exit&quot;)
+     (set! state 'menu)
+     (printf &quot;you get back to the main menu.\n&quot;))
+    (else
+     (printf &quot;unknown input\n&quot;)))
+  (game-loop))
+(define (handle-game)
+  (cond
+    ((string=? input &quot;add1&quot;)
+     (set! world (add1 world))
+     (printf &quot;current world: ~s\n&quot; world))
+    ((string=? input &quot;sub1&quot;)
+     (set! world (sub1 world))
+     (printf &quot;current world: ~s\n&quot; world))
+    ((string=? input &quot;exit&quot;)
+     (if (eq? highest (void))
+         (set! highest world)
+         (set! highest (max highest world)))
+     (set! state 'menu)
+     (printf &quot;you exit the current battle.\n&quot;))
+    (else
+     (printf &quot;unknown input\n&quot;)))
+  (game-loop))</code></pre><pre><code>> (game-begin)
+highest
+there is no record.
+exit
+you get back to the main menu.
+start
+you enter a new game.
+add1
+current world: 1
+sub1
+current world: 0
+exit
+you exit the current battle.
+highest
+HIGHEST SCORE: 0
+exit
+you get back to the main menu.
+start
+you enter a new game.
+add1
+current world: 1
+add1
+current world: 2
+exit
+you exit the current battle.
+highest
+HIGHEST SCORE: 2
+exit
+you get back to the main menu.
+exit
+you exit the whole game.</code></pre><h3>第1.5节 渲染</h3><p>到目前为止我们的游戏只是以句子作为反馈. 更一般地, 我们需要系统呈现当前世界状态的方式, 即渲染. 虽然渲染在图形学中有特别的含义, 但是这里我们将一切呈现世界状态的过程称为渲染, 不论其是否涉及图形.</p><h3>第1.6节 游戏AI</h3><h4>第1.6.1小节 对话树和行为树</h4><p>对话树和行为树都是很古早的想法了, 然而仍然普遍运用于各种各样的游戏之中. 使用对话树的最典型例子是所谓的视觉小说, 不过实际上对话树可能并不是一个树, 而是一个图, 甚至我们所说的对话树还可能涉及一些编程语言的机制, 典型的情况是设置一些FLAG或者说变量用于条件判断. 行为树在某种意义上和对话树是一模一样的, 只是不限于所谓的对话而已.</p><h4>第1.6.2小节 寻路</h4><p>寻路的基本模板是所谓的A*算法, 其可以视为一致代价搜索的推广. </p><h4>第1.6.3小节 Monte-Carlo树搜索</h4><p>Monte-Carlo树搜索的运用舒适区大概是一些离散决策AI, 尤其是棋类游戏或者类似物. </p><h3>第1.7节 程序化生成</h3><p>虽然程序化生成在某种意义上也应该算作AI, 但是我觉得值得单独成为一节. 虽然手工设计和制作的素材和资源也相当重要, 程序化生成在很多时候仍然是不可或缺的.</p><p>第一眼看到程序化生成的时候, 人们可能会想到程序化生成的游戏地图 (或者也可以说是世界?), 例如Persona 3所做的那样 (虽然这个游戏的程序化生成地图饱受诟病). 不过, 当然还有很多地方需要用到一些程序化生成技术, 例如许多游戏的某些视觉效果 (水的波纹之类的).</p><h3>第1.8节 DSL (领域特定语言)</h3><p>游戏制作是控制复杂度的艺术, 而控制复杂度的终极方式是元语言抽象. 通过DSL来描述游戏逻辑是游戏开发领域的一种惯例, 尽管许多游戏开发人员并没有严肃的编程语言理论背景. 如果举一个实际的例子的话, 我首先会想到Naughty Dog工作室所使用的一种嵌入Racket的DSL, 其用于神秘海域和最后生还者等游戏的开发. </p><h3>第1.9节 游戏状态的保存</h3><p>某些古早游戏并不考虑游戏状态的保存, 或者说存档问题. 然而, 对于绝大多数游戏而言, 这仍然是一个相当实际的问题. 古早的游戏状态保存可能涉及手工设计的数据结构和数据格式, 然而现在的游戏总是要用到编程语言本身或者库提供的反序列化机制. </p></body></html>
