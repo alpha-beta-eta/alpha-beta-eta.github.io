@@ -1,0 +1,126 @@
+<html><head><meta charset="utf-8"/><title>绘制数学图形</title><link href="styles.css" rel="stylesheet"/></head><body><h1>绘制数学图形</h1><p>本书介绍了如何在PostScript中绘制图形, 当然也必然涉及一些几何.</p><h2>第1章 开始</h2><h3>第1.1节 简单绘图</h3><pre><code>GS>newpath
+GS>144 144 moveto
+GS>288 288 lineto
+GS>stroke
+GS></code></pre><ul><li>构造一条路径始于命令<code>newpath</code>. 这就像拿起笔准备画画.</li><li>路径本身始于命令<code>moveto</code>. 这就像将笔置于路径的起点.</li><li>使用命令<code>lineto</code>为路径添加线条. 这就像在纸上移动笔.</li><li>已经构造好了路径, 使用命令<code>stroke</code>绘制它, 或者说使其变得可见.</li><li>PostScript总是倒着书写, 参数总是出现在运算符之前, 此即所谓逆波兰记号 (Reverse Polish Notation, RPN).</li></ul><p>以下命令序列可以绘制一个边长为<math><mn>2</mn></math>英寸的正方形.</p><pre><code>newpath
+144 144 moveto
+288 144 lineto
+288 288 lineto
+144 288 lineto
+144 144 lineto
+stroke</code></pre><p>当然PoscScript中存在许多不同的方式来绘制这个正方形.</p><pre><code>newpath
+144 144 moveto
+144 0 rlineto
+0 144 rlineto
+-144 0 rlineto
+closepath
+stroke</code></pre><p><code>rlineto</code>是<code>lineto</code>的相对 (relative) 位置版本. <code>closepath</code>通过回到上一个应用<code>moveto</code>的位置以封闭路径.</p><pre><code>newpath
+144 144 moveto
+144 0 rlineto
+0 144 rlineto
+-144 0 rlineto
+closepath
+fill</code></pre><p><code>fill</code>和<code>stroke</code>有着不同的效果. </p><pre><code>0.5 setgray
+newpath
+144 144 moveto
+144 0 rlineto
+0 144 rlineto
+-144 0 rlineto
+closepath
+fill</code></pre><pre><code>1 0 0 setrgbcolor
+newpath
+144 144 moveto
+144 0 rlineto
+0 144 rlineto
+-144 0 rlineto
+closepath
+fill</code></pre><h3>第1.2节 简单坐标变换</h3><p>对于生活在北美的人而言, 既然默认的页面尺寸为<math><mrow><msup><mn>8.5</mn><mo>&Prime;</mo></msup><mo>&times;</mo><msup><mn>11</mn><mo>&Prime;</mo></msup></mrow></math>, 与单位英寸打交道通常来得更加容易. 以下命令可以将基本的长度单位转换为英寸.</p><pre><code>72 72 scale</code></pre><p>当进行缩放的时候, 需要注意默认的线宽是一个单位. 如果什么都不做, 那么现在线宽就是<math><mn>1</mn></math>英寸了.</p><pre><code>0.01389 setlinewidth</code></pre><p>你可以使用<code>0.01389 setlinewidth</code>将其改回来, 因为<math><mn>0.01389</mn></math>约等于<math><mrow><mn>1</mn><mo lspace="0" rspace="0">/</mo><mn>72</mn></mrow></math>.</p><pre><code>1 2 translate</code></pre><p>你可以使用<code>translate</code>进行平移, 比如这里将坐标原点右移了<math><mn>1</mn></math>个单位, 上移了<math><mn>2</mn></math>个单位.</p><pre><code>72 72 scale
+4.25 5.5 translate</code></pre><p>如此原点就移动了到了页面的中心.</p><p>还有一种简单的坐标变换, 即旋转<code>rotate</code>.</p><pre><code>144 144 translate
+30 rotate
+newpath
+0 0 moveto
+144 0 lineto
+144 144 lineto
+0 144 lineto
+0 0 lineto
+stroke</code></pre><p>旋转总是围绕当前原点进行, 注意到PostScript的角度单位是角度制而不是弧度制.</p><h3>第1.3节 坐标框架</h3><h3>第1.4节 PostScript中做算术</h3><p>PostScript是一种完备的编程语言. </p><pre><code>GS>3 4 add
+GS&lt;1></code></pre><p>你可能想问<code>&lt;1></code>是什么意思, 它指的是栈的深度.</p><pre><code>GS>3 4 add
+GS&lt;1>=
+7
+GS></code></pre><p><code>=</code>移除栈顶的元素, 并将其输出. <code>==</code>与<code>=</code>类似, 但是输出在某种意义上更加美观, 所以你总是应该使用<code>==</code>.</p><pre><code>GS>3 4 add
+GS&lt;1>stack
+7
+GS&lt;1></code></pre><p><code>stack</code>输出整个栈, 类似的命令还有<code>pstack</code>. <code>pstack</code>之于<code>stack</code>就像<code>==</code>之于<code>=</code>.</p><pre><code>GS>3 3 mul
+GS&lt;1>4 4 mul
+GS&lt;2>add
+GS&lt;1>sqrt
+GS&lt;1>=
+5.0
+GS></code></pre><h3>第1.5节 错误</h3><h3>第1.6节 </h3><h3>第1.7节 一些细节</h3><table><tr><th><code>linecap</code></th><th>样式</th></tr><tr><td><code>0</code></td><td><svg width="500" height="50"><line x1="50" y1="25" x2="450" y2="25" stroke="black" stroke-width="25" stroke-linecap="butt"/></svg></td></tr><tr><td><code>1</code></td><td><svg width="500" height="50"><line x1="50" y1="25" x2="450" y2="25" stroke="black" stroke-width="25" stroke-linecap="round"/></svg></td></tr><tr><td><code>2</code></td><td><svg width="500" height="50"><line x1="50" y1="25" x2="450" y2="25" stroke="black" stroke-width="25" stroke-linecap="square"/></svg></td></tr></table><p>默认情况下<code>linecap</code>为<code>0</code>, 你可以通过<code>setlinecap</code>来设置这个参数.</p><pre><code>9 setlinewidth
+% linejoin = 0 by default
+newpath
+0 0 moveto
+0 72 lineto
+72 0 lineto
+stroke</code></pre><p><code>linejoin</code>是一个与<code>linecap</code>有点联系的参数, 它控制line join的样式, 其值同样仅可能为<code>0</code>, <code>1</code>, <code>2</code>, 并使用<code>setlinejoin</code>修改.</p><h3>第1.8节 消除冗余的一个技巧</h3><pre><code>newpath
+144 144 moveto
+144 0 rlineto
+0 144 rlineto
+-144 0 rlineto
+closepath
+gsave
+1 0 0 setrgbcolor
+fill
+grestore
+0 setgray
+stroke</code></pre><h3>第1.9节 总结</h3><pre><code>newpath
+moveto
+lineto
+rmoveto
+rlineto
+closepath
+stroke
+fill</code></pre><pre><code>translate
+scale
+rotate</code></pre><pre><code>setlinewidth
+setrgbcolor
+setgray
+setlinejoin
+setlinecap</code></pre><pre><code>gsave
+grestore
+showpage</code></pre><h2>第2章 初等坐标几何</h2><h3>第2.1节 点和向量</h3><p>如果<math><mi>P</mi></math>是一个点而<math><mi>v</mi></math>是一个向量, 那么<math><mrow><mi>P</mi><mo>+</mo><mi>v</mi></mrow></math>是一个点, 其是满足<math><mrow><mrow><mi>Q</mi><mo>&minus;</mo><mi>P</mi></mrow><mo>=</mo><mi>v</mi></mrow></math>的点<math><mi>Q</mi></math>. 我们称<math><mi>Q</mi></math>是<math><mi>P</mi></math>平移<math><mi>v</mi></math>得到的. 若给定实数<math><mi>t</mi></math>以及点<math><mi>P</mi></math>和<math><mi>Q</mi></math>, 我们可以构造一个点<math><mrow><mi>P</mi><mo>+</mo><mrow><mi>t</mi><mo>&it;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>Q</mi><mo>&minus;</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 若<math><mrow><mn>0</mn><mo>&le;</mo><mi>t</mi><mo>&le;</mo><mn>1</mn></mrow></math>, 那么该点在线段<math><mrow><mi>P</mi><mi>Q</mi></mrow></math>上. 当<math><mrow><mi>t</mi><mo>=</mo><mrow><mn>1</mn><mo lspace="0" rspace="0">/</mo><mn>2</mn></mrow></mrow></math>时, 该点即<math><mrow><mi>P</mi><mi>Q</mi></mrow></math>的中点. 我们可以将<math><mrow><mi>P</mi><mo>+</mo><mrow><mi>t</mi><mo>&it;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>Q</mi><mo>&minus;</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>写成<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>&minus;</mo><mi>t</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&it;</mo><mi>P</mi></mrow><mo>+</mo><mrow><mi>t</mi><mo>&it;</mo><mi>Q</mi></mrow></mrow></math>的形式.</p><h2>第3章 变量和过程</h2><h3>第3.1节 PostScript中的变量</h3><pre><code>/s 1 def
+
+newpath
+0 0 moveto
+s 0 rlineto
+0 s rlineto
+s neg 0 rlineto
+closepath
+stroke</code></pre><h3>第3.2节 PostScript中的过程</h3><h2>第4章 坐标和条件式</h2><h3>第4.1节 坐标</h3><p>PostScript在内部(至少是隐式地)处理三种坐标系统. 第一种是物理坐标系. 物理坐标系的基本单位是像素. 第二种是页面坐标系. 其原点位于页面的左下角, 单位长度为一个Adobe点, 等于<math><mrow><mn>1</mn><mo lspace="0" rspace="0">/</mo><mn>72</mn></mrow></math>英寸. 页面可以被视为一种理想化了的物理设备. 第三种是用户坐标系, 这是用户绘制图像时使用的坐标系. 最初页面坐标系和用户坐标系是相同的, 但是特定的操作, 例如<code>scale</code>, <code>translate</code>, <code>rotate</code>, 可以改变其间的关系.</p><math display="block"><mrow><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>x</mi><mo>&bull;</mo></msub></mtd><mtd><msub><mi>y</mi><mo>&bull;</mo></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>=</mo><mrow><mrow><mrow><mo>[</mo><mtable><mtr><mtd><mi>x</mi></mtd><mtd><mi>y</mi></mtd></mtr></mtable><mo>]</mo></mrow><mo>&it;</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><mo>]</mo></mrow></mrow><mo>+</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr></mtable><mo>]</mo></mrow></mrow></mrow></math><p>仿射变换可以看成是一个线性变换加上一个平移分量, 其具有特定的性质: 直线经过变换仍然是直线, 平行线经常变换仍然是平行的.</p><h3>第4.2节 PostScript如何存储坐标变换</h3><p>确定一个仿射坐标变换<math display="block"><mrow><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>x</mi><mo>&bull;</mo></msub></mtd><mtd><msub><mi>y</mi><mo>&bull;</mo></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>=</mo><mrow><mrow><mrow><mo>[</mo><mtable><mtr><mtd><mi>x</mi></mtd><mtd><mi>y</mi></mtd></mtr></mtable><mo>]</mo></mrow><mo>&it;</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><mo>]</mo></mrow></mrow><mo>+</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr></mtable><mo>]</mo></mrow></mrow></mrow></math>所需要的数据被存储在一个长度为六的数组<code>[a b c d e f]</code>里, 其被称为matrix. 命令<code>matrix</code>将数组<code>[1 0 0 1 0 0]</code>置于栈上, 此即恒等变换. 若此时再使用<code>currentmatrix</code>命令, 则会将当前变换置于该数组之中.<pre><code>GS>matrix currentmatrix ==
+[1.33333337 0.0 0.0 1.33333337 0.0 0.0]
+GS></code></pre>[注记: 至少若是在Windows系统之中调整缩放比例, 结果是会改变的, 当然这也是相当合理的.] <code>defaultmatrix</code>和<code>currentmatrix</code>有些类似, 但是顾名思义, 其将从页面到物理坐标系的变换置于栈顶的数组之中. 如果什么都没动, 这两个命令的效果显然是一样的. [译注: <code>currentmatrix</code>当然就是从用户到物理坐标系的变换了.]</p><p>现在我们想要解方程<math display="block"><mrow><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>x</mi><mo>&bull;</mo></msub></mtd><mtd><msub><mi>y</mi><mo>&bull;</mo></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>=</mo><mrow><mrow><mrow><mo>[</mo><mtable><mtr><mtd><mi>x</mi></mtd><mtd><mi>y</mi></mtd></mtr></mtable><mo>]</mo></mrow><mo>&it;</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><mo>]</mo></mrow></mrow><mo>+</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr></mtable><mo>]</mo></mrow></mrow></mrow></math>以用<math><msub><mi>x</mi><mo>&bull;</mo></msub></math>和<math><msub><mi>y</mi><mo>&bull;</mo></msub></math>表达<math><mi>x</mi></math>和<math><mi>y</mi></math>. 我们考虑将其写成<math display="block"><mrow><msub><mi>P</mi><mo>&bull;</mo></msub><mo>=</mo><mrow><mrow><mi>P</mi><mo>&it;</mo><mi>A</mi></mrow><mo>+</mo><mi>v</mi></mrow></mrow></math>的形式. 假定<math><mi>A</mi></math>可逆, 我们得到<math display="block"><mrow><mi>P</mi><mo>=</mo><mrow><mrow><msub><mi>P</mi><mo>&bull;</mo></msub><mo>&it;</mo><msup><mi>A</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup></mrow><mo>&minus;</mo><mrow><mi>v</mi><mo>&it;</mo><msup><mi>A</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup></mrow></mrow></mrow></math>也就是说, 这个逆变换同样是仿射变换. 实际上, PostScript拥有一个计算逆变换的命令, 即<code>invertmatrix</code>. 另外, <code>concatmatrix</code>可以用来计算变换的复合. 它们的用法如下.<pre><code>M matrix invertmatrix</code></pre>这可以将<code>M</code>的逆变换置于栈上.<pre><code>A B matrix concatmatrix</code></pre>这可以将<code>A</code>和<code>B</code>的复合置于栈上. [译注: 先施行变换<code>A</code>, 后施行变换<code>B</code>.]</p><p>显然, 我们可以藉由这些操作来计算从用户到页面坐标系的变换.<pre><code>/user-to-page-matrix {
+  matrix currentmatrix
+  matrix defaultmatrix
+  matrix invertmatrix
+  matrix concatmatrix
+} def</code></pre>当前变换是<math><mrow><mi>user</mi><mo>&rarr;</mo><mi>physics</mi></mrow></math>, 默认变换是<math><mrow><mi>page</mi><mo>&rarr;</mo><mi>physics</mi></mrow></math>, 逆就是<math><mrow><mi>physics</mi><mo>&rarr;</mo><mi>page</mi></mrow></math>, 当前变换和{默认变换的逆}复合一下就得到了<math><mrow><mi>user</mi><mo>&rarr;</mo><mi>page</mi></mrow></math>.</p><h3>第4.3节 绘制坐标系</h3><h3>第4.4节 移入三维</h3><p>注记: 本节考虑的不是三维的仿射变换的情形, 而是仿射坐标系的诸多事宜.</p><p>实际上, 我们可以在三维的情况下用线性变换表示二维的仿射变换.<math display="block"><mrow><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>x</mi><mo>&bull;</mo></msub></mtd><mtd><msub><mi>y</mi><mo>&bull;</mo></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>=</mo><mrow><mrow><mrow><mo>[</mo><mtable><mtr><mtd><mi>x</mi></mtd><mtd><mi>y</mi></mtd></mtr></mtable><mo>]</mo></mrow><mo>&it;</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><mo>]</mo></mrow></mrow><mo>+</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr></mtable><mo>]</mo></mrow></mrow></mrow></math>可以被重写为<math display="block"><mrow><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>x</mi><mo>&bull;</mo></msub></mtd><mtd><msub><mi>y</mi><mo>&bull;</mo></msub></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo>=</mo><mrow><mrow><mo>[</mo><mtable><mtr><mtd><mi>x</mi></mtd><mtd><mi>y</mi></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo>&it;</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow></mrow></mrow></math>这样之后, 仿射变换的复合就变成纯粹的矩阵乘法了.</p><h3>第4.5节 坐标变换是如何进行的</h3><p>现在我们可以检视如何以矩阵表示先前的几种简单变换.<pre><code>a b scale</code></pre><math display="block"><mrow><mo>[</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mi>b</mi></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow></math><pre><code>x rotate</code></pre><math display="block"><mrow><mo>[</mo><mtable><mtr><mtd><mrow><mi>cos</mi><mo>&af;</mo><mi>x</mi></mrow></mtd><mtd><mrow><mi>sin</mi><mo>&af;</mo><mi>x</mi></mrow></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mrow><mo>&minus;</mo><mrow><mi>sin</mi><mo>&af;</mo><mi>x</mi></mrow></mrow></mtd><mtd><mrow><mi>cos</mi><mo>&af;</mo><mi>x</mi></mrow></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow></math><pre><code>a b translate</code></pre><math display="block"><mrow><mo>[</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow></math>当然了, 最一般的变换如下.<pre><code>[a b c d e f] concat</code></pre><math display="block"><mrow><mo>[</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow></math>以上这些变换的效果都是给当前矩阵<b>左乘</b>其变换矩阵.</p><div class="exercise"><b>练习6.</b> 在变换<pre><code>72 72 scale
+4 5 translate
+30 rotate</code></pre>之后, 从用户到页面坐标系的变换矩阵应该是什么?</div><p>在Racket写了点简单的程序算一算.<pre><code>> (matrix-print
+   (matrix* (make-scale 72 72)
+            (make-translation 4 5)
+            (make-rotation (/ pi 6))))
+62.353829072479584 -35.99999999999999 288 
+35.99999999999999 62.353829072479584 360 
+0 0 1 </code></pre>当然, 我的这个采用的是通行的左乘而不是PostScript的右乘, 所以结果应该是其转置.<pre><code>GS>/user-to-page-matrix {
+  matrix currentmatrix
+  matrix defaultmatrix
+  matrix invertmatrix
+  matrix concatmatrix
+} def
+GS>72 72 scale
+GS>4 5 translate
+GS>30 rotate
+GS>user-to-page-matrix
+GS&lt;1>==
+[62.3538284 36.0 -36.0 62.3538284 288.0 360.0]
+GS></code></pre>我们再在PostScript的REPL里算一遍, 的确如此.</p><h2>第5章 绘制多边形: 循环和数组</h2><h2>第6章 曲线</h2></body></html>

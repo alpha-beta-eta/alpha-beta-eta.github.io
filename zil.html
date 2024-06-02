@@ -1,0 +1,107 @@
+<html><head><meta charset="utf-8"/><title>LearningZIL笔记</title><link href="styles.css" rel="stylesheet"/></head><body><h1>LearningZIL笔记</h1><h2>第1章 基本</h2><p>大致上IF由两类实体构成, 对象和例程. 对象又大致上可分为两类, 房间和物品.</p><p>既然处理了输入, 游戏就必须在适当的时候产生回复.</p><p>parser的目的在于将用户的输入规约为动词, 直接宾语, 间接宾语. 在ZIL中, 它们分别被称为<code>PRSA</code>, <code>PRSO</code>, <code>PRSI</code>. parser的结果分为三类, 仅包含动词, 包含动词和直接宾语, 包含动词, 直接宾语和间接宾语.</p><p>间接宾语将首先拥有处理输入的机会, 其次是直接宾语, 最后是动词. 这种做法的想法在于, 它们的特殊性依次降低.</p><h2>第2章 创建房间</h2><p>以下是一个房间的定义:</p><pre><code>&lt;ROOM LIVING-ROOM
+  (LOC ROOMS)
+  (DESC &quot;Living Room&quot;)
+  (EAST TO KITCHEN)
+  (WEST TO STRANGE-PASSAGE IF CYCLOPS-FLED ELSE
+        &quot;The wooden door is nailed shut.&quot;)
+  (DOWN PER TRAP-DOOR-EXIT)
+  (ACTION LIVING-ROOM-F)
+  (FLAGS RLANDBIT ONBIT SACREDBIT)
+  (GLOBAL STAIRS)
+  (THINGS &lt;> NAILS NAILS-PSEUDO)></code></pre><p><code>ROOM</code>代表这是一个房间对象的定义. <code>LIVING-ROOM</code>是这个对象的名字. <code>LOC</code>一行给出了对象的位置, 所有的房间都位于一个特别的对象之中, 其被称为<code>ROOMS</code>. <code>DESC</code>一行也给出了某种名字, 这样的名字不是供内部引用的, 而是供玩家看到的.</p><p>接下来数行给出了房间的出口. 许多房间的定义中, 出口占据了多数内容. 出口分为不同的种类, 例如<code>(EAST TO KITCHEN)</code>定义了一个无条件出口 (<code>UEXIT</code>). 第五行和第六行定义了一个有条件出口 (<code>CEXIT</code>), 其涉及一个全局变量<code>CYCLOPS-FLED</code>, 要么为真要么为假. 第七行是函数出口 (<code>FEXIT</code>) 的一个例子, <code>PER</code>标示了其为函数出口. 例程<code>TRAP-DOOR-EXIT</code>将决定玩家是否能够移动, 移动到哪里, 以及若不能移动该怎样回应. 还有两种出口, 虽然该房间的定义没有用到. 一种是非出口 (<code>NEXIT</code>), 用<code>SORRY</code>标示, 例如<pre><code>(NW SORRY &quot;The soldier at Uncle Otto's front door
+informs you that only Emperor Bonaparte is allowed
+through.&quot;)</code></pre>不论如何玩家都不能走这个方向. 另一种是门出口 (<code>DEXIT</code>), 它与有条件出口类似, 只是把全局变量换成了一个门对象, 例如<pre><code>(SOUTH TO GARAGE IF GARAGE-DOOR IS OPEN ELSE
+ &quot;You ought to use the garage door opener.&quot;)</code></pre>注意到有条件出口里是没有<code>IS OPEN</code>的.</p><p><code>ACTION</code>一行是房间的动作例程, 这之后再说. <code>FLAGS</code>一行包含了可应用于该房间的<code>FLAG</code>. <code>RLANDBIT</code>意味着房间在陆地上, 而不是在水上, 或者空中. <code>ONBIT</code>意味着该房间永远是亮着的. 有的<code>FLAG</code>每个游戏都有, 有的则是特定于游戏的. 例如, <code>SACREDBIT</code>特定于ZORK I, 它意味着神偷不会光顾这个房间. 根据命名约定, 所有的<code>FLAG</code>都以<code>BIT</code>结尾, 你可以根据自己的需要使用特殊的<code>FLAG</code>.</p><h2>第3章 创建物品</h2><p>以下是一个物品定义:</p><pre><code>&lt;OBJECT LANTERN
+  (LOC LIVING-ROOM)
+  (SYNONYM LAMP LANTERN LIGHT)
+  (ADJECTIVE BRASS)
+  (DESC &quot;brass lantern&quot;)
+  (FLAGS TAKEBIT LIGHTBIT)
+  (ACTION LANTERN-F)
+  (FDESC &quot;A battery-powered lantern is on the trophy case.&quot;)
+  (LDESC &quot;There is a brass lantern (battery-powered) here.&quot;)
+  (SIZE 15)></code></pre><p><code>(LOC LIVING-ROOM)</code>代表铜灯最初在起居室里. 随着游戏进程的推进, 其位置也有可能发生变化. 例如, 若玩家捡起铜灯, 那么它的<code>LOC</code>就会变为<code>PLAYER</code>对象, 有时<code>PLAYER</code>也被称为<code>PROTAGONIST</code>. 之后若玩家在厨房丢掉铜灯, 铜灯的<code>LOC</code>就是厨房了.</p><p><code>SYNONYM</code>性质是一些可以用来引用铜灯的名字. <code>ADJECTIVE</code>性质是一些用来限定引用物品的形容词, 该性质是可选的.</p><p><code>DESC</code>性质自然是物品的名字, 它会出现在例程需要插入名字的时候.</p><p>铜灯具有两个<code>FLAG</code>, <code>TAKEBIT</code>意味着它可以被玩家捡起, <code>LIGHTBIT</code>意味着它可以被点亮. 铜灯现在不是开着的, 一旦它被打开, 其就拥有了<code>ONBIT</code>, 意味着它正在发着光.</p><p><code>ACTION</code>性质将<code>LANTERN-F</code>作为处理与铜灯相关的输入的动作例程. 例如, 若玩家输入<code>THROW THE NERF BALL AT THE BRASS LANTERN</code>, 那么<code>LANTERN</code>对象就是<code>PRSI</code>, 而例程<code>LANTERN-F</code>将首先拥有处理输入的机会. 如果玩家输入了<code>THROW THE BRASS LANTERN AT THE NERF BALL</code>, 那么<code>LANTERN</code>将会是<code>PRSO</code>. 当nerf ball的动作例程不能处理输入的时候, <code>LANTERN-F</code>也将拥有处理输入的机会. </p><p><code>FDESC</code>性质是一个字符串, 当玩家第一次捡起铜灯的时候, 它将被用来描述铜灯. <code>LDESC</code>是当铜灯在地上的时候用来描述铜灯的字符串. 如果一个物品没有<code>FDESC</code>或<code>LDESC</code>, 那么<code>DESC</code>性质就会被用来描述对象.</p><p><code>SIZE</code>属性定义了物品的大小/重量. 这帮助游戏判断玩家是否可以捡起某个东西, 还是说已经拿得太多了. 如果不给可拿的物品提供<code>SIZE</code>, 通常默认的情况是<code>5</code>.</p><h2>第4章 ZIL中的例程</h2><p>例程的基本形式如下:</p><pre><code>&lt;ROUTINE ROUTINE-NAME (argument-list)
+  &lt;guts of the routine>></code></pre><p>命名例程有许多约定, 例如通常物品和房间的动作例程的名字以<code>-F</code>结尾. 参数列表跟在例程的名字之后出现. 参数是只在特定例程中被使用的变量, 这有别于全局变量. 以下是两个简单的例程:<pre><code>&lt;ROUTINE TURN-OFF-HOUSE-LIGHTS ()
+  &lt;FCLEAR ,LIVING-ROOM ,ONBIT>
+  &lt;FCLEAR ,DINING-ROOM ,ONBIT>
+  &lt;FCLEAR ,KITCHEN ,ONBIT>>
+&lt;ROUTINE INCREMENT-SCORE (NUM)
+  &lt;SETG SCORE &lt;+ ,SCORE .NUM>>
+  &lt;COND (,SCORE-NOTIFICATION-ON
+         &lt;TELL &quot;[Your score has just gone up by &quot;
+               N .NUM &quot;.]&quot; CR>)>></code></pre>调用例程的时候, 例程的名字写在开头, 参数跟在后面, 用尖括号括起来.</p><p>除了正常的参数之外, 还有两类参数, 可选参数和辅助参数, 分别以<code>&quot;OPT&quot;</code>和<code>&quot;AUX&quot;</code>标示. 描述例程的参数时, 必须按照正常参数, 可选参数, 辅助参数的顺序. 以下是一个例子.<pre><code>&lt;ROUTINE RHYME (&quot;AUX&quot; ARG1 ARG2)
+  &lt;SET ARG1 30>
+  &lt;SET ARG2 &quot;September&quot;>
+  &lt;LINE-IN-RHYME .ARG1 .ARG2>
+  &lt;SET ARG1 28>
+  &lt;SET ARG2 &quot;February&quot;>
+  &lt;LINE-IN-RHYME .ARG1 .ARG2>
+  etc.>
+&lt;ROUTINE LINE-IN-RHYME (ARG-A ARG-B)
+  &lt;TELL N .ARG-A &quot; days hath &quot; .ARG-B &quot;.&quot; CR>></code></pre>调用<code>RHYME</code>的时候, 是不需要参数的, 因为<code>ARG1</code>和<code>ARG2</code>都是辅助参数. 再看一个例子.<pre><code>&lt;ROUTINE CALLEE (X &quot;OPT&quot; Y &quot;AUX&quot; Z)
+  &lt;some-stuff>></code></pre>你有两种调用<code>CALLEE</code>的方式, 例如<code>&lt;CALLEE .FOO></code>或者<code>&lt;CALLEE .FOO .BAR></code>.</p><p>编写例程的时候, 你总是需要用到条件表达式<code>COND</code>, 以下是其一般格式:<pre><code>&lt;COND (&lt;predicate-1>
+       &lt;do-stuff-1>)
+      (&lt;predicate-2>
+       &lt;do-stuff-2>)
+      (&lt;predicate-3>
+       &lt;do-stuff-3>)></code></pre>其行为就和其他Lisp方言里的差不多.</p><p>在正常情况下, 调用一个例程返回其最后一个表达式的值, 不过读者也可以通过<code>&lt;RTRUE></code>和<code>&lt;RFALSE></code>提前返回真或假, 或者通过<code>RETURN</code>提前返回其他什么值.</p><p>ZIL代码中有些东西看起来像例程, 不过你在游戏程序的任何地方都找不到, 这些东西被称为ZIL指令. ZIL指令是游戏与运行在微机上的解释器交流的手段, 有时其也被称为操作码 (op-code). 关于当前ZIL指令的完整列表, 请参考附录D.</p><h2>第5章 简单动作例程</h2><p>假设现在你有了一个对象<code>AVOCADO</code>, 带有性质<code>(ACTION AVOCADO-F)</code>, 那么<code>AVOCADO-F</code>就是<code>AVOCADO</code>的动作例程了, 它长得可能像以下这样:<pre><code>&lt;ROUTINE AVOCADO-F ()
+  &lt;COND (&lt;VERB? EAT>
+         &lt;REMOVE ,AVOCADO>
+         &lt;TELL &quot;The avocado is so delicious that you
+eat it all.&quot; CR>)
+        (&lt;VERB? CUT OPEN>
+         &lt;FSET ,AVOCADO ,OPENBIT>
+         &lt;MOVE ,AVOCADO-PIT ,AVOCADO>
+         &lt;TELL &quot;You halve the avocado, revealing a
+gnarly pit.&quot; CR>)>></code></pre><code>(VERB? EAT)</code>为真当且仅当<code>PRSA</code>是<code>EAT</code>. 若的确如此, 那么先<code>REMOVE</code>这个鳄梨, 即将其<code>LOC</code>设置为假, 然后调用<code>TELL</code>输出想要告诉玩家的信息. 如果<code>EAT</code>不是动词, 而<code>CUT</code>或者<code>OPEN</code>是动词的话, 那么就会先调用<code>FSET</code>, 它的意思是&quot;flag set&quot;, 将为<code>AVOCADO</code>添加<code>OPENBIT</code>flag. 如果你想要去除某个flag, 那就调用<code>FCLEAR</code>. 接着, 还是调用<code>TELL</code>告诉玩家发生了什么. 若动词不是以上三个, 那么<code>AVOCADO-F</code>就没能成功处理输入. 如果<code>AVOCADO</code>是<code>PRSI</code>, 那么接下来就由<code>PRSO</code>处理输入. 如果<code>AVOCADO</code>是<code>PRSO</code>, 那么接下来就由动词处理输入.</p><p>除了<code>VERB?</code>, 还有其他许多常用的谓词, 例如<code>EQUAL?</code>, 请看例子:<pre><code>&lt;EQUAL? ,HERE ,DRAGONS-LAIR></code></pre><code>HERE</code>是一个全局变量, 其总是被设置为当前的房间. 引用全局变量的值时, 前面要加上逗号. 引用局部变量的值时, 前面要加上点号. 许多全局变量只是取布尔值而已, 因此它们本身就是谓词. 实际上, <code>EQUAL?</code>可以接受多于两个参数.</p><p><code>FSET?</code>判断一个对象是否拥有某个flag, 例如<pre><code>&lt;FSET? ,AVOCADO ,OPENBIT></code></pre></p><p><code>IN?</code>可以用来检查一个对象的位置, 例如<pre><code>&lt;IN? ,EGGS ,BASKET></code></pre></p><p><code>AND</code>, <code>OR</code>, <code>NOT</code>表现得就如同其他Lisp方言.</p><p>房间的动作例程不是用来直接处理玩家的输入的. 一般而言, 房间的动作例程会接受一个参数<code>RARG</code>, 代表room argument, 房间参数之意. 通常的<code>RARG</code>有<code>M-LOOK</code>和<code>M-ENTER</code>. 许多时候, 处理<code>M-ENTER</code>时, 房间的动作例程会做些玩家不可见的事情.</p><h2>第6章 事件</h2><p>不是所有的文本都为了回应玩家的输入, 有些也可能是事件的结果, 事件也被称为中断. 中断的命名约定是在前面加上<code>I-</code>, 例如<code>I-GUNSHOT</code>, 以下是一个简单中断的例子:<pre><code>&lt;ROUTINE I-OTTO-GOES-NUTS ()
+  &lt;FSET ,UNCLE-OTTO ,LOONEYBIT>
+  &lt;COND (&lt;IN? ,UNCLE-OTTO ,HERE>
+         &lt;TELL
+&quot;Sigh; it appears that Uncle Otto's delusion has
+returned; he has begun shouting orders to unseen
+troops.&quot; CR>)>></code></pre></p><p>在绝大多数回合里, 时间会在故事之中流逝, 例外可能有parser没能解析玩家的输入之类的情况. 在每个回合的结尾, 已经处理好了玩家的输入, 时间也被推进了, 此时一个被称为<code>CLOCKER</code>的例程会被调用. 它会为被安排上的中断例程倒计时, 并调用到点了的中断.</p><p>任何进行了<code>TELL</code>的中断应该返回真, 否则应该返回假. 这是为了动词<code>WAIT</code>的方便, 其作用是忽略数个回合. 中断必须能够终止<code>WAIT</code>, 以防以下事情发生:<pre><code>>WAIT
+Time passes ...
+    A truck begins speeding toward you.
+    The truck loudly honks its horn.
+    Since you refuse to move out of the way, the truck
+merges you into the pavement.</code></pre></p><p>中断是由作者加入的. 有可能在游戏的开头, 或许是为了响应玩家的某个动作. 一个中断例程或许也会加入其他的中断例程. 调用<code>QUEUE</code>加入例程, 它有两个参数, 一个是中断, 另一个是倒计时回合数:<pre><code>&lt;QUEUE I-SHOOTING-STAR 10></code></pre>倒计时为<code>1</code>的, 本回合就会开始运行. 倒计时为<code>2</code>的, 那就是下回合, 依此类推. 一般情况下, 一个中断只会运行一次, 除非你再次加入它. 例外情况在于, 如果倒计时为<code>-1</code>, 那么每回合都会运行, 除非你主动<code>DEQUEUE</code>它.</p><p>倒计时为<code>-1</code>的一个例子是之前看到的卡车的中断<code>I-TRUCK</code>, 它与一个被初始化为<code>0</code>的全局变量<code>TRUCK-COUNTER</code>协同运作:<pre><code>&lt;ROUTINE I-TRUCK ()
+  &lt;SETG TRUCK-COUNTER &lt;+ ,TRUCK-COUNTER 1>>
+  &lt;COND (&lt;EQUAL? ,TRUCK-COUNTER 1>
+         &lt;MOVE ,TRUCK ,STREET>
+         &lt;TELL
+&quot;A truck begins speeding toward you.&quot; CR>)
+        (&lt;EQUAL? ,TRUCK-COUNTER 2>
+         &lt;TELL
+&quot;The truck loudly honks its horn.&quot; CR>)
+        (&lt;EQUAL? ,TRUCK-COUNTER 3>
+         &lt;COND (&lt;EQUAL? ,HERE ,STREET>
+                &lt;JIGS-UP
+&quot;Since you refuse to move out of the way, the truck
+merges you into the pavement.&quot;>)
+               (T ;&quot;you've gotten out of the way&quot;
+                &lt;TELL
+&quot;The truck blasts you with hot exhaust fumes as it
+rumbles past.&quot; CR>)>)
+        (T ;&quot;counter is 4&quot;
+         &lt;DEQUEUE I-TRUCK>
+         &lt;SETG TRUCK-COUNTER 0>
+         &lt;TELL
+&quot;The truck vanishes in the direction of Hoboken.&quot;
+CR>)>></code></pre>分号后面是注释. 例程体的第一行是在计数, 如此<code>I-TRUCK</code>才知道卡车开了多远. 例程<code>JIGS-UP</code>以一个字符串为参数, &quot;杀死&quot;玩家, 输出接受的字符串, 最后再提示一下玩家已经死了. 这里只有当玩家还在<code>STREET</code>的时候才会调用<code>JIGS-UP</code>, 否则的话它就会提示卡车(安全地)过去了. 当<code>TRUCK-COUNTER</code>为<code>4</code>时, 也就是对应谓词为<code>T</code>的分支. 此时<code>I-TRUCK</code>将被<code>DEQUEUE</code>, 并且注意一下<code>TRUCK-COUNTER</code>也被设置为<code>0</code>, 如此未来再次运转<code>I-TRUCK</code>时也能表现正确.</p><p>在回合末, 但在<code>CLOCKER</code>之前, 当前房间的动作例程将被自动地调用以参数<code>M-END</code>. 以下是一个例子:<pre><code>&lt;ROUTINE AIRPORT-F (RARG)
+  &lt;COND (&lt;EQUAL? .RARG ,M-ENTER>
+         &lt;QUEUE I-STRAFING 5>)
+        (&lt;EQUAL? .RARG ,M-LOOK>
+         &lt;TELL
+&quot;You are on the tarmac of an airport runway...&quot; CR>)
+        (&lt;EQUAL? .RARG ,M-END>
+         &lt;TELL &quot;A plane zooms low overhead.&quot; CR>)>></code></pre></p><h2>第7章 更多关于ZIL代码的说明</h2><p><code>GLOBAL</code>形式定义全局变量, 例如:<pre><code>&lt;GLOBAL SECRET-PASSAGE-OPENED &lt;>>
+&lt;GLOBAL SLEEPY T>
+&lt;GLOBAL NUMBER-OF-MATCHES 5></code></pre></p><p>容器系统是ZIL的重要组成部分. 每个对象都有<code>LOC</code>, 房间位于特殊的对象<code>ROOMS</code>之中. 有的对象的<code>LOC</code>可能为假. 容器系统决定了许多重要的事情. 例如, 它决定一个对象是否可被引用. 一般情况下, 能够被引用的对象必须在场并且是可见的. 例如, 如果一个东西不在玩家所处的房间, 或者它处于一个封闭容器之中, 或者它本身拥有一个<code>INVISIBLE</code>flag, 那么它就没法被引用. 为了得到一个对象的<code>LOC</code>, 只需要使用<code>LOC</code>:<pre><code>&lt;LOC ,OBJECT-NAME></code></pre>你可以使用<code>IN?</code>来检查对象的位置:<pre><code>&lt;IN? ,PICKLE ,BARREL></code></pre><code>MOVE</code>以改变对象的位置:<pre><code>&lt;MOVE ,HORSE ,STABLE></code></pre><code>REMOVE</code>以去除对象:<pre><code>&lt;REMOVE ,HORSE></code></pre>为了探查一个对象的内容, 你需要两种指令, <code>FIRST?</code>和<code>NEXT?</code>. 假设你现在有了一个叫做<code>KITCHEN-CABINET</code>的对象, 它包含一个pitcher, 一个serving spoon, 还有一个severed head.<pre><code>&lt;FIRST? ,KITCHEN-CABINET></code></pre>将返回对象<code>PITCHER</code>, 然后<pre><code>&lt;NEXT? ,PITCHER></code></pre>将会是serving spoon, 它的<code>NEXT?</code>又会是severed head. 既然severed head是cabinet所包含的最后一个东西, 那么<pre><code>&lt;NEXT? ,SEVERED-HEAD></code></pre>根据定义应该是假.</p><p>机动装置:</p><h2>第8章 更大的图景</h2><p>当玩家启动游戏的时候, 解释器第一件所做的事情是调用被称为<code>GO</code>的例程, 它应该完全所有的准备工作, 例如调用<code>V-VERSION</code>, 调用<code>V-LOOK</code>, 加入必要的中断, 等等. <code>GO</code>应该做的最后一件事情是调用被称为<code>MAIN-LOOP</code>的例程, 它在某种意义上是整个游戏的king. </p><pre><code>&lt;ROUTINE MAIN-LOOP (argument-list-from-hell)
+  &lt;REPEAT ()
+    &lt;PARSER>
+    &lt;COND (&lt;did-the-parser-fail?>
+           &lt;AGAIN>)>
+    &lt;PERFORM ,PRSA ,PRSO ,PRSI>
+    &lt;COND (&lt;did-this-input-cause-time-to-pass?>
+           &lt;call-room-function-with-M-END>
+           &lt;CLOCKER>)>>></code></pre><h2>第9章 句法文件</h2><h2>第10章 演员</h2><h2>第11章 描述过程</h2><h2>第12章 一些复杂的东西</h2><h2>第13章 图形和声音</h2><h2>第14章 组织你的ZIL文件</h2><h2>第15章 庆祝时刻&mdash;编译你的游戏</h2><h2>第16章 使用ZIL编写其他类型的游戏</h2><h2>附录A: 性质</h2><h2>附录B: flag</h2><h2>附录C: 常用例程</h2><h2>附录D: ZIL指令</h2></body></html>

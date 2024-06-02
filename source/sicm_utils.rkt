@@ -1,0 +1,13 @@
+#lang racket
+(provide (all-defined-out))
+(require SMathML)
+(define $partial (Mi "&part;"))
+(define $partial_1 (_ $partial $1))
+(define $partial_2 (_ $partial $2))
+(define (&Gmap q)
+  (ap $Gamma:normal (bra0 q)))
+(define (@Gmap q) (@ (&Gmap q)))
+(define (&D f) (app $D f))
+(define (@D f) (@ap $D f))
+(define (Center . html*)
+  `(div ((style "text-align: center;")) . ,html*))
