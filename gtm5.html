@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>数学工作者的范畴论</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>数学工作者的范畴论</h1>
+    <h2>第二版前言</h2>
+    <h2>第一版前言</h2>
+    <h2>引论</h2>
+    <p>范畴论始于如下观察, 即数学系统的许多性质可由箭头图表的呈现所统一和简化. 每个箭头<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow></mrow></math>都代表了一个函数; 也就是说, 一个集合<math><mi>X</mi></math>, 一个集合<math><mi>Y</mi></math>, 以及一个规则<math><mrow><mi>x</mi><mo>&mapsto;</mo><mrow><mi>f</mi><mo>&af;</mo><mi>x</mi></mrow></mrow></math>, 其赋每个元素<math><mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow></math>以一个元素<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mi>x</mi></mrow><mo>&in;</mo><mi>Y</mi></mrow></math>; 若有可能, 我们总是记<math><mrow><mi>f</mi><mo>&af;</mo><mi>x</mi></mrow></math>而非<math><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 省略不必要的括号. 一个典型的集合和函数的图表为
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+      当<math><mi>h</mi></math>为<math><mrow><mi>h</mi><mo>=</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></mrow></math>时, 该图表是交换的, 其中<math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math>是通常的复合函数<math><mrow><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>Z</mi></mrow></mrow></math>, 由<math><mrow><mi>x</mi><mo>&mapsto;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>定义. 相同的图表可以应用于其他的数学上下文; 因此, 在由所有拓扑空间构成的<q>范畴</q>里, 字母<math><mrow><mi>X</mi><mo>,</mo><mi>Y</mi><mo>,</mo><mi>Z</mi></mrow></math>代表拓扑空间, 而<math><mrow><mi>f</mi><mo>,</mo><mi>g</mi><mo>,</mo><mi>h</mi></mrow></math>代表连续映射. 又一次, 在由所有群构成的<q>范畴</q>里, <math><mrow><mi>X</mi><mo>,</mo><mi>Y</mi><mo>,</mo><mi>Z</mi></mrow></math>代表群, <math><mrow><mi>f</mi><mo>,</mo><mi>g</mi><mo>,</mo><mi>h</mi></mrow></math>代表同态.</p>
+    <p>数学构造的许多性质可以由图表的泛性质所表示. 考虑两个集合的笛卡尔积<math><mrow><mi>X</mi><mo>&times;</mo><mi>Y</mi></mrow></math>, 和通常一样其由元素<math><mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow></math>和<math><mrow><mi>y</mi><mo>&in;</mo><mi>Y</mi></mrow></math>的所有序对<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">&rang;</mo></mrow></math>构成. 积于其<q>轴</q><math><mi>X</mi></math>和<math><mi>Y</mi></math>上的投影<math><mrow><mrow><mo stretchy="false">&lang;</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">&rang;</mo></mrow><mo>&mapsto;</mo><mi>x</mi></mrow></math>和<math><mrow><mrow><mo stretchy="false">&lang;</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">&rang;</mo></mrow><mo>&mapsto;</mo><mi>y</mi></mrow></math>是函数<math><mrow><mi>p</mi><mo>:</mo><mrow><mrow><mi>X</mi><mo>&times;</mo><mi>Y</mi></mrow><mo>&rarr;</mo><mi>X</mi></mrow></mrow></math>, <math><mrow><mi>q</mi><mo>:</mo><mrow><mrow><mi>X</mi><mo>&times;</mo><mi>Y</mi></mrow><mo>&rarr;</mo><mi>Y</mi></mrow></mrow></math>. 任何自第三个集合<math><mi>W</mi></math>始的函数<math><mrow><mi>h</mi><mo>:</mo><mrow><mi>W</mi><mo>&rarr;</mo><mrow><mi>X</mi><mo>&times;</mo><mi>Y</mi></mrow></mrow></mrow></math>都可由其组分<math><mrow><mi>p</mi><mo>&compfn;</mo><mi>h</mi></mrow></math>和<math><mrow><mi>q</mi><mo>&compfn;</mo><mi>h</mi></mrow></math>唯一确定. 反过来, 给定如以下图表所示的<math><mi>W</mi></math>和两个函数<math><mi>f</mi></math>和<math><mi>g</mi></math>, 存在唯一的函数<math><mi>h</mi></math>使得图表交换; 即<math><mrow><mrow><mi>h</mi><mo>&af;</mo><mi>w</mi></mrow><mo>=</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mrow><mi>f</mi><mo>&af;</mo><mi>w</mi></mrow><mo>,</mo><mrow><mi>g</mi><mo>&af;</mo><mi>w</mi></mrow></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>, 对于每个<math><mi>W</mi></math>中的<math><mi>w</mi></math>:
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+      因此, 给定<math><mi>X</mi></math>和<math><mi>Y</mi></math>, </p>
+  </body>
+</html>

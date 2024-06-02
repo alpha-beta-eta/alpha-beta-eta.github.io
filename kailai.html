@@ -1,0 +1,369 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>概率论教程</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>概率论教程</h1>
+    <p>这是个人阅读钟开莱所著的概率论教程一书的笔记.</p>
+    <h2>第1章 分布函数</h2>
+    <h3>第1.1节 单调函数</h3>
+    <p>本书的正负增减均为广义, 即<q><math><mi>x</mi></math>为正</q>指的是<q><math><mrow><mi>x</mi><mo>&ge;</mo><mn>0</mn></mrow></math></q>. 若要使用传统意义, 则须加<q>严格</q>二字.</p>
+    <p>设<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>&Ropf;</mi><mo>&rarr;</mo><mi>&Ropf;</mi></mrow></mrow></math>是一个增函数, 则对于任意两个实数<math><msub><mi>x</mi><mn>1</mn></msub></math>和<math><msub><mi>x</mi><mn>2</mn></msub></math>, 我们有
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(1)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <msub><mi>x</mi><mn>1</mn></msub>
+                  <mo>&lt;</mo>
+                  <msub><mi>x</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>&rArr;</mo>
+                <mrow>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>x</mi><mn>1</mn></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&le;</mo>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>x</mi><mn>2</mn></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mtext>.</mtext></mtd>
+            <mtd><mtext>(1)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      当然了, 这也等价于
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>x</mi><mn>1</mn></msub>
+            <mo>&le;</mo>
+            <msub><mi>x</mi><mn>2</mn></msub>
+          </mrow>
+          <mo>&rArr;</mo>
+          <mrow>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>x</mi><mn>1</mn></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&le;</mo>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>x</mi><mn>2</mn></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </p>
+    <p>我们使用<math><mrow><mi>t</mi><mo>&uarr;</mo><mi>x</mi></mrow></math>表示<math><mi>t</mi></math>从左侧趋近于<math><mi>x</mi></math>, <math><mrow><mi>t</mi><mo>&darr;</mo><mi>x</mi></mrow></math>表示<math><mi>t</mi></math>从右侧趋近于<math><mi>x</mi></math>.</p>
+    <div class="proposition" id="increasing-unilateral-limits"><b>命题1.1.1. </b>对于每个<math><mi>x</mi></math>, <math><mi>f</mi></math>在<math><mi>x</mi></math>处的左极限和右极限均(严格)存在, 其记号分别为
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(2)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>f</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo lspace="0" rspace="0">&minus;</mo></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>=</mo>
+                <mrow>
+                  <munder><mi>lim</mi>
+                    <mrow><mi>t</mi><mo>&uarr;</mo><mi>x</mi></mrow>
+                  </munder>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mtext>和</mtext>
+              <mrow>
+                <mrow><mi>f</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo lspace="0" rspace="0">+</mo></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>=</mo>
+                <mrow>
+                  <munder><mi>lim</mi>
+                    <mrow><mi>t</mi><mo>&darr;</mo><mi>x</mi></mrow>
+                  </munder>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mtext>.</mtext></mtd>
+            <mtd><mtext>(2)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math><mi>f</mi></math>在无穷远处的极限亦(广义)存在, 其记号分别为
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mo>&minus;</mo><mi>&infin;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <munder><mi>lim</mi>
+              <mrow><mi>t</mi><mo>&darr;</mo>
+                <mrow><mo>&minus;</mo><mi>&infin;</mi></mrow>
+              </mrow>
+            </munder>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>和</mtext>
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mo>+</mo><mi>&infin;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <munder><mi>lim</mi>
+              <mrow><mi>t</mi><mo>&uarr;</mo>
+                <mrow><mo>+</mo><mi>&infin;</mi></mrow>
+              </mrow>
+            </munder>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      前者可能为<math><mrow><mo>&minus;</mo><mi>&infin;</mi></mrow></math>, 后者可能为<math><mrow><mo>+</mo><mi>&infin;</mi></mrow></math>.</div>
+    <div class="proof"><b>证明.</b> 对于任意的实数<math><mi>x</mi></math>, 设
+      <math display="block">
+        <mrow><mi>a</mi><mo>=</mo>
+          <mrow>
+            <munder><mi>sup</mi>
+              <mrow><mi>t</mi><mo>&lt;</mo><mi>x</mi></mrow>
+            </munder>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      根据单调性和确界原理, 这个上确界是良定的. 对于每个<math><mrow><mi>&epsilon;</mi><mo>></mo><mn>0</mn></mrow></math>, 存在<math><mrow><mi>&delta;</mi><mo>></mo><mn>0</mn></mrow></math>满足
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo>&minus;</mo><mi>&delta;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>></mo>
+          <mrow><mi>a</mi><mo>&minus;</mo><mi>&epsilon;</mi></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      根据单调性, 对于每个实数<math><mi>t</mi></math>满足<math><mrow><mrow><mi>x</mi><mo>&minus;</mo><mi>&delta;</mi></mrow><mo>&lt;</mo><mi>t</mi><mo>&lt;</mo><mi>x</mi></mrow></math>, 我们有
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>></mo>
+          <mrow><mi>a</mi><mo>&minus;</mo><mi>&epsilon;</mi></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      并且, 我们还知道
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&le;</mo><mi>a</mi></mrow>
+        <mtext>.</mtext></math>
+      因此, 可以推出
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">|</mo>
+            <mrow>
+              <mrow><mi>f</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&minus;</mo><mi>a</mi></mrow>
+            <mo stretchy="false">|</mo></mrow>
+          <mo>&lt;</mo><mi>&epsilon;</mi></mrow>
+        <mtext>.</mtext></math>
+      这告诉我们<math><mi>f</mi></math>在<math><mi>x</mi></math>处的左极限存在, 且
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo lspace="0" rspace="0">&minus;</mo></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <munder><mi>sup</mi>
+              <mrow><mi>t</mi><mo>&lt;</mo><mi>x</mi></mrow>
+            </munder>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      如法炮制, 我们可以证明
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo lspace="0" rspace="0">+</mo></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <munder><mi>inf</mi>
+              <mrow><mi>t</mi><mo>></mo><mi>x</mi></mrow>
+            </munder>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      对于趋向无穷远处的极限, 证明也是类似的.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="proposition" id="increasing-continuous"><b>命题1.1.2. </b>对于每个实数<math><mi>x</mi></math>, <math><mi>f</mi></math>在<math><mi>x</mi></math>处连续当且仅当
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo lspace="0" rspace="0">&minus;</mo></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo lspace="0" rspace="0">+</mo></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </div>
+    <div class="proof"><b>证明.</b> 函数<math><mi>f</mi></math>在<math><mi>x</mi></math>处连续当且仅当
+      <math display="block">
+        <mrow>
+          <mrow>
+            <munder><mi>lim</mi>
+              <mrow><mi>t</mi><mo lspace="0" rspace="0">&rarr;</mo><mi>x</mi></mrow>
+            </munder>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      而这又当且仅当
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo lspace="0" rspace="0">&minus;</mo></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>且</mtext>
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo lspace="0" rspace="0">+</mo></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      另外, 原书的证明方法给出了
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(3)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>f</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo lspace="0" rspace="0">&minus;</mo></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&le;</mo>
+                <mrow><mi>f</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&le;</mo>
+                <mrow><mi>f</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo lspace="0" rspace="0">+</mo></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(3)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      作为中间步骤.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>一般而言, 我们称<math><mi>f</mi></math>在<math><mi>x</mi></math>处有一个<em>跳跃</em>, 如果(2)中的两个极限均存在且不相等. <math><mi>f</mi></math>在<math><mi>x</mi></math>处的值本身, 即<math><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 则可以是任意的. 但对于增函数<math><mi>f</mi></math>而言, 关系(3)必然成立. 作为<cite>命题<a href="#increasing-unilateral-limits">1.1.1</a></cite>和<cite>命题<a href="#increasing-continuous">1.1.2</a></cite>的推论, 我们有以下结果.</p>
+    <div class="proposition"><b>命题1.1.3. </b>一个增函数的唯一可能的非连续性种类为跳跃. {读者还应该自问, 对于一般的函数, 还存在哪些种类的非连续性.}</div>
+    <h3>第1.2节 分布函数</h3>
+    <h3>第1.3节 绝对连续分布和奇异分布</h3>
+    <h2>第2章 测度论</h2>
+    <h3>第2.1节 集类</h3>
+    <h3>第2.2节 概率测度及其分布函数</h3>
+    <h2>第3章 随机变量 期望 独立性</h2>
+    <h2>第4章 收敛概念</h2>
+    <h3>第4.1节 各种收敛方式</h3>
+    <h2>第5章 大数定律 随机级数</h2>
+    <h2>第6章 特征函数</h2>
+    <h2>第7章 中心极限定理及其分歧</h2>
+    <h2>第8章 随机游走</h2>
+    <h2>第9章 条件期望 Markov性 鞅</h2>
+  </body>
+</html>

@@ -1,0 +1,1848 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>如何编写金融合约</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>如何编写金融合约</h1>
+    <h2>第1章 引论</h2>
+    <h2>第2章 开始</h2>
+    <p>本节我们将会非形式化地引入我们对于合约的记号, 并展示我们如何根据较为简单的合约构建更为复杂的合约. 整个文章我们都会使用函数式语言Haskell.</p>
+    <h3>第2.1节 一个简单合约</h3>
+    <p>考虑以下简单合约, 或许可以充当Richard的礼物: <q>receive £100 on 13th February 2003</q>. (这种形式的合约在业界被称为<em>零息折扣债券 (zero-coupon discount bond)</em>.) 我们可以描述这个合约, 称之为<math><msub><mi>c</mi><mn>1</mn></msub></math>, 如下:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <msub><mi>c</mi><mn>1</mn></msub>
+            </mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd><mi>Contract</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>c</mi><mn>1</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>zcb</mi><mspace width="2ex"/>
+                <msub><mi>t</mi><mn>1</mn></msub>
+                <mspace width="2ex"/><mn>100</mn><mspace width="2ex"/><mi>GBP</mi></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      图1总结了整篇文章我们对于变量所使用的记号约定, 例如这个定义里的<math><msub><mi>c</mi><mn>1</mn></msub></math>和<math><msub><mi>t</mi><mn>1</mn></msub></math>.</p>
+    <p><math><msub><mi>c</mi><mn>1</mn></msub></math>定义中所使用的组合子<math><mi>zcb</mi></math>具有如下类型:
+      <math display="block">
+        <mrow><mi>zcb</mi><mo>::</mo>
+          <mrow><mi>Date</mi><mo>&rarr;</mo><mi>Double</mi><mo>&rarr;</mo><mi>Currency</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p><math><mi>zcb</mi></math>的第一个参数是一个<math><mi>Date</mi></math>, 其刻画了时间方面的一个特定时刻 (即日期和时间). 我们提供了一个函数<math><mi>mkDate</mi></math>, 其将表达以一个友好的字符串的date转换为一个<math><mi>Date</mi></math>.
+      <math display="block">
+        <mrow><mi>mkDate</mi><mo>::</mo>
+          <mrow><mi>String</mi><mo>&rarr;</mo><mi>Date</mi></mrow>
+        </mrow>
+      </math>
+      现在我们可以定义Richard的2003年和2004年的生日如下:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>t</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi>t</mi><mn>2</mn></msub>
+              </mrow>
+            </mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd><mi>Date</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>t</mi><mn>1</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>mkDate</mi><mspace width="2ex"/>
+                <mrow><mo>&quot;</mo><mtext>0800 GMT 13 Feb 2003</mtext><mo>&quot;</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>t</mi><mn>2</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>mkDate</mi><mspace width="2ex"/>
+                <mrow><mo>&quot;</mo><mtext>0800 GMT 13 Feb 2004</mtext><mo>&quot;</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <h3>第2.2节 对于合约进行组合</h3>
+    <p>所以说, <math><mi>zcb</mi></math>让我们能够构建一个简单合约. 我们也可以组合合约以制作更大的合约. 这样一种组合形式的良好例子是<math><mi>and</mi></math>, 其类型为:
+      <math display="block">
+        <mrow><mi>and</mi><mo>::</mo>
+          <mrow><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+        </mrow>
+      </math>
+      使用<math><mi>and</mi></math>我们可以定义<math><msub><mi>c</mi><mn>3</mn></msub></math>, 一个牵涉两个支付的合约:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>c</mi><mn>2</mn></msub>
+                <mo>,</mo>
+                <msub><mi>c</mi><mn>3</mn></msub>
+              </mrow>
+            </mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd><mi>Contract</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>c</mi><mn>2</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>zcb</mi><mspace width="2ex"/>
+                <msub><mi>t</mi><mn>2</mn></msub>
+                <mspace width="2ex"/><mn>200</mn><mspace width="2ex"/><mi>GBP</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>c</mi><mn>3</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                <msub><mi>c</mi><mn>2</mn></msub>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      也就是说, 如果Richard持有合约<math><msub><mi>c</mi><mn>3</mn></msub></math>, 那么他会在2003年生日受益于£100的支付, 在2004年生日受益于£200的支付.</p>
+    <p>一般而言, 我们可以描述的合约是两方之间的, 即合约的<em>持有者</em>, 以及<em>交易对手</em>. 尽管有圣经教导在先 (Acts 20.35), 默认情况下还是合约的持有者接受支付, 并作出选择, 这在合约中进行描述. 这种情况可由<math><mi>give</mi></math>组合子反转:
+      <math display="block">
+        <mrow><mi>give</mi><mo>::</mo>
+          <mrow><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+        </mrow>
+      </math>
+      合约<math><mrow><mi>give</mi><mspace width="2ex"/><mi>c</mi></mrow></math>不过就是<math><mi>c</mi></math>的权利和义务反转, 而其精确含义我们将会在第4.2节揭晓. 的确, 当两方就合约达成一致时, 一方获得了合约<math><mi>c</mi></math>, 而另一方获得了合约<math><mrow><mi>give</mi><mspace width="2ex"/><mi>c</mi></mrow></math>; 每一方都是另一方的对手方. 例如, <math><msub><mi>c</mi><mn>4</mn></msub></math>是一个合约, 其持有者在时间<math><msub><mi>t</mi><mn>1</mn></msub></math><em>接受</em>£100, 而在时间<math><msub><mi>t</mi><mn>2</mn></msub></math><em>支付</em>£200:
+      <math display="block">
+        <mrow>
+          <msub><mi>c</mi><mn>4</mn></msub>
+          <mo>=</mo>
+          <mrow>
+            <msub><mi>c</mi><mn>1</mn></msub>
+            <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>give</mi><mspace width="2ex"/>
+                <msub><mi>c</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      到目前为止, 我们的每个定义都在定义新的<em>合约</em> (<math><msub><mi>c</mi><mn>1</mn></msub></math>, <math><msub><mi>c</mi><mn>2</mn></msub></math>, 等等). 定义新的<em>组合子</em> (构建合约的函数) 也是相当容易的. 例如, 我们可以按照如下方式定义<math><mi>andGive</mi></math>:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>andGive</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>andGive</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>d</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>c</mi>
+                <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>give</mi><mspace width="2ex"/><mi>d</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      现在我们给出<math><msub><mi>c</mi><mn>4</mn></msub></math>的另外一个定义 (比之前更加简单):
+      <math display="block">
+        <mrow>
+          <msub><mi>c</mi><mn>4</mn></msub>
+          <mo>=</mo>
+          <mrow>
+            <msub><mi>c</mi><mn>1</mn></msub>
+            <mrow><mo>'</mo><mi>andGive</mi><mo>'</mo></mrow>
+            <msub><mi>c</mi><mn>2</mn></msub>
+          </mrow>
+        </mrow>
+      </math>
+      这种定义新的组合子, 然后将其像内置函数一样使用的能力, 对于函数式程序员是相当常规的, 但对于金融工程师并非如此.</p>
+    <h2>第3章 构建合约</h2>
+    <p>
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>zero</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd><mi>Contract</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mi>zero</mi><mtext>是一个没有权利且没有义务的合约.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>one</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow><mi>Currency</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>如果你获得了</mtext>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>one</mi><mspace width="2ex"/><mi>k</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mtext>, 那么你立即可以收到货币</mtext><mi>k</mi><mtext>的一个单位.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>give</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>获得</mtext>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>give</mi><mspace width="2ex"/><mi>c</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mtext>就是获得所有的</mtext><mi>c</mi><mtext>的权利作为义务, 所有的义务作为权利.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>注意到对于</mtext><mi>A</mi><mtext>方和</mtext><mi>B</mi><mtext>方之间的双边合约</mtext><mi>q</mi><mtext>而言,&nbsp;</mtext><mi>A</mi><mtext>获得</mtext><mi>q</mi><mtext>可以推出</mtext><mi>B</mi><mtext>获得</mtext>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>give</mi><mspace width="2ex"/><mi>q</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mtext>.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>and</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>如果你获得了</mtext>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mtext>, 那么你立即获得了</mtext>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mtext>和</mtext>
+                <msub><mi>c</mi><mn>2</mn></msub>
+                <mtext>.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>or</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>如果你获得了</mtext>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mtext>, 那么你必须立即从</mtext>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mtext>和</mtext>
+                <msub><mi>c</mi><mn>2</mn></msub>
+                <mtext>中选择一个获得.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>cond</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>Bool</mi></mrow>
+                <mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>scale</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>Double</mi></mrow>
+                <mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>when</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>Bool</mi></mrow>
+                <mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>anytime</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>Bool</mi></mrow>
+                <mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>until</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>Bool</mi></mrow>
+                <mo>&rarr;</mo><mi>Contract</mi><mo>&rarr;</mo><mi>Contract</mi></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <b>图2. 定义合约的原语</b></p>
+    <p>我们已经完成了我们的非正式介绍. 本章我们将给出完整的原语集, 并展示各种各样的合约是如何通过这些原语构建的. 处于参考的目的, 图2给出了所有合约上的原始组合子; 我们将会按需引入这些原语.</p>
+    <h3>第3.1节 获取日期和可观察量</h3>
+    <p>
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>konst</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow><mi>a</mi><mo>&rarr;</mo>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>a</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>konst</mi><mspace width="2ex"/><mi>x</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mtext>是一个在任何时间都具有值</mtext><mi>x</mi><mtext>的量.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>lift</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>b</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>lift</mi><mspace width="2ex"/><mi>f</mi><mspace width="2ex"/><mi>o</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mtext>是可观察量, 其值为应用</mtext><mi>f</mi><mtext>于可观察量</mtext><mi>o</mi><mtext>的值的结果.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>lift</mi><mn>2</mn></msub>
+            </mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi><mo>&rarr;</mo><mi>c</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>b</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>c</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>lift</mi><mn>2</mn></msub>
+                    <mspace width="2ex"/><mi>f</mi><mspace width="2ex"/>
+                    <msub><mi>o</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>o</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mtext>是可观察量, 其值为应用</mtext><mi>f</mi><mtext>于可观察量</mtext>
+                <msub><mi>o</mi><mn>1</mn></msub>
+                <mtext>和</mtext>
+                <msub><mi>o</mi><mn>2</mn></msub>
+                <mtext>的值之结果.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>date</mi></mtd>
+            <mtd><mo>::</mo></mtd>
+            <mtd>
+              <mrow><mi>Obs</mi><mspace width="2ex"/><mi>Date</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>日期为</mtext><mi>s</mi><mtext>时可观察量</mtext><mi>date</mi><mtext>的值就是</mtext><mi>s</mi><mtext>.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>instance</mi><mspace width="2ex"/>
+                <mrow><mi>Num</mi><mspace width="2ex"/><mi>a</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&rArr;</mo></mtd>
+            <mtd>
+              <mrow><mi>Num</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>Obs</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>所有的数值运算都可以提升至</mtext><mi>Obs</mi><mtext>类型. 实现颇为简单, 使用</mtext><mi>lift</mi><mtext>和</mtext>
+                <msub><mi>lift</mi><mn>2</mn></msub>
+                <mtext>即可.</mtext></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <b>图3. 可观察量上的原语</b></p>
+    <p>图2给出了对于每个组合子的自然语言描述, 尽管相当精确. 为了做到这一点, 它使用了两个我们必须预先引入的概念: 获取日期和可观察量.</p>
+    <p>我们的语言描述了什么是一个合约. 然而, 合约对于持有者而言的后效依赖于合约获得的日期, 也就是<em>获取日期 (acquisition date)</em>. (使用<q>持有者的后效</q>, 我们指的是合约施加于合约持有者的支付, 权利和义务.) 例如, 合约<q>receive £100 on 1 Jan 2000 and receive £100 on 1 Jan 2001</q>若获取时间晚于2000年1月1日则会价值低上不少, 因为根据定义, 任何在获取日期之前截止的权利和义务应该直接抛弃.</p>
+    <p>第二个基础概念是<em>可观察量</em>. 一个真实合约往往依赖于可测量的量. 例如, 一个合约可能会说<q>receive an amount in dollars equal to the noon Centigrade temperature in Los Angeles</q>; 或者是</p>
+    <h3>第3.2节 折扣债券</h3>
+    <h3>第3.3节 可观察量和缩放</h3>
+    <h3>第3.4节 期权合约</h3>
+    <h3>第3.5节 限制合约 (limit contracts)</h3>
+    <h3>第3.6节 总结</h3>
+    <h2>第4章 估值</h2>
+    <p>
+      <math display="block">
+        <mtable columnalign="left right center left">
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mo>&sdot;</mo><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>Contract</mi><mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E1)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>zero</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E2)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow><mi>one</mi><mspace width="2ex"/>
+                    <msub><mi>k</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>exch</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>k</mi><mn>2</mn></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E3)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow><mi>give</mi><mspace width="2ex"/><mi>c</mi></mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo>&minus;</mo>
+                <mrow>
+                  <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>c</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E4)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow><mi>o</mi>
+                    <mrow><mo>'</mo><mi>scale</mi><mo>'</mo></mrow>
+                    <mi>c</mi></mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>o</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+                <mo>&#8270;</mo>
+                <mrow>
+                  <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>c</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E5)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+                <mo>+</mo>
+                <mrow>
+                  <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E6)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>max</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow>
+                      <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>c</mi><mn>1</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>c</mi><mn>2</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E7)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow><mi>cond</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>if</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>o</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>c</mi><mn>1</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>c</mi><mn>2</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E8)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow><mi>when</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/><mi>c</mi></mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>disc</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>o</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>c</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E9)</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(E10)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <b>图4. 合约的复合性估值语义</b></p>
+    <p>我们现在拥有一种丰富的语言, 可用于描述金融合约. 这在人与人之间的交流中已经非常有用&mdash;&mdash;金融业界正缺乏这样一种精确的表示法. 但除此之外, 精确的描述还适用于各种自动处理. 我们有望从单一的合约描述中, 生成法律文件, 图表, 日程表以及更多其他内容. 然而, 人们可能会对合约提出的最直接的问题是: 它价值几何? 也就是说, 为了拥有这份合约, 我愿意支付多少钱? 这正是我们现在要转向的问题.</p>
+    <p>我们将通过两个<q>层次</q>来表达合约估值:</p>
+    <p><b>抽象估值语义. </b>首先, 我们将展示如何将使用我们的语言编写的任意合约, 转化为一个<em>价值过程 (value process)</em>, 并要展示对于这些过程的一组操作. 这些过程与金融专家所使用的数学和随机机制直接对应.</p>
+    <p><b>具体实现. </b>过程是一个抽象的数学值. 为了让计算机利用过程进行计算, 我们必须以某种方式对其进行表示&mdash;&mdash;这是从抽象语义向具体实现迈出的一步. 一个实现将由一个金融模型以及某种离散的数值方法组成. 如今有大量不同的金融模型被投入使用 (例如Black-Scholes, Ho-Lee, 等等); 但在业界, 只有三大类数值方法被广泛使用: 偏微分方程 [Willmot et al., 1993], 蒙特卡洛 [Boyle et al., 1997] 和格方法 [Cox et al., 1997].</p>
+    <p>这种方法强烈让人联想到编译器典型的构建方式. 程序首先被翻译成一种低级但与机器无关的中间语言; 许多优化都会在这个层面上进行; 然后程序被进一步翻译成目标处理器 (Pentium, Sparc, 诸如此类) 的指令集.</p>
+    <p>以类似的方式, 我们可以将一个合约转换为一个价值过程. 在计算该过程的价值之前, 对这个中间表示应用保持语义不变的优化转换. 最后的这个步骤可以通过解释执行的方式来完成, 或者也可以设想生成特化的代码, 在运行时执行估值.</p>
+    <p>事实上, 我们的抽象语义可以作为判断两个合约是否<q>相同</q>的参考模型. 例如, 存在两个声明:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                    <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                    <msub><mi>c</mi><mn>3</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                    <msub><mi>c</mi><mn>3</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>give</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>give</mi><mspace width="2ex"/>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>give</mi><mspace width="2ex"/>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      实际上, 第一个声明为真, 而第二个声明为假, 但是我们该如何确切地知道呢? 答案: 我们对比它们的估值语义, 将见于第4.6节.</p>
+    <h3>第4.1节 价值过程</h3>
+    <p>
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mo>&sdot;</mo><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>Obs</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>a</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow><mi>konst</mi><mspace width="2ex"/><mi>x</mi></mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>date</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>date</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow><mi>lift</mi><mspace width="2ex"/><mi>f</mi><mspace width="2ex"/><mi>o</mi></mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>lift</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>f</mi><mo>,</mo>
+                    <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>o</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow>
+                    <msub><mi>lift</mi><mn>2</mn></msub>
+                    <mspace width="2ex"/><mi>f</mi><mspace width="2ex"/>
+                    <msub><mi>o</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>o</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>lift</mi><mn>2</mn></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>f</mi><mo>,</mo>
+                    <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>o</mi><mn>1</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                    <mo>,</mo>
+                    <mrow><mi mathvariant="script">V</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                        <msub><mi>o</mi><mn>2</mn></msub>
+                        <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <b>图5. 可观察量的估值语义</b></p>
+    <p>
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi mathvariant="script">K</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>a</mi><mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>a</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>过程</mtext>
+                <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mtext>被定义为在任意时刻都具有值</mtext><mi>x</mi><mtext>.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>date</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>Date</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>过程</mtext><mi>date</mi><mtext>以日期作为其值.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>cond</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>Bool</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>a</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>lift</mi></mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>b</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mtext>逐点应用函数于参数过程.</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>lift</mi><mn>2</mn></msub>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi><mo>&rarr;</mo><mi>c</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>a</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>b</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>c</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mtext>将两个参数过程以函数逐点组合.</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo>+</mo><mo>,</mo><mo>&#8270;</mo><mo>,</mo><mo>&hellip;</mo></mrow>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mtext>加起或乘起两个过程, 等等. 等价于</mtext>
+                <mrow>
+                  <msub><mi>lift</mi><mn>2</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mo lspace="0" rspace="0">+</mo><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mtext>, 等等.</mtext></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <b>图6. 过程原语</b></p>
+    <div class="definition"><b>定义1. </b>类型<math><mi>a</mi></math>上的价值过程<math><mi>p</mi></math>是一个从时间到类型为<math><mi>a</mi></math>的随机变量的(完全)函数. 随机变量<math><mrow><mi>p</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></math>描述了<math><mi>p</mi></math>在时间<math><mi>t</mi></math>处的可能值. 我们写下非正式的类型定义
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>a</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi>Date</mi><mo>&rarr;</mo>
+            <mrow><mi mathvariant="script">RV</mi><mspace width="2ex"/><mi>a</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      (对于语义层次的类型我们使用花体.) 因为我们需要与相同<q>潜在空间</q> (从技术上说, 是filtration) 上的不同过程打交道, 这样的价值过程的更精确描述是<em>给定filtration的适应随机过程</em>. 此类过程配备了一套复杂的数学理论 [Revuz and Yor, 1991, Musiela and Rutkowski, 1997], 但计算机科学家可能对其并不熟悉, 因此我们仅提供非正式的直观的概念. 我们通常将<q>价值过程</q>简称为<q>过程</q>. 不过需要注意的是: <q>过程</q>和<q>变量</q>的含义与它们常规的计算机科学含义完全不同.</div>
+    <p>合约和可观察量都被建模为过程. 其潜在的直觉如下:
+      <ul>
+        <li>可观察量<math><mi>o</mi></math>的价值过程将时间<math><mi>t</mi></math>映射为随机变量, 该随机变量描述了<math><mi>o</mi></math>在<math><mi>t</mi></math>时的可能值. 例如, 可观察量<q>IBM stock price in US$</q>是一个函数, 其将时间映射为实值随机变量, 该随机变量描述了IBM股价以美元计的可能值.</li>
+        <li>以货币<math><mi>k</mi></math>表达的合约<math><mi>c</mi></math>的价值过程是一个从时间<math><mi>t</mi></math>到随机变量的函数, 其描述了于时间<math><mi>t</mi></math>获取合约<math><mi>c</mi></math>以货币<math><mi>k</mi></math>计的价值.</li>
+      </ul>
+      这些直觉对于理解本文的剩余内容是必要的.</p>
+    <h3>第4.2节 从合约到过程</h3>
+    <p>以下原语依赖于特定模型.
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>exch</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mo>&sdot;</mo><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow><mi>Currency</mi><mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>disc</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mo>&sdot;</mo><mo>,</mo><mo>&sdot;</mo></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Bopf;</mi></mrow>
+                  <mo>&times;</mo>
+                  <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                </mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>snell</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mo>&sdot;</mo><mo>,</mo><mo>&sdot;</mo></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Bopf;</mi></mrow>
+                  <mo>&times;</mo>
+                  <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                </mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>absorb</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mo>&sdot;</mo><mo>,</mo><mo>&sdot;</mo></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Bopf;</mi></mrow>
+                  <mo>&times;</mo>
+                  <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                </mrow>
+                <mo>&rarr;</mo>
+                <mrow><mi mathvariant="script">PR</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <b>图7. 模型原语</b></p>
+    <p>那么,我们该如何由合约和可观察量得到过程呢? 图4给出了从合约到过程的完整转换, 而图5对可观察量做了同样的处理. 这些图看起来并不令人印象深刻, 但这也正是要义所在! 到目前为止的一切都在为这一点做铺垫; 我们的整个设计都是围绕着提供一个简单, 易处理, 模块化的估值语义这一愿望展开的. 让我们更仔细地看一下图4.</p>
+    <p>函数<math><mrow><msub><mi mathvariant="script">E</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>c</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>取了一个合约, 然后将其映射为了一个过程, 这个过程描述的是在每一时刻, 获取合约<math><mi>c</mi></math>以货币<math><mi>k</mi></math>计的价值. 例如, 描述<math><mi>give</mi></math>的等式(E3)说的是<math><mrow><mi>give</mi><mspace width="2ex"/><mi>c</mi></mrow></math>的价值过程不过就是<math><mrow><msub><mi mathvariant="script">E</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>c</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>的反转, <math><mrow><msub><mi mathvariant="script">E</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>c</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>即<math><mi>c</mi></math>的价值过程. Aha! <q>反转</q>是什么意思? 显然, 我们不仅需要价值过程的概念, 还需要一集能够施行于过程之上的运算. 反转一个过程就是这样的运算之一; 一个过程<math><mi>p</mi></math>的反转不过就是一个函数, 其将每个时间<math><mi>t</mi></math>映射至<math><mrow><mi>p</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></math>的negation. <q>提升</q>所有实数上的运算以对于过程进行逐点操作是绝对直接的练习. (继而这需要我们对于随机变量进行negate, 不过这是简单的.) 我们需要其他诸多过程上的运算. 这些运算在图6和7中得到了总结, 但是我们将按需引入.</p>
+    <p>接着考虑等式(E5). 两个合约之<math><mi>and</mi></math>不过就是简单通过取两个价值过程之和来建模. 等式(E6)对于<math><mi>or</mi></math>组合子做了相同的时期. 又一次, 根据设计, 该组合子映射为了一个简单的数学运算<math><mi>max</mi></math>.</p>
+    <p>等式(E4)既漂亮又简单. 为了以时变可观察量<math><mi>o</mi></math>对于合约<math><mi>c</mi></math>进行缩放, 我们不过就是将合约<math><mi>c</mi></math>的价值过程和可观察量的价值过程相乘&mdash;&mdash;记得我们将每个可观察量建模为一个价值过程. 我们将后者表达为<math><mrow><mi mathvariant="script">V</mi><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>o</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>, 其在图5中以和<math><mrow><msub><mi mathvariant="script">E</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>c</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></math>非常类似的方式进行定义. 乍看上去这有些奇怪: 当缩放应用于<math><mi>c</mi></math>中<em>未来的</em>支付和收取时, 我们该如何逐点缩放? 回忆一下, <math><mi>c</mi></math>的价值过程在时间<math><mi>t</mi></math>处给出了在<math><mi>t</mi></math>时获取<math><mi>c</mi></math>的价值. 那么, 如果这个价值是<math><mi>v</mi></math>, 获取相同的合约但所有的支付和收取都缩放以<math><mi>x</mi></math>的价值当然应该是<math><mrow><mi>v</mi><mo>&#8270;</mo><mi>x</mi></mrow></math>. 我们在图2中对于<math><mi>scale</mi></math>的定义实际上直接由我们想要以简单方式表达其语义这一欲望所驱使. 简单的语义导致了简单的代数性质 (第4.6节).</p>
+    <h3>第4.3节 汇率</h3>
+    <p>图6中所定义的价值过程上的运算是一般性的&mdash;&mdash;其与特定金融模型无关. 但是, 我们不能永远抛开金融模型. 图7中的原语是特定于金融合约的, 而它们在图4的剩余等式中使用. 考虑图4中的等式(E2). 它指出以货币<math><mi>k</mi></math>表达的货币<math><msub><mi>k</mi><mn>2</mn></msub></math>的一个单位的价值过程, 不过就是<math><msub><mi>k</mi><mn>2</mn></msub></math>和<math><mi>k</mi></math>之间的汇率过程, 即<math><mrow><msub><mi>exch</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>k</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math> (图7). 我们从哪里获得这些汇率过程? 当涉及到具体实现时, 我们将需要一些关于汇率未来演变的(数值)假设, 但目前而言, 将汇率过程视为原语就足够了. 然而, 它们之间存在着重要的关系! 特别是:
+      <math display="block">
+        <mtable columnalign="center right center left">
+          <mtr>
+            <mtd><mtext>(A1)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>exch</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(A2)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <msub><mi>exch</mi>
+                    <msub><mi>k</mi><mn>2</mn></msub>
+                  </msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>k</mi><mn>1</mn></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&#8270;</mo>
+                <mrow>
+                  <msub><mi>exch</mi>
+                    <msub><mi>k</mi><mn>3</mn></msub>
+                  </msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>k</mi><mn>2</mn></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>exch</mi>
+                  <msub><mi>k</mi><mn>3</mn></msub>
+                </msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>k</mi><mn>1</mn></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      也就是说, 一种货币与其自身的汇率过程处处为一; 并且, 不论是直接将<math><msub><mi>k</mi><mn>1</mn></msub></math>换成<math><msub><mi>k</mi><mn>3</mn></msub></math>, 还是将<math><msub><mi>k</mi><mn>1</mn></msub></math>藉由某个中间货币<math><msub><mi>k</mi><mn>2</mn></msub></math>换成<math><msub><mi>k</mi><mn>3</mn></msub></math>, 都没有区别. 这些是<em>无套利</em>条件的特别情形.</p>
+    <p>你可能还会好奇, 每个旅行者在外汇柜台都会遇到的买卖价差 (bid-offer spread) 怎么不见了. 为了保持技术上的易处理性, 金融理论在大多数情况下假设不存在任何价差: 通常先计算一个<q>公允</q>价格, 最后再加入利润空间. 产生价差的是后者, 而我们的建模仅适用于前者.</p>
+    <h3>第4.4节 利率</h3>
+    <p>接下来,考虑等式(E8). 一旦可观察量<math><mi>o</mi></math>变为<math><mi>True</mi></math>, 或者是在获取<math><mrow><mo stretchy="false">(</mo><mrow><mi>when</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/><mi>c</mi></mrow><mo stretchy="false">)</mo></mrow></math>的时刻<math><mi>o</mi></math>就是<math><mi>True</mi></math>, 那么合约<math><mrow><mo stretchy="false">(</mo><mrow><mi>when</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/><mi>c</mi></mrow><mo stretchy="false">)</mo></mrow></math>就立即获得潜在的合约<math><mi>c</mi></math>. 在<math><mi>o</mi></math>为<math><mi>True</mi></math>的状态下, <math><mrow><mo stretchy="false">(</mo><mrow><mi>when</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/><mi>c</mi></mrow><mo stretchy="false">)</mo></mrow></math>的价值因而和<math><mi>c</mi></math>的价值相同. 那么在<math><mi>o</mi></math>为<math><mi>False</mi></math>的状态下, <math><mrow><mo stretchy="false">(</mo><mrow><mi>when</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/><mi>c</mi></mrow><mo stretchy="false">)</mo></mrow></math>的价值是什么呢? 为了回答这个问题, 我们需要对于利率的未来演变的描述, 即一个利率模型.</p>
+    <p>让我们考虑一个具体的例子:
+      <math display="block">
+        <mrow><mi>c</mi><mo>=</mo>
+          <mrow><mi>when</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>at</mi><mspace width="2ex"/><mi>t</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>scale</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>konst</mi><mspace width="2ex"/><mn>10</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>one</mi><mspace width="2ex"/><mi>GBP</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其中<math><mi>t</mi></math>是今天之后一年的时刻. 潜在的合约在其获取时会立即支付£10; <math><mi>when</mi></math>在<math><mi>t</mi></math>时获取它. 于是, <math><mi>c</mi></math>在<math><mi>t</mi></math>时的价值就是£10. 然而, 在<math><mi>t</mi></math>之前, 它并不值这么多. 如果我期望利率在下一年平均相当于10%, 那么对于今日的<math><mi>c</mi></math>的公平价格应该是大约£9.</p>
+    <p>正如原语<math><mi>exch</mi></math>包裹了对于未来汇率演变的假设, 原语<math><mrow><msub><mi>disc</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>o</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>包裹了利率演变 (图7). 这里的<math><mi>o</mi></math>是一个布尔值过程, 其定义了一个区域, 我们将其称为<em>获取区域 (acquisition region)</em>. 在该区域里&mdash;&mdash;即在<math><mi>o</mi></math>具有值<math><mi>True</mi></math>的状态下&mdash;&mdash;<math><mrow><msub><mi>disc</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>o</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>等于<math><mi>p</mi></math>. 而在区域之外, <math><mrow><msub><mi>disc</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>o</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的值应该由计算<math><mi>p</mi></math>的<q>折现期望值 (discounted expected value)</q>得到. 例如, 设<math><mi>p</mi></math>在任何时候(的价值)都等于£100, 而在任何1 Jan 2003之后的时间<math><mi>o</mi></math>都为<math><mi>True</mi></math>. 那么, <math><mrow><msub><mi>disc</mi><mi mathvariant="normal">£</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>o</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>在1 Feb 2003时的价值是100. 然而, 其在1 Jan 2002的价值则取决于英镑利率 (sterling interest rate): 我们必须要计算在1 Jan 2003时取得£100对应于1 Jan 2002时的值.</p>
+    <p>就像<math><mi>exch</mi></math>一样, 存在一些性质对于任意的无套利金融模型而言都应该满足. 尤其是:
+      <math display="block">
+        <mtable columnalign="center right center left">
+          <mtr>
+            <mtd><mtext>(A3)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>disc</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>True</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>,</mo><mi>p</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>p</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(A4)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <msub><mi>exch</mi>
+                    <msub><mi>k</mi><mn>1</mn></msub>
+                  </msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>k</mi><mn>2</mn></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&#8270;</mo>
+                <mrow>
+                  <msub><mi>disc</mi>
+                    <msub><mi>k</mi><mn>2</mn></msub>
+                  </msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>o</mi><mo>,</mo><mi>p</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>disc</mi>
+                  <msub><mi>k</mi><mn>1</mn></msub>
+                </msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>o</mi><mo>,</mo>
+                    <mrow>
+                      <mrow>
+                        <msub><mi>exch</mi>
+                          <msub><mi>k</mi><mn>1</mn></msub>
+                        </msub>
+                        <mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>k</mi><mn>2</mn></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&#8270;</mo><mi>p</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(A5)</mtext></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>disc</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>o</mi><mo>,</mo>
+                    <mrow>
+                      <msub><mi>p</mi><mn>1</mn></msub>
+                      <mo>+</mo>
+                      <msub><mi>p</mi><mn>2</mn></msub>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <msub><mi>disc</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>o</mi><mo>,</mo>
+                      <msub><mi>p</mi><mn>1</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>+</mo>
+                <mrow>
+                  <msub><mi>disc</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>o</mi><mo>,</mo>
+                      <msub><mi>p</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      第一个等式是说, 如果获取区域是整个空间, 那么<math><mi>disc</mi></math>应该是恒等函数; 第二个等式是说, 不同货币的利率演化应该与汇率演化假设兼容. 第三个等式经常作为优化自右向左使用: 与其对于两个随机变量单独施行折现, 将两个随机变量相加然后对于结果进行折现来得更快. {原注: 受过金融教育的读者应该注意到这里我们隐式假定了<em>完备 (complete)</em>市场.} 正如一个优化编译器, 我们可以使用像这样的等式对于我们的合约(的意义)进行变换, 将其转化为执行更为快速的形式.</p>
+    <p>尽管如此, 我们需要小心谨慎. 以下是一个看似令人信服的性质, 但是并不成立:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>disc</mi><mi>k</mi></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>o</mi><mo>,</mo>
+                <mrow><mi>max</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>p</mi><mn>1</mn></msub>
+                      <mo>,</mo>
+                      <msub><mi>p</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>max</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>disc</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>o</mi><mo>,</mo>
+                      <msub><mi>p</mi><mn>1</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>,</mo>
+                <mrow>
+                  <msub><mi>disc</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>o</mi><mo>,</mo>
+                      <msub><mi>p</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      它之所以看上去令人信服, 是因为如果<math><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>,</mo><msub><mi>p</mi><mn>2</mn></msub></mrow></math>是单个数字, 而<math><mi>disc</mi></math>是简单的乘性因子的话, 那么这就是成立的. 但是, <math><msub><mi>p</mi><mn>1</mn></msub></math>和<math><msub><mi>p</mi><mn>2</mn></msub></math>是随机过程, 于是这个性质就不成立.</p>
+    <p>等式(E9)使用了<math><mi>snell</mi></math>算子以给出<math><mi>anytime</mi></math>的意义. </p>
+    <h3>第4.5节 可观察量</h3>
+    <p>我们只能对能够建模的可观察量进行合约估值. 例如, 只有在我们有洛杉矶气温的模型时, 才能对涉及洛杉矶气温的合约进行估值. 有些这样的可观察量显然需要单独的模型. 而另一些, 比如LIBOR利率和期货价格, 则可以自洽地建模为特定合约的价值. 我们在此省略所有细节; 图5仅给出了最简单的可观察量的语义. 然而这并不意味着不切实际. 利用我们的合约组合子, 仅凭这些简单的可观察量就可以写出范围很广的合约.</p>
+    <h3>第4.6节 对于合约进行推理</h3>
+    <p>现在我们准备好用我们的语义来回答在第4节开头提出的问题了. 首先, 下面这个等式是否成立?
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>c</mi><mn>1</mn></msub>
+            <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>c</mi><mn>2</mn></msub>
+                <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                <msub><mi>c</mi><mn>3</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                <msub><mi>c</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mrow><mo>'</mo><mi>and</mi><mo>'</mo></mrow>
+                <msub><mi>c</mi><mn>3</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      通过取等式左边的含义, 我们得到
+      <math display="block">
+        <mtable displaystyle="true" columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>LHS</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mo>+</mo>
+                <mrow><mi>max</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>c</mi><mn>2</mn></msub>
+                      <mo>,</mo>
+                      <msub><mi>c</mi><mn>3</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>max</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow>
+                      <msub><mi>c</mi><mn>1</mn></msub>
+                      <mo>+</mo>
+                      <msub><mi>c</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <msub><mi>c</mi><mn>1</mn></msub>
+                      <mo>+</mo>
+                      <msub><mi>c</mi><mn>3</mn></msub>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>RHS</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      其中<math><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>=</mo><mrow><msub><mi mathvariant="script">E</mi><mi>k</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><msub><mi>c</mi><mn>1</mn></msub><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></mrow></math>, 诸如此类. 以类似的方式, 我们可以论证以下看似令人信服的等式实则是错误的:
+      <math display="block">
+        <mrow>
+          <mrow><mi>give</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                <msub><mi>c</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mover><mo>=</mo><mi>?</mi></mover>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>give</mi><mspace width="2ex"/>
+                <msub><mi>c</mi><mn>1</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>give</mi><mspace width="2ex"/>
+                <msub><mi>c</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      证明是常规的, 但要义在于观察到
+      <math display="block">
+        <mrow>
+          <mrow><mo>&minus;</mo>
+            <mrow><mi>max</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>&ne;</mo>
+          <mrow><mi>max</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mo>&minus;</mo><mi>a</mi></mrow>
+                <mo>,</mo>
+                <mrow><mo>&minus;</mo><mi>b</mi></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      回到现实世界, 要义在于左侧将选择交给了对手, 而右侧的选择则是由合约的持有者作出的.</p>
+    <p>我们的组合子满足丰富的一集等式, 例如以上关于<math><mi>and</mi></math>和<math><mi>or</mi></math>的等式. 其中一些等式有着副条件, 例如:
+      <math display="block">
+        <mrow>
+          <mrow><mi>scale</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>c</mi><mn>1</mn></msub>
+                <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+                <msub><mi>c</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>scale</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/>
+                <msub><mi>c</mi><mn>1</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>scale</mi><mspace width="2ex"/><mi>o</mi><mspace width="2ex"/>
+                <msub><mi>c</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      成立仅当<math><mrow><mi>o</mi><mo>&ge;</mo><mn>0</mn></mrow></math>, 这恰好出于和<math><mi>give</mi></math>与<math><mi>or</mi></math>不能交换相同的原因. 保持耐心! <q><math><mrow><mi>o</mi><mo>&ge;</mo><mn>0</mn></mrow></math></q>是什么意思? 我们这里的意思是<math><mi>o</mi></math>在任何时间都为正. 更一般地, 合约之间不仅能够建立等式, 合约之间还存在着一种简单的序概念, <math><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>&ge;</mo><msub><mi>c</mi><mn>2</mn></msub></mrow></math>读作<q><math><msub><mi>c</mi><mn>1</mn></msub></math>主宰<math><msub><mi>c</mi><mn>2</mn></msub></math></q>: <math><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>&ge;</mo><msub><mi>c</mi><mn>2</mn></msub></mrow></math>, 如果在任意的时刻都不会出现获取<math><msub><mi>c</mi><mn>2</mn></msub></math>的倾向大于获取<math><msub><mi>c</mi><mn>1</mn></msub></math>的倾向. 这个序被定义为简单比较两个合约的价值过程; 也就是说, <math><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>&ge;</mo><msub><mi>c</mi><mn>2</mn></msub></mrow></math>当且仅当<math><mrow><mrow><msub><mi mathvariant="script">E</mi><mrow/></msub><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><msub><mi>c</mi><mn>1</mn></msub><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow><mo>&ge;</mo><mrow><msub><mi mathvariant="script">E</mi><mrow/></msub><mo>&af;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><msub><mi>c</mi><mn>2</mn></msub><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></mrow></math>. 一个价值过程大于另一个价值过程, 当且仅当其在世界的任意状态下都大于. (这个序仅仅是一个偏序.)</p>
+    <p>等式, 例如上文所给出的, 可以在求值引擎中作为优化变换使用. 一个<q>合约编译器</q>可以使用这些恒等式对于合约进行变换, 其以价值过程的中间语言进行表达 (见第4章的引论), 以将其转换为能够更高效地进行求值的形式.</p>
+    <h3>第4.7节 总结</h3>
+    <p>以上完成了我们对抽象估值语义的描述. 从编程语言的角度来看, 一切都相当常规, 包括我们的证明. 但我们要强调, 在金融行业中, 在这一抽象层次上进行形式化证明是极为罕见的. 我们已经命名并驯服了那些复杂的原语 (<math><mi>disc</mi></math>, <math><mi>exch</mi></math>等): 它们必须满足的定律为我们提供了一种方法, 使我们能够证明关于合约的恒等式, 而无需深入了解随机变量的诸多细节. 其中的数学细节相当晦涩, 请相信我们!</p>
+    <h2>第5章 实现</h2>
+    <p>我们的估值语义不仅仅是一个抽象的存在. 我们还可以将图4和图5视为从我们的合约语言到一种更低层次的过程语言的翻译, 该过程语言的组合子即为图6和图7中的原语. 然后, 我们可以利用诸如(A1)-(A5)之类的恒等式来优化过程层面的描述. (我们使用了数十条这样的恒等式作为变换规则.) 最终, 我们所需要做的就是实现这些过程层面的原语, 这样我们就能够对任意合约进行估值.</p>
+    <p>关键的决策当然是如何实现一个价值过程. 价值过程必须以显式的方式表示对未来的不确定性. 对这种不确定性进行建模的方法有很多种. 为了具体起见, 我们将简单地选择Ho-Lee模型, 并使用格方法来对合约进行估值 [Ho and Lee, 1986]. 我们选择该模型和数值方法是因为它们在技术上的简洁性和历史上的重要性, 但本节的大部分内容同样适用于其他模型 (例如Black-Derman-Toy). 更换数值方法 (例如换成蒙特卡罗方法) 将带来更大的变动, 但我们的语言及其语义 (第1-4节) 不会受到任何影响. 事实上, 完全可以对同一份合约的不同部分使用不同的数值方法.</p>
+    <h3>第5.1节 利率模型</h3>
+    <p>在典型的Ho-Lee数值方案中, 利率的演化由一个格 (或称<q>重组树</q>) 表示, 如图8所示. 树的每一列代表一个离散的时间步, 时间从左向右递增. 时间零点代表<q>现在</q>. 与离散模型一样, 时间步长的选取是一个问题; 我们在此不做进一步讨论, 但顺便指出, 各时间步的长度不必是均匀的.</p>
+    <p>在树的每个节点上关联着一个单期短期利率, 以下简称为利率. 我们知道今天的利率, 因此树的第一列只有一个元素. 然而, 到第一个时间步结束时, 利率会演化为何值存在一定的不确定性. 这通过在第二列中设置两个利率值来表达; 其含义是利率将以相等的概率演化为这两个值之一. 在第三个时间步, 利率再次分裂, 但下行/上行路径与上行/下行路径会合, 因此第三列中只有三个利率值, 而非四个. 这就是该结构被称为格的原因; 它使得树的宽度仅随时间线性增长, 从而保证了整个方案在计算上的可行性. 当然, 该树只是连续过程的一种离散近似; 其重组特性只是出于效率考虑的一种选择. 我们用<math><msub><mi>R</mi><mi>t</mi></msub></math>表示时间步数为<math><mi>t</mi></math>的利率向量, 对于该向量的第<math><mi>i</mi></math>个元素, 我们记以<math><msub><mi>R</mi><mrow><mi>t</mi><mo>,</mo><mi>i</mi></mrow></msub></math>, 此索引自零开始计. 因此, 例如<math><mrow><msub><mi>R</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow></msub><mo>=</mo><mrow><mn>5</mn><mo>%</mo></mrow></mrow></math>. 图8中的数字是不切实际地规整: 在更复杂的利率模型中, 它们不会等间距分布, 而只是在每列中单调分布.</p>
+    <h3>第5.2节 价值过程</h3>
+    <p>利率模型就介绍到这里. 价值过程由一个与利率演化形状完全相同的格来建模, 不同之处在于每个节点上存储的是一个价值而不是一个利率. 图9展示了我们最常用的零息债券的价值过程树:
+      <math display="block">
+        <mrow>
+          <msub><mi>c</mi><mn>7</mn></msub>
+          <mo>=</mo>
+          <mrow><mi>when</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>at</mi><mspace width="2ex"/><mi>t</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>scale</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>konst</mi><mspace width="2ex"/><mn>10</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>one</mi><mspace width="2ex"/><mi>GBP</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其以GBP求值. 使用我们的估值语义, 我们有
+      <math display="block">
+        <mtable displaystyle="true" columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="script">E</mi><mi>GBP</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <msub><mi>c</mi><mn>7</mn></msub>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>disc</mi><mi mathvariant="normal">£</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>date</mi><mo>=</mo><mi>t</mi></mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mn>10</mn><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&#8270;</mo>
+                      <mrow>
+                        <msub><mi>exch</mi><mi mathvariant="normal">£</mi></msub>
+                        <mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi mathvariant="normal">£</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>disc</mi><mi mathvariant="normal">£</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>date</mi><mo>=</mo><mi>t</mi></mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mn>10</mn><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&#8270;</mo>
+                      <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>disc</mi><mi mathvariant="normal">£</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>date</mi><mo>=</mo><mi>t</mi></mrow>
+                    <mo>,</mo>
+                    <mrow><mi mathvariant="script">K</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mn>10</mn><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      在图中, 我们假定时间<math><mi>t</mi></math>是时间步数<math><mn>3</mn></math>. 因此, </p>
+    <h2>第6章 操作语义</h2>
+    <p>到目前为止, 我们只讨论了合约的估值问题. 另一个适合自动化辅助的操作是合约的执行, 或者说管理. 银行持有数以千计的合约, 要记住何时支付款项, 何时收取款项, 以及何时可以做出选择 (对于期权而言), 绝非易事.</p>
+    <p>合约会随时间演化. 例如, 一个最初为
+      <math display="block">
+        <mrow><mi>when</mi><mspace width="2ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>at</mi><mspace width="2ex"/><mi>t</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mspace width="2ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <msub><mi>c</mi><mn>1</mn></msub>
+              <mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow>
+              <msub><mi>c</mi><mn>2</mn></msub>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      的合约, 在时间<math><mi>t</mi></math>到来时会演化为<math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>c</mi><mn>1</mn></msub><mrow><mo>'</mo><mi>or</mi><mo>'</mo></mrow><msub><mi>c</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></math>, 进而演化为<math><msub><mi>c</mi><mn>1</mn></msub></math>或<math><msub><mi>c</mi><mn>2</mn></msub></math>. 这种演化过程让人联想到程序在执行过程中的演化方式. 实际上, 我们可以将执行合约视为类似于运行程序. 编程语言领域的学者使用操作语义来精确描述运行中程序的演化过程, 我们也可以对合约做同样的事情.</p>
+    <p>篇幅所限, 此处无法进行完整的讨论. 这里只需指出, 描述合约如何随时间演化的规则相对容易给出, 而在自动化系统中实现这些规则也并不复杂. 驱动合约估值引擎的同一份合约描述, 同样可以驱动合约管理引擎. 与估值引擎的情况一样, 管理引擎只需在添加新的原语组合子时才需要增强&mdash;&mdash;它能够自动处理由已知原语构建的任意合约.</p>
+    <p>不仅如此, 一个部分执行的合约的状态本身仍然是一个合约项, 因此可以被输入到合约估值引擎中. 这样, 银行可以在任何时候对其全部部分执行合约的<q>账簿</q>进行估值, 只需将它们输入估值引擎即可.</p>
+    <h2>第7章 将我们的工作置于上下文之中</h2>
+    <p>乍看之下, 金融合约与函数式编程似乎没有太大关系. 然而令我们惊喜地发现, 许多在编程语言的设计, 语义和实现中有用的洞见, 可以直接应用于合约的描述, 估值和管理. 最初的想法是将函数式编程应用于一个现实问题, 并将我们得到的程序与现有的命令式版本进行比较&mdash;&mdash;但最终我们对如何描述和评估合约进行了一次根本性的重新思考.</p>
+    <p>尽管在领域特定编程语言方面已有大量工作 (参见[Hudak, 1996, van Deursen et al., 2000]的综述), 我们的工作实际上是对金融合约进行形式化描述的唯一尝试. 一个例外是在CWI开发的RISLA语言 [van Deursen and Klint, 1998], 这是一种面向对象的金融合约领域特定语言. RISLA是为面向对象框架设计的, 与我们的系统相比, 它似乎更具状态性而较少声明性.</p>
+    <p>我们将我们的设计呈现为嵌入在Haskell中的组合子库, 事实上Haskell已被证明是一种出色的宿主语言, 非常适合对库设计和各种实现选择进行原型开发. 然而, 我们的设计绝不是Haskell特有的. 最大的收益来自于以声明式方法描述合约. 碰巧我们也使用了函数式语言来实现合约语言, 但这在某种程度上是附带的. 它同样可以被实现为一种独立的领域特定语言, 使用领域特定的编译器技术.</p>
+    <p>许多应用领域使用一种或多种ad hoc的语言来指定领域对象, 尽管这类语言通常被视为<q>数据文件格式</q>而非<q>语言</q>. 我们在此描述的工作是语言学方法强大能力的一个很好的例证: 我们不仅能够描述比任何商业系统都更为丰富的合约族, 而且语言结构直接导向了一个模块化且健壮的软件框架. 有原则的思考能带来实际的回报.</p>
+    <h2>致谢</h2>
+    <p>我们衷心感谢Lombard Risk Systems Ltd的John Wisbey, Jurgen Gaiser-Porter和Malcolm Pymm 的合作. 他们投入了大量时间, 向本文作者之一 (Peyton Jones) 传授金融合约的奥秘以及Black-Derman-Toy估值模型. Jean-Marc Eber热忱感谢Philippe Artzner的许多有益讨论, 以及Pierre Weis的大量建议. 我们还要感谢Conal Elliott, Jeremy Gibbons, Andrew Kennedy, Stephen Jarvis, Andy Moran, Chris Okasaki, Norman Ramsey, Colin Runciman, Ganesh Sittampalam, David Vincent以及ICFP的审稿人们提供的宝贵反馈.</p>
+  </body>
+</html>

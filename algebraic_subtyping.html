@@ -1,0 +1,220 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>代数子类型</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>代数子类型</h1>
+    <p>大量使用机器翻译, 尽管又经人工大量修饰. 尽管经过修饰, 鉴于大语言模型对于编程语言理论几乎一无所知, 所以难免有很多直接的翻译错误, 我不一定会纠正, 因为我也就是看个大概而已.</p>
+    <h2>总结</h2>
+    <p>类型推断让程序员享有静态的编译期类型检查的优势, 同时无需手动标注类型, 长期以来一直是函数式编程语言的标准特性. 然而, 将类型推断与子类型相结合被证明十分困难, 因为经典类型推断核心所使用的unification引擎只接受等式约束, 而非子类型约束.</p>
+    <p>本论文提出了一种类型系统, 将ML风格的参数多态与子类型相结合, 并支持类型推断, principal types以及可判定的类型subsumption. 类型推断基于biunification&mdash;&mdash;一种适用于子类型约束的unification类比机制.</p>
+    <p>使这一切成为可能的, 是若干理论贡献, 其中首要的是<q>可扩展</q>类型系统的概念. 该概念假设存在一个开放的类型世界, 从而保证: 向语言中添加新类型, 不会使原本可定型的程序变得不可定型. 以往的子类型化方案均未能满足可扩展性, 而本论文表明, 采用更具代数风格的方法可以弥补这一缺陷. 基于这一方法, 本论文发展了biunification的理论, 阐明了其用于类型推断的方式, 并展示了其高效实现的途径&mdash;&mdash;深刻利用了正则语言代数与多态子类型之间的内在联系.</p>
+    <h2>第1章 引论</h2>
+    <p>长期以来, 使用ML及其衍生语言等函数式语言的程序员一直享受强大的类型推断能力&mdash;&mdash;他们可以写出<pre><code>f x y = {foo : x, bar : y}</code></pre>然后让编译器静态地推断出: 函数<code>f</code>返回一条record, 其<code>foo</code>和<code>bar</code>字段的类型分别与<code>f</code>的第一个和第二个参数的类型一致. 用符号表示即为
+      <math display="block">
+        <mrow><mi>f</mi><mo>:</mo>
+          <mrow><mo>&forall;</mo>
+            <mrow><mi>&alpha;</mi><mo>,</mo><mi>&beta;</mi></mrow>
+            <mo lspace="0">.</mo>
+            <mrow><mi>&alpha;</mi><mo>&rarr;</mo><mi>&beta;</mi><mo>&rarr;</mo>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>foo</mi><mo>:</mo><mi>&alpha;</mi></mrow>
+                  <mo>,</mo>
+                  <mrow><mi>bar</mi><mo>:</mo><mi>&beta;</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      而更长久以来, 程序员们一直借助前置条件与后置条件来推理程序 (尽管这一过程未必令人愉快). 具体而言, 若某函数所提供的后置条件能满足另一函数所要求的前置条件, 则前者的输出可作为后者的输入. 例如, <code>f</code>的输出可以传递给函数<code>g</code>, 即<pre><code>g x = x.foo</code></pre>这是因为<code>g</code>仅要求其输入拥有一个名为<code>foo</code>的字段, 而<code>f</code>恰好提供了含有该字段的输出.</p>
+    <p>这种推理本质上是不对称的. 函数<code>f</code>所产生的输出, 其后置条件可能强于<code>g</code>所要求的: 在上例中, <code>f</code>的输出还额外拥有一个名为<code>bar</code>的字段. 然而这与传统的类型推断方法相悖&mdash;&mdash;传统方法将程序归结为一组类型等式, 将输出端所提供的类型与输入端所要求的类型相等同. 这种做法不允许<code>f</code>所提供的条件强于<code>g</code>所要求的条件.</p>
+    <h3>第1.1节 类型和数据流</h3>
+    <p>传统的类型推断方法要求: 某个值被产生时所提供的类型 (例如<code>f</code>的返回值) 与该值被消费时所要求的类型 (例如<code>g</code>的参数) 必须严格相等. 这使得数据流的方向被完全忽视. 其结果是, 大量使用record等语言特性变得相当繁琐, 而面向对象风格的编程则几乎无从实现. 然而, 忽视数据流的弊端并不局限于record和对象这类特性, 甚至会导致一些简单的函数变得不如预期的那般通用.</p>
+    <p>考虑<code>select</code>函数&mdash;&mdash;它接受三个参数: 谓词<code>p</code>, 值<code>v</code>以及默认值<code>d</code>, 若<code>p</code>对<code>v</code>成立则返回<code>v</code>, 否则返回<code>d</code>:<pre><code>select p v d = if (p v) then v else d</code></pre>在ML及相关语言中, <code>select</code>的类型模式 (scheme) 为
+      <math display="block">
+        <mrow><mo>&forall;</mo><mi>&alpha;</mi><mo lspace="0">.</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&alpha;</mi><mo>&rarr;</mo><mi>bool</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&rarr;</mo><mi>&alpha;</mi><mo>&rarr;</mo><mi>&alpha;</mi><mo>&rarr;</mo><mi>&alpha;</mi></mrow>
+        </mrow>
+      </math>
+      这个类型颇为奇怪, 因为它要求传入的默认值<code>d</code>必须能被谓词<code>p</code>所接受. 然而这一约束并不来源于程序的实际行为: 我们的函数在任何时候都不会将<code>d</code>传递给<code>p</code>.</p>
+    <p>下面来审视这个函数的实际数据流:</p>
+    <p>只有无视上述边的方向, 才能得出<q><code>d</code>流向<code>p</code>的参数</q>这一结论. 而这恰恰正是ML的做法: 通过将数据流转化为类型之间的等式约束, 数据流的方向信息被丢弃了. 由于等式具有对称性, 数据流便被视作无向的.</p>
+    <p>支持子类型的类型系统则关注数据流的方向. 在子类型机制下, 数据的来源必须至少提供目的地所要求的保证, 但也可以自由地提供更强的保证.</p>
+    <p>本论文所描述的类型系统支持子类型. 它为<code>select</code>函数赋予如下类型:
+      <math display="block">
+        <mrow><mo>&forall;</mo>
+          <mrow><mi>&alpha;</mi><mo>,</mo><mi>&beta;</mi></mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&alpha;</mi><mo>&rarr;</mo><mi>bool</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&rarr;</mo><mi>&alpha;</mi><mo>&rarr;</mo><mi>&beta;</mi><mo>&rarr;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&alpha;</mi><mo>&sqcup;</mo><mi>&beta;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      这正对应于上面的数据流图: 谓词<code>p</code>必须能接受值<code>v</code> (其类型为<math><mi>&alpha;</mi></math>), 但默认值<code>d</code>可以具有不同的类型<math><mi>&beta;</mi></math>. 而输出的类型为<math><mrow><mi>&alpha;</mi><mo>&sqcup;</mo><mi>&beta;</mi></mrow></math>, 因此只能用于同时接受<math><mi>&alpha;</mi></math>和<math><mi>&beta;</mi></math>的上下文中.</p>
+    <h3>第1.2节 贡献</h3>
+    <h3>第1.3节 子定型的设计原则</h3>
+    <p>本论文的类型系统与以往工作的主要区别, 不在于定型规则, 程序的句法或语义, 而在于类型的集合本身. 我们并非直接给出类型与子类型的定义, 而是首先考虑这些类型应当遵循的若干指导原则.</p>
+    <h4>第1.3.1小节 可扩展性</h4>
+    <p>第一个指导原则是可扩展性. 我将一个类型系统称为可扩展的, 当且仅当仅仅向语言中添加更多类型, 不会导致任何原本可定型的程序变得不可定型. 换言之, 可扩展的类型系统从不依赖于某些类型的不存在性: 它们假设类型世界是开放的, 而非封闭的.</p>
+    <p>可扩展性之所以值得追求, 原因是多方面的. 首先, 编程语言会不断演进, 新特性与新类型会在后续版本中被陆续引入. 为确保早期版本中编写的旧程序能够继续正常运行, 这些旧程序就不能依赖于新类型的缺失.</p>
+    <p>即便我们认为某门语言已臻完善, 无需再做改动, 编译器也难以掌握所有类型. 若该语言支持用户自定义类型与分离编译, 则编译器在编译程序时, 往往只能获知一个不完整的类型集合.</p>
+    <p>可扩展性这一概念鲜少受到关注. 我推测其原因在于, 大多数情况下它会自然而然地成立. 在没有子类型的情况下, 通常无需特别努力即可保证可扩展性.</p>
+    <p>然而, 引入子类型后情况便有所不同. 本章后续部分 (第1.4节) 将展示以往方法如何以看似自然的子类型定义破坏了可扩展性. 第3章中, 我将提出一种不同的子类型处理方式, 以保持可扩展性.</p>
+    <h4>第1.3.2小节 代数先于句法</h4>
+    <p>第二个指导原则是, 相较于类型的句法, 更应着重关注类型的代数结构. 类型的代数由定义在类型上的运算及其相互关系所构成: 哪些类型是其他类型的子类型或与之相等, 类型是否构成格, 等等. 了解类型的代数结构在编写程序时颇为有用, 因为它使程序员能够推断所用类型是否等价, 或至少是否相容. 有鉴于此, 本论文将首先聚焦于确定正确的类型代数结构, 其次才考虑寻找表示它的句法.</p>
+    <p>更简洁地说, 这一思路可以概括为:
+      <blockquote>寻找<b>最简洁</b>的类型代数结构, 以及表示它的<b>某种</b>句法.</blockquote>
+    </p>
+    <p>这与标准方法形成鲜明对比. 标准方法从最简洁的类型句法出发, 进而在其上构建某种代数结构. 若以句法的极简性为首要目标, 则极易导致代数结构变得繁复难用. 下文将列举若干此类无意间引入复杂性的例子.</p>
+    <p>代数方法的一个优点在于, 它使可扩展性更易实现. 句法推理的基本工具 (基于抽象句法的定义, 对项的归纳) 预设了一个封闭的项的世界, 因此若可扩展性成立, 也不过是巧合或艰辛努力的结果. 而另一方面, 代数的基本工具 (公理化定义, 等式推理) 则在默认情况下就具有可扩展性.</p>
+    <h3>第1.4节 可扩展性的失却</h3>
+    <p>接下来, 我们将梳理一种标准的子类型处理方式, 说明可扩展性原则是如何被看似无害的定义轻易破坏的, 以及如何通过对类型代数结构的审慎处理加以修复. 以下讨论较为非正式, 完整阐述将留至第3章.</p>
+    <p>作为贯穿始终的例子, 我们考虑一种简单的函数式语言, 其中包含记录类型与原始布尔类型. 非正式地, 该语言的类型由如下抽象句法定义:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(1.4)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mi>types</mi><mo>=</mo>
+                <mrow><mi>boolean_type</mi><mo>|</mo><mi>function_types</mi><mo>|</mo><mi>record_types</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(1.4)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      为支持子类型, 上述类型被赋予某种偏序关系. 该偏序的大部分细节在此暂不相关 (尽管我们将在第3章中详加讨论). 目前唯一值得关注的一点是, 函数类型, 记录类型与布尔类型两两不可比: 虽然存在一些子类型规则, 规定了例如两种不同记录类型之间的子类型关系, 但记录类型与函数类型之间并无此类规则.</p>
+    <p>函数类型与记录类型不仅不可比, 而且也没有公共的上界或下界. 这一事实使得类型的偏序无法构成格. 而为了进行类型推断, 类型构成格是非常有用的, 因为这样一来, 条件表达式的结果类型便可被类型化为各分支结果类型的最小上界.</p>
+    <p>因此, 子类型系统通常采用如下不同的类型定义, 使之确实构成一个格:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(1.5)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mi>types</mi><mo>=</mo>
+                <mrow><mi>boolean_type</mi><mo>|</mo><mi>function_types</mi><mo>|</mo><mi>record_types</mi><mo>|</mo><mi>&bottom;</mi><mo>|</mo><mi>&top;</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(1.5)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      新引入的类型<math><mi>&bottom;</mi></math>是所有类型的子类型, 因而是无寓居类型, 不包含任何值; 而<math><mi>&top;</mi></math>是所有类型的超类型, 因而是无信息类型, 包含所有值. 添加这两种类型后, 类型的偏序 (在函数与记录子定型的通常定义下) 便构成了一个格.</p>
+    <p>然而, 这个格在实践中表现相当不佳. 在存在类型变量的情况下, 即便是相当简单的子类型性质也难以判定 [SAN+02, Reh98, Pri04].</p>
+    <p>下文将说明, 这种不良行为源于其对可扩展性的违背, 而坚守第1.3节所述的设计原则, 则可有效规避这一问题.</p>
+    <h4>第1.4.1小节 虚空推理</h4>
+    <p>使用(1.5)定义的格, 对于每个函数类型<math><msub><mi>&tau;</mi><mi>f</mi></msub></math>和记录类型<math><msub><mi>&tau;</mi><mi>s</mi></msub></math>, 我们都有
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(1.6)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <msub><mi>&tau;</mi><mi>f</mi></msub>
+                  <mo>&sqcap;</mo>
+                  <msub><mi>&tau;</mi><mi>s</mi></msub>
+                </mrow>
+                <mo>&le;</mo><mi>bool</mi></mrow>
+            </mtd>
+            <mtd><mtext>(1.6)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      其中<math><mo>&sqcap;</mo></math>是格的meet运算. 因此, (1.5)的格假定了不存在, 将来也永远不会存在, 同时为记录 (有着属性) 和函数 (可以被应用) 的值. 我注意到这样的值最初没有出现在C++, Python等编程语言语言之中, 但是之后却加入了.</p>
+    <p>因此, 可扩展性要求我们将类似于(1.6)这样的陈述视为假的. 特别地, 类型<math><mrow><msub><mi>&tau;</mi><mi>s</mi></msub><mo>&sqcap;</mo><msub><mi>&tau;</mi><mi>f</mi></msub></mrow></math>, <math><mrow><msub><mi>&tau;</mi><mi>s</mi></msub><mo>&sqcap;</mo><mi>bool</mi></mrow></math>, <math><mrow><msub><mi>&tau;</mi><mi>f</mi></msub><mo>&sqcap;</mo><mi>bool</mi></mrow></math>应该是不同的也不可比较的类型. 这些类型当前并非寓居不代表我们就应该将它们视为等同的.</p>
+    <p>让我们重新检视原本的定义(1.4), 其定义类型的集合为函数类型的集合, 记录类型的集合, 布尔类型的集合的无交并. {译注: 当然了, 布尔类型只有一个, 函数类型和记录类型都有许多.} 以<math><mo>+</mo></math>记无交并, 我们表达其以
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(1.7)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mi>types</mi><mo>=</mo>
+                <mrow><mi>boolean_type</mi><mo>+</mo><mi>function_types</mi><mo>+</mo><mi>record_types</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(1.7)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      {译注: 这上面四个东西都是集合.} 无交并在集合范畴中是余积, 所以说我们有很好的借口滥用符号<math><mo>+</mo></math>.</p>
+    <h4>第1.4.2小节 封闭世界多态和自由代数</h4>
+    <h3>第1.5节 论文的结构</h3>
+    <h2>第2章 背景</h2>
+    <p>这篇论文所研究的中心问题是<em>类型推导</em>, 这是检视程序并推导其类型的动作.</p>
+    <p>当检视程序时, 我们会发现其子表达式会对于我们可以赋予该程序的类型施加<em>约束</em>. 例如, 设我们有了一个具有类型<math><mrow><msub><mi>&tau;</mi><mn>1</mn></msub><mo>&rarr;</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow></math>的函数于具有类型<math><msub><mi>&tau;</mi><mn>3</mn></msub></math>的参数的应用. 那么, 这个应用能够被定型仅当类型<math><msub><mi>&tau;</mi><mn>3</mn></msub></math>的值能够传递给期望类型<math><msub><mi>&tau;</mi><mn>1</mn></msub></math>的值的地方. 在类型推导算法能够赋予一个类型于该应用之前, 这个约束必然要得到处理.</p>
+    <p>在经典的Hindley-Milner类型推导算法中, 约束是一种相等约束, 而应用能够被定型仅当<math><mrow><msub><mi>&tau;</mi><mn>1</mn></msub><mo>=</mo><msub><mi>&tau;</mi><mn>3</mn></msub></mrow></math>. 类型被定义为一阶项, 而相等约束是运用合一处理的.</p>
+    <p><em>子定型</em>允许更为有趣的约束, 特别是由于其并不要求对称性: 这只是因为我们可以将一个<math><msub><mi>&tau;</mi><mn>3</mn></msub></math>传给期望一个<math><msub><mi>&tau;</mi><mn>1</mn></msub></math>的地方并不能推出反过来也成立. 这对于许多语言特征进行了建模: 最朴素的一点是, 我们可以期望有着更多域的记录用在需要更少的域的记录的上下文里. 然而, 合一的经典理论不能应用于子定型约束, 于是类型推导的标准方法就失效了.</p>
+    <h3>第2.1节 序理论</h3>
+    <h2>第3章 构造类型</h2>
+    <p>对于本论文的大部分而言, 我们会研究一种具有子定型的极小演算, 其包含布尔值, 记录, 以及函数. 这三个特性足以使得子定型关系实际上会变得尴尬, 但又保持了语言尽可能简单:
+      <ul>
+        <li>布尔值给出了一个基本类型, 这个类型与任何其他使用类型构造子作成的类型都是不可比较的.</li>
+        <li>函数给出了具有不同variance的类型参数的类型构造子: 函数类型相对于domain是逆变的, 相当于codomain是协变的.</li>
+        <li>记录给出了不同元数的类型构造子之间的子定型关系, 因为具有更多的域的记录类型是具有更少的域的记录类型的子类型.</li>
+      </ul>
+      包括这三种类型排除了一些著名的更为简单的情形: 函数类型意味着我们不能假定纯粹的<em>协变子定型</em>, 于是我们必须要能够解决一般性的问题. 在第9章, 我们会看到我们建立的用于处理布尔, 记录以及函数类型的系统时如何丝滑地扩展至其他特性的, 例如variant类型 (和), 可变引用, 以及effect.</p>
+    <p>{原注: 这里的术语实在有些不幸. 在子定型文献中, 结构子定型 (与非结构子定型相对) 指的是一种仅关联相同元数类型构造器的子类型关系, 这排除了记录上的宽度子定型. 而在面向对象文献中, 结构定型 (与名义定型相对) 指的是隐式地由相似结构形成的子类型关系, 而不需要通过子类化注解 (subclassing annotations) 进行显式声明. 令人困惑的是, 根据这些定义, 结构定型反而需要非结构子定型!}</p>
+    <p>这个极简演算的类型规则是标准的ML类型规则, 并辅以标准的子类型规则, 因此我将其毫无新意地命名为MLsub. 下一章将详细介绍并讨论该类型规则的两种表述形式&mdash;&mdash;熟悉的ML风格表述, 以及一种等价的重新表述, 后者使推断算法更加清晰.</p>
+    <p>MLsub的句法, 语义乃至类型规则均完全标准. 使主类型推断成为可能的新颖之处, 在于该语言中一个常被过于简略处理的部分: 类型本身的定义.</p>
+    <p>通常, 类型仅凭一行定义来描述其句法:
+      <math display="block">
+        <mrow><mi>&tau;</mi><mo>&Colone;</mo>
+          <mrow><mi>bool</mi><mo>|</mo>
+            <mrow>
+              <msub><mi>&tau;</mi><mn>1</mn></msub>
+              <mo>&rarr;</mo>
+              <msub><mi>&tau;</mi><mn>2</mn></msub>
+            </mrow>
+            <mo>|</mo>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>l</mi><mn>1</mn></msub>
+                  <mo>:</mo>
+                  <msub><mi>&tau;</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <mrow>
+                  <msub><mi>l</mi><mi>n</mi></msub>
+                  <mo>:</mo>
+                  <msub><mi>&tau;</mi><mi>n</mi></msub>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      这样的定义可以从两个角度来理解. 第一是句法视角: 类型是依据上述文法构成的符号树. 第二是代数视角: 类型是<math><mi mathvariant="bold">Set</mi></math>上某个函子的始代数的元素.</p>
+    <p>句法视角便于实现: 在编译器中将句法项表示为数据结构是直截了当的. 代数视角则便于推理: 由于这是一个始代数, 关于它的结论可以迁移到任意其他代数, 从而获得可扩展性. 幸运的是, 两种视角殊途同归.</p>
+    <p>引入子类型后, 情形大致相同. 句法表述通过添加一个归纳定义的子类型关系加以修改, 而代数表述则通过将始代数取于<math><mi mathvariant="bold">Pos</mi></math>而非<math><mi mathvariant="bold">Set</mi></math>中来加以修改. 同样, 两种视角给出相同的答案.</p>
+    <p>然而, 一旦要求类型构成一个格而非仅仅是一个偏序集 (这是推断所必需的), 两种视角便急剧分歧. 以往的工作(或许是未加深思地)一贯选择句法路径, 导致所得系统缺乏泛性质或有用的代数结构. 我们在此的目标是构造一组类型及一个子类型关系, 使其具备比以往方法更好的代数结构.</p>
+    <p>类型集合的代数构造分阶段进行, 依次定义以下各类型系统, 每一个都比前一个具有更多的结构:</p>
+    <h2>第4章 类型系统</h2>
+    <h2>第5章 极性和双向合一 (biunification)</h2>
+    <h2>第6章 主类型推导</h2>
+    <h2>第7章 类型的表示</h2>
+  </body>
+</html>

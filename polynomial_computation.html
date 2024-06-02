@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>高效多项式计算</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>高效多项式计算</h1>
+    <p>本书是Richard Zippel所著的一本关于计算机代数和多项式计算的书籍. 作者发明了一种多项式GCD的概率算法, 其被广泛应用于各种计算机代数系统之中. 我完全是因为Gerald Sussman和其所著的SICP以及SICM才得知Zippel和此书.</p>
+    <p>这里的翻译很多都是由机器翻译的, 问题在于基于LLM的翻译有时会产生一些出乎意料的低级翻译错误. 必须要承认的是, 单论这本书, 我没有仔细审查机器翻译的结果, 但是至少修改了一眼看出来的明显逻辑错误.</p>
+    <h2>前言</h2>
+    <p>计算机代数与其他数学计算领域的区别在于, 它注重对所操作对象的数学语义进行精确建模. 这一点的第一个体现是: 传统计算系统通常将整数定义为绝对值小于<math><msup><mn>2</mn><mn>31</mn></msup></math>或<math><msup><mn>2</mn><mn>63</mn></msup></math>的整数, 而代数操作系统则将整数定义为没有大小限制的整数. 虽然这一区别在许多计算中影响不大, 但代数操作关注的是那些需要精确计算或对复杂数学概念进行精确建模的技术和问题.</p>
+    <p>本书讨论的是作用于多项式的算法: 多项式算术的算法, 计算若干多项式最大公因子的算法, 以及多项式因式分解的算法. 我们强调的是<em>高效 (effective)</em>计算. 简单, 清晰且易于实现的算法优先于那些稍快但更难理解的算法. 算法在实际中的表现比其最坏情况下的渐近复杂度更受关注.</p>
+    <p>最坏情况渐近复杂度并不是区分不同算法行为的一把非常锋利的手术刀. 例如, 对整系数一元多项式进行因式分解的多项式时间算法和指数时间算法都存在, 但在当今任何机器上, 我不知道有哪个多项式能用多项式时间算法比用最好的指数时间算法更快地完成因式分解.</p>
+    <p>多项式计算中使用的许多算法在计算数论中都有对应物, 而且多项式算法分析中出现的许多问题都根植于数论. 因此, 本书首先考察我认为最有用和最引人入胜的数论部分.</p>
+    <p>我在教授计算机代数时遇到的一个问题是, 学生通常具有以下两种背景之一:
+      <ul>
+        <li>数学背景, 熟悉计算机代数中使用的大部分交换代数和数论知识, 但对编程和计算问题不熟悉, 对分析计算成本感到不适应.</li>
+        <li>计算机背景, 但对所需的交换代数和数论不熟悉.</li>
+      </ul>
+      以数论开始计算机代数课程, 可以为数学背景的学生提供大量学习编程的实例, 同时也为计算机背景的学生提供充分的动力(和时间)来学习必要的数学知识.</p>
+    <p>本书的内容已被用于康奈尔大学和麻省理工学院的一学期计算机代数课程. 虽然在计算机代数中还有大量额外的内容是我希望在课程中涵盖的, 例如代数函数的操作, Gröbner基, 多元结式, 代数几何中的计算, 超越函数和代数函数的积分, 以及常微分方程和偏微分方程的定性方法, 但我发现要在一个学期内深入覆盖比本书更多的内容是很困难的. 上面提到的许多主题本身都足够深入和丰富, 值得单独成书, 而且在某些情况下这样的书已经出现. 在某些情况下, 纳入这些内容会大幅提高数学方面的预备知识要求.</p>
+    <p>对于本书的大部分内容, 只需要对近世代数有最基本的理解即可. 我已尽量在代数术语首次出现时加以定义. 大多数本科近世代数课程或典型的计算机科学<q>离散数学</q>课程的第一学期所学内容就已足够. 在少数地方, 特别是在第19章, 会用到更为深入的数学知识. 在需要使用更高级的数学原理时, 我已尽量为读者提供适当的参考文献. 通篇而言, 如果读者愿意在不看证明的情况下接受定理, 那么那些章节可以跳过.</p>
+    <h2>第1章 Euclid算法</h2>
+    <p>我们将要研究的数学问题包括计算最大公因子, 分解质因数以及求有理逼近. 这些计算可以在各种不同的数学量上进行: 多项式, 有理整数, 幂级数, 微分算子等. 这些代数结构中最为人熟知的是自然数: <math><mrow><mi>&Nopf;</mi><mo>=</mo><mrow><mo stretchy="false">{</mo><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mo>&hellip;</mo></mrow><mo stretchy="false">}</mo></mrow></mrow></math>. 如果加入零和负整数, 我们就得到<math><mi>&Zopf;</mi></math>, 即有理整数, 通常简称为整数.</p>
+    <p>在本章中, 我们通过研究涉及有理整数的各种计算来开始对数学算法的学习. 后续章节将讨论处理多项式和其他代数结构的更复杂的算法. 有趣的是, 有理整数上的某些问题的求解可以引出利用多项式的算法, 从而使整个过程带有一定的循环性.</p>
+    <p>学习加法和乘法是我们基础教育的一个重要组成部分. 计算机中使用的硬件通常只实现指定长度的数的算术运算, 即32位或64位整数. 在代数计算中, 我们经常使用大得多的整数; 然而, 这并不是因为最终结果很大. 相反, 这些大数出现在某些计算的中间过程中, 然后在接近结束时缩小. 这一现象后来被称为中间表达式膨胀.</p>
+    <p>整数算术的详细算法可以在许多教材中找到, 例如Knuth [143] 以及Aho, Hopcroft和Ullman [7]. 但实现高效的可变精度算术算法是一个非常精细的过程, 它涉及许多这些教材中未触及的问题, 如寄存器使用, 缓存扰动和流水线停顿. 例如, 经过适当实现的经典算法对于比人们预期更大的整数都能很好地工作. 由于所有这些原因, 由于已有大量可变精度整数软件包可用, 并且由于越来越多的编程语言现在将可变精度整数作为其基本类型之一, 我们不讨论这些算术算法.</p>
+    <p>我们从一些基本定义开始. 当一个有理整数<math><mi>m</mi></math>可以写成另外两个整数<math><mi>p</mi></math>和<math><mi>q</mi></math>的乘积, 即<math><mrow><mi>m</mi><mo>=</mo><mrow><mi>p</mi><mo>&it;</mo><mi>q</mi></mrow></mrow></math>时, <math><mi>p</mi></math>和<math><mi>q</mi></math>被称为<math><mi>m</mi></math>的因子, 而<math><mi>m</mi></math>被称为可被<math><mi>p</mi></math>和<math><mi>q</mi></math>整除. 我们用<math><mrow><mi>p</mi><mo>|</mo><mi>m</mi></mrow></math>表示<math><mi>p</mi></math>整除<math><mi>m</mi></math>. 我们用<math><mrow><mi>p</mi><mo>&nmid;</mo><mi>m</mi></mrow></math>表示<math><mi>p</mi></math>不整除<math><mi>m</mi></math>. 唯一具有乘法逆元的有理整数是<math><mn>1</mn></math>和<math><mrow><mo>&minus;</mo><mn>1</mn></mrow></math>. 因为它们具有乘法逆元, 所以被称为单位元. 两个整数的比为单位元时, 它们被称为相伴元 (associate). 为简单起见, 我们在枚举一个整数的因子时将忽略相伴元. 因此, 每个非单位整数至少有两个因子, 即<math><mn>1</mn></math>和它自身 (在相伴意义下). 一个只有这两个<q>平凡</q>因子的整数称为素数. 所有其他非单位整数称为合数.</p>
+    <p>将一个正整数<math><mi>N</mi></math>表示为若干正整数的乘积, <math><mrow><mi>N</mi><mo>=</mo><mrow><msub><mi>m</mi><mn>1</mn></msub><mo>&it;</mo><mo>&ctdot;</mo><mo>&it;</mo><msub><mi>m</mi><mi>k</mi></msub></mrow></mrow></math>, 称为<math><mi>N</mi></math>的一个因子分解. 如果每个<math><msub><mi>m</mi><mi>i</mi></msub></math>都是素数或素数的幂, 则称该因子分解是完备的. 我们通常将这样的因式分解写为<math><mrow><mi>N</mi><mo>=</mo><mrow><msubsup><mi>p</mi><mn>1</mn><msub><mi>e</mi><mn>1</mn></msub></msubsup><mo>&it;</mo><mo>&ctdot;</mo><mo>&it;</mo><msubsup><mi>p</mi><mi>k</mi><msub><mi>e</mi><mi>k</mi></msub></msubsup></mrow></mrow></math>. 根据算术基本定理, 有理整数的因子分解是唯一的.</p>
+    <p>整数<math><mi>N</mi></math>的因子分解问题目前是非常困难的. 尝试所有可能的因子需要<math><mrow><mi>O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msqrt><mi>N</mi></msqrt><mo stretchy="false">)</mo></mrow></mrow></math>的时间. 粗略地说, 目前已知最好的算法需要<math><mrow><mi>O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>exp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msqrt><mrow><mi>log</mi><mo>&af;</mo><mi>N</mi></mrow></msqrt><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的时间, 虽然这好得多, 但远未达到多项式时间算法所期望的<math><mrow><mi>O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>log</mi><mi>k</mi></msup><mo>&af;</mo><mi>N</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 有趣的是, 多项式因式分解问题可以在多项式时间内求解.</p>
+    <p>一个同时整除<math><mi>m</mi></math>和<math><mi>n</mi></math>的整数<math><mi>d</mi></math>被称为是<math><mi>m</mi></math>和<math><mi>n</mi></math>的一个公因子. 数字<math><mrow><mi>m</mi><mo lspace="0" rspace="0">/</mo><mi>d</mi></mrow></math>被称为<math><mi>m</mi></math>关于<math><mi>d</mi></math>的余因子. 两个整数的最大公因子称为最大公因子 (GCD). 如果两个整数的最大公因子为<math><mn>1</mn></math>, 则称它们互素. 在处理有理数时, 计算整数GCD所花费的时间可能比加法和乘法之外的任何其他运算都多. 在使用有理函数时, 计算多项式GCD所花费的时间超过所有其他算术运算也并不罕见. 第1.1节讨论了计算两个整数GCD的Euclid算法. Euclid算法为初等数论的许多方面提供了一个入口. 本章的其他各节阐述了其中的若干思想. 后续章节将更深入地探讨所提出的每个问题.</p>
+    <h3>第1.1节 Euclid算法</h3>
+    <p>用于计算两个整数GCD的欧几里得算法至少从Euclid [228] 时代就已为人所知, 他称之为<q>anthyparesis</q>. 它很可能是现存最古老的数学算法. Euclid算法所依据的原理是求解从Diophantine逼近到消元等许多数学问题的基础. 由于它的重要性, 以及它是我们考虑的第一个算法, 我们将较为详细地推导Euclid算法.</p>
+    <p>设<math><mrow><mi>m</mi><mo>></mo><mi>n</mi></mrow></math>为两个正有理整数. 用<math><mi>d</mi></math>表示<math><mi>m</mi></math>和<math><mi>n</mi></math>的某个公因子. <math><mi>d</mi></math>也整除<math><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></math>和<math><mrow><mi>m</mi><mo>&minus;</mo><mi>n</mi></mrow></math>. 事实上, <math><mi>d</mi></math>整除所有形如<math><mrow><mrow><mi>a</mi><mo>&it;</mo><mi>m</mi></mrow><mo>+</mo><mrow><mi>b</mi><mo>&it;</mo><mi>n</mi></mrow></mrow></math>的数, 其中<math><mi>a</mi></math>和<math><mi>b</mi></math>是有理整数. 用<math><mi>M</mi></math>表示所有这样的数的集合:
+      <math display="block">
+        <mrow><mi>M</mi><mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi>a</mi><mo>&it;</mo><mi>m</mi></mrow>
+                <mo>&minus;</mo>
+                <mrow><mi>b</mi><mo>&it;</mo><mi>n</mi></mrow>
+              </mrow>
+              <mo stretchy="false">|</mo>
+              <mrow>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo>&in;</mo><mi>&Zopf;</mi></mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      由于<math><mi>m</mi></math>和<math><mi>n</mi></math>的每个公因子都整除<math><mi>M</mi></math>的每个元素, 因此<math><mi>M</mi></math>的每个元素也是<math><mi>m</mi></math>和<math><mi>n</mi></math>的最大公因子的倍数. 因此, <math><mi>M</mi></math>的最小正元素就是<math><mi>m</mi></math>和<math><mi>n</mi></math>的GCD. {译注: 个人认为这里存在逻辑gap, 不过根据Euclid算法, 这的确是成立的. 有时这个事实被称为Bézout定理.}</p>
+    <p>为了将其转化为一个算法, 我们使用一种简单的递归技术, 将集合<math><mi>M</mi></math>中的一对元素转换为一对更小的元素. </p>
+    <h3>第1.2节 Diophantine近似</h3>
+    <h3>第1.3节 连分式</h3>
+    <h3>第1.4节 Diophantine方程</h3>
+    <h2>第2章 连分式</h2>
+    <h2>第3章 Diophantine方程</h2>
+    <h2>第4章 格技巧</h2>
+  </body>
+</html>
