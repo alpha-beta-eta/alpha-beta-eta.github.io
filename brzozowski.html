@@ -1,0 +1,139 @@
+<html><head><meta charset="utf-8"/><title>Brzozowski导数</title><link href="styles.css" rel="stylesheet"/></head><body><h1>Brzozowski导数</h1><div class="definition"><b>定义.</b> 一个语言是一个字符串的集合, 一个字符串是一个字符的有限序列.</div><div class="notation"><b>记号.</b> <math><mi>&epsilon;</mi></math>代表空字符串 (显然只有一个). <math><mrow><mn>0</mn><mo>&colone;</mo><mi>&empty;</mi></mrow></math>. <math><mrow><mn>1</mn><mo>&colone;</mo><mrow><mo stretchy="false">{</mo><mi>&epsilon;</mi><mo stretchy="false">}</mo></mrow></mrow></math>. 对于字符<math><mi>c</mi></math>, <math><mrow><mi>c</mi><mo>&colone;</mo><mrow><mo stretchy="false">{</mo><mi>c</mi><mo stretchy="false">}</mo></mrow></mrow></math> (注意到我们将字符<math><mi>c</mi></math>当成字符串<math><mi>c</mi></math>, 这有些模糊, 却是数学实践的惯例).</div><div class="definition"><b>定义.</b> 对于字符<math><mi>c</mi></math>和语言<math><mi>L</mi></math>, <math><mi>L</mi></math>相对于<math><mi>c</mi></math>的Brzozowski导数<math><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>L</mi><mo stretchy="false">)</mo></mrow></mrow></math>是一个语言, 其是<math><mi>L</mi></math>中所有以<math><mi>c</mi></math>开头的字符串去掉开头的<math><mi>c</mi></math>得到的.</div><div class="definition"><b>定义.</b> 给定语言<math><msub><mi>L</mi><mn>1</mn></msub></math>和<math><msub><mi>L</mi><mn>2</mn></msub></math>, <math><mrow><mrow><msub><mi>L</mi><mn>1</mn></msub><mo>+</mo><msub><mi>L</mi><mn>2</mn></msub></mrow><mo>&colone;</mo><mrow><msub><mi>L</mi><mn>1</mn></msub><mo>&cup;</mo><msub><mi>L</mi><mn>2</mn></msub></mrow></mrow></math>, <math><mrow><mrow><msub><mi>L</mi><mn>1</mn></msub><mo>&times;</mo><msub><mi>L</mi><mn>2</mn></msub></mrow><mo>&colone;</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><msub><mi>w</mi><mn>1</mn></msub><msub><mi>w</mi><mn>2</mn></msub></mrow><mo stretchy="false">|</mo><mrow><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>&in;</mo><msub><mi>L</mi><mn>1</mn></msub></mrow><mo>,</mo><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>&in;</mo><msub><mi>L</mi><mn>2</mn></msub></mrow></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></math>.</div><div class="definition"><b>定义.</b> 根据乘法的定义, 我们可以递归地定义语言的幂. 对于语言<math><mi>L</mi></math>, <math><mrow><msup><mi>L</mi><mn>0</mn></msup><mo>&colone;</mo><mn>1</mn></mrow></math>, <math><mrow><msup><mi>L</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>&colone;</mo><mrow><mi>L</mi><mo>&times;</mo><msup><mi>L</mi><mi>i</mi></msup></mrow></mrow></math>.</div><div class="definition"><b>定义.</b> 根据幂的定义, 我们可以定义Kleene星号. 对于语言<math><mi>L</mi></math>, <math><mrow><msup><mi>L</mi><mo>&#8270;</mo></msup><mo>&colone;</mo><mrow><msub><mo>&bigcup;</mo><mrow><mi>i</mi><mo>&in;</mo><mi>&Nopf;</mi></mrow></msub><msup><mi>L</mi><mi>i</mi></msup></mrow></mrow></math>, 注意这里的<math><mi>&Nopf;</mi></math>包括自然数<math><mn>0</mn></math>.</div><div class="definition"><b>定义.</b> 正则语言可以递归地被定义<ol><li><math><mn>0</mn></math>是一个正则语言;</li><li><math><mn>1</mn></math>是一个正则语言;</li><li>如果<math><msub><mi>L</mi><mn>1</mn></msub></math>和<math><msub><mi>L</mi><mn>2</mn></msub></math>是正则语言, 那么<math><mrow><msub><mi>L</mi><mn>1</mn></msub><mo>+</mo><msub><mi>L</mi><mn>2</mn></msub></mrow></math>是正则语言;</li><li>如果<math><msub><mi>L</mi><mn>1</mn></msub></math>和<math><msub><mi>L</mi><mn>2</mn></msub></math>是正则语言, 那么<math><mrow><msub><mi>L</mi><mn>1</mn></msub><mo>&times;</mo><msub><mi>L</mi><mn>2</mn></msub></mrow></math>是正则语言;</li><li>如果<math><mi>L</mi></math>是一个正则语言, 那么<math><msup><mi>L</mi><mo>&#8270;</mo></msup></math>是一个正则语言.</li></ol></div><div class="definition"><b>定义.</b> 正则表达式是描述正则语言的表达式, 其可以由以下的BNF定义<pre><code>&lt;exp> ::= zero
+       |  one
+       |  &lt;char>
+       |  (plus &lt;exp> &lt;exp>)
+       |  (times &lt;exp> &lt;exp>)
+       |  (star &lt;exp>)</code></pre></div><div class="theorem"><b>定理.</b> Brzozowski导数具有以下性质<ol><li><math><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mn>0</mn></mrow></math>;</li><li><math><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mn>0</mn></mrow></math>;</li><li><math><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mn>1</mn></mrow></math>;</li><li><math><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>c</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mn>0</mn></mrow></math>, 如果<math><mrow><mi>c</mi><mo>&ne;</mo><msup><mi>c</mi><mo>&prime;</mo></msup></mrow></math>;</li><li><math><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>L</mi><mn>1</mn></msub><mo>+</mo><msub><mi>L</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow><mo>+</mo><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>;</li><li><math><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>L</mi><mn>1</mn></msub><mo>&times;</mo><msub><mi>L</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow><mo>&times;</mo><msub><mi>L</mi><mn>2</mn></msub></mrow></mrow></math>, 如果<math><mrow><mi>&epsilon;</mi><mo>&notin;</mo><msub><mi>L</mi><mn>1</mn></msub></mrow></math>;</li><li><math><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>L</mi><mn>1</mn></msub><mo>&times;</mo><msub><mi>L</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow><mo>&times;</mo><msub><mi>L</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow><mo>+</mo><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>, 如果<math><mrow><mi>&epsilon;</mi><mo>&in;</mo><msub><mi>L</mi><mn>1</mn></msub></mrow></math>;</li><li><math><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>L</mi><mo>&#8270;</mo></msup><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>L</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&times;</mo><msup><mi>L</mi><mo>&#8270;</mo></msup></mrow></mrow></math>.</li></ol>其中<math><mrow><mi>c</mi><mo>,</mo><msup><mi>c</mi><mo>&prime;</mo></msup></mrow></math>是字符, <math><mrow><mi>L</mi><mo>,</mo><msub><mi>L</mi><mn>1</mn></msub><mo>,</mo><msub><mi>L</mi><mn>2</mn></msub></mrow></math>是语言.<br/>实际上, 这给我们提供了计算正则语言的Brzozowski导数的递归方法.</div><div class="program"><b>程序.</b> 以下过程<code>D</code>可以计算Brzozowski导数.<pre><code>(define (D exp c)
+  (match exp
+    (zero zero)
+    (one zero)
+    (,c^
+     (guard (char? c^))
+     (if (char=? c^ c) one zero))
+    ((plus ,e1 ,e2)
+     (plus (D e1 c) (D e2 c)))
+    ((times ,e1 ,e2)
+     (define e3
+       (times (D e1 c) e2))
+     (if (delta? e1)
+         (plus e3 (D e2 c))
+         e3))
+    ((star ,e)
+     (times (D e c) (star e)))))</code></pre>其中<pre><code>(define zero 'zero)
+(define one 'one)
+(define (plus e1 e2)
+  (cond ((eq? e1 zero) e2)
+        ((eq? e2 zero) e1)
+        (else `(plus ,e1 ,e2))))
+(define (times e1 e2)
+  (cond ((eq? e1 zero) zero)
+        ((eq? e2 zero) zero)
+        ((eq? e1 one) e2)
+        ((eq? e2 one) e1)
+        (else `(times ,e1 ,e2))))
+(define (star exp)
+  (cond ((eq? exp zero) one)
+        ((eq? exp one) one)
+        (else `(star ,exp))))
+(define (delta? exp)
+  (match exp
+    (zero #f)
+    (one #t)
+    (,c (guard (char? c)) #f)
+    ((plus ,e1 ,e2)
+     (or (delta? e1) (delta? e2)))
+    ((times ,e1 ,e2)
+     (and (delta? e1) (delta? e2)))
+    ((star ,e) #t)))</code></pre></div><div class="theorem"><b>定理.</b> 对于字符<math><mi>c</mi></math>和字符串<math><mi>w</mi></math>, 对于语言<math><mi>L</mi></math>, <math><mrow><mrow><mi>c</mi><mi>w</mi></mrow><mo>&in;</mo><mi>L</mi></mrow></math>当且仅当<math><mrow><mi>w</mi><mo>&in;</mo><mrow><msub><mi>D</mi><mi>c</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>L</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</div><div class="program"><b>程序.</b> 以上定理给我们提供了一个判断字符串是否在语言之中的方法, 根据过程<code>D</code>, 我们可以编写一个判断字符串是否在 (由正则表达式刻画的) 正则语言之中的谓词<code>in?</code>.<pre><code>(define (in? str exp)
+  (define l (string-length str))
+  (let iter ((i 0) (exp exp))
+    (cond ((= i l) (delta? exp))
+          ((eq? exp zero) #f)
+          (else
+           (iter (+ i 1)
+                 (D exp (string-ref str i)))))))</code></pre></div><div class="example"><b>例子.</b> 以下是简单的例子, 刻画了<code>in?</code>的用法<pre><code>> (define L-pair-elim
+    (times #\c
+           (times (plus #\a #\d)
+                  (times (star (plus #\a #\d))
+                         #\r))))
+> (in? &quot;cadar&quot; L-pair-elim)
+#t
+> (in? &quot;cr&quot; L-pair-elim)
+#f
+> (in? &quot;cada&quot; L-pair-elim)
+#f
+> (in? &quot;cader&quot; L-pair-elim)
+#f</code></pre></div><h2>附录: Standard ML实现的版本</h2><p>鉴于有的读者可能看不得Lisp, 我也准备了Standard ML的版本.</p><pre><code>datatype exp =
+    Zero
+  | One
+  | Char of char
+  | Plus of exp * exp
+  | Times of exp * exp
+  | Star of exp
+
+fun deltap(Zero) = false
+  | deltap(One) = true
+  | deltap(Char(c)) = false
+  | deltap(Plus(e1,e2)) =
+  deltap(e1) orelse deltap(e2)
+  | deltap(Times(e1,e2)) =
+  deltap(e1) andalso deltap(e2)
+  | deltap(Star(e)) = true
+
+fun ZeroC() = Zero;
+fun OneC() = One;
+fun PlusC(Zero,e2) = e2
+  | PlusC(e1,Zero) = e1
+  | PlusC(e1,e2) = Plus(e1,e2)
+fun TimesC(Zero,e2) = Zero
+  | TimesC(e1,Zero) = Zero
+  | TimesC(One,e2) = e2
+  | TimesC(e1,One) = e1
+  | TimesC(e1,e2) = Times(e1,e2)
+fun StarC(Zero) = One
+  | StarC(One) = One
+  | StarC(exp) = Star(exp)
+
+fun D(Zero,c) = Zero
+  | D(One,c) = Zero
+  | D(Char(c0),c) =
+  if (c0 = c) then One else Zero
+  | D(Plus(e1,e2),c) =
+  PlusC(D(e1,c),D(e2,c))
+  | D(Times(e1,e2),c) =
+  let
+   val e3 = TimesC(D(e1,c),e2)
+  in
+   if deltap(e1)
+   then PlusC(e3,D(e2,c))
+   else e3
+  end
+  | D(Star(e),c) =
+  TimesC(D(e,c),StarC(e))
+
+fun matchp(str,exp) =
+  let
+   val l = size(str)
+   fun iter(i,exp) =
+   if (i = l) then deltap(exp)
+   else if (exp = Zero) then false
+   else iter(i+1,D(exp,String.sub(str,i)))
+  in
+   iter(0,exp)
+  end
+
+val L_pair_elim =
+Times(Char(#&quot;c&quot;),
+  Times(Plus(Char(#&quot;a&quot;),Char(#&quot;d&quot;)),
+    Times(Star(Plus(Char(#&quot;a&quot;),Char(#&quot;d&quot;))),
+      Char(#&quot;r&quot;))))</code></pre><p>并请读者阅读以下交互.</p><pre><code>- D(L_pair_elim,#&quot;c&quot;);
+val it =
+  Times
+    (Plus (Char #&quot;a&quot;,Char #&quot;d&quot;),
+     Times (Star (Plus (Char #&quot;a&quot;,Char #&quot;d&quot;)),Char #&quot;r&quot;)) : exp
+- D(it,#&quot;a&quot;);
+val it = Times (Star (Plus (Char #&quot;a&quot;,Char #&quot;d&quot;)),Char #&quot;r&quot;) : exp
+- D(it,#&quot;d&quot;);
+val it = Times (Star (Plus (Char #&quot;a&quot;,Char #&quot;d&quot;)),Char #&quot;r&quot;) : exp
+- D(it,#&quot;r&quot;);
+val it = One : exp</code></pre></body></html>
