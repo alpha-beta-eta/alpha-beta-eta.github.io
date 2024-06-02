@@ -1,0 +1,16 @@
+<html><head><meta charset="utf-8"/><title>OPLSS</title><link href="styles.css" rel="stylesheet"/></head><body><h1>OPLSS 俄勒冈编程语言暑期学校</h1><p>不懂编程语言, 也不懂数学和逻辑, 我该怎么办呢?</p><p>白鹤衔苦桃, 千里作一息. 欲往蓬莱山, 将此充粮食. 未达毛摧落, 离群心惨恻. 却归旧来巢, 妻子不相识.</p><p>随便记点笔记, 但是我不能保证这里的笔记的准确性.</p><h2>会话类型并发编程</h2><ul><li>演员模型 (actor model)</li><li>会话类型 (session types)</li><li>线性逻辑 (linear logic)</li></ul><h3>消息传递并发</h3><h4>通过沿信道交换消息进行计算的进程</h4><ul><li><math><mi>n</mi></math>-ary信道</li><li>非确定性</li><li>形式化基础: 进程演算, 例如<math><mi>&pi;</mi></math>演算</li></ul><h4>消息传递队列</h4><ul><li>移动性 (mobility)</li><li>高阶信道 (higher-order channel)</li></ul><h4>消息交换协议的类型</h4><p>会话类型 (Honda, Kohei. 1993. 'Types for Dyadic Interaction'. In CONCUR'93, edited by Eike Best, 715:509–523. Lecture Notes in Computer Science. Springer, Berlin, Heidelberg.)</p><pre><code>A ::= ?[T].A'
+   |  ![T].A'
+   |  &amp;{l_1: A_1; ...; l_n: A_n}  (external choice)
+   |  &oplus;{l_1: A_1; ...; l_n: A_n}  (internal choice)
+   |  end
+   |  X
+   |  μX.A'
+T ::= A
+   |  basic types such as int, char, ...</code></pre><pre><code>queue = &amp;{enq: ?[char].queue;
+          deq: &oplus;{none: end; some: ![char].queue}}</code></pre><pre><code>[client] ---(q: queue)--- [O]-[P]-[L]-[ ]
+
+q: ... (queue)
+  send 'enq' along q
+q: ?[char].queue
+  send 'S' along q
+q: queue</code></pre><p>观察: 信道/进程的类型随着消息的交换而改变</p><h4>会话类型中的保持 (<q>session fidelity</q>)</h4><p>guarantees that expectation of client matches with the one of providers if they do initially</p><h2>线性逻辑</h2><p>线性逻辑拒绝弱化规则和收缩规则, 这是因为在线性逻辑中命题相当于资源, 我们不能随意添加或删除. 弱化和丢弃资源有关, 收缩和复制资源有关.</p></body></html>

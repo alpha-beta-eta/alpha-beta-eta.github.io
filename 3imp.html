@@ -1,0 +1,75 @@
+<html><head><meta charset="utf-8"/><title>Scheme的三种实现模型</title><link href="styles.css" rel="stylesheet"/></head><body><h1>Scheme的三种实现模型</h1><p>这是本人对于Kent Dybvig博士论文的试译. 除了一些笔误之外, 影响读者阅读这篇论文的主要因素在于这篇论文的发表时间是1987年. 那个时间点别说R5RS标准了, 连R4RS标准都还没有问世, 因而这篇论文里的Scheme和现在的Scheme有一些不同之处. 例如, 这篇论文里的空表被视为假, 而自R5RS开始空表则被视为真.</p><h2>第1章 引论</h2><h2>第2章 Scheme语言</h2><h2>第3章 基于堆的模型</h2><p>本章描述了Scheme的一个基于堆的实现模型. 基于堆的模型已经被用在诸多Scheme实现之中, 包括Scheme84 [Fri84], C-Scheme [Dyb83] 和Scheme-311 [Cli84]. 这些系统与关于Scheme的第一份报告 [Sus75] 中所描述的系统在本质上都是相同的, 尽管每个都使用了不同的编译和解释策略.</p><p>本章的第一节描述了基于堆的模型背后的动机以及其问题. 第二节呈现了支持基于堆的模型所需要的数据结构, 第三节描述了这个模型的操作. 接着在第四节中的是一个生成基于堆的模型的代码的编译器和一个描述这种代码如何被执行的虚拟机. 最后第五节呈现了一种常见的优化, 其可以极大地削减大多数程序的执行开销, 并且也呈现了修改之后的编译器和虚拟机, 作为之后章节的所呈现的其他编译器和虚拟机的基础.</p><p>本章和之后的两章描述了一系列模型, 以及实现这些模型的转换器 (编译器) 和求值器. 每个模型都建立在之前的模型之上, 而每个转换器和求值器都可以使用之前的转换器和求值器所用到的过程. 对于每个转换器而言, 能够运行的Scheme代码都有给出, 而对于求值器, 本章和下一章的可运行Scheme代码每个也都有给出 (第5章使用了不同的方法来描述其低层次代码的意义). 不是所有的模型都支持完整的Scheme语言; 不支持的模型也有呈现, 因为其有助于将读者的注意力集中在最重要的细节上, 其有助于强调为了支持特定的特性所遇到的问题, 并且其或许也对于在特定方面与Scheme不同的语言有用.</p><h3>第3.1节 动机和问题</h3><p>在诸如Algol 60, C或者Pascal这样的词法作用域语言的典型实现之中, 一个真实的栈 (true stack) 用于记录调用帧 [Aho 77, Ran64]. 每个调用帧里都包含了一个返回地址, 变量绑定, 一个指向前一个帧的链接, 有时还有一些额外的信息. 变量绑定是被调用例程的实际参数和被调用例程所使用的局部变量. 一个调用帧通常是由调用例程所建立的, 或者说调用者 (caller). 调用者将实际参数压到栈上, 连同一个指向其栈帧的链接以及返回地址, 然后跳转至被调用例程, 或者说被调用者 (callee). 被调用者可以通过压入局部变量的值来扩充帧. 如果这个被调用者又调用了另外一个例程, 那么其会通过压入实际参数, 帧链接, 返回地址等东西来创建一个新的栈帧. 当被调用者抵达其代码的终点时, 其会通过重设帧链接, 移除帧, 并跳转至被保存的返回地址来返回到调用者那里. {译注: 新人对于<q>重设帧链接</q>这种表达可能有点困惑. 实际上, 它指的是指向当前帧的链接会保存在某个地方, 而返回时既然当前帧被移除了, 那么指向当前帧的链接也需要随之更新.} 通过这种方式, 每个活跃调用的状态都被记录在栈上, 而一旦调用完成之后这个状态又会被销毁.</p><p>因为Scheme的第一级闭包和延续, 这种结构还不足够. 第一级闭包能够半无限地保持参数绑定. 特别是, 闭包和被保存的绑定甚至能够在创建绑定的调用已经返回且其栈帧已经被从栈上移除的情况下被保持在系统之中. 出于这种原因, 将参数绑定存储在栈帧里并不可能. 转而, 一个堆上分配的<em>环境</em>被创建出来以存放实际参数, 而一个指向这个环境的指针被放置在调用帧的绑定的位置上. 当一个闭包被创建时, 一个指向这环境的指针被置于这闭包对象之中.</p><p>将变量绑定移入堆中使得绑定免于因为栈的收缩和成长而被覆写. 鉴于调用帧 (减去之前所说的变量绑定) 仍然被保存在栈上, 施行一个函数调用的唯一额外开销是环境的分配. 然而, 第一级延续要求调用帧要和环境一样在堆上分配. 这是因为延续的自然实现就是保持一个指向调用栈内部位置的指针 (a pointer into the call stack). 回忆一下, 一个延续是一个闭包, 当被调用时, 将控制返回至延续获得的那个点. 因为延续是一种第一级对象, 对于其何时被调用则没有限制. 特别是, 甚至在控制已经从其被获得的那个点返回之后, 其仍然有可能被调用. 如果是这样的话, 栈有可能自那时起又已经成长了, 覆写了延续中的一些栈帧. {译注: 作者的想法是这样的, 一般来说, 返回的时候可以不用强行移除栈上的内容, 因为我们已经将其视为了垃圾. 而如果从那个点返回了又返回之后, 新的栈帧就要覆盖原本延续里所涉及的栈帧的内容了.} 因此, 自然的解决方案是要维护一个堆分配的栈帧的链表. 当栈成长时, 新的帧在堆中未被使用的位置上分配, 于是旧的栈帧仍然完好无缺.</p><p>堆上分配调用帧和环境的主要问题与使用堆相关的开销. 这种开销包括在构建调用帧和环境时在堆中寻找空间的代价, 也包括访问帧或者环境的片段时沿着链接而非自栈或者帧指针进行索引 (indexing a stack or frame pointer) 的代价. </p><h3>第3.2节 数据结构的表示</h3><p>在基于堆的系统之中, 基本上需要五种不同的数据结构来支持核心语言. 这些结构分别是<em>环境</em>, <em>调用帧</em>, <em>控制栈</em>, <em>闭包</em>, 以及<em>延续</em>. 这些对象的结构在设计Scheme系统时是关键的, 因为其在Scheme系统所施行的每个计算中都有涉及. 这些结构在这里被描述, 连带着其在Scheme之中的表示.</p><h4>第3.2.1小节 环境</h4><p>一个环境由<code>cons</code>创建的序对构建出来. 一个环境的结构类似于一个<em>肋骨笼(rib cage)</em>, 因为环境是列表序对的列表. </p><h4>第3.2.2小节 帧和控制栈</h4><p>帧是用来在施行另一个计算时记录待处理计算的状态的. 它们最常在一个函数调用另一个函数时被创建; 第一个函数(的执行)被推迟了, 等待着第二个函数(的调用)的值. 任何对于第一个函数的继续求值而言必要的信息都必须记录在帧里. 取决于实现, 或许其他操作也可能需要帧, 尽管这种帧在这篇论文里没有用到.</p><p>调用帧的使用贯穿了本章和下一章, 而特定的格式则随模型而变. {译注: 所谓格式, 另一个说法大概是栈帧布局.} 然而, 一个调用帧总是必须包含一个<q>返回地址</q>或者说接下来要被求值的表达式, 环境或者对于活跃变量绑定的等价描述, 一个指向前一个帧的指针, 以及任意其他对于继续计算而言所必要的状态.</p><p>在基于堆的系统之中, 调用帧不过就是包含四个域的列表. 第一个域是<em>表达式</em>域. 这个域确定了接下来要被求值的表达式. 其对应于一个标准计算机架构中的一个返回地址 (被保存的程序计数器或者指令计数器(的值)). 第二个域是<em>环境</em>域. 这包含了当前活跃的环境. 第三个域是<code>rib</code>域. 在对于一个应用的求值过程中, 这个域包含了已经被求值的参数的列表. {译注: 更准确地说, <code>rib</code>域是已经求值过了的实际参数的值的列表.} 第四个域, 也是最后一个域, 存放了下一个帧.</p><p>在基于堆的系统之中, 控制栈就是一个由当前帧, 之前的帧, 再之前的帧等东西构成的链接结构 (linked structure). 其类似于一个链表, 以每个帧的域为元素而链接是在内部通过<q>下一个帧</q>指针完成的. {译注: 准确来说, 这里所谓的元素排除了下一个帧域.} 将栈结构化以使得链接外部于帧也是合理的, 只要不引入额外的存储开销或者沿着链接(行进)的开销. {译注: 这里所谓的外部, 大概指的是将除了下一个帧域之外的信息打包, 形成一个链表结构.}</p><h4>第3.2.3小节 闭包和延续</h4><p>基于堆的系统之中的闭包是简单的对象, 其将一个函数的文本或者可执行部分与当前环境组合起来. 除非使用<cite>第<a href="#variable-access">3.5</a>节</cite>的优化, 不然的话变量也是需要的. {译注: 这里的变量指的是函数的形式参数.} 因此, 在<cite>第<a href="#heap-model-impl">3.4</a>节</cite>的系统之中, 一个闭包对象是由三个元素构成的列表: 一个函数体, 一个环境, 以及一个变量列表. 例如, 由表达式<pre><code>((lambda (x)
+   (lambda (y) (cons x y)))
+ 'a)</code></pre>返回的闭包看起来类似于<pre><code>((cons x y) ((x) . (a)) (y))</code></pre>除了实际的体 (body) 会是<code>(cons x y)</code>的编译后版本. 在<cite>第<a href="#variable-access">3.5</a>节</cite>, 一个闭包仅是由两个元素构成的列表, 一个是环境, 另一个是函数体.</p><p>一个延续是一个闭包, 其包含了足够多的信息用以从一个给定继续进行计算. </p><h3>第3.3节 实现策略</h3><p>本节描述了一种基于堆的系统的实现策略, 其利用了前一节所描述的数据结构. 许多实现策略都是可行的; 这里给出的意在容易理解并可简单推广至之后章节的系统. 它并没有精确模仿本章开头所提及的任何实现所使用的策略.</p><p>计算以迭代的方式施行, 其使用了一集寄存器来存放计算的状态. 迭代方法是必要的, 因为第2章所呈现的所呈现的更直接的元循环解释器的递归方法并不能正确 (properly) 支持延续或者尾调用. 求值器必须要能够显式访问计算的状态以将这状态保存在一个延续之中, 而递归使得这状态的某些部分隐式起来; 这状态位于<em>元(meta)</em>层次, 并不对于实现直接可用. 除非(元层次上的)实现正确支持尾调用, 否则的话尾调用也不能被正确支持. {译注: 这里说的是, 如果是采用直接递归的元循环解释器, 那么其是否能够正确支持尾调用依赖于实现语言 (宿主语言) 能否正确支持尾调用.}</p><p>本章的策略使用了五个寄存器:<ul><li><math><mi>a</mi></math>: 累积器,</li><li><math><mi>x</mi></math>: 下一个表达式,</li><li><math><mi>e</mi></math>: 当前环境,</li><li><math><mi>r</mi></math>: 当前值肋骨,</li><li><math><mi>s</mi></math>: 当前栈.</li></ul>之后的内容描述了这些寄存器的使用(方式).</p><p><em>累积器</em>存放着由一个值返回 (value-returning) 操作所计算的最后一个值, 这样的操作诸如加载一个常量或者引用一个变量. 在函数应用期间, 其在参数的值被保存在值肋骨之前依次存放着每个参数的值, 并且在应用之前存放着函数(位置表达式)的值. 在对于<code>if</code>表达式求值期间, 其存放着测试 (test) 表达式的值; <code>if</code>用这个值来决定要对两个其他子表达式中的哪一个进行求值. 当一个计算完成时, 累积器里的值应该是这个计算的值.</p><p><em>下一个表达式</em>刻画了接下来要求值的表达式, </p><p><em>当前环境</em>存放着活跃的词法绑定. </p><p>在一个应用的求值期间, <em>当前值肋骨</em>存放着已经被求值了的参数(的值)的列表. </p><h3 id="heap-model-impl">第3.4节 实现基于堆的模型</h3><h4>第3.4.1小节 汇编代码</h4><p>本节所描述的VM汇编代码由12种指令构成, 每个指令有零或更多个参数 (operand). 以下是对于这些指令的描述.</p><ol><li><code>(halt)</code>终止了虚拟机器. 累积器里的值是计算的(最终)结果.</li><li><code>(refer <math><mi mathvariant="italic">var</mi></math> <math><mi>x</mi></math>)</code>找出当前环境里变量<math><mi mathvariant="italic">var</mi></math>的值, 然后将这个值放到累积器里, 并将下一个表达式置为<math><mi>x</mi></math>.</li><li><code>(constant <math><mi mathvariant="italic">obj</mi></math> <math><mi>x</mi></math>)</code>将<math><mi mathvariant="italic">obj</mi></math>放到累积器里, 并将下一个表达式置为<math><mi>x</mi></math>.</li><li><code>(close <math><mi mathvariant="italic">vars</mi></math> <math><mi mathvariant="italic">body</mi></math> <math><mi>x</mi></math>)</code>根据<math><mi mathvariant="italic">body</mi></math>, <math><mi mathvariant="italic">vars</mi></math>以及当前环境创建一个闭包, 然后将这个闭包放到累积器里, 并将下一个表达式置为<math><mi>x</mi></math>.</li><li><code>(test <math><mi mathvariant="italic">then</mi></math> <math><mi mathvariant="italic">else</mi></math>)</code>对于累积器进行测试, 如果累积器是nonnull的 (意即测试(表达式)返回真), 置下一个表达式为<math><mi mathvariant="italic">then</mi></math>. 否则的话, <code>test</code>置下一个表达式为<math><mi mathvariant="italic">else</mi></math>. {译注: 在作者写下论文的时候, Scheme里的<code>#f</code>和空表实际上是相同的, 所以不要见怪.}</li><li><code>(assign <math><mi mathvariant="italic">var</mi></math> <math><mi>x</mi></math>)</code>将当前环境中对于变量<math><mi mathvariant="italic">var</mi></math>的绑定改变为累积器里的值, 并将下一个表达式置为<math><mi>x</mi></math>.</li><li><code>(conti <math><mi>x</mi></math>)</code>根据当前的栈创建一个延续, 将这个延续置于累积器之中, 最后将下一个表达式置为<math><mi>x</mi></math>.</li><li><code>(nuate <math><mi>s</mi></math> <math><mi mathvariant="italic">var</mi></math>)</code>将<math><mi>s</mi></math>恢复为当前的栈, 将累积器置为当前环境中<math><mi mathvariant="italic">var</mi></math>的值, 然后将下一个表达式置为<code>(return)</code> (见之后的说明).</li><li><code>(frame <math><mi mathvariant="italic">ret</mi></math> <math><mi>x</mi></math>)</code>由当前环境, 当前值肋骨, 以及作为下一个表达式的<math><mi mathvariant="italic">ret</mi></math>构造出一个新的帧, 然后将这个帧加入到当前的栈里, 并将当前值肋骨置为空表, 下一个表达式置为<math><mi>x</mi></math>. {译注: 原文存在笔误, 将参数顺序弄反了.}</li><li><code>(argument <math><mi>x</mi></math>)</code>将累积器里的值加入到当前值肋骨里, 然后置下一个表达式为<math><mi>x</mi></math>.</li><li><code>(apply)</code>应用累积器里的闭包于当前值肋骨里的值列表. 精确地说, 这个指令扩展闭包的环境以闭包的变量 (也就是形式参数) 列表和当前值肋骨, 然后将当前环境设置为这个新的环境, 当前值肋骨置为空表, 下一个表达式置为闭包的体.</li><li><code>(return)</code>移除(当前)栈的第一个帧, 重设当前环境, 当前值肋骨, 下一个表达式, 以及当前栈. {译注: 实际上, 对于当前栈的变动就是移除其第一个帧.}</li></ol><h4>第3.4.2小节 转换</h4><p>编译器将Scheme表达式转换为上述汇编语言指令. 一些表达式, 诸如变量和常量, 被转换为一条汇编语言指令. 另一些表达式, 例如应用, 被转换为多条指令.</p><p>编译器依次寻求每种类型的表达式, 然后将其转换为相应的指令. 编译器的输入是要被编译的表达式和在表达式(求值)完成之后接下来要执行的指令. 这接下来的指令可以想成是表达式的延续 (不要将其与<code>call/cc</code>所返回的延续对象相混淆).</p><p>出现在下方的编译器的代码. 注意到我们使用<code>cond</code>和<code>record-case</code>来parse表达式; 并且这篇论文里的所有编译器都会用到它们. 它们在第2章里和其他Scheme句法形式一起被描述了.<pre><code>(define compile
+  (lambda (x next)
+    (cond
+      [(symbol? x)
+       (list 'refer x next)]
+      [(pair? x)
+       (record-case x
+         [quote (obj)
+          (list 'constant obj next)]
+         [lambda (vars body)
+          (list 'close vars (compile body '(return)) next)]
+         [if (test then else)
+          (let ([thenc (compile then next)]
+                [elsec (compile else next)])
+            (compile test (list 'test thenc elsec)))]
+         [set! (var x)
+          (compile x (list 'assign var next))]
+         [call/cc (x)
+          (let ([c (list 'conti
+                         (list 'argument
+                               (compile x '(apply))))])
+            (if (tail? next)
+                c
+                (list 'frame next c)))]
+         [else
+          (recur loop ([args (cdr x)]
+                       [c (compile (car x) '(apply))])
+            (if (null? args)
+                (if (tail? next)
+                    c
+                    (list 'frame next c))
+                (loop (cdr args)
+                      (compile (car args)
+                               (list 'argument c)))))])]
+      [else
+       (list 'constant x next)])))</code></pre>这个编译器并没有进行任何错误检查, 尽管任何意在实用的编译器至少应该验证参数的数目和结构. 整篇论文里出现的编译器和虚拟机都几乎不进行错误检查, 这是为了缩短代码和简化呈现.</p><p>对于变量 (符号), <code>quote</code>表达式, 常量表达式 (刻画于<code>cond</code>的<code>else</code>子句之中) 的处理都是直接的. 一个变量<math><mi mathvariant="italic">v</mi></math>和接下来的指令<math><mi mathvariant="italic">next</mi></math>会被转换为<code>(refer <math><mi>v</mi></math> <math><mi mathvariant="italic">next</mi></math>)</code>. 类似地, <code>(quote <math><mi mathvariant="italic">obj</mi></math>)</code>和简单的<math><mi mathvariant="italic">obj</mi></math>会被转换为<code>(constant <math><mi mathvariant="italic">obj</mi></math> <math><mi mathvariant="italic">next</mi></math>)</code>.</p><p>对于<code>lambda</code>表达式的处理也是同样直接的. </p><h4>第3.4.3小节 求值</h4><p>虚拟机器, 也就是VM, 解释上述编译器所产生的指令, 使用之前所描述的数据结构和寄存器. 它的结构和SECD机器 [Lan64, Lan65] 类似; 寄存器状态的改变由一个尾递归函数所模拟. 这个函数的参数即是寄存器本身. 每次对于VM的递归调用都象征着一次新的机器循环的开始; VM寄存器的新值由其参数刻画. 这种结构避免了赋值的使用, 使得对于VM及其状态变化的更为清晰紧凑的描述成为可能.</p><p>以下是VM的代码:<pre><code>(define VM
+  (lambda (a x e r s)
+    (record-case x
+      [halt () a]
+      [refer (var x)
+       (VM (car (lookup var e)) x e r s)]
+      [constant (obj x)
+       (VM obj x e r s)]
+      [close (vars body x)
+       (VM (closure body e vars) x e r s)]
+      [test (then else)
+       (VM a (if a then else) e r s)]
+      [assign (var x)
+       (set-car! (lookup var e) a)
+       (VM a x e r s)]
+      [conti (x)
+       (VM (continuation s) x e r s)]
+      [nuate (s var)
+       (VM (car (lookup var e)) '(return) e r s)]
+      [frame (ret x)
+       (VM a x e '() (call-frame ret e r s))]
+      [argument (x)
+       (VM a x e (cons a r) s)]
+      [apply ()
+       (record a (body e vars)
+         (VM a body (extend e vars r) '() s))]
+      [return ()
+       (record s (x e r s)
+         (VM a x e r s))])))</code></pre></p><p>VM的操作遵循着前述对于指令的描述. 注意到绝大多数指令只会修改一两个寄存器. 只有一种指令执行了副作用, 那就是<code>assign</code>, 其破坏性地修改当前的环境. 辅助函数<code>lookup</code>, <code>closure</code>, <code>continuation</code>, <code>call-frame</code>和<code>extend</code>之后均有呈现.</p><p>函数<code>lookup</code>寻找变量<math><mi mathvariant="italic">var</mi></math>在环境<math><mi>e</mi></math>中的值. 其做法是依次在每个变量肋骨里搜寻, 直至找到变量. 在找到变量的时候, 其会返回一个列表, 这个列表的car部分是(变量)相应的值. 其返回列表而非值本身的原因在于其既被<code>refer</code>使用也被<code>assign</code>使用. <code>assign</code>通过修改列表结构来执行赋值.<pre><code>(define lookup
+  (lambda (var e)
+    (recur nxtrib ([e e])
+      (recur nxtelt ([vars (caar e)] [vals (cdar e)])
+        (cond
+          [(null? vars) (nxtrib (cdr e))]
+          [(eq? (car vars) var) vals]
+          [else (nxtelt (cdr vars) (cdr vals))])))))</code></pre>两层循环是必要的, 一层施行于环境的肋骨之上, 另一层施行于变量肋骨的变量之上. 第二层循环也携带着值肋骨, 以使得正确的位置被找到时值可以立即取出. 注意到鉴于循环是尾递归的, 所以说搜索是迭代性的.</p><p>函数<code>closure</code>创建一个新的闭包对象, 其不过就是由一个体, 一个环境, 一个变量列表构成的一个列表:<pre><code>(define closure
+  (lambda (body e vars)
+    (list body e vars)))</code></pre></p><p>函数<code>continuation</code>创建一个新的延续对象. 一个延续是一个闭包, </p><h3 id="variable-access">第3.5节 改进变量访问</h3><h2>第4章 基于栈的模型</h2><h2>第5章 基于字符串的模型</h2><h2>第6章 总结</h2></body></html>
