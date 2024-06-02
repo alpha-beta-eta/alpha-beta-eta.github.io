@@ -1,0 +1,584 @@
+<html><head><meta charset="utf-8"/><title>monad的Schemer之见</title><link href="styles.css" rel="stylesheet"/></head><body><h1>monad的Schemer之见</h1><h2>第1章 状态monad</h2><h3>第1.1节 简谈monad</h3><p>一个monad是一对函数<math><msub><mi>unit</mi><mi>M</mi></msub></math>和<math><msub><mi>star</mi><mi>M</mi></msub></math>, 这两者可以合作完成有趣的事情. 一对特定的<math><msub><mi>unit</mi><mi>M</mi></msub></math>和<math><msub><mi>star</mi><mi>M</mi></msub></math>是一个monad, 如果以下<em>monad律</em>成立:<ul><li><math><mrow><mrow><mo stretchy="false">(</mo><mrow><msub><mi>star</mi><mi>M</mi></msub><mspace width="2ex"/><msub><mi>unit</mi><mi>M</mi></msub></mrow><mo stretchy="false">)</mo></mrow><mo>=</mo><msub><mi>identity</mi><mi>M</mi></msub></mrow></math></li><li><math><mrow><mrow><mo stretchy="false">(</mo><mrow><mo>&compfn;</mo><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><msub><mi>star</mi><mi>M</mi></msub><mspace width="2ex"/><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><msub><mi>unit</mi><mi>M</mi></msub></mrow><mo stretchy="false">)</mo></mrow><mo>=</mo><mi>f</mi></mrow></math></li><li><math><mrow><mrow><mo stretchy="false">(</mo><mrow><msub><mi>star</mi><mi>M</mi></msub><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mo>&compfn;</mo><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><msub><mi>star</mi><mi>M</mi></msub><mspace width="2ex"/><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&compfn;</mo><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><msub><mi>star</mi><mi>M</mi></msub><mspace width="2ex"/><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><msub><mi>star</mi><mi>M</mi></msub><mspace width="2ex"/><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></li></ul>其中<math><mo>&compfn;</mo></math>是<em>复合</em>函数, 被定义为<math><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mspace width="2ex"/><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mspace width="2ex"/><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math>, 其取两个函数然后将其复合.</p><p>如果我们所做的是给别人呈现新的monad, 那么我们就不得不证明monad律对于我们所提出的<math><msub><mi>unit</mi><mi>M</mi></msub></math>和<math><msub><mi>star</mi><mi>M</mi></msub></math>成立. 但是现在, 我们将只会处理已知的monad. 如果我们想要令别人相信一个monad的确是一个monad, 那么证明就是完全必要的.</p><p>我们需要写下我们的代码以使得给定两个表达式, 我们可以很快观察出这两个表达式之中哪一个首先出现. 我们将这种编码风格称为<em>monad风格</em>. 只要你能够识别出何时一个函数调用是(或不是)参数简单的尾调用, 那么理解如何以monad风格编写代码也是容易的事情了. 一旦定义已经被置于monad风格, 那么存在一种机制用来为定义插入<q>操作</q>以给出对于某种effect的刻画. 在这第一次讲座之中, 这将会是对于可修改变量 (settable variable) 的刻画. 在第二次讲座里, 我们将会引入其他effect.</p><p>monad风格的函数是基于两个函数之上的: 一个<math><mi>unit</mi></math>和一个<math><mi>star</mi></math>, 并且其必须构成一个monad. 如果你从如下递归函数<code>f</code>的定义开始:<pre><code>(define f (λ (...) body))</code></pre>那么monad化的相同函数看起来会是:<pre><code>(define f
+  (λ (unit star)
+    (if (monad? unit star)
+        (letrec ((f (λ (...) body*)))
+          f))))</code></pre></p><p>不幸的是, 保证<math><mi>unit</mi></math>和<math><mi>star</mi></math>构成一个monad比起编写一个简单谓词要花费更多努力. 暂时, 我们将会假定程序员可以信任<math><mi>unit</mi></math>和<math><mi>star</mi></math>的确构成了monad, 这简化了我们的定义.<pre><code>(define f
+  (λ (unit star)
+    (letrec ((f (λ (...) body*)))
+      f)))</code></pre></p><p>我们使用<code>body*</code>来指明<code>body</code>已是monad风格. 但是, 我们不打算传入特定的<math><mi>unit</mi></math>和<math><mi>star</mi></math>, 而是准备全局地<code>define</code>它们以类似于<math><msub><mi>unit</mi><mi>state</mi></msub></math>和<math><msub><mi>star</mi><mi>state</mi></msub></math>这样的唯一名字, 那么<code>body*</code>就会和之前的<code>body</code>看起来如出一辙, 除了会用到特定的<math><mi>unit</mi></math>和<math><mi>star</mi></math>. 这个决定允许我们使用<code>define</code>而非<code>letrec</code>以支持递归.<pre><code>(define f (λ (...) body*))</code></pre></p><p>使用全局定义只是封装monad的诸多方式之一. 我们可以将这两个函数打包成一个cons序对, 一个向量, 一个可继承的类对象, 诸如此类. 一般而言, 为了支持对于某种effect的刻画, 我们需要一个或者更多的与<math><mi>unit</mi></math>和<math><mi>star</mi></math>协作的辅助函数. 而当我们遇到这些辅助函数的时候, 我们也会指出它们. 这些辅助函数返回了和<math><mi>unit</mi></math>的<em>调用</em>相同种类的值. 但是, 请记住monad仅是一对满足monad律的<math><mi>unit</mi></math>和<math><mi>star</mi></math>.</p><h3>第1.2节 类型和形状</h3><p>考虑三种类型的值: <em>纯</em>值, 记以<math><mrow><mi>a</mi><mo>&in;</mo><mi>A</mi></mrow></math>; 参数化于<math><mi>A</mi></math>之上的表达式, 记以<math><mrow><mi>ma</mi><mo>&in;</mo><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></mrow></math>; 还有函数, 记以<math><mrow><mi>sequel</mi><mo>&in;</mo><mi>Sequel</mi></mrow></math>, 其接受一个纯值<math><mrow><mi>a</mi><mo>&in;</mo><mi>A</mi></mrow></math>, 然后返回了一个monadic值<math><mrow><mi>mb</mi><mo>&in;</mo><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></mrow></math>. 函数<math><msub><mi>unit</mi><mi>M</mi></msub></math>的形状类似于类型<math><mi>Sequel</mi></math>, 但是其返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>而非一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>. <math><msub><mi>star</mi><mi>M</mi></msub></math>接受两个(curry化了的)参数, 一个<math><mi>Sequel</mi></math>和一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>, 然后返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>. 因此, 我们可以记<math><msub><mi>unit</mi><mi>M</mi></msub></math>和<math><msub><mi>star</mi><mi>M</mi></msub></math>的<em>类型</em>如下.<math display="block"><mtable columnalign="right center left" displaystyle="true"><mtr><mtd><msub><mi>Sequel</mi><mi>M</mi></msub></mtd><mtd><mo>=</mo></mtd><mtd><mrow><mi>A</mi><mo>&rarr;</mo><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></mrow></mtd></mtr><mtr><mtd><msub><mi>unit</mi><mi>M</mi></msub></mtd><mtd><mo>:</mo></mtd><mtd><mrow><mi>A</mi><mo>&rarr;</mo><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></mrow></mtd></mtr><mtr><mtd><msub><mi>star</mi><mi>M</mi></msub></mtd><mtd><mo>:</mo></mtd><mtd><mrow><msub><mi>Sequel</mi><mi>M</mi></msub><mo>&rarr;</mo><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow><mo>&rarr;</mo><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></mrow></mtd></mtr></mtable></math></p><p>这里的第一行告诉我们类型<math><msub><mi>Sequel</mi><mi>M</mi></msub></math>是类型<math><mrow><mi>A</mi><mo>&rarr;</mo><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></mrow></math>的缩略, 而接下来的两行分别告诉我们了表达式<math><msub><mi>unit</mi><mi>M</mi></msub></math>和<math><msub><mi>star</mi><mi>M</mi></msub></math>的类型.</p><p>根据monad律, 我们知道表达式<math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>star</mi><mi>M</mi></msub><mspace width="2ex"/><msub><mi>unit</mi><mi>M</mi></msub></mrow><mo stretchy="false">)</mo></mrow></math>是合法的, 尽管似乎<math><msub><mi>star</mi><mi>M</mi></msub></math>想要的是类型<math><msub><mi>Sequel</mi><mi>M</mi></msub></math>的一个值作为其第一个参数. 因此, 我们必然知道<math><msub><mi>unit</mi><mi>M</mi></msub></math>和一个<math><msub><mi>Sequel</mi><mi>M</mi></msub></math>必然有着类似的形状. 它们都消费一个纯值<math><mi>a</mi></math>, 然后分别返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>或者一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>. 更进一步, <math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>unit</mi><mi>M</mi></msub><mspace width="2ex"/><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></math>和<math><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><msub><mi>star</mi><mi>M</mi></msub><mspace width="2ex"/><msub><mi>sequel</mi><mi>M</mi></msub></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mi>ma</mi></mrow><mo stretchy="false">)</mo></mrow></math>返回了相同的形状, 分别是一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>或者一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>.</p><h3>第1.3节 状态monad</h3><p>以下是<math><mi>state</mi></math> monad, 如此命名乃是因为其创造了对于一个单独的可变变量的刻画.<pre><code>(define unit_state ;A -> MA
+  (λ (a)
+    (λ (s) ;This function is a MA.
+      `(,a . ,s))))
+;诸多编程语言实际上称unit为return</code></pre><pre><code>(define star_state ;Sequel -> MA -> MB
+  (λ (sequel)
+    (λ (ma)
+      (λ (s) ;This function is a MB.
+        (let ((p (ma s)))
+          (let ((new-a (car p)) (new-s (cdr p)))
+            (let ((mb (sequel new-a)))
+              (mb new-s))))))))</code></pre></p><p>让我们稍微分析一下这些定义. <math><msub><mi>unit</mi><mi>state</mi></msub></math>接受一个纯值<math><mrow><mi>a</mi><mo>&in;</mo><mi>A</mi></mrow></math>, 然后返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>, 这个函数期望接受一个状态<math><mrow><mi>s</mi><mo>&in;</mo><mi>S</mi></mrow></math>. 当<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>得到一个状态的时候, 就返回一个序对. 这个序对的<math><mi>car</mi></math>部分是一个纯值, 而<math><mi>cdr</mi></math>部分则是一个<em>额外</em>的值. 这个纯值传递给一个<math><mi>Sequel</mi></math>以产生一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>, 而这个额外的值又传递给了这个得到的<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>.</p><p>对于调用<math><mi>state</mi></math> <math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>或者<math><mi>state</mi></math> <math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>所返回的序对, 其<math><mi>car</mi></math>部分是纯值, 而<math><mi>cdr</mi></math>部分则是额外的值. 这提醒我们这些结构总是会有一个纯值, 而纯值有的时候是没有用的. <math><mi>cdr</mi></math>里的东西是额外的值, 其用以支持各种各样的刻画.</p><p>我们可以观察到<math><msub><mi>star</mi><mi>state</mi></msub></math>接受两个(curry化了的)值, 一个函数<math><mi>Sequel</mi></math>和一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>, 而对于状态而言<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>恰好是函数. 考虑<math><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mi>ma</mi><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mi>body</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 那么<math><mi>body</mi></math>应该是一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>. 但是, 在<math><msub><mi>star</mi><mi>state</mi></msub></math>的定义之中, <math><mi>ma</mi></math>在<math><mi>sequel</mi></math>之前被调用. 我们令序对<math><mi>p</mi></math>是应用<math><mi>ma</mi></math>于某个<math><mi>s</mi></math>的结果, 那么<math><mi>p</mi></math>的<math><mi>car</mi></math>是某个纯值<math><mi>new-a</mi></math>, 其会被传递给<math><mi>sequel</mi></math>. 应用<math><mi>sequel</mi></math>于<math><mi>new-a</mi></math>的结果是一个<math><mi>mb</mi></math>, 据我们所知, 其期望着一个状态, 而这个状态就在<math><mi>p</mi></math>的<math><mi>cdr</mi></math>之中. 因此, 我们可以说<math><mi>ma</mi></math>进入的时候是以一个状态, 而从<math><mrow><mi>mb</mi><mo>&in;</mo><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></mrow></math>退出的时候则是以一个可能不同的状态.</p><p>monad的类型信息告诉了我们该如何使用<math><mi>unit</mi></math>和<math><mi>star</mi></math>来以monad风格定义函数. 那么, 现在让我们来看一个例子. 我们的问题是取一个整数的嵌套(至任意深度的)列表, 然后返回一对值. 这个序对的第一个项应该是同样的列表, 除了其中的偶数都已经被移除, 第二个项则是被删除的偶数的数目. 我们称这个函数为<code>remberevensXcountevens</code>. 这里的<code>X</code>指明函数会返回一个eXtra值.</p><p>在我们移步至<code>remberevensXcountevens</code>的monadic定义之前, 让我们先来看一个简单的直接风格的定义. 我们从一个<q>驱动</q>过程<code>remberevensXcountevens_2pass</code>开始, 其会调用两个辅助函数<code>remberevens_pure</code>和<code>countevens_pure</code>.<pre><code>(define remberevensXcountevens_2pass
+  (λ (l) `(,(remberevens_pure l) . ,(countevens_pure l))))
+(define remberevens_pure
+  (λ (l)
+    (cond
+      ((null? l) '())
+      ((list?? (car l))
+       (cons (remberevens_pure (car l)) (remberevens_pure (cdr l))))
+      ((odd? (car l)) (cons (car l) (remberevens_pure (cdr l))))
+      (else (remberevens_pure (cdr l))))))
+(define countevens_pure
+  (λ (l)
+    (cond
+      ((null? l) 0)
+      ((list?? (car l))
+       (+ (countevens_pure (car l)) (countevens_pure (cdr l))))
+      ((odd? (car l)) (countevens_pure (cdr l)))
+      (else (add1 (countevens_pure (cdr l)))))))
+;原文这里存在笔误, 将两处x误写作了l
+(define list??
+  (λ (x)
+    (or (null? x) (pair? x))))</code></pre><pre><code>> (remberevensXcountevens_2pass '(2 3 (7 4 5 6) 8 (9) 2))
+((3 (7 5) (9)) . 5)</code></pre><code>remberevensXcountevens_2pass</code>能够给出正确的结果, 但是却非常低效: 它对于列表<code>l</code>处理了两遍. 存在着一种众人皆知的解法, 其只需要处理一遍, 但是需要我们将代码转换为延续传递风格.<pre><code>(define remberevensXcountevens_cps
+  (λ (l k)
+    (cond
+      ((null? l) (k `(() . 0)))
+      ((list?? (car l))
+       (remberevensXcountevens_cps
+        (car l)
+        (λ (pa)
+          (remberevensXcountevens_cps
+           (cdr l)
+           (λ (pd)
+             (k `(,(cons (car pa) (car pd))
+                  . ,(+ (cdr pa) (cdr pd)))))))))
+      ((odd? (car l))
+       (remberevensXcountevens_cps
+        (cdr l)
+        (λ (p)
+          (k `(,(cons (car l) (car p))
+               . ,(cdr p))))))
+      (else
+       (remberevensXcountevens_cps
+        (cdr l)
+        (λ (p)
+          (k `(,(car p) . ,(add1 (cdr p))))))))))</code></pre>译注: 实际上比起这种写法, 一般人用延续传递风格编写这个过程会让<code>k</code>接受两个参数, 这样会更简单一些.<pre><code>> (remberevensXcountevens_cps '(2 3 (7 4 5 6) 8 (9) 2) (λ (p) p))
+((3 (7 5) (9)) . 5)</code></pre></p><p>接下来我们将直接风格的<code>remberevens_pure</code>转换为monad风格. <code>cond</code>的第四个子句是一个尾调用, 故保持不变就好. 对于第三个子句, 我们取(具有简单参数的)非尾调用, 然后将其变为<math><msub><mi>star</mi><mi>state</mi></msub></math>的第二个(curry化了的)参数.<pre><code>((star_state ...)
+ (remberevens_pure (cdr l)))</code></pre>围绕非尾调用的上下文进入了<code>...</code>之中, 于是我们必须要有一个变量用于绑定调用<code>(remberevens_pure (cdr l))</code>的结果, 那么让我们称之为<code>d</code>.<pre><code>((star_state (λ (d) ...))
+ (remberevens_pure (cdr l)))</code></pre>如果我们有了一个简单表达式 (没有递归函数调用的表达式), 诸如<code>(cons (car l) d)</code>, 那么为了monad化这个表达式, 我们使用<math><msub><mi>unit</mi><mi>state</mi></msub></math>来包裹这个简单表达式.<pre><code>((star_state (λ (d) (unit_state (cons (car l) d))))
+ (remberevens_pure (cdr l)))</code></pre>考虑第二个子句. 这里我们有两个(具有简单参数的)非尾(递归)调用, 于是我们需要给予它们一个顺序.<pre><code>((star_state (λ (a) ...))
+ (remberevens_pure (car l)))</code></pre>在<code>(λ (a) ...)</code>的体里, 我们进行下一个调用.<pre><code>((star_state (λ (a)
+               ((start_state (λ (d) ...))
+                (remberevens_pure (cdr l)))))
+ (remberevens_pure (car l)))</code></pre>最后, 我们来处理递归调用的结果, 那么就是<code>(cons a d)</code>, 这是一个简单表达式. 又一次, 我们需要做的事情就是用<math><msub><mi>unit</mi><mi>state</mi></msub></math>来包裹这个表达式.<pre><code>((star_state (λ (a)
+               ((start_state (λ (d) (unit_state (cons a d))))
+                (remberevens_pure (cdr l)))))
+ (remberevens_pure (car l)))</code></pre>第一个子句是简单的, 所以说我们将<code>'()</code>传递给<math><msub><mi>unit</mi><mi>state</mi></msub></math>. 现在, 我们有了结果.<pre><code>(define remberevens
+  (λ (l)
+    (cond
+      ((null? l) (unit_state '()))
+      ((list?? (car l))
+       ((star_state (λ (a)
+                      ((star_state (λ (d) (unit_state (cons a d))))
+                       (remberevens (cdr l)))))
+        (remberevens (car l))))
+      ((odd? (car l))
+       ((star_state (λ (d) (unit_state (cons (car l) d))))
+        (remberevens (cdr l))))
+      (else
+       (remberevens (cdr l))))))</code></pre></p><p>当然了, 到现在为止我们处理的只是<code>remberevens</code>, 而我们真正想要的是<code>remberevensXcountevens</code>. 似乎我们只完成了一半的工作, 但是monad风格的优美之处在于其实我们已经快要完成了. 让我们将这个函数改名为<code>remberevensXcountevens_almost</code>, 并让我们看看我们离目标还有多远.<pre><code>(define remberevensXcountevens_almost
+  (λ (l)
+    (cond
+      ((null? l) (unit_state '()))
+      ((list?? (car l))
+       ((star_state (λ (a)
+                      ((star_state (λ (d) (unit_state (cons a d))))
+                       (remberevensXcountevens_almost (cdr l)))))
+        (remberevensXcountevens_almost (car l))))
+      ((odd? (car l))
+       ((star_state (λ (d) (unit_state (cons (car l) d))))
+        (remberevensXcountevens_almost (cdr l))))
+      (else
+       (remberevensXcountevens_almost (cdr l))))))</code></pre></p><p>首先, <code>(remberevensXcountevens_almost l)</code>会返回什么呢? 其会返回一个函数, 这个函数接受一个状态, 然后返回一对值, 即一个纯值 (应该是<code>(remberevens_pure l)</code>会返回的) 和一个额外值 (应该是移除的偶数的数目). 以下是对于<code>remberevensXcountevens_almost</code>的一个测试.<pre><code>> ((remberevensXcountevens_almost '(2 3 (7 4 5 6) 8 (9) 2)) 0)
+((3 (7 5) (9)) . 0)</code></pre></p><p>这个测试里的<code>0</code>有什么用呢? 它是状态<code>s</code>的初值. 当数字的列表为空会发生什么? 其会返回<code>(unit_state '())</code>, 而我们知道这是函数<code>(λ (s) `(() . ,s))</code>, 通过将<code>a</code>替换为空表. 然后, <code>s</code>会被替换为<code>0</code>, 这就产生了序对<code>(() . 0)</code>.</p><p>但是, 我们的答案只是<em>近乎于</em>正确, 因为我的错误的部分仅是数目不对. 什么时候我们需要计数呢? 当我们知道<code>(car l)</code>是一个偶数的时候. 所以说, 让我们再来看看<code>else</code>子句.<pre><code>(remberevensXcountevens_almost (cdr l))</code></pre>我们该如何修订这个表达式以修正bug呢? 这是一个尾调用, 所以说我们将该调用移入sequel的体内.<pre><code>((star_state (λ (_)
+               (remberevensXcountevens_almost (cdr l))))
+ ...)</code></pre>然后我们应该制造一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>出来, 其可以通过<math><msub><mi>star</mi><mi>state</mi></msub></math>给出对于effect的刻画. 既然状态monad的<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>看起来像是<code>(λ (s) `(,a . ,s^))</code>, 那么我们也必须使用这样的格式, 并且既然我们不会关心<code>_</code>被绑定到了什么值上, 所以说我们令这个纯值为符号<code>_</code>也就可以了, 这给出了以下代码.<pre><code>((star_state (λ (_)
+               (remberevensXcountevens_almost (cdr l))))
+ (λ (s) `(_ . ,s^)))</code></pre>剩下来我们需要做的事情是确定我们想要<code>s^</code>是什么. 既然进入这个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>的<code>s</code>是当前的计数, 那么我们可以令<code>s^</code>为<code>(add1 s)</code>, 这将我们导向了完整的<code>else</code>子句.<pre><code>((star_state (λ (_)
+               (remberevensXcountevens_almost (cdr l))))
+ (λ (s) `(_ . ,(add1 s))))</code></pre>现在代码就是全部正确的了, 所以我们可以把下标从名字里去掉.<pre><code>(define remberevensXcountevens
+  (λ (l)
+    (cond
+      ((null? l) (unit_state '()))
+      ((list?? (car l))
+       ((star_state (λ (a)
+                      ((star_state (λ (d) (unit_state (cons a d))))
+                       (remberevensXcountevens (cdr l)))))
+        (remberevensXcountevens (car l))))
+      ((odd? (car l))
+       ((star_state (λ (d) (unit_state (cons (car l) d))))
+        (remberevensXcountevens (cdr l))))
+      (else
+       ((star_state (λ (_)
+                      (remberevensXcountevens (cdr l))))
+        (λ (s) `(_ . ,(add1 s))))))))</code></pre><pre><code>> ((remberevensXcountevens '(2 3 (7 4 5 6) 8 (9) 2)) 0)
+((3 (7 5) (9)) . 5)</code></pre>译注: 实际上, 还可以换个写法.<pre><code>(define remberevensXcountevens
+  (λ (l)
+    (cond
+      ((null? l) (unit_state '()))
+      ((list?? (car l))
+       ((star_state (λ (a)
+                      ((star_state (λ (d) (unit_state (cons a d))))
+                       (remberevensXcountevens (cdr l)))))
+        (remberevensXcountevens (car l))))
+      ((odd? (car l))
+       ((star_state (λ (d) (unit_state (cons (car l) d))))
+        (remberevensXcountevens (cdr l))))
+      (else
+       ((star_state (λ (d)
+                      (λ (s)
+                        `(,d . ,(add1 s)))))
+        (remberevensXcountevens (cdr l)))))))</code></pre></p><p>让我们来思考之前延续传递风格版本的定义. 两个程序都能计算出正确的答案, 但是它们做事的方式相当不同. 为了表明我们所言非虚, 让我们追踪每个版本的程序里<code>add1</code>和<code>+</code>的动向. 以下是追踪<code>remberevensXcountevens_cps</code>时所发生的:<pre><code>> (remberevensXcountevens_cps '(2 3 (7 4 5 6) 8 (9) 2) (λ (p) p))
+(add1 0)
+(add1 1)
+(add1 0)
+(+ 0 1)
+(add1 1)
+(+ 2 2)
+(add1 4)
+((3 (7 5) (9)) . 5)</code></pre></p><p>从对于执行过程的追踪可以看出, <code>remberevensXcountevens_cps</code>计算出<code>5</code>是通过对于输入中的子列表计算子答案, 然后使用<code>+</code>合并子答案得到的.</p><p>与之相对的是, 让我们看看对于monad版本程序<code>remberevensXcountevens</code>的追踪:<pre><code>> ((remberevensXcountevens '(2 3 (7 4 5 6) 8 (9) 2)) 0)
+(add1 0)
+(add1 1)
+(add1 2)
+(add1 3)
+(add1 4)
+((3 (7 5) (9)) . 5)</code></pre></p><p>现在对于<code>add1</code>的调用遵循着可以预测的模式, 而<code>+</code>压根就没有用到! 比起我们在对于<code>remberevensXcountevens_cps</code>的追踪中看到的由子答案构筑答案的现象, 这个版本看起来我们是在对于计数器进行逐步增量.</p><p>实际上, monad版本的计算非常类似于我们使用全局变量<code>counter</code> (初始化为<code>0</code>) 然后简单通过<code>(set! counter (add1 counter))</code>来增长计数的情况. 但是, 我们甚至没有用到<code>set!</code>. 转而, 状态monad为我们提供了对于全局可变变量的<em>刻画</em>. 这是一种极其强大的想法. 现在我们可以编写程序来提供对于effectful计算的忠实模拟, 但是却并不需要实际执行任何side effects. 也就是说, 我们得到了effectful计算的通常好处, 却没有通常的缺陷.</p><p>一个关于状态monad的最后观察是辅助函数<code>(λ (s) `(_ . ,(add1 s)))</code>并不包含自由变量, 本可以赋予一个全局性的名字, 让我们称其为<code>incr_state</code>:<pre><code>(define incr_state
+  (λ (s) `(_ . ,(add1 s))))</code></pre>但是如果这样的话, <math><mi>sequel</mi></math>和其<math><mi>ma</mi></math><math display="block"><mtable><mtr><mtd><ms>(λ (_) ...)</ms></mtd><mtd><mtext>;sequel</mtext></mtd></mtr><mtr><mtd><mrow><mo>&uArr;</mo><mspace width="8ex"/></mrow></mtd></mtr><mtr><mtd><ms>(λ (s) `(_ . ,(add1 s)))</ms></mtd><mtd><mtext>;ma</mtext></mtd></mtr></mtable></math>之间的关系就不甚明了了. 纯值, 即符号<code>_</code>, 在将状态传给<math><mi>ma</mi></math>之后得到的序对的<math><mi>car</mi></math>部分里, 然后其会被绑定至<math><mi>sequel</mi></math>的形式变量<code>_</code>上. 作成这种绑定是<math><msub><mi>star</mi><mi>state</mi></msub></math>的工作之一.</p><p>练习 (可以见之前的译注): </p><h3>第1.4节 推导状态monad</h3><p>如果我们取<code>remberevensXcountevens</code>的代码, 并将<code>unit_state</code>和<code>star_state</code>代之以它们的定义, 那么对于<code>(let ((x e)) body)</code>或者等价的<code>((λ (x) body) e)</code>存在着将<code>body</code>中的<code>x</code>替换为<code>e</code>的机会. 如果我们知道<code>x</code>在<code>body</code>之中恰出现一次, 那么这些是保持正确性和效率的变换. {译注: 依赖于代码是pure的.} 我们这里所执行的变换的详细步骤见于附录 (总计三十六步), 但是其结果是<em>状态传递风格</em>的代码, 其中状态作为参数进出于每个递归函数调用. 我们可能写过这种代码, 但是却不知道状态monad的存在.<pre><code>(define remberevensXcountevens_sps
+  (λ (l s)
+    (cond
+      ((null? l) `(() . ,s))
+      ((list?? (car l))
+       (let* ((p (remberevensXcountevens_sps (car l) s)))
+         (let ((p^ (remberevensXcountevens_sps (cdr l) (cdr p))))
+           `(,(cons (car p) (car p^)) . ,(cdr p^)))))
+      ((odd? (car l))
+       (let ((p (remberevensXcountevens_sps (cdr l) s)))
+         `(,(cons (car l) (car p)) . ,(cdr p))))
+      (else
+       (let ((p (remberevensXcountevens_sps (cdr l) s)))
+         `(,(car p) . ,(add1 (cdr p))))))))</code></pre><pre><code>> (remberevensXcountevens_sps '(2 3 (7 4 5 6) 8 (9) 2) 0)
+((3 (7 5) (9)) . 5)</code></pre></p><p>我们也可以从<code>remberevensXcountevens_sps</code>出发推导<code>unit_state</code>和<code>star_state</code>, 因为这种变换是可逆的. {译注: 非常可疑的说法.}</p><p>这就结束了第一次讲座, 第二次讲座里我将呈现各种其他monad以及如何使用它们.</p><p>译者: 这次讲座有一些脚注, 所以现在我们整合一下, 呈现在下方.</p><p>我们可以定义<code>bind_state</code>, 使得参数采用事情发生的顺序.<pre><code>(define bind_state
+  (λ (ma sequel)
+    ((star_state sequel) ma)))</code></pre>那么<pre><code>((star_state (λ (a)
+               ((star_state (λ (d) (unit_state (cons a d))))
+                (remberevensXcountevens (cdr l)))))
+ (remberevensXcountevens (car l)))</code></pre>可以写成<pre><code>(bind_state
+ (remberevensXcountevens (car l))
+ (λ (a)
+   (bind_state
+    (remberevensXcountevens (cdr l))
+    (λ (d)
+      (unit_state (cons a d))))))</code></pre>我们甚至还可以模仿Haskell的<code>do</code>和Scheme的<code>let*</code>编写一个宏<code>do*_state</code>.<pre><code>(define-syntax do*_state
+  (syntax-rules ()
+    ((_ () body) body)
+    ((_ ((a ma) (b mb) ...) body)
+     ((star_state
+       (λ (a)
+         (do*_state ((b mb) ...) body)))
+      ma))))</code></pre>那么还可以写成<pre><code>(do*_state
+ ((a (remberevensXcountevens (car l)))
+  (d (remberevensXcountevens (cdr l))))
+ (unit_state (cons a d)))</code></pre></p><h2>第2章 其他一些monad</h2><h3>第2.1节 可能monad (Maybe Monad)</h3><p>以下是<math><mi>maybe</mi></math> monad.<pre><code>(define unit_maybe
+  (λ (a)
+    `(,a . _))) ;This MA get its type from the type of a.</code></pre><pre><code>(define star_maybe
+  (λ (sequel)
+    (λ (ma)
+      (cond ;This is a MB.
+        ((eq? (cdr ma) '_)
+         (let ((a (car ma)))
+           (sequel a)))
+        (else (let ((mb ma))
+                mb))))))</code></pre></p><p><math><mi>cdr</mi></math>里的标记<code>_</code>指明了纯值就在<math><mi>car</mi></math>里, 这和之前的状态monad是一样的. 我们立即发现对于这个monad而言似乎存在着多余的方面. 如果你回忆一下状态monad, 会发现一切都是自足的; 然而, 在这里事情并不那么明朗显然. 但是, 既然<math><msub><mi>unit</mi><mi>maybe</mi></msub></math>里用了符号<code>_</code>, <math><msub><mi>star</mi><mi>maybe</mi></msub></math>对于符号<code>_</code>又有专门的分派, 所以至少monad律的前两个等式是成立的.</p><p>如果你使用过Scheme的<code>assq</code>, 那么就会明白为了检查可能的失败, 程序的结构是多么得病态 (what an ill-structured mess). 可能monad允许编程者在更高层次进行思考, 从而忽略处理失败. 考虑<code>new-assq</code>, 其类似于<code>assq</code>. 它的工作是返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math> (此时是一个序对), 其<math><mi>car</mi></math>会是<code>p*</code>中第一个满足<math><mi>car</mi></math>匹配<code>v</code>的序对的<math><mi>cdr</mi></math>.<pre><code>(define new-assq
+  (λ (v p*)
+    (cond
+      ((null? p*) `(_ . fail))
+      ((eq? (caar p*) v)
+       (unit_maybe (cdar p*)))
+      (else
+       ((star_maybe (λ (a) (unit_maybe a)))
+        (new-assq v (cdr p*)))))))</code></pre>既然<code>(new-assq v (cdr p*))</code>是一个尾调用, 我们可以依据<math><mi>&eta;</mi></math>归约和monad律第一等式重写<code>new-assq</code>, 即<pre><code>(define new-assq
+  (λ (v p*)
+    (cond
+      ((null? p*) `(_ . fail))
+      ((eq? (caar p*) v)
+       (unit_maybe (cdar p*)))
+      (else
+       (new-assq v (cdr p*))))))</code></pre>每个<code>cond</code>的子句的右支都应该是<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>. 终结递归调用的是前两个子句. (鉴于<code>(_ . fail)</code>的<math><mi>cdr</mi></math>是符号<code>fail</code>, 所以说你不会将其与<math><mi>cdr</mi></math>为符号<code>_</code>的情况混淆.) 为了看看我们如何使用<code>new-assq</code>, 请看以下测试.<pre><code>> ((star_maybe (λ (a) (new-assq a '((1 . 10) (2 . 20)))))
+   ((λ (ma1 ma2)
+      (cond
+        ((eq? (cdr ma1) '_) ma1)
+        (else ma2)))
+    (new-assq 8 '((7 . 1) (9 . 3)))
+    (new-assq 8 '((9 . 4) (6 . 5) (8 . 2) (7 . 3)))))</code></pre></p><p>我们需要验证<math><msub><mi>star</mi><mi>maybe</mi></msub></math>的第二个(curry化了的)参数的确是一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>. 以上的两个<code>cond</code>子句里, 结果均是一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>. 这里我们在两个不同的关联列表里寻找<code>8</code>. 然后, 我们取了纯值<code>2</code>, 在第三个关联列表里寻找它. 这将返回<code>(20 . _)</code>. 在<code>cond</code>子句里, 当我们失败时, 我们将会尝试另外一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>, 但是如果成功, 就会使用第一个. 然后, <code>a</code>就会被绑定到纯值<code>2</code>. 我们的这个定义的一个缺陷在于前两次对于<code>new-assq</code>的调用都会被求值, 这是因为我们并不是在类似于Haskell这样的按需调用语言里进行编程. 如果我们想要获得通常Haskell的好处, 就需要重新定义第二个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>为一个thunk.<pre><code>> ((star_maybe (λ (a) (new-assq a '((1 . 10) (2 . 20)))))
+   ((λ (Ma1 Ma2)
+      (cond
+        ((eq? (cdr Ma1) '_) Ma1)
+        (else (Ma2))))
+    (new-assq 8 '((7 . 1) (9 . 3)))
+    (λ () (new-assq 8 '((9 . 4) (6 . 5) (8 . 2) (7 . 3))))))
+(20 . _)</code></pre>显然, 我们仍然信任第二个(curry化了的)参数将求值至一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>. 从结构上来说, 我们本也可以选择使用<code>#f</code>而非<code>(_ . fail)</code>, 然后据此修改我们的各个定义. 然而, 因为我们接下来要呈现异常monad, 所以说我们想要坚持现在的这种表示.</p><p>练习: 修改可能monad, 其中假设每个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>都是一个thunk.</p><h3>第2.2节 异常monad</h3><p>以下是异常monad (exception monad), 其中纯值还是在<math><mi>car</mi></math>里, 而这一次异常 (一个字符串) 出现在<math><mi>cdr</mi></math>里, 尽管任何不是符号<code>_</code>其实都可以.<pre><code>(define unit_exception
+  (λ (a)
+    `(,a . _))) ;This MA gets its type from the type of a.
+(define star_exception
+  (λ (sequel)
+    (λ (ma)
+      (cond ;This is a MB.
+        ((eq? (cdr ma) '_)
+         (let ((a (car ma)))
+           (sequel a)))
+        (else (let ((mb ma))
+                mb))))))</code></pre></p><p><math><msub><mi>unit</mi><mi>exception</mi></msub></math>和<math><msub><mi>star</mi><mi>exception</mi></msub></math>的定义实际上和之前的可能monad是等同的. 我们的例子来源于Jeff Newbern的<q>All About Monads</q>.</p><p>引用一下Newbern的话, <q>这个例子试图parse十六进制数字, 并且在遇到非法字符时会抛出异常</q>. 以下的<code>char-hex->integer</code>里的<code>else</code>分支里的异常<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>构造指明了要抛出异常. 如果<code>char-hex->integer</code>产生的<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>是一个异常, 那么sequel就不会被调用, 接受纯值的变量<code>a</code>也不会得到绑定. 转而, 这个异常会作为答案返回.<pre><code>(define parse-hex-c*
+  (λ (c* pos n)
+    (cond
+      ((null? c*) (unit_exception n))
+      (else
+       ((star_exception
+         (λ (a)
+           (parse-hex-c*
+            (cdr c*) (+ pos 1) (+ (* n 16) a))))
+        (char-hex->integer (car c*) pos))))))
+(define char-hex?
+  (λ (c)
+    (or (char-numeric? c) (char&lt;=? #\a c #\f))))
+(define char-hex->integer/safe
+  (λ (c)
+    (- (char->integer c)
+       (if (char-numeric? c)
+           (char->integer #\0)
+           (- (char->integer #\a) 10)))))
+(define char-hex->integer
+  (λ (c pos)
+    (cond
+      ((char-hex? c)
+       (unit_exception
+        (char-hex->integer/safe c)))
+      (else
+       `(_ . ,(format &quot;At index ~s: bad char ~s&quot; pos c))))))</code></pre></p><p>当然了, <code>parse-hex-c*</code>的优美之处在于你<em>纯粹地</em>进行思考, <code>parse-hex-c*</code>的定义中并没有指出什么可能会导致异常.<pre><code>> (parse-hex-c* (string->list &quot;ab&quot;) 0 0)
+(171 . _)
+> (parse-hex-c* (string->list &quot;a5bex21b&quot;) 0 0)
+(_ . &quot;At index 4: bad char x&quot;)</code></pre></p><p>通常来说, 这传递给<code>parse-hex-c*</code>的两个<code>0</code>应该藏于<code>parse-hex-c*</code>的接口之下, 这通过局部定义很容易实现. 总之, 还可以进行种种改进. 然而, 这些只会使得理解异常monad更为困难, 而理解异常monad才是本节的主题.</p><p>练习: </p><p>练习: </p><p>接下来的是<math><mi>writer</mi></math> monad.</p><h3>第2.3节 writer monad</h3><p>以下是<math><mi>writer</mi></math> monad.<pre><code>(define unit_writer
+  (λ (a)
+    `(,a . ,mzero^list))) ;This pair is a MA.
+(define star_writer
+  (λ (sequel)
+    (λ (ma)
+      (let ((a (car ma))) ;This is a MB.
+        (let ((mb (sequel a)))
+          (let ((new-b (car mb)))
+            `(,new-b . ,(mplus^list (cdr ma) (cdr mb)))))))))</code></pre></p><p>我们需要以下辅助定义.<pre><code>(define mzero^list '())
+(define mplus^list append)</code></pre></p><p>我们现在要定义<code>remberevensXevens</code>, 其和<code>remberevensXcountevens</code>接受同样的参数, 返回的序对则在<math><mi>cdr</mi></math>上有所不同: 不是返回计数, 而是按照移除顺序返回偶数的列表.<pre><code>(define remberevensXevens
+  (λ (l)
+    (cond
+      ((null? l) (unit_writer '()))
+      ((list?? (car l))
+       ((star_writer
+         (λ (a)
+           ((star_writer
+             (λ (d) (unit_writer (cons a d))))
+            (remberevensXevens (cdr l)))))
+        (remberevensXevens (car l))))
+      ((odd? (car l))
+       ((star_writer
+         (λ (d) (unit_writer (cons (car l) d))))
+        (remberevensXevens (cdr l))))
+      (else
+       ((star_writer
+         (λ (_) (remberevensXevens (cdr l))))
+        `(_ . (,(car l))))))))</code></pre><pre><code>> (remberevensXevens '(2 3 (8 (5 6 7) 4 8 7) 8 2 9))
+((3 ((5 7) 7) 9) . (2 8 6 4 8 8 2))</code></pre></p><p>这在结构上类似于异常monad, 除了我们使用了一个幺半群 (monoid) 来构筑我们的结果. 幺半群是一个序对, 由一个抽象加法和一个抽象零元构成. (当然了, 加法需要满足结合律, 零元需要是加法的单位元.) {译注: 数学的上下文里一般把交换幺半群的操作才称为加法, 不要混淆.} 这里我们使用的幺半群是<math><mrow><mo stretchy="false">(</mo><mrow><mi>append</mi><mo>,</mo><mi>()</mi></mrow><mo stretchy="false">)</mo></mrow></math>.</p><p>练习: 通过重新定义某个全局变量, 但不改变<code>remberevensXevens</code>的定义和测试程序, 使得返回的序对的<math><mi>cdr</mi></math>反转.<pre><code>> (remberevensXevens '(2 3 (8 (5 6 7) 4 8 7) 8 2 9))
+((3 ((5 7) 7) 9) . (2 8 8 4 6 8 2))</code></pre>译注: 显然, 我们应该改变<code>mplus^list</code>的定义.<pre><code>(define mplus^list
+  (λ (l1 l2)
+    (append l2 l1)))</code></pre>这是考虑了<pre><code>(reverse (append l1 l2)) = (append (reverse l2) (reverse l1))</code></pre></p><p>下一个monad是<math><mi>list</mi></math> monad.</p><h3>第2.4节 列表monad</h3><p>以下是列表monad.<pre><code>(define unit_list
+  (λ (a)
+    `(,a . ()))) ;This pair is a MA.
+(define star_list
+  (λ (sequel)
+    (λ (ma)
+      (cond ;This is a MB.
+        ((eq? (car ma) '_) '(_ . _))
+        (else
+         (let ((mb (sequel (car ma))))
+           (let ((extra (append (cdr mb) (mapcan sequel (cdr ma)))))
+             `(,(car mb) . ,extra))))))))
+(define mapcan
+  (λ (f ls)
+    (cond
+      ((null? ls) '())
+      (else
+       (append (f (car ls))
+               (mapcan f (cdr ls)))))))
+;老实说, 不是很理解 (怀疑有问题
+;和同学吃完火锅回来, 想了一会儿, 的确很有问题</code></pre><pre><code>;依照我的直觉, star_list的定义应该改成
+(define star_list
+  (λ (sequel)
+    (λ (ma)
+      (mapcan sequel ma))))
+;另外, 其实mapcan用append-map就好啦
+;不过, 我猜测本来另写mapcan是为了强调用了mplus^list?
+;可惜也并没有这么写
+
+;而且, 依照我的习惯, unit_list应该定义成
+(define unit_list
+  (λ (a)
+    (list a)))</code></pre></p><p>我们知道一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>是一个由纯值构成的列表, 于是每个<code>(sequel a)</code>都返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>, 因而<code>mapcan</code>的结果会是纯值的列表. {译注: 这个因果关系也令我感到匪夷所思, 不过在明白正确的定义之后, 可能也不难理解. <math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>和<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>其实都是纯值的列表, 所以说想要将调用数次<code>sequel</code>得到的数个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>再拼成一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>B</mi></mrow></math>, 就需要用到<code>mplus^list</code> (其实也就是<code>append</code>) 展平.}</p><p>考虑来自于Jeff Newbern的教程中的例子. <q>使用列表monad的标准例子是parse具有歧义的文法. 以下所展示的只是一个将数据理解为十六进制值, 十进制值, 以及单纯由alphanumeric字符构成的词进行parse的简单例子. 注意到十六进制的位, 十进制的位, 以及alphanumeric字符之间是有重合的, 所以说这会导致歧义. 例如, <code>dead</code>作为十六进制值和词都是合法的. <code>10</code>作为十进制值是<math><mn>10</mn></math>, 而作为十六进制值是<math><mn>16</mn></math>.</q> (<code>10</code>作为词也是合法的.)</p><p>在以下对于<code>parse-c*</code>的定义之中, 我们首先创建了三个特化的parser, 其接受一个带标记的纯值和一个新的字符. 然后, 我们定义一个函数, 其接受一个带标记的纯值和一个字符列表. 相同的字符会被传递给这三个已经定义了的parser, 连带着带标记的纯值. 每个parser都会返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>, 然后他们会由<math><msup><mi>mplus</mi><mi>list</mi></msup></math>组合成一个列表.<pre><code>(define parse-c*
+  (λ (a c*)
+    (cond
+      ((null? c*) (unit_list a))
+      (else
+       ((star_list
+         (λ (a) (parse-c* a (cdr c*))))
+        (mplus^list
+         (parse-hex-digit a (car c*))
+         (parse-dec-digit a (car c*))
+         (parse-alphanumeric a (car c*))))))))
+(define parse-hex-digit
+  (λ (a c)
+    (cond
+      ((and (eq? (car a) 'hex-number)
+            (char-hex? c))
+       (unit_list
+        `(hex-number . ,(+ (* (cdr a) 16)
+                           (char-hex->integer/safe c)))))
+      (else mzero^list))))
+(define parse-dec-digit
+  (λ (a c)
+    (cond
+      ((and (eq? (car a) 'dec-number)
+            (char-numeric? c))
+       (unit_list
+        `(dec-number . ,(+ (* (cdr a) 10)
+                           (- (char->integer c)
+                              (char->integer #\0))))))
+      (else mzero^list))))
+(define parse-alphanumeric
+  (λ (a c)
+    (cond
+      ((and (eq? (car a) 'word)
+            (or (char-alphabetic? c)
+                (char-numeric? c)))
+       (unit_list
+        `(word . ,(string-append (cdr a) (string c)))))
+      (else mzero^list))))</code></pre></p><p>译者: 后面的测试我也看了一下, 感觉也不是很有趣. 所以说, 我去看了看Dan Friedman抄的Haskell教程原文的例子. 好吧, 确实不是很有趣. 不过, 至少类比来看原作者还定义了<pre><code>(define parse-c
+  (λ (a c)
+    (mplus^list
+     (parse-hex-digit a c)
+     (parse-dec-digit a c)
+     (parse-alphanumeric a c))))
+(define parse-arg
+  (λ (s)
+    ((star_list
+      (λ (a) (parse-c* a (string->list s))))
+     (mplus^list
+      (unit_list '(hex-number . 0))
+      (unit_list '(dec-number . 0))
+      (unit_list '(word . &quot;&quot;))))))</code></pre>当然, 由此<code>parse-c*</code>也应该重新定义一下, 变成<pre><code>(define parse-c*
+  (λ (a c*)
+    (cond
+      ((null? c*) (unit_list a))
+      (else
+       ((star_list
+         (λ (a) (parse-c* a (cdr c*))))
+        (parse-c a (car c*)))))))</code></pre></p><p>看点我自己的测试.<pre><code>> (parse-arg &quot;dead&quot;)
+((hex-number . 57005) (word . &quot;dead&quot;))
+> (parse-arg &quot;1234&quot;)
+((hex-number . 4660) (dec-number . 1234) (word . &quot;1234&quot;))
+> (parse-arg &quot;abc@x&quot;)
+()</code></pre>然后, 给<code>parse-c</code>加个<code>printf</code>再看看. 之所以给<code>parse-c</code>加, 是因为三个子parser的调用实际上都要经过它. 看到<code>parse-c</code>调用一次, 等价于三个子parser给被调用了一次. 如果每个子parser都追踪, 那就太多了.<pre><code>> (parse-arg &quot;dead&quot;)
+parse-c:
+a: (hex-number . 0)
+c: #\d
+
+parse-c:
+a: (hex-number . 13)
+c: #\e
+
+parse-c:
+a: (hex-number . 222)
+c: #\a
+
+parse-c:
+a: (hex-number . 3562)
+c: #\d
+
+parse-c:
+a: (dec-number . 0)
+c: #\d
+
+parse-c:
+a: (word . &quot;&quot;)
+c: #\d
+
+parse-c:
+a: (word . &quot;d&quot;)
+c: #\e
+
+parse-c:
+a: (word . &quot;de&quot;)
+c: #\a
+
+parse-c:
+a: (word . &quot;dea&quot;)
+c: #\d
+
+((hex-number . 57005) (word . &quot;dead&quot;))</code></pre></p><p>这结束了对于列表monad的讨论. 下一个monad是<math><mi>environment</mi></math> monad.</p><h3>第2.5节 环境monad</h3><p>以下是环境monad.<pre><code>(define unit_environment
+  (λ (a)
+    (λ (env)
+      a)))
+(define star_environment
+  (λ (sequel)
+    (λ (ma)
+      (λ (env)
+        (let ((a (ma env)))
+          (let ((mb (sequel a)))
+            (mb env)))))))
+;似乎作者正在重写这一节的内容, 但是还没有完成
+;环境monad和reader monad是相同的东西
+;我怀疑作者是先写的reader monad,
+;但是现在准备改成环境monad</code></pre></p><p>译者: 原文写的是<pre><code>(define unit_environment
+  (λ (a)
+    (λ (env)
+      (let ((ma a))
+        ma))))</code></pre>这肯定是不对的, 可能是作者犯糊涂了.</p><p><math><mi>reader</mi></math> monad可以等效为状态monad, 但是我们只能够初始化状态. 在某种意义上说, 之前我们并不修改状态的例子其实可以视为reader monad的例子. reader monad的可能用法之一是初值可能是包含了令人感兴趣的全局信息的关联列表, 那么reader monad能够使你访问这些信息. 你可以理解为, 相对于状态monad而言, reader monad也是对于某个全局变量的刻画, 只是这个变量的值不能被修改.</p><p>...</p><p>这结束了我们对于reader monad的讨论. 接下来我们要使用类似于Scheme的<code>call/cc</code>的运算符来定义程序. 正如我们将会看到的, 它几乎与Scheme的相同, 但又不那么相同.</p><h3>第2.6节 延续monad</h3><p>以下是<math><mi>continuation</mi></math> monad.<pre><code>(define unit_continuation
+  (λ (a)
+    (λ (k) ;This function is a MA.
+      (k a))))
+(define star_continuation
+  (λ (sequel)
+    (λ (ma)
+      (λ (k) ;This function is a MB.
+        (let ((k^ (λ (a)
+                    (let ((mb (sequel a)))
+                      (mb k)))))
+          (ma k^))))))</code></pre></p><p>如果我们使用延续monad来修改<code>remberevensXcountevens_cps</code>的定义, 那么<code>remberevensXcountevens_continuation</code>就会变成一个单参数的过程了. {译注: 不过, 延续monad的<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>还是要接受一个作为延续的参数的.}<pre><code>(define remberevensXcountevens_continuation
+  (λ (l)
+    (cond
+      ((null? l) (unit_continuation '(() . 0)))
+      ((list?? (car l))
+       ((star_continuation
+         (λ (pa)
+           ((star_continuation
+             (λ (pd)
+               (unit_continuation
+                `(,(cons (car pa) (car pd))
+                  . ,(+ (cdr pa) (cdr pd))))))
+            (remberevensXcountevens_continuation (cdr l)))))
+        (remberevensXcountevens_continuation (car l))))
+      ((odd? (car l))
+       ((star_continuation
+         (λ (p)
+           (unit_continuation
+            `(,(cons (car l) (car p)) . ,(cdr p)))))
+        (remberevensXcountevens_continuation (cdr l))))
+      (else
+       ((star_continuation
+         (λ (p)
+           (unit_continuation
+            `(,(car p) . ,(add1 (cdr p))))))
+        (remberevensXcountevens_continuation (cdr l)))))))</code></pre><pre><code>> ((remberevensXcountevens_continuation
+    '(2 3 (7 4 5 6) 8 (9) 2))
+   (λ (p) p))
+((3 (7 5) (9)) . 5)</code></pre></p><p>显然, 这段代码可以视为延续传递风格, 但又没有显式用到延续. 甚至和之前的存储传递风格一样, 我们可以从这个定义重写得到延续传递风格的版本. 感兴趣的读者可以尝试一下. {译注: 实际上, 之前的原文写的是状态传递风格, 不过存储传递风格这个术语的确用得更多.}</p><p>以下是<code>callcc</code>的定义. 正如这个名字所暗示的那样, 它允许我们编写monadic程序时使用类似于Scheme的<code>call/cc</code>的机制.<pre><code>(define callcc
+  (λ (f)
+    (λ (k)
+      (let ((k-as-proc
+             (λ (a)
+               (λ (k_ignored)
+                 (k a)))))
+        (let ((ma (f k-as-proc)))
+          (ma k))))))</code></pre></p><p>译者: 从某种意义上来说, <code>callcc</code>的参数<code>k</code>具有双重作用. 从概念上来说, 它是所谓的当前延续. 这个当前延续(的包装版本)会传递给<code>f</code>, 使得<code>f</code>的体中在调用它时返回一个恰当的monadic值, 这个monadic值会忽略其所接受的延续, 转而使用之前所保存的当前延续. 另外, 这个<code>k</code> (未经包装的当前延续) 也会直接传递给<code>f</code>的体, 作为当前延续使用.</p><p>在<code>callcc</code>的定义之中, 我们打包了当前的延续<code>k</code>以忽略未来的当前延续而调用现在存储的这个当前延续. 这就是绑定到<code>k-as-proc</code>的对象. {译注: 更准确地说, 给<code>k-as-proc</code>喂一个纯值之后会产生一个monadic值.} 我们将包装了的延续传递给<code>f</code>, 其会返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>, 然后其又会被传递进入时的当前的延续<code>k</code>. 我们使用一个程序来描述<code>callcc</code>. 这个程序的参数也接受嵌套的整数列表, 然后返回其中的数字之积. 当遇到数字<code>0</code>的时候, 这个过程应该立即返回<code>0</code>. 出于乐趣, 我们给退出之后添加了一些代码, 以确保它并不会发生. 如果不加这冗余的代码, 或许不会令某些人信服. 这种证明手法在于使得<code>(exit 0)</code>位于非尾位置, 让sequel做些什么. 不过若是我们的<code>callcc</code>以预想的方式工作, 那么这个sequel就会被直接忽略.<pre><code>(define product
+  (λ (ls exit)
+    (cond
+      ((null? ls) (unit_continuation 1))
+      ((list?? (car ls))
+       ((star_continuation
+         (λ (a)
+           ((star_continuation
+             (λ (d)
+               (unit_continuation (* a d))))
+            (product (cdr ls) exit))))
+        (product (car ls) exit)))
+      ((zero? (car ls))
+       ((star_continuation
+         (λ (_)
+           (unit_continuation (sub1 _))))
+        (exit 0)))
+      (else
+       ((star_continuation
+         (λ (d)
+           (unit_continuation
+            (* (car ls) d))))
+        (product (cdr ls) exit))))))</code></pre></p><p>以下的第一个测试处理的是基本情况, <code>1</code>会直接返回, <code>out</code>不会被调用.<pre><code>> ((callcc
+    (λ (out) (product '() out)))
+   (λ (x) x))
+1</code></pre></p><p>下一个例子对应于Scheme的<code>(add1 (call/cc (λ (out) (product '() out))))</code>. {译注: 当然了, 这里的<code>product</code>是按照通常方式而非monad风格定义的.} 这表明了<code>callcc</code>具有某种可复合性.<pre><code>> (((star_continuation
+     (λ (a)
+       (unit_continuation
+        (add1 a))))
+    (callcc
+     (λ (out)
+       (product '() out))))
+   (λ (x) x))
+2</code></pre></p><p>第三个例子和第二个例子, 只是<code>out</code>会被调用, 我们需要保证这种情况下的可复合性.<pre><code>> (((star_continuation
+     (λ (a)
+       (unit_continuation
+        (add1 a))))
+    (callcc
+     (λ (out)
+       (product '(5 0 5) out))))
+   (λ (x) x))
+1</code></pre></p><p>以下是一个非常正常的例子. 因为列表里没有<code>0</code>, 所以<code>out</code>不会被调用. {译注: 尽管如此, 作为延续的<code>(λ (x) x)</code>还是会在最后被调用.}<pre><code>> ((callcc
+    (λ (out)
+      (product '(2 3 (7 4 5 6) 8 (9) 2) out)))
+   (λ (x) x))
+725760</code></pre></p><p>让我们来看最后一个例子, 其应该等价于以下的Scheme例子. {译注: Dan Friedman称其为简单的例子, 我希望他只是在开玩笑. 尽管我可以理解这个例子, 但我实在拒绝称这个例子为简单的.}<pre><code>(call/cc
+ (λ (k0)
+   ((car (call/cc
+          (λ (k1)
+            (k0 (- (call/cc
+                    (λ (k2)
+                      (k1 `(,k2))))
+                   1)))))
+    3)))</code></pre>但是, 对于这个表达式进行monad化有点tricky. {译注: 如果你能理解上面的表达式, 那么monad化就不tricky了.} 延续<code>k1</code>中的<code>((car []) 3)</code>需要移到第一个sequel的位置, 同理<code>(k0 (- [] 1))</code>需要移到第二个sequel的位置.<pre><code>> ((callcc
+    (λ (k0)
+      ((star_continuation
+        (λ (a) ((car a) 3)))
+       (callcc
+        (λ (k1)
+          ((star_continuation
+            (λ (n) (k0 (- n 1))))
+           (callcc
+            (λ (k2) (k1 `(,k2))))))))))
+   (λ (x) x))
+2</code></pre></p><p>下一个monad是<math><mi>identity</mi></math> monad.</p><h3>第2.7节 恒等monad</h3><p>以下是<math><mi>identity</mi></math> monad.<pre><code>(define unit_identity
+  (λ (a)
+    (let ((ma a))
+      ma)))
+(define star_identity
+  (λ (sequel)
+    (λ (ma)
+      (let ((a ma)) ;This is a MB.
+        (sequel a)))))</code></pre></p><p>考虑第一次讲座里的<code>remberevens</code>. {译注: 那是已经monad化了的版本.} 我们取该定义, 然后将<code>unit_state</code>替换为<code>unit_identity</code>, <code>star_state</code>替换为<code>star_identity</code>, 接着我们就得到了以下定义.<pre><code>(define remberevens
+  (λ (l)
+    (cond
+      ((null? l) (unit_identity '()))
+      ((list?? (car l))
+       ((star_identity
+         (λ (a)
+           ((star_identity (λ (d) (unit_identity (cons a d))))
+            (remberevens (cdr l)))))
+        (remberevens (car l))))
+      ((odd? (car l))
+       ((star_identity (λ (d) (unit_identity (cons (car l) d))))
+        (remberevens (cdr l))))
+      (else
+       (remberevens (cdr l))))))</code></pre><pre><code>> (remberevens '(2 3 (7 4 5 6) 8 (9) 2))
+(3 (7 5) (9))</code></pre></p><p>这是一个纯粹的解法, 因为有着非常干净的<math><mi>unit</mi></math>和<math><mi>star</mi></math>: 相当于恒等函数. 将恒等monad修改为使用<math><mi>car</mi></math>部分有着纯值的序对是平凡的事情.</p><h2>第3章 附录</h2><h3>第3.1节 状态传递风格的推导</h3><h3>第3.2节 结论</h3><p>我们使用了Wadler的方法来解释来源于<q>The Essence of Functional Programming</q>的monad. 但是, 存在着不同之处. Wadler使用了bind, 而我则像Moggi一样使用了star. Wadler展示了如何扩展解释器, 而我展示了如何扩展<q>The Little Schemer</q>中的程序. Wadler假定能够阅读Haskell程序, 我则假定理解函数作为值以及能够阅读Scheme程序. 最后, 我相信我的方法对于新人更加清晰, 而Wadler的方法更适合成熟的读者.</p><h3>第3.3节 致谢</h3></body></html>
