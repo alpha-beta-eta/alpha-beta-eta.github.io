@@ -1,11 +1,8 @@
 #lang racket
-(provide hoffman_ch5.html)
+(provide div:hoffman_ch5)
 (require SMathML "linear_algebra_utils.rkt")
-(define hoffman_ch5.html
-  (TmPrelude
-   #:title "线性代数 第5章 行列式"
-   #:css "styles.css"
-   (H1 "线性代数")
+(define div:hoffman_ch5
+  (TmDiv
    (H2 "第5章 行列式")
    (H3 "第5.1节 交换环")
    (P "本章我们将证明与方阵的行列式有关的基本事实. 我们不仅对于域上的矩阵这么做, "

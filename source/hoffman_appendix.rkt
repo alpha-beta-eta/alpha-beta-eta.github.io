@@ -1,11 +1,8 @@
 #lang racket
-(provide hoffman_appendix.html)
+(provide div:hoffman_appendix)
 (require SMathML "linear_algebra_utils.rkt")
-(define hoffman_appendix.html
-  (TmPrelude
-   #:title "线性代数 附录"
-   #:css "styles.css"
-   (H1 "线性代数")
+(define div:hoffman_appendix
+  (TmDiv
    (H2 "附录")
    (P "这个附录逻辑上分为两个部分. 第一部分由前三节构成, "
       "包含了整本书 (实际上是整个数学) 会出现的特定基础概念. "

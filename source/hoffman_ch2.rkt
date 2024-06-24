@@ -1,11 +1,8 @@
 #lang racket
-(provide hoffman_ch2.html)
+(provide div:hoffman_ch2)
 (require SMathML "linear_algebra_utils.rkt")
-(define hoffman_ch2.html
-  (TmPrelude
-   #:title "线性代数 第2章 向量空间"
-   #:css "styles.css"
-   (H1 "线性代数")
+(define div:hoffman_ch2
+  (TmDiv
    (H2 "第2章 向量空间")
    (H3 "第2.1节 向量空间")
    (P "在数学的许多部分中, 人们经常会遇到这样的集合, 其中处理对象的线性组合是有趣的. "

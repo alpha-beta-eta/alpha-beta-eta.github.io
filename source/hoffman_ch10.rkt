@@ -1,11 +1,8 @@
 #lang racket
-(provide hoffman_ch10.html)
+(provide div:hoffman_ch10)
 (require SMathML "linear_algebra_utils.rkt")
-(define hoffman_ch10.html
-  (TmPrelude
-   #:title "线性代数 第10章 双线性形式"
-   #:css "styles.css"
-   (H1 "线性代数")
+(define div:hoffman_ch10
+  (TmDiv
    (H2 "第10章 双线性形式")
    (H3 "第10.1节 双线性形式")
    (P "本章中, 我们处理有限维向量空间上的双线性形式. 读者可能会发现其与")

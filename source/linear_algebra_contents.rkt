@@ -7,6 +7,7 @@
    #:css "styles.css"
    (H1 "线性代数目录")
    (columnize
+    (H2 (A "前言" #:attr* '((href "hoffman_preface.html"))))
     (H2 (A "第1章 线性方程" #:attr* '((href "hoffman_ch1.html"))))
     (H2 (A "第2章 向量空间" #:attr* '((href "hoffman_ch2.html"))))
     (H2 (A "第3章 线性变换" #:attr* '((href "hoffman_ch3.html"))))

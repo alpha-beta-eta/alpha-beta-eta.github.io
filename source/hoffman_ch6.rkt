@@ -1,11 +1,8 @@
 #lang racket
-(provide hoffman_ch6.html)
+(provide div:hoffman_ch6)
 (require SMathML "linear_algebra_utils.rkt")
-(define hoffman_ch6.html
-  (TmPrelude
-   #:title "线性代数 第6章 初等标准形式"
-   #:css "styles.css"
-   (H1 "线性代数")
+(define div:hoffman_ch6
+  (TmDiv
    (H2 "第6章 初等标准形式")
    (H3 "第6.1节 引论")
    (P "之前我们已经提过我们的主要目的在于研究有限维向量空间上的线性变换. "

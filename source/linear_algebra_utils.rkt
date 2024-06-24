@@ -1,6 +1,84 @@
 #lang racket
 (provide (all-defined-out))
 (require SMathML)
+(define TmDiv (compose Tm Div))
+(define $perp (Mo "&perp;"))
+(define (&perp W) (^ W $perp))
+(define (@perp W) (@ (&perp W)))
+(define align:thin
+  (Ttable
+   (lambda (d i j)
+     (cond ((= j 0) (set-attr* d 'columnalign "right"))
+           ((= j 2) (set-attr* d 'columnalign "left"))
+           (else d)))))
+(define-syntax-rule (eqn* (x ...) ...)
+  (MB (set-attr*
+       (align:thin
+        (&Table (x ...) ...))
+       'displaystyle "true")))
+(define (orthoproj u v)
+  (&i* (~ (inner* u v) (sqrnorm v)) v))
+(define $VerticalBar
+  (Mo "|"
+      #:attr*
+      '((lspace "0") (rspace "0") (stretchy "true"))))
+(define (Inner* a b)
+  (angb (Mrow a $VerticalBar b)))
+(define &Abs
+  (let ((vert (Mo "|" #:attr* '((stretchy "true")))))
+    (lambda (x)
+      (Mrow vert x vert))))
+(define (in* a b)
+  (bra0
+   (Mrow a
+         (Mo "|" #:attr* '((lspace "0") (rspace "0")))
+         b)))
+(define (&sqr x) (^ x $2))
+(define (sqrnorm x) (&sqr (&norm x)))
+(define (Complex a b)
+  (&+ a (&i* $i b)))
+(define (uintegral f)
+  (integral $0 $1 f $t))
+(define (linear+ & a b)
+  (&= (& (&+ a b)) (&+ (& a) (& b))))
+(define (linear* & c a)
+  (&= (& (&i* c a)) (&i* c (& a))))
+(define (csym & a b)
+  (&= (& a b) (OverBar (& b a))))
+(define (clinear & c a b)
+  (&= (& (LC c a b))
+      (LC (OverBar c) (& a) (& b))))
+(define-syntax MatR
+  (syntax-rules ()
+    ((_ (x ...) ...)
+     (brac
+      (set-right
+       (&Table (x ...) ...))))))
+(define (subdetC J . a*)
+  (apply appl (_ $D J) a*))
+(define (subdet I J M)
+  (app (_ $D (&cm I J)) M))
+(define (&delta_k M)
+  (app $delta_k M))
+(define Func
+  (case-lambda
+    ((A) A)
+    ((A f . B*) (: A (^^ $-> f) (apply Func B*)))))
+(define $<- (Mo "&larr;"))
+(define $uarr (Mo "&uarr;"))
+(define $darr (Mo "&darr;"))
+(define <αβ> (inner* $alpha $beta))
+(define $n-1 (&- $n $1))
+(define (&J n)
+  (_^ $J n (@ $i)))
+(define (insert-before-last x lst)
+  (let r ((a (car lst)) (d (cdr lst)))
+    (if (null? (cdr d))
+        (cons a (cons x d))
+        (cons a (r (car d) (cdr d))))))
+(define (..lize &)
+  (lambda arg*
+    (apply & (insert-before-last $..c arg*))))
 (define (set-left d)
   (set-attr* d 'columnalign "left"))
 (define (set-right d)
@@ -9,6 +87,13 @@
   (case-lambda
     ((S) (ap $max S))
     ((c S) (ap (__ $max c) S))))
+(define $min (Mi "min"))
+(define (&min . x*)
+  (apply appl $min x*))
+(define mini
+  (case-lambda
+    ((S) (ap $min S))
+    ((c S) (ap (__ $min c) S))))
 (define ((tcomment #:n [n ""]) . x*)
   (keyword-apply
    Div '(#:attr*) '(((class "tcomment")))
@@ -110,7 +195,7 @@
     ((V W) (appl $L V W))))
 (define $nullity (Mi "nullity"))
 (define (&nullity T)
-  (app $nullity $T))
+  (app $nullity T))
 (define alpha_1..n
   (&cm $alpha_1 $..h $alpha_n))
 (define $BBB^ (&prime $BBB))
@@ -241,7 +326,14 @@
   (@wedge &wedge)
   
   )
-
+(define &..+ (..lize &+))
+(define &..i* (..lize &i*))
+(define &..d+ (..lize &d+))
+(define @..d+ (@lize &..d+))
+(define (&..cm . arg*)
+  (apply &cm (insert-before-last $..h arg*)))
+(define &..< (..lize &<))
+(define &..>= (..lize &>=))
 (define (n2s n)
   (format "~s" (exact-round n)))
 (define (s2n s)

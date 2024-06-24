@@ -1,11 +1,8 @@
 #lang racket
-(provide hoffman_ch1.html)
+(provide div:hoffman_ch1)
 (require SMathML "linear_algebra_utils.rkt")
-(define hoffman_ch1.html
-  (TmPrelude
-   #:title "线性代数 第1章 线性方程"
-   #:css "styles.css"
-   (H1 "线性代数")
+(define div:hoffman_ch1
+  (TmDiv
    (H2 "第1章 线性方程")
    (H3 "第1.1节 域")
    (P "我们假定读者熟悉实数和复数的初等代数. 对于本书的很大一部分, 数字"

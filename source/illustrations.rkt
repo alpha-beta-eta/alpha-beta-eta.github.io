@@ -2,6 +2,15 @@
 (provide illustrations.html)
 (require SMathML)
 (define $bull (Mo "&bull;"))
+(define def:affine-transformation
+  (MB (&= (Mat ((_ $x $bull) (_ $y $bull)))
+          (&+ (&i* (Mat ($x $y))
+                   (Mat ($a $b) ($c $d)))
+              (Mat ($e $f))))))
+(define $sin (Mi "sin"))
+(define $cos (Mi "cos"))
+(define (&sin x) (ap $sin x))
+(define (&cos x) (ap $cos x))
 (define illustrations.html
   (TmPrelude
    #:title "绘制数学图形"
@@ -191,9 +200,16 @@ showpage")
    (H2 "第2章 初等坐标几何")
    (H3 "第2.1节 点和向量")
    (P "如果" $P "是一个点而" $v "是一个向量, 那么" (&+ $P $v)
-      "是一个点, 其实满足" (&= (&- $Q $P) $v)
-      "的点" $Q ". "
-      )
+      "是一个点, 其是满足" (&= (&- $Q $P) $v)
+      "的点" $Q ". 我们称" $Q "是" $P "平移" $v
+      "得到的. 若给定实数" $t "以及点" $P "和" $Q
+      ", 我们可以构造一个点" (&+ $P (&i* $t (@- $Q $P)))
+      ". 若" (&<= $0 $t $1) ", 那么该点在线段" (: $P $Q)
+      "上. 当" (&= $t (&/ $1 $2)) "时, 该点即" (: $P $Q)
+      "的中点. 我们可以将" (&+ $P (&i* $t (@- $Q $P)))
+      "写成" (&+ (&i* (@- $1 $t) $P) (&i* $t $Q))
+      "的形式.")
+   
    (H2 "第3章 变量和过程")
    (H3 "第3.1节 PostScript中的变量")
    (CodeB "/s 1 def
@@ -209,22 +225,121 @@ stroke")
    
    (H2 "第4章 坐标和条件式")
    (H3 "第4.1节 坐标")
-   (MB (&= (Mat ((_ $x $bull) (_ $y $bull)))
-           (&+ (&i* (Mat ($x $y))
-                    (Mat ($a $b) ($c $d)))
-               (Mat ($e $f)))))
+   (P "PostScript在内部(至少是隐式地)处理三种坐标系统. 第一种是物理坐标系. "
+      "物理坐标系的基本单位是像素. 第二种是页面坐标系. 其原点位于页面的左下角, "
+      "单位长度为一个Adobe点, 等于" (&/ $1 72) "英寸. 页面可以被视为一种"
+      "理想化了的物理设备. 第三种是用户坐标系, 这是用户绘制图像时使用的坐标系. "
+      "最初页面坐标系和用户坐标系是相同的, 但是特定的操作, 例如"
+      (Code "scale") ", " (Code "translate") ", " (Code "rotate")
+      ", 可以改变其间的关系.")
+   def:affine-transformation
+   (P "仿射变换可以看成是一个线性变换加上一个平移分量, 其具有特定的性质: "
+      "直线经过变换仍然是直线, 平行线经常变换仍然是平行的.")
    (H3 "第4.2节 PostScript如何存储坐标变换")
    (P "确定一个仿射坐标变换"
-      (MB (&= (Mat ((_ $x $bull) (_ $y $bull)))
-              (&+ (&i* (Mat ($x $y))
-                       (Mat ($a $b) ($c $d)))
-                  (Mat ($e $f)))))
+      def:affine-transformation
       "所需要的数据被存储在一个长度为六的数组"
       (Code "[a b c d e f]")
       "里, 其被称为matrix. 命令" (Code "matrix")
-      "或者" (Code "currentmatrix")
-      "的作用是将当前的变换矩阵置于栈上. "
-      )
+      "将数组" (Code "[1 0 0 1 0 0]")
+      "置于栈上, 此即恒等变换. 若此时再使用" (Code "currentmatrix")
+      "命令, 则会将当前变换置于该数组之中."
+      (CodeB "GS>matrix currentmatrix ==
+[1.33333337 0.0 0.0 1.33333337 0.0 0.0]
+GS>")
+      "[注记: 至少若是在Windows系统之中调整缩放比例, 结果是会改变的, 当然这也是相当合理的.] "
+      (Code "defaultmatrix") "和" (Code "currentmatrix")
+      "有些类似, 但是顾名思义, 其将从页面到物理坐标系的变换置于栈顶的数组之中. "
+      "如果什么都没动, 这两个命令的效果显然是一样的. [译注: " (Code "currentmatrix")
+      "当然就是从用户到物理坐标系的变换了.]")
+   (P "现在我们想要解方程"
+      def:affine-transformation
+      "以用" (_ $x $bull) "和" (_ $y $bull) "表达" $x "和" $y
+      ". 我们考虑将其写成"
+      (MB (&= (_ $P $bull) (&+ (&i* $P $A) $v)))
+      "的形式. 假定" $A "可逆, 我们得到"
+      (MB (&= $P (&- (&i* (_ $P $bull) (inv $A))
+                     (&i* $v (inv $A)))))
+      "也就是说, 这个逆变换同样是仿射变换. 实际上, PostScript拥有一个计算逆变换的命令, 即"
+      (Code "invertmatrix") ". 另外, " (Code "concatmatrix") "可以用来计算变换的复合. "
+      "它们的用法如下."
+      (CodeB "M matrix invertmatrix")
+      "这可以将" (Code "M") "的逆变换置于栈上."
+      (CodeB "A B matrix concatmatrix")
+      "这可以将" (Code "A") "和" (Code "B") "的复合置于栈上. "
+      "[译注: 先施行变换" (Code "A") ", 后施行变换" (Code "B") ".]")
+   (P "显然, 我们可以藉由这些操作来计算从用户到页面坐标系的变换."
+      (CodeB "/user-to-page-matrix {
+  matrix currentmatrix
+  matrix defaultmatrix
+  matrix invertmatrix
+  matrix concatmatrix
+} def")
+      "当前变换是" (&-> 'user 'physics) ", 默认变换是"
+      (&-> 'page 'physics) ", 逆就是" (&-> 'physics 'page)
+      ", 当前变换和{默认变换的逆}复合一下就得到了"
+      (&-> 'user 'page) ".")
+   (H3 "第4.3节 绘制坐标系")
+   (H3 "第4.4节 移入三维")
+   (P "注记: 本节考虑的不是三维的仿射变换的情形, 而是仿射坐标系的诸多事宜.")
+   (P "实际上, 我们可以在三维的情况下用线性变换表示二维的仿射变换."
+      def:affine-transformation
+      "可以被重写为"
+      (MB (&= (Mat ((_ $x $bull) (_ $y $bull) $1))
+              (&i* (Mat ($x $y $1))
+                   (Mat ($a $b $0)
+                        ($c $d $0)
+                        ($e $f $1)))))
+      "这样之后, 仿射变换的复合就变成纯粹的矩阵乘法了.")
+   (H3 "第4.5节 坐标变换是如何进行的")
+   (P "现在我们可以检视如何以矩阵表示先前的几种简单变换."
+      (CodeB "a b scale")
+      (MB (Mat ($a $0 $0)
+               ($0 $b $0)
+               ($0 $0 $1)))
+      (CodeB "x rotate")
+      (MB (Mat ((&cos $x) (&sin $x) $0)
+               ((&- (&sin $x)) (&cos $x) $0)
+               ($0 $0 $1)))
+      (CodeB "a b translate")
+      (MB (Mat ($1 $0 $0)
+               ($0 $1 $0)
+               ($a $b $1)))
+      "当然了, 最一般的变换如下."
+      (CodeB "[a b c d e f] concat")
+      (MB (Mat ($a $b $0)
+               ($c $d $0)
+               ($e $f $1)))
+      "以上这些变换的效果都是给当前矩阵" (B "左乘") "其变换矩阵.")
+   ((exercise #:n "6")
+    "在变换"
+    (CodeB "72 72 scale
+4 5 translate
+30 rotate")
+    "之后, 从用户到页面坐标系的变换矩阵应该是什么?")
+   (P "在Racket写了点简单的程序算一算."
+      (CodeB "> (matrix-print
+   (matrix* (make-scale 72 72)
+            (make-translation 4 5)
+            (make-rotation (/ pi 6))))
+62.353829072479584 -35.99999999999999 288 
+35.99999999999999 62.353829072479584 360 
+0 0 1 ")
+      "当然, 我的这个采用的是通行的左乘而不是PostScript的右乘, 所以结果应该是其转置."
+      (CodeB "GS>/user-to-page-matrix {
+  matrix currentmatrix
+  matrix defaultmatrix
+  matrix invertmatrix
+  matrix concatmatrix
+} def
+GS>72 72 scale
+GS>4 5 translate
+GS>30 rotate
+GS>user-to-page-matrix
+GS&lt;1>==
+[62.3538284 36.0 -36.0 62.3538284 288.0 360.0]
+GS>")
+      "我们再在PostScript的REPL里算一遍, 的确如此.")
    (H2 "第5章 绘制多边形: 循环和数组")
    (H2 "第6章 曲线")
    

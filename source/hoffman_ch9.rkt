@@ -1,11 +1,8 @@
 #lang racket
-(provide hoffman_ch9.html)
+(provide div:hoffman_ch9)
 (require SMathML "linear_algebra_utils.rkt")
-(define hoffman_ch9.html
-  (TmPrelude
-   #:title "线性代数 第9章 内积空间上的算子"
-   #:css "styles.css"
-   (H1 "线性代数")
+(define div:hoffman_ch9
+  (TmDiv
    (H2 "第9章 内积空间上的算子")
    (H3 "第9.1节 引论")
    (H3 "第9.2节 内积空间上的形式")

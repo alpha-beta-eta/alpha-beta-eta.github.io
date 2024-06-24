@@ -20,3 +20,18 @@
 (define $sup0 (Mi "sup"))
 (define (&sup0 X)
   (ap $sup0 X))
+(define (insert-before-last x lst)
+  (let r ((a (car lst)) (d (cdr lst)))
+    (if (null? (cdr d))
+        (cons a (cons x d))
+        (cons a (r (car d) (cdr d))))))
+(define (..lize &)
+  (lambda arg*
+    (apply & (insert-before-last $..c arg*))))
+(define &..i* (..lize &i*))
+(define (&..cm . arg*)
+  (apply &cm (insert-before-last $..h arg*)))
+(define LC0
+  (case-lambda
+    ((k u) (&+ $..c (&i* k u)))
+    ((k u . arg*) (&+ (&i* k u) (apply LC0 arg*)))))

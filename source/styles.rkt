@@ -15,26 +15,28 @@
      (font-weight "400"))
     ("h1, h2, h3, h4, h5, h6, a, b"
      (font-weight "700"))
+    ("a"
+     (text-decoration "none"))
     ("code"
      (font-family "JBMono")
      (color "white")
      (background-color "black")
      (font-variant-ligatures "none"))
-    ("ms"
-     (font-family "JBMono")
-     (color "white")
-     (background-color "black"))
     ("pre:has(> code)"
      (background-color "black"))
-    (Em
+    ("Em"
      (font-style "normal")
      (font-family "Courier, KaiTi"))
-    (".qed"
-     (text-align "right"))
     ("math"
      (font-family "LatinModern, SHSerif"))
     ("mtext"
      (font-weight "400"))
+    ("ms"
+     (font-family "JBMono")
+     (color "white")
+     (background-color "black"))
+    (".qed"
+     (text-align "right"))
     ("cite"
      (font-style "normal"))
     ))

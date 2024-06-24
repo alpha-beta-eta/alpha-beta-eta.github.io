@@ -1,11 +1,8 @@
 #lang racket
-(provide hoffman_ch3.html)
+(provide div:hoffman_ch3)
 (require SMathML "linear_algebra_utils.rkt")
-(define hoffman_ch3.html
-  (TmPrelude
-   #:title "线性代数 第3章 线性变换"
-   #:css "styles.css"
-   (H1 "线性代数")
+(define div:hoffman_ch3
+  (TmDiv
    (H2 "第3章 线性变换")
    (H3 "第3.1节 线性变换")
    (P "我们将引入线性变换, 本书的剩余部分我们将研究的对象. 读者或许会发现阅读 (或重读) "

@@ -26,16 +26,6 @@
          "smathml_comments.rkt"
          "hoffman.rkt"
          "linear_algebra_contents.rkt"
-         "hoffman_ch1.rkt"
-         "hoffman_ch2.rkt"
-         "hoffman_ch3.rkt"
-         "hoffman_ch4.rkt"
-         "hoffman_ch5.rkt"
-         "hoffman_ch6.rkt"
-         "hoffman_ch7.rkt"
-         "hoffman_ch8.rkt"
-         "hoffman_ch9.rkt"
-         "hoffman_ch10.rkt"
          "intro.rkt"
          "sos.rkt"
          "prot.rkt"
@@ -79,12 +69,15 @@
          "illustrations.rkt"
          "analysis3_amann.rkt"
          "classical_complex_analysis.rkt"
-         "hoffman_appendix.rkt"
          "analysis_notes.rkt"
          "fdvs.rkt"
          "linear_algebra_notes.rkt"
          "archaeology.rkt"
          "analysis_munkres.rkt"
+         "cat_awodey.rkt"
+         "topology.rkt"
+         "combinatorics_notes.rkt"
+         "asd.rkt"
          
          )
 (define (emit-web)
@@ -173,6 +166,11 @@
   (emitXml linear_algebra_notes.html "../linear_algebra_notes.html")
   (emitXml archaeology.html "../archaeology.html")
   (emitXml analysis_munkres.html "../analysis_munkres.html")
+  (emitXml cat_awodey.html "../cat_awodey.html")
+  (emitXml topology.html "../topology.html")
+  (emitXml hoffman_preface.html "../hoffman_preface.html")
+  (emitXml combinatorics_notes.html "../combinatorics_notes.html")
+  (emitXml asd.html "../asd.html")
   
   )
 (emit-web)
