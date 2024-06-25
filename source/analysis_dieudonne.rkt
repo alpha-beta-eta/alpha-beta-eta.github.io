@@ -2,6 +2,16 @@
 (provide analysis_dieudonne.html)
 (require SMathML)
 (define (&d x y) (appl $d x y))
+(define Union
+  (case-lambda
+    ((a b X) (: (__^^ $Union a b) X))
+    ((a X) (: (__ $Union a) X))
+    ((X) (: $Union X))))
+(define Intersect
+  (case-lambda
+    ((a b X) (: (__^^ $Cap a b) X))
+    ((a X) (: (__ $Cap a) X))
+    ((X) (: $Cap X))))
 (define analysis_dieudonne.html
   (TmPrelude
    #:title "分析专著"
@@ -94,7 +104,22 @@
       ". (实际上即便允许基为空也不会引起任何问题, 例如"
       "空集可以是空拓扑空间的基, 当然这要允许空并操作.)")
    ((proof)
-    ""
+    "如果" (_ (@ $G_lambda) (∈ $lambda $L))
+    "是一个基, 那么对于" $x "的邻域" $V
+    ", 存在开集" (&sub $W $V) "满足" (∈ $x $W)
+    ", 于是" $W "是某个子族的并, 因而存在下标" $mu
+    "使得" (∈ $x $G_mu) ". 如果对于每个" (∈ $x $E) "和每个"
+    $x "的邻域" $V "存在下标" $lambda "满足"
+    (∈ $x (&sub $G_lambda $V)) ", 那么设" $U
+    "是任意的开集, 对于每个" (∈ $x $U)
+    ", 当然" $U "是" $x "的一个邻域, 我们有存在下标"
+    (app $mu $x) "使得" (∈ $x (&sub (_ $G (app $mu $x)) $U))
+    ", 最终" (&sub $U (Union (∈ $x $U) (_ $G (app $mu $x))) $U)
+    ", 即" (&= (Union (∈ $x $U) (_ $G (app $mu $x))) $U) ".")
+   (P (B "(3.9.4) ") "度量空间" $E "是可分空间的充要条件是其存在"
+      "一个至多可数的基 (即第二可数性条件).")
+   ((proof)
+    
     )
    (H3 "第3.10节 度量空间的子空间")
    (H3 "第3.11节 连续映射")
