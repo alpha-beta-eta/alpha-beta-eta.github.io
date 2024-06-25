@@ -110,7 +110,7 @@
     ((V W) (appl $L V W))))
 (define $nullity (Mi "nullity"))
 (define (&nullity T)
-  (app $nullity $T))
+  (app $nullity T))
 (define alpha_1..n
   (&cm $alpha_1 $..h $alpha_n))
 (define $BBB^ (&prime $BBB))
