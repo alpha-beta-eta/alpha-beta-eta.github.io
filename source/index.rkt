@@ -56,6 +56,6 @@
     (H2 (A "线性代数笔记"
            #:attr* '((href "linear_algebra_notes.html"))))
     (H2 (A "计算机科学考古" #:attr* '((href "archaeology.html"))))
-    
+    (H2 (A "范畴论笔记" #:attr* '((href "cat_awodey.html"))))
     )
    ))

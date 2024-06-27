@@ -85,6 +85,7 @@
          "linear_algebra_notes.rkt"
          "archaeology.rkt"
          "analysis_munkres.rkt"
+         "cat_awodey.rkt"
          
          )
 (define (emit-web)
@@ -173,6 +174,7 @@
   (emitXml linear_algebra_notes.html "../linear_algebra_notes.html")
   (emitXml archaeology.html "../archaeology.html")
   (emitXml analysis_munkres.html "../analysis_munkres.html")
+  (emitXml cat_awodey.html "../cat_awodey.html")
   
   )
 (emit-web)
