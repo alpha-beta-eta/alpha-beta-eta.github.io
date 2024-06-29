@@ -86,6 +86,7 @@
          "archaeology.rkt"
          "analysis_munkres.rkt"
          "cat_awodey.rkt"
+         "topology.rkt"
          
          )
 (define (emit-web)
@@ -175,6 +176,7 @@
   (emitXml archaeology.html "../archaeology.html")
   (emitXml analysis_munkres.html "../analysis_munkres.html")
   (emitXml cat_awodey.html "../cat_awodey.html")
+  (emitXml topology.html "../topology.html")
   
   )
 (emit-web)
