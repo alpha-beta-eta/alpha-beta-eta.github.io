@@ -1,6 +1,14 @@
 #lang racket
 (provide (all-defined-out))
 (require SMathML)
+(define (insert-before-last x lst)
+  (let r ((a (car lst)) (d (cdr lst)))
+    (if (null? (cdr d))
+        (cons a (cons x d))
+        (cons a (r (car d) (cdr d))))))
+(define (..lize &)
+  (lambda arg*
+    (apply & (insert-before-last $..c arg*))))
 (define (set-left d)
   (set-attr* d 'columnalign "left"))
 (define (set-right d)
@@ -241,7 +249,13 @@
   (@wedge &wedge)
   
   )
-
+(define &..+ (..lize &+))
+(define &..i* (..lize &i*))
+(define &..d+ (..lize &d+))
+(define (&..cm . arg*)
+  (apply &cm (insert-before-last $..h arg*)))
+(define &..< (..lize &<))
+(define &..>= (..lize &>=))
 (define (n2s n)
   (format "~s" (exact-round n)))
 (define (s2n s)
