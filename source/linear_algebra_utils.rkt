@@ -1,6 +1,13 @@
 #lang racket
 (provide (all-defined-out))
 (require SMathML)
+(define $T^+ (^ $T $+))
+(define (&T^+ n) (app $T^+ n))
+(define $GL (Mi "GL"))
+(define (&GL n) (app $GL n))
+(define (normalize u)
+  (~ u (&norm u)))
+(define e^iθ (^ $e (&i* $i $theta)))
 (define TmDiv (compose Tm Div))
 (define $perp (Mo "&perp;"))
 (define (&perp W) (^ W $perp))
@@ -54,6 +61,13 @@
      (brac
       (set-right
        (&Table (x ...) ...))))))
+(define-syntax BigMat
+  (syntax-rules ()
+    ((_ (x ...) ...)
+     (brac
+      (set-attr*
+       (&Table (x ...) ...)
+       'displaystyle "true")))))
 (define (subdetC J . a*)
   (apply appl (_ $D J) a*))
 (define (subdet I J M)
