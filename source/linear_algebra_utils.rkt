@@ -1,6 +1,15 @@
 #lang racket
 (provide (all-defined-out))
 (require SMathML)
+(define (Lorentz^2 u)
+  (_^ (&norm u) $L $2))
+(define (Lorentz u) (_ (&norm u) $L))
+(define iaut
+  (case-lambda
+    ((T) (&i* $U T (inv $U)))
+    ((T U) (&i* U T (inv U)))))
+(define @iaut (@lize iaut))
+(define $phiv (Mi "&phiv;"))
 (define $T^+ (^ $T $+))
 (define (&T^+ n) (app $T^+ n))
 (define $GL (Mi "GL"))
