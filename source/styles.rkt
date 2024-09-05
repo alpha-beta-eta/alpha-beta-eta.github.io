@@ -12,7 +12,8 @@
      (src "url('fonts/SourceHanSerifCN-VF.otf.woff2') format('woff2')"))
     ("body"
      (font-family "SHSerif")
-     (font-weight "400"))
+     (font-weight "400")
+     (quotes "'\\\"' '\\\"'"))
     ("h1, h2, h3, h4, h5, h6, a, b"
      (font-weight "700"))
     ("a"
@@ -47,4 +48,5 @@
      (height "225px"))
     (".label"
      (break-inside "avoid"))
+    
     ))

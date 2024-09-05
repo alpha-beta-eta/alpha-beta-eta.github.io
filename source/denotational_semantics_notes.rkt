@@ -102,11 +102,6 @@
   (:arr p1 p2))
 (define (_cm x . i*)
   (_ x (apply &cm i*)))
-(define Cup
-  (case-lambda
-    ((S) (: $Union S))
-    ((a S) (: (__ $Union a) S))
-    ((a b S) (: (__^^ $Union a b) S))))
 (define (set-compact x)
   (set-attr* x 'lspace "0" 'rspace "0"))
 (define $LUB (Mo "&bigsqcup;"))
@@ -115,8 +110,7 @@
     ((d x) (: (__ $LUB d) x))
     ((d l x) (: (__^^ $LUB d l) x))
     ((x) (: $LUB x))))
-(define (@LUB . x*)
-  (pare (apply LUB x*)))
+(define @LUB (@lize LUB))
 (define $fix (Mi "fix"))
 (define (&fix f) (app $fix f))
 (define $dom (Mi "dom"))
@@ -197,7 +191,6 @@
 (define (UnderBar x)
   (Munder x $UnderBar))
 (define $conj (Mo "&amp;"))
-(define $<=> (Mo "&hArr;"))
 (define $def<=> (^^ $<=> $def))
 (define-infix*
   (&::= $::=)
@@ -209,7 +202,6 @@
   (&=> $=>)
   (&and $conj)
   (&or $disj)
-  (&<=> $<=>)
   (&def<=> $def<=>)
   (&sqsube_1 $sqsube_1)
   (&sqsube_2 $sqsube_2))
@@ -1500,7 +1492,183 @@
                    (_ $bottom $D_2)))))
      "height: 300px")
     "幻灯片32")
-   ((proposition #:n "1")
+   ((proposition #:n "1. 投影和配对")
+    "令" $D_1 "和" $D_2 "是cpo, 那么投影"
+    (MB (func:def $pi_1 (&c* $D_1 $D_2) $D_1
+                  (tu0 $d_1 $d_2) $d_1))
+    "和"
+    (MB (func:def $pi_2 (&c* $D_1 $D_2) $D_2
+                  (tu0 $d_1 $d_2) $d_2))
+    "是连续函数. 如果" (func $f_1 $D $D_1)
+    "和" (func $f_2 $D $D_2) "是连续函数, 其中"
+    $D "是一个cpo, 那么"
+    (MB (func:def (tupa0 $f_1 $f_2) $D (&c* $D_1 $D_2)
+                  $d (tu0 (app $f_1 $d) (app $f_2 $d))))
+    "是连续的.")
+   ((proof)
+    "这些函数的连续性可由幻灯片32上对于" (&c* $D_1 $D_2)
+    "中的链的最小上界的刻画直接推出.")
+   ((proposition #:n "2")
+    "对于每个domain " $D ", 函数"
+    (MB (func:def 'if (&c* (_ $BB $bottom) (@ (&c* $D $D))) $D
+                  (tu0 $x (tu0 $d $d^))
+                  (Choice0
+                   ($d ", 如果" (&= $x $true))
+                   ($d^ ", 如果" (&= $x $false))
+                   ((_ $bottom $D) ", 如果" (&= $x $bottom)))))
+    "是连续的.")
+   (P "我们将会需要以下更一般的积构造.")
+   ((definition #:n "3. 依赖积")
+    "给定集合" $I ", 设对于每个" (∈ $i $I) "我们有一个cpo "
+    (tu0 $D_i (_ $sqsube:compact $i)) ", 那么这个cpo族之"
+    (Em "积") "为"
+    (Ul (Li "基础集是集合" $D_i "的" $I "重笛卡尔积"
+            (prod (∈ $i $I) $D_i) ", 其由所有这样的函数"
+            $p "构成, " $p "定义在" $I "上, 而" $p "在每个"
+            (∈ $i $I) "处的值" (∈ (app $p $i) $D_i) ";")
+        (Li "偏序" $sqsube "为"
+            (MB (&def<=> (&sqsube $p $p^)
+                         (forall (∈ $i $I)
+                                 (: (app $p $i)
+                                    (_ $sqsube $i)
+                                    (app $p^ $i)))) ".")))
+    "就和二元积的情况一样, "
+    (tu0 (prod (∈ $i $I) $D_i) $sqsube:compact)
+    "中的链的最小上界也可以逐分量计算: 如果"
+    (&sqsube $p_0 $p_1 $p_2 $..h)
+    "是积cpo中的一个链, 那么其最小上界是将每个"
+    (∈ $i $I) "映射至" $D_i "中的链"
+    (&sqsube (app $p_0 $i) (app $p_1 $i) (app $p_2 $i) $..h)
+    "的最小上界的函数, 即"
+    (MB (&cm (&= (app (@LUB (&>= $n $0) $p_n) $i)
+                 (LUB (&>= $n $0) (app $p_n $i)))
+             (∈ $i $I)) ".")
+    "而且, 对于每个" (∈ $i $I) ", 第" $i "投影函数"
+    (MB (func:def $pi_i (prod (∈ $j $I) $D_j) $D_i
+                  $p (app $p $i)))
+    "是连续的. 如果每个" $D_i "都是domain, 那么它们的积"
+    "也是domain, 并且其最小元是将每个" (∈ $i $I)
+    "映射至" $D_i "的最小元的函数.")
+   (&label
+    (set-style
+     (make-slide
+      "两个参数的连续函数"
+      ((proposition)
+       "令" (&cm $D $E $F) "是cpo, 那么函数"
+       (func $f (&c* $D $E) $F) "是单调的当且仅当"
+       "其对于每个参数分别都是单调的:"
+       (MB (forall (&cm (∈ $d $d^ $D) (∈ $e $E))
+                   (&=> (&sqsube $d $d^)
+                        (&sqsube (appl $f $d $e)
+                                 (appl $f $d^ $e)))))
+       (MB (forall (&cm (∈ $d $D) (∈ $e $e^ $E))
+                   (&=> (&sqsube $e $e^)
+                        (&sqsube (appl $f $d $e)
+                                 (appl $f $d $e^)))))
+       "而且, 其是连续的当且仅当其对于每个参数分别都是连续的 "
+       "[译注: 在单调的基础之上, 也就是对于每个参数分别都是"
+       "保持链的最小上界的]:"
+       (MB (&= (appl $f (LUB (&>= $n $0) $d_n) $e)
+               (LUB (&>= $n $0) (appl $f $d_n $e))))
+       (MB (preserve
+            (lambda (e) (appl $f $d e))
+            (lambda (e_n) (LUB (&>= $n $0) e_n))
+            $e_n))))
+     "height: 300px")
+    "幻灯片33")
+   (&label
+    (make-slide
+     "两个参数的连续函数: 推导规则"
+     (Ul (Li "在" $f "单调的情况下, 我们有"
+             (MB (&rule (&sqsube $x $x^)
+                        (&sqsube $y $y^)
+                        (&sqsube (appl $f $x $y)
+                                 (appl $f $x^ $y^)))))
+         (Li "在" $f "连续的情况下, 我们有"
+             (MB (&rule
+                  (&= (appl $f (LUB (&>= $m $0) $x_m)
+                            (LUB (&>= $n $0) $y_n))
+                      (LUB (&>= $k $0)
+                           (appl $f $x_k $y_k))))))))
+    "幻灯片34")
+   ((proof)
+    "&quot;仅当&quot;的方向是直接的, 其证明依赖于简单的观察, 即"
+    (&=> (&sqsube $d $d^) (&sqsube (tu0 $d $e) (tu0 $d^ $e))) "和"
+    (preserve (lambda (d) (tu0 d $e))
+              (lambda (d_n) (LUB (&>= $n $0) d_n))
+              $d_n)
+    ", 以及它们之于右参数的对偶版本. 对于&quot;当&quot;的方向, "
+    "首先设" $f "对于每个参数分别都是单调的, 那么如果"
+    (&c* $D $E) "中有" (&sqsube (tu0 $d $e) (tu0 $d^ $e^))
+    ", 根据二元积的定义, 我们可以推出" $D "中有"
+    (&sqsube $d $d^) "而" $E "中有" (&sqsube $e $e^) ", 因此"
+    (eqn*
+     ((appl $f $d $e) $sqsube (appl $f $d^ $e) "根据对于第一个参数的单调性")
+     ($ $sqsube (appl $f $d^ $e^) "根据对于第二个参数的单调性"))
+    "于是, " (&sqsube (appl $f $d $e) (appl $f $d^ $e^))
+    ", 即" $f "是单调函数." (Br)
+    "现在设" $f "对于每个参数分别都是连续的, 那么如果"
+    (&sqsube (tu0 $d_0 $e_0) (tu0 $d_1 $e_1) (tu0 $d_2 $e_2) $..h)
+    "是二元积中的一个链, 我们有"
+    (eqn*
+     ((app $f (LUB (&>= $n $0) (tu0 $d_n $e_n)))
+      $= (appl $f (LUB (&>= $i $0) $d_i) (LUB (&>= $j $0) $e_j))
+      "见幻灯片32")
+     ($ $= (LUB (&>= $i $0) (appl $f $d_i (LUB (&>= $j $0) $e_j)))
+        "根据对于第一个参数的连续性")
+     ($ $= (LUB (&>= $i $0) (LUB (&>= $j $0) (appl $f $d_i $e_j)))
+        "根据对于第二个参数的连续性")
+     ($ $= (LUB (&>= $n $0) (appl $f $d_n $e_n))
+        "根据幻灯片27上的引理"))
+    "而这就说明了" $f "的连续性.")
+   (H3 "第3.3节 函数domain")
+   (P "两个cpo/domain之间的所有连续函数的集合可以赋予一个偏序"
+      "而成为一个cpo/domain, 见幻灯片35. 有时我们也用术语"
+      "&quot;指数cpo/domain (exponential cpo/domain)&quot;"
+      "而不是&quot;函数cpo/domain&quot;.")
+   (&label
+    (set-style
+     (make-slide
+      "函数cpo和domain"
+      "给定cpo " (tu0 $D (_ $sqsube:compact $D)) "和"
+      (tu0 $E (_ $sqsube:compact $E)) ", 函数cpo "
+      (tu0 (&-> $D $E) $sqsube:compact)
+      "的基础集为 [译注: 以下符号有点过载]"
+      (MB (&def= (@-> $D $E)
+                 (setI (func $f $D $E) (: $f "连续"))))
+      "而偏序为"
+      (MB (&def<=> (&sqsube $f $f^)
+                   (forall (∈ $d $D)
+                           (: (app $f $d)
+                              (_ $sqsube $E)
+                              (app $f^ $d)))))
+      "推导规则:"
+      (MB (&rule (: $f (_ $sqsube (@-> $D $E)) $g)
+                 (: $x (_ $sqsube $D) $y)
+                 (: (app $f $x)
+                    (_ $sqsube $E)
+                    (app $g $y)))))
+     "height: 250px")
+    "幻灯片35")
+   (&label
+    (make-slide
+     "函数cpo和domain (续)"
+     "链的最小上界可以逐参数计算:"
+     (MB (&= (LUB (&>= $n $0) $f_n)
+             (lam (∈ $d $D)
+                  (LUB (&>= $n $0)
+                       (app $f_n $d)))))
+     "推导规则:"
+     (MB (&rule
+          (&= (app (@LUB (&>= $n $0) $f_n)
+                   (LUB (&>= $n $0) $x_n))
+              (LUB (&>= $k $0) (app $f_k $x_k)))))
+     "如果" $D "和" $E "还是domain, 那么" (&-> $D $E)
+     "也成为一个domain, 并且最小元为"
+     (MB (func:def (_ $bottom (&-> $D $E))
+                   $D $E $d (_ $bottom $E)) "."))
+    "幻灯片36")
+   ((proof)
     
     )
    (H2 "第4章 Scott归纳")

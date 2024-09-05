@@ -218,7 +218,7 @@
         (if auto?
             `(,tag ,(attr*-set attr* 'id id) ,(format-section section level)
                    " " . ,xml*)
-            `(,tag ,(attr*-set attr* 'id id) " " . ,xml*)))
+            `(,tag ,(attr*-set attr* 'id id) . ,xml*)))
       (error 'default-heading0-present "invalid level ~s" level)))
 (define (default-heading0-cite %heading0)
   (define id (%heading-id %heading0))

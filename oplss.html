@@ -1,1 +1,12 @@
-<html><head><meta charset="utf-8"/><title>OPLSS</title><link href="styles.css" rel="stylesheet"/></head><body><h1>OPLSS 俄勒冈编程语言暑期学校</h1><p>老实说, 我觉得我压根不懂编程语言. 当然, 这不妨碍我从OPLSS中汲取智慧. 这里是我的一些翻译, 一些笔记?</p></body></html>
+<html><head><meta charset="utf-8"/><title>OPLSS</title><link href="styles.css" rel="stylesheet"/></head><body><h1>OPLSS 俄勒冈编程语言暑期学校</h1><p>老实说, 我觉得我压根不懂编程语言. 当然, 这不妨碍我从OPLSS中汲取智慧. 这里是我的一些翻译, 一些笔记?</p><h2>Probabilistic Programming from the Ground Up (2024)</h2><h3>Lecture 1</h3><p>我们呈现了Tiny PPL, 其句法:<pre><code>pure terms
+&lt;p> ::= true
+     |  false
+     |  &lt;var>
+     |  (if &lt;p> &lt;p> &lt;p>)
+     |  (disj &lt;p> &lt;p>)
+     |  (conj &lt;p> &lt;p>)
+
+effectful or probabilistic terms
+&lt;e> ::= (let &lt;var> &lt;e> &lt;e>)
+     |  (return &lt;p>)
+     |  (flip &lt;theta>)</code></pre>其语义:<br/>首先我们考虑pure term的语义, 当然其是相对于环境而言的.<math display="block"><mrow><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>p</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow><mo>:</mo><mrow><mi>env</mi><mo>&rarr;</mo><mi>bool</mi></mrow></mrow></math></p></body></html>

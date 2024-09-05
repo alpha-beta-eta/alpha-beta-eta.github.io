@@ -1,6 +1,33 @@
 #lang racket
 (provide sewpr.html)
 (require SMathML)
+(define $FV (Mi "FV" #:attr* '((mathvariant "script"))))
+(define (&FV M) (app $FV M))
+(define (subst M X N)
+  (: M (bra0 (&<- X N))))
+(define $uarr (Mo "&uarr;"))
+(define align:thin
+  (Ttable
+   (lambda (d i j)
+     (cond ((= j 0) (set-attr* d 'columnalign "right"))
+           ((>= j 2) (set-attr* d 'columnalign "left"))
+           (else d)))))
+(define-syntax-rule (eqn* (x ...) ...)
+  (MB (set-attr*
+       (align:thin
+        (&Table (x ...) ...))
+       'displaystyle "true")))
+(define $lceil (Mo "&lceil;"))
+(define $rceil (Mo "&rceil;"))
+(define (numeral n)
+  (: $lceil n $rceil))
+(define $beta_v:sans-serif
+  (_ $beta $v:sans-serif))
+(define (APP . M*)
+  (apply @ M*))
+(define $. (Mo "." #:attr* '((lspace "0") (rspace "0"))))
+(define (LAM X M)
+  (@ $lambda X $. M))
 (define $<- (Mo "&larr;"))
 (define $-- (Mo "-"))
 (define $or (Mo "&or;"))
@@ -22,6 +49,7 @@
 (define $->> (Mo "&Rarr;"))
 (define $->>r (_ $->> $r:bold))
 (define $=r (_ $= $r:bold))
+(define $cup (Mo "&cup;"))
 (define-infix*
   (&dot $dot)
   (&Implies $Implies)
@@ -36,7 +64,7 @@
   (&refl_r $refl_r)
   (&=r $=r)
   (&<- $<-)
-  
+  (&cup $cup)
   )
 (define (@dot . x*)
   (@ (apply &dot x*)))
@@ -688,15 +716,170 @@
    (H4 "第3.10节 历史")
    
    (H3 "第4章 ISWIM")
+   (P "在1950年代晚期和1960年代早期, 人们发现"
+      "编程语言和" $lambda "演算的诸多方面"
+      "之间存在联系. 这里的动机是多样的, "
+      "有的只是想要刻画Algol 60的语义, "
+      "而有的是试图通过已经得到良好理解的数学系统"
+      "来理解整个编程语言领域的面貌. "
+      "实际上, 人们希望学会如何系统设计编程语言.")
+   (P "Landin是这群研究者之中的新星. "
+      "他设计了一种被称为ISWIM的基于" $lambda
+      "演算的语言, 并探索了其通过抽象或者说虚拟机器的"
+      "应用和实现. 不严格地说, ISWIM几乎是一个函数式编程语言, "
+      "Scheme编程语言是其最近的亲戚. "
+      "[译注: 当然, 有的人可能认为Standard ML之类的语言比"
+      "Scheme更加接近于ISWIM. 另外, ISWIM其实是一类语言, "
+      "而不是一个语言.]")
+   (P "虽然人们欣赏ISWIM的表达力并将其当作灵感的源泉, "
+      "人们也意识到ISWIM和" $lambda "演算之间的关系"
+      "并不那么直接. Plotkin最终设计了" $lambda
+      "演算的一个变种, 其与ISWIM有着直接而自然的对应关系. "
+      "他也表明了, 这种对应是一般性的原则. "
+      "他将这原则具体化为了ISWIM的两个变种: "
+      "call-by-name和call-by-value.")
+   (P "这一章和接下来的一章里我们呈现了ISWIM, 其演算, 以及"
+      "ISWIM和演算之间的关系. 具体来说, 本章呈现了ISWIM的"
+      "句法和ISWIM的&quot;算术&quot;系统. 这包含一个求值器"
+      "的定义以及对于这个求值器所定义的最广泛等式系统的探索. "
+      "接下来的一章展现了" $lambda "演算的一个元定理"
+      "是如何自然地定义了ISWIM的一个高层次的抽象机器的.")
    (H4 "第4.1节 ISWIM表达式")
+   (P "ISWIM是一族编程语言, 根据字面常量和原始运算符"
+      "而有所不同. ISWIM族的每一语言都扩展了" $lambda
+      "演算的句法以基本常量的集合" $b "和一族多元函数"
+      $o^n ".")
+   (MB (deriv0 (&cm $M $N $L $K) $= $X
+               $lv (LAM $X $M)
+               $lv (APP $M $M)
+               $lv $b
+               $lv (APP $o^n $M $..h $M)))
+   (P "这里的" $o^n "里的" $n "不是确定的, 其代表了原始运算符的"
+      "参数数目 (元数), 并且我们额外限制这个应用的实际参数的数目"
+      "必须等于相应的原始运算符的元数.")
+   (P "为了明确起见, 我们使用"
+      (eqn* ($b $= (setI (numeral $n) (∈ $n $ZZ)))
+            ($o^1 $= (setE (Ms "add1") (Ms "sub1") (Ms "iszero")))
+            ($o^2 $= (setE $+ $- $* $uarr)))
+      "其中" (numeral $n) "是表示数字" $n "的numeral.")
+   (P $FV "和" (subst $d* $d* $d*) "可以自然地扩展至新的句法上来."
+      (MB (eqn* ((&FV $b) $= $empty)
+                ((&FV $X) $= (setE $X))
+                ((&FV (LAM $X $M)) $= (&- (&FV $M) (setE $X)))
+                ((&FV (APP $M_1 $M_2))
+                 $= (&cup (&FV $M_1) (&FV $M_2)))
+                ((&FV (APP $o^n $M_1 $..h $M_n))
+                 $= (&cup (&FV $M_1) $..c (&FV $M_n)))))
+      (MB (eqn* ((subst $b $X $M) $= $b)
+                ((subst $X_1 $X_1 $M) $= $M)
+                ((subst $X_2 $X_1 $M)
+                 $= (: $X_2 ", 其中" (&!= $X_1 $X_2)))
+                ((subst (LAM $X_1 $M_1) $X_1 $M_2)
+                 $= (LAM $X_1 $M_1))
+                ((subst (LAM $X_1 $M_1) $X_2 $M_2)
+                 $= (LAM $X_3 (subst (subst $M_1 $X_1 $X_3) $X_2 $M_2)))
+                ($ $ (: "其中" (eqn* ($X_1 $!= $X_2)
+                                   ($X_3 $!in (&FV (LAM $X_1 $M_1)))
+                                   ($X_3 $!in (&FV $M_2)))))
+                ((subst (APP $M_1 $M_2) $X $M_3)
+                 $= (APP (subst $M_1 $X $M_3) (subst $M_2 $X $M_3)))
+                ((subst (APP $o^n $M_1 $..h $M_n) $X $M)
+                 $= (APP $o^n (subst $M_1 $X $M) $..h
+                         (subst $M_n $X $M))))))
    (H4 "第4.2节 使用ISWIM进行计算")
+   (P "受到Algol 60的call-by-value参数传递机制的启发, Landin以类似的方式"
+      "设计了ISWIM的函数. 也就是说, 在ISWIM之中, 一个函数应用在函数取得控制之前"
+      "对于其实际参数求值. 这么做可以消除在函数体中对于一个参数多次求值或者"
+      "追踪一个参数是否已经被求值过了的开销. 这也排除了纯粹" $lambda
+      "演算中的一些incongruities, 例如表达式"
+      (MB (APP (LAM $x (numeral $1))
+               (APP (Ms "sub1") (LAM $y (LAM $x $y)))))
+      "将" (Ms "sub1") "应用于一个并非numeral的东西 [译注: 从句法上说], "
+      "会被call-by-value的参数传递机制发现. 而在纯粹" $lambda
+      "演算之中, 这种错误应用 (mis-application) 因为可以直接施行" $beta
+      "规约而不会被发现.")
+   (P "因为ISWIM的函数只接受被求值了的参数, 那么我们必须首先规定何谓"
+      (B "值") ". 从直觉上说, 值是对其求值可以立即知道结果的项. "
+      "[译注: 一般我们在操作语义之中采用这种观点, 在其他场合, 值还有另外的含义.] "
+      "或者说, 值是任意的表达式在规约过程之中的目的地. 我们定义值的集合如下:"
+      (MB (deriv0 (&cm $V $U $W) $= $b
+                  $lv $X
+                  $lv (LAM $X $M)))
+      "基本的常量当然是值, " $lambda "抽象也是值, 不论其体的形状如何. "
+      "因此, Landin将函数作为第一级对象的想法引入了编程语言的研究之中. "
+      "[译注: 至于第一级对象这个想法或者说术语, 最早提出者应该是Christopher Strachey, "
+      "他也算是指称语义学的奠基人之一.]")
+   (P "应用不可能是一个值, 因为它就像刻画计算的发动机一样. 变量也是值, "
+      "不过这值得额外的解释. " $lambda "演算中的变量有且只有一种目的: "
+      "作为形式参数 (formal argument) 或者说" (B "parameter")
+      ". 对于一个程序员而言, parameter的作用在于为函数的实际参数充当占位符号 "
+      "(place holder). 既然ISWIM的函数只能消化值, 那么变量就总是代表值. "
+      "因此, 我们暂时也将变量看成是值. 第4.7节回顾了这个决定.")
+   (P "基于对于值的刻画, 现在我们可以定义ISWIM的基本规约概念."
+      (MB (eqn* ((APP (LAM $X $M) $V)
+                 $beta_v:sans-serif
+                 (subst $M $X $V))))
+      "这个关系有别于" $beta ", 因为参数必须是" $V "的成员. "
+      "在ISWIM中, 你不能将任意的项替换进函数的体里.")
+   (P "限制参数必须是一个值迫使参数表达式的规约在对于函数应用求值之前进行. 例如, "
+      (APP (LAM $X (numeral $1)) (APP (Ms "sub1") (LAM $y $y)))
+      "就不能被规约至" (numeral $1) ", 因为"
+      (&!in (APP (Ms "sub1") (LAM $y $y)) $V) ".")
+   (P "除了函数应用, 计算ISWIM的系统还必须考虑原始运算. "
+      "既然ISWIM是随着常量集和原始运算符集的改变而变化的"
+      "一族语言, 那么对于这些集合我们需要一个足够一般的"
+      "规约概念, 因而我们引入了一个部分" $delta "函数:"
+      (MB (func $delta (&c* $o^n $b $..c $b) $V))
+      "也就是说, " $delta "将" $o^n "的元素和" $n
+      "个基本常量映射至一个值. 添加" $delta
+      "至演算引入了第二种规约概念.")
+   (P "对于我们之前约定好了的常量和运算符, 我们选择了以下具体的"
+      $delta "函数."
+      (eqn*
+       ((appl $delta (Ms "add1") (numeral $m))
+        $= (numeral (&+ $m $1)))
+       ((appl $delta (Ms "sub1") (numeral $m))
+        $= (numeral (&- $m $1)))
+       ((appl $delta (Ms "iszero") (numeral $0))
+        $= (LAM $x (LAM $y $x)))
+       ((appl $delta (Ms "iszero") (numeral $n))
+        $= (LAM $x (LAM $y $y)) (: ",&nbsp;" (&!= $n $0)))
+       ((appl $delta $+ (numeral $m) (numeral $n))
+        $= (numeral (&+ $m $n)))
+       ((appl $delta $- (numeral $m) (numeral $n))
+        $= (numeral (&- $m $n)))
+       ((appl $delta $* (numeral $m) (numeral $n))
+        $= (numeral (&d* $m $n)))
+       ((appl $delta $uarr (numeral $m) (numeral $n))
+        $= (numeral $m^n)))
+      
+      )
    (H4 "第4.3节 " $alpha ", " $eta "和商")
    
    (H3 "第5章 抽象句法机器")
-
+   (P "ISWIM求值器的定义是优雅的, 但是难于实现. "
+      "为了确定一个程序的结果, 程序员可以自由地"
+      "应用等式系统的规则以任意的顺序, 以任意的方向, "
+      "在程序的任意位置. 然而, 这种灵活性并非将"
+      "求值器实现为(元)程序的良好基础. 根据一致性定理, "
+      
+      )
    (H3 "第6章 抽象寄存器机器")
+   (P "依照所处的上下文, 求值器的效率可能并不重要. 例如, 如果"
+      )
    (H4 "第6.1节 CC机器")
-   
+   (P "前一章的句法机器的每个求值循环中都需要执行三个步骤. "
+      "首先, 其需要判断程序是否是一个值; 如果是的话, 那么"
+      "机器就停止了. 其次, 或者说程序并非一个值, 那么机器"
+      "会将程序分成一个求值上下文" $E "和一个应用"
+      (APP $U $V) "或者" (APP $o^n $V_1 $..h $V_n)
+      ". 最后, 如果这个应用是一个" $beta_v:sans-serif
+      "或者" $delta "可规约表达式, 那么机器会构造contractum "
+      $M ", 然后填充求值上下文" $E "以" $M
+      ". 这一步的结果是下一个机器状态, 于是求值循环又重新再来.")
+   (P "这个机器显见的低效之处在于反复将程序分成一个求值上下文和"
+      "一个可规约表达式. "
+      )
    (H4 "第6.2节 SCC机器")
    
    (H4 "第6.3节 CK机器")
