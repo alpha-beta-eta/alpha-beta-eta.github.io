@@ -80,6 +80,9 @@
          "asd.rkt"
          "stone_spaces.rkt"
          "denotational_semantics_notes.rkt"
+         "cat_homework.rkt"
+         "topology_via_logic.rkt"
+         "hott.rkt"
          
          )
 (define (emit-web)
@@ -176,6 +179,9 @@
   (emitXml stone_spaces.html "../stone_spaces.html")
   (emitXml denotational_semantics_notes.html
            "../denotational_semantics_notes.html")
+  (emitXml cat_homework.html "../cat_homework.html")
+  (emitXml topology_via_logic.html "../topology_via_logic.html")
+  (emitXml hott.html "../hott.html")
   
   )
 (emit-web)

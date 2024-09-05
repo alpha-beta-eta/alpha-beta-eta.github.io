@@ -1,6 +1,7 @@
 #lang racket
 (provide (all-defined-out))
 (require SMathML)
+(define @inv (@lize inv))
 (define pminor
   (case-lambda
     ((A) (app (_ $Delta:normal $k) A))
