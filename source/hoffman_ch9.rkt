@@ -1139,12 +1139,106 @@
     "而值取于标量域的函数, 那么" (app $f $T) "是一个谱为"
     (app $f $S) "的可对角化正规算子. 如果" $V^
     "也是一个有限维内积空间而" $U "是一个从" $V "到" $V^
-    "的酉算子, 并且" (&= $T^ (&i* $U $T (inv $U))) ", 那么"
+    "的酉映射, 并且" (&= $T^ (&i* $U $T (inv $U))) ", 那么"
     $S "也是" $T^ "的谱而"
     (MB (&= (app $f $T^) (&i* $U (app $f $T) (inv $U))) "."))
    ((proof)
-    
-    )
+    (app $f $T) "的正规性可以根据定义和"
+    (MB (&= (&* (app $f $T))
+            (sum (&= $j $1) $k
+                 (&i* (OverBar (app $f $c_j))
+                      $E_j))))
+    "这一事实通过简单的计算推得. 而且, 显然对于每个"
+    (∈ $alpha (app $E_j $V)) ", 我们有"
+    (MB (&= (ap (app $f $T) $alpha)
+            (&i* (app $f $c_j) $alpha)) ".")
+    "因此, 集合" (app $f $S) "是" (app $f $T)
+    "的谱的子集. 反过来, 设" (&!= $alpha $0) "并且"
+    (MB (&= (ap (app $f $T) $alpha) (&i* $b $alpha)))
+    "那么根据"
+    (MB (&= $alpha (sum (&= $j $1) $k (ap $E_j $alpha))))
+    "由此可以推出"
+    (eqnderiv
+     (ap (app $f $T) $alpha)
+     (sum (&= $j $1) $k
+          (ap (app $f $T) (ap $E_j $alpha)))
+     (sum (&= $j $1) $k
+          (&i* (app $f $c_j) (ap $E_j $alpha)))
+     (sum (&= $j $1) $k
+          (&i* $b (ap $E_j $alpha))))
+    "因而"
+    (eqnderiv
+     (&norm (sum (&= $j $1) $k
+                 (&i* (@- (app $f $c_j) $b)
+                      (ap $E_j $alpha))))
+     (sum (&= $j $1) $k
+          (&i* (&sqr (&abs (&- (app $f $c_j) $b)))
+               (sqrnorm (ap $E_j $alpha))))
+     $0)
+    "所以, 我们可以断言" (&= (app $f $c_j) $b) "或者"
+    (&= (ap $E_j $alpha) $0) ". 根据假设, " (&!= $alpha $0)
+    ", 故存在一个下标" $i "使得" (&!= (ap $E_i $alpha) $0)
+    ". 然后我们就可以推出" (&= (app $f $c_i) $b)
+    ", 也就是说" (app $f $S) "的确是" (app $f $T)
+    "的谱. 实际上, 设"
+    (MB (&= (app $f $S) (setEnum $b_1 $b_r)))
+    "其中当" (&!= $m $n) "时" (&!= $b_m $b_n) ", 也就是互异, 令"
+    (&= $X_m (setI (∈ $i $NN)
+                   (: (&<= $1 $i $k) "且" (&= (app $f $c_i) $b_m))))
+    ", 置"
+    (MB (&= $P_m (sum (∈ $i $X_m) $E_i)))
+    "那么" $P_m "是从" $V "到" (app $f $T) "与特征值" $b_m
+    "相关联的特征空间的正交投影, 而且"
+    (MB (&= (app $f $T) (sum (&= $m $1) $r (&i* $b_m $P_m))))
+    "是" (app $f $T) "的谱分解." (Br)
+    "现在设" $U "是从" $V "到" $V^ "的酉变换, 并且"
+    (&= $T^ (&i* $U $T (inv $U))) ", 那么等式"
+    (MB (&= (ap $T $alpha) (&i* $c $alpha)))
+    "成立当且仅当"
+    (MB (&= (ap $T^ (ap $U $alpha))
+            (&i* $c (ap $U $alpha))))
+    "因此" $S "是" $T^ "的谱, 并且" $U "将" $T
+    "的每个特征空间映射成相对应的" $T^ "的特征空间. 实际上, 根据定义, 我们可以看出"
+    (MB (&cm (&= $T^ (sum (&= $j $1) $k
+                          (&i* $c_j (_^ $E $j $prime))))
+             (&= (_^ $E $j $prime)
+                 (&i* $U $E_j (inv $U)))))
+    "是" $T^ "的谱分解. 因此, 我们又可以推出"
+    (eqnderiv
+     (app $f $T^)
+     (sum (&= $j $1) $k
+          (&i* (app $f $c_j) (_^ $E $j $prime)))
+     (sum (&= $j $1) $k
+          (&i* (app $f $c_j)
+               (&i* $U $E_j (inv $U))))
+     (&i* $U
+          (@sum (&= $j $1) $k
+                (&i* (app $f $c_j) $E_j))
+          (inv $U))
+     (&i* $U (app $f $T) (inv $U))))
+   ((tcomment)
+    "以上存在一些需要澄清的地方. 首先, 酉映射其实指的就是内积空间的同构. 其次, 事实"
+    (MB (&= (&* (app $f $T))
+            (sum (&= $j $1) $k
+                 (&i* (OverBar (app $f $c_j))
+                      $E_j))))
+    "的推出需要伴随的基本性质, " $E_j "是正交投影, 还有正交投影是自伴算子. 之所以"
+    $E_j "是正交投影, 实际上是因为我们发现可对角化正规算子的条件就足够"
+    "推出定理9的那些结论了, 当然或许读者还需要结合第6章的定理11的讨论看看. "
+    "至于证明正交投影是自伴算子, 第8章的例子17实际上已经提供了一个证明. "
+    "接着, 为了推出" (&= (app $f $c_j) $b) "或者" (&= (ap $E_j $alpha) $0)
+    ", 其实不一定要用勾股定理, 也可以根据直和的性质得到. 最后, 这个证明没有提及"
+    (&= $T^ (&i* $U $T (inv $U))) "的正规性, 但是我们可以发现"
+    (&= (&* (@ $T^)) (&i* $U (&* $T) (inv $U))) ", 鉴于"
+    (eqnderiv
+     (inner* (ap $T^ $alpha^) $beta^)
+     (inner* (ap (&i* $U $T (inv $U)) $alpha^) $beta^)
+     (inner* (ap (&i* $T (inv $U)) $alpha^) (ap (inv $U) $beta^))
+     (inner* (ap (inv $U) $alpha^) (ap (&i* (&* $T) (inv $U)) $beta^))
+     (inner* $alpha^ (ap (&i* $U (&* $T) (inv $U)) $beta^)))
+    "其中" (∈ $alpha^ $beta^ $V^) ", 并且我们用到了酉变换的保持内积的特性.")
+   (P "在思考前述的讨论时, "
+      )
    ((corollary)
     
     )
