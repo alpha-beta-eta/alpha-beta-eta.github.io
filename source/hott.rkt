@@ -67,23 +67,28 @@
   (define sec (cdr (reverse section)))
   (apply string-append
          (add-between (map number->string sec) ".")))
+(define (heading-cite %heading)
+  (define id (%heading-id %heading))
+  (define href (string-append "#" id))
+  (define section (%heading-section %heading))
+  `(a ((href ,href)) ,(format-section section)))
 (define (H1 #:attr* [attr* '()] . html*)
   `(,(build-%heading #:present heading-present #:level 1)
     ,attr* . ,html*))
-(define (H2 #:attr* [attr* '()] . html*)
-  `(,(build-%heading #:present heading-present #:level 2)
+(define (H2 #:attr* [attr* '()] #:id [id #f] . html*)
+  `(,(build-%heading #:present heading-present #:cite heading-cite #:level 2 #:id id)
     ,attr* . ,html*))
 (define (H2: #:attr* [attr* '()] . html*)
   `(,(build-%heading #:level 2 #:auto? #f)
     ,attr* . ,html*))
-(define (H3 #:attr* [attr* '()] . html*)
-  `(,(build-%heading #:present heading-present #:level 3)
+(define (H3 #:attr* [attr* '()] #:id [id #f] . html*)
+  `(,(build-%heading #:present heading-present #:cite heading-cite #:level 3 #:id id)
     ,attr* . ,html*))
 (define (H3: #:attr* [attr* '()] . html*)
   `(,(build-%heading #:level 3 #:auto? #f)
     ,attr* . ,html*))
-(define (H4 #:attr* [attr* '()] . html*)
-  `(,(build-%heading #:present heading-present #:level 4)
+(define (H4 #:attr* [attr* '()] #:id [id #f] . html*)
+  `(,(build-%heading #:present heading-present #:cite heading-cite #:level 4 #:id id)
     ,attr* . ,html*))
 (define (Td* . x*)
   (apply Tr (map Td x*)))
@@ -203,7 +208,7 @@
       "是类型" $B "的一个元素, 而" $A "是" $B "上的一个谓词; 见第3.5节.");@@@
    (P "类型论和集合论之间的最后一点不同在于对于相等的处理. "
       "数学中为人熟知的相等概念是一种命题: 例如, 我们可以证伪一个相等性或者"
-      "将一个相等性当作假设. 既然在类型论中, 命题也是类型, 这意味着"
+      "将一个相等性当作前提. 既然在类型论中, 命题也是类型, 这意味着"
       "一个相等性也是一个类型: 对于元素" (&: (&cm $a $b) $A)
       " (即" (&: $a $A) "且" (&: $b $A) ") 而言, 我们有类型"
       (Q (prop= $a $b $A)) ". (当然, 在" (Em "同伦")
@@ -257,8 +262,24 @@
       "可以被视为一个类型判断, 因为我们使用" (Q (&-> $A $B))
       "作为从" $A "到" $B "的函数的类型 (这是类型论的标准实践; 见第1.4节).");@@@
    (P "判断可以依赖于具有形式" (&: $x $A) "的" (Em "假设")
-      ", 其中" $x "是一个变量而" $A "是一个类型. 例如, 我们可以"
+      ", 其中" $x "是一个变量而" $A "是一个类型. 例如, 我们可以在"
+      (&: (&cm $m $n) $NN) "的假设下构造一个对象" (&: (&+ $m $n) $NN)
+      ". 另外一个例子是假设" $A "是一个类型, " (&: (&cm $x $y) $A)
+      ", 以及" (&: $p (prop= $x $y $A)) ", 那么我们可以构造一个元素"
+      (&: (inv $p) (prop= $y $x $A)) ". 所有这样的假设构成的合集被称为"
+      (B "上下文 (context)") "; 从拓扑的角度来看, 其可以被想成是一个"
+      (Q "参数空间") ". 实际上, 从技术上来说上下文必须是假设的有序列表, "
+      "因为后面的假设可以依赖于之前的假设: "
       )
+   (P "如果一个假设" (&: $x $A) "中的类型" $A "代表一个命题, 那么这个假设是类型论版本的"
+      (Em "前提(hypothesis)") ": 我们假定命题" $A "成立. 当类型被视为命题时, "
+      "我们可以省略证明的名字. 因此, 在上面的第二个例子里, 我们也可以说假定"
+      (prop= $x $y $A) ", 我们可以证明" (prop= $y $x $A)
+      ". 然而, 鉴于我们正在做" (Q "证明相关") "的数学, 所以我们也将经常"
+      "回头指明证明为对象. 例如, 在上面的例子里, 我们想要建立这样的想法, 即"
+      (inv $p) "连带着传递性和自反性的证明就表现得如同一个群胚; 见第"
+      (Cite "chapter_hott") "章.")
+   
    (H3 "函数类型")
    (H3 "宇宙和族")
    (H3 "依赖函数类型 (" $Pi:normal "类型)")
@@ -272,7 +293,7 @@
    (H3 "相等类型")
    (H3: "注记")
    (H3: "练习")
-   (H2 "同伦类型论")
+   (H2 "同伦类型论" #:id "chapter_hott")
    (H3 "类型是高阶群胚")
    (H3 "函数是函子")
    (H3 "类型族是纤维")
