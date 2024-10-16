@@ -43,10 +43,8 @@
     (".slide"
      (break-inside "avoid")
      (border "2px solid black")
-     ;(text-align "left")
      (width "400px")
      (height "225px"))
     (".label"
      (break-inside "avoid"))
-    
     ))
