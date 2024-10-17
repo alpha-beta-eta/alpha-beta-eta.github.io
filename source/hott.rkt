@@ -5,6 +5,12 @@
   (: a (_ $= A) b))
 (define (judg= a b A)
   (&: (&≡ a b) A))
+(define $. (Mo "." #:attr* '((lspace "0"))))
+(define lam
+  (case-lambda
+    ((var type exp) (: $lambda (@: var type) $. exp))
+    ((var exp) (: $lambda var $. exp))))
+(define @lam (@lize lam))
 (define (Cite #:attr* [attr* '()] id)
   `(cite ,attr* ,(Ref id)))
 (define (&label x . t*)
@@ -342,7 +348,17 @@
       ". (我们将于第" (Cite "section_nat") "节定义" $NN "和" $+
       ".) 那么, " (app $f $2) "判断相等于" (&+ $2 $2) ".")
    (P "如果我们不希望为函数引入名字, 我们可以使用" (B $lambda "抽象")
-      ". "
+      ". 给定一个类型" $B "的表达式" $Phi:normal ", 其可以和上面一样使用"
+      (&: $x $A) ", 我们记" (lam $x $A $Phi:normal)
+      "以指和之前的表达式所定义的相同的函数. 因此, 我们有"
+      (MB (&: (@lam $x $A $Phi:normal) (&-> $A $B)) ".")
+      "对于前一节的例子, 我们有类型判断"
+      (MB (&: (@lam $x $NN (&+ $x $x)) (&-> $NN $NN)) ".")
+      "作为另外一个例子, 对于任意的类型" $A "和" $B "以及任意的元素"
+      (&: $y $B) ", 我们有一个" (B "恒等函数")
+      (&: (@lam $x $A $y) (&-> $A $B)) ".")
+   (P "我们一般会省略" $lambda "抽象里变量" $x "的类型而记"
+      (lam $x $Phi:normal) ", "
       )
    (H3 "宇宙和族")
    (H3 "依赖函数类型 (" $Pi:normal "类型)")
