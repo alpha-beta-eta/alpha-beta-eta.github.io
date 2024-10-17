@@ -1,6 +1,8 @@
 #lang racket
 (provide hott.html)
 (require SMathML)
+(define $blank (Mi "-"))
+(define @\|-> (@lize &\|->))
 (define (prop= a b A)
   (: a (_ $= A) b))
 (define (judg= a b A)
@@ -358,7 +360,31 @@
       (&: $y $B) ", 我们有一个" (B "恒等函数")
       (&: (@lam $x $A $y) (&-> $A $B)) ".")
    (P "我们一般会省略" $lambda "抽象里变量" $x "的类型而记"
-      (lam $x $Phi:normal) ", "
+      (lam $x $Phi:normal) ", 因为定型判断" (&: $x $A)
+      "可从函数" (lam $x $Phi:normal) "具有类型"
+      (&-> $A $B) "这一判断推出. 根据惯例, 变量绑定"
+      (Q (M $lambda $x $.)) "的" (Q "作用域")
+      "是表达式的整个剩余部分, 除非被括号隔断. 因此, "
+      (lam $x (&+ $x $x)) "应该被理解为"
+      (lam $x (@+ $x $x)) "而不是" (&+ (@lam $x $x) $x)
+      ", 当然后者不论如何都是病态类型 (ill-typed) 的.")
+   (P "另一种等价的记号是"
+      (MB (&: (@\|-> $x $Phi:normal) (&-> $A $B)) ".")
+      "有时我们也可以在表达式" $Phi:normal
+      "中用空白" (Q $blank) "代替变量以指称隐式的" $lambda
+      "抽象. 例如, " (appl $g $x $blank) "是另一种书写"
+      (lam $y (appl $g $x $y)) "的方式.")
+   (P "现在" $lambda "抽象是函数, 于是我们可以将其应用于参数"
+      (&: $a $A) ". 然后我们会有以下" (B "计算规则")
+      ", 其是定义相等性:"
+      (MB (&≡ (app (@lam $x $Phi:normal) $a)
+              (&prime $Phi:normal)))
+      "其中" (&prime $Phi:normal) "是将所有" $x
+      "的出现替换为" $a "了的" $Phi:normal
+      ". [译注: 其实是所有" $x "的自由出现.] 继续上面的例子, 我们有"
+      (MB (&≡ (app (@lam $x (&+ $x $x)) $2)
+              (&+ $2 $2)) ".")
+      
       )
    (H3 "宇宙和族")
    (H3 "依赖函数类型 (" $Pi:normal "类型)")
