@@ -4,6 +4,7 @@
 (define tuple tu0)
 (define $Hat (Mo "&Hat;"))
 (define (Hat x) (^^ x $Hat))
+(define (distance x y) (&abs (&- x y)))
 (define exercises_in_analysis.html
   (TmPrelude
    #:title "分析学练习"
@@ -32,7 +33,16 @@
    ((remark #:n "1.5")
     "注意到"
     (MB (&< (appl (_ (Hat $d) $X) $x $y) $1))
-    
+    "而且, 使用以上命题, 我们可以发现实序列的空间" $X
+    "在装备了距离"
+    (MB (&= (appl $d_X $x $y)
+            (sum (&= $k $1) $inf
+                 (&i* (~ $1 $2^k)
+                      (~ (distance $x_k $y_k)
+                         (&+ $1 (distance $x_k $y_k)))))))
+    "之后就成为一个度量空间 (见例子1.3的b).")
+   ((definition #:n "1.6")
+    "唉, 又是一些基本概念的定义."
     )
    (H2 "第2章 拓扑空间")
    
