@@ -84,6 +84,7 @@
          "topology_via_logic.rkt"
          "hott.rkt"
          "useless.rkt"
+         "exercises_in_analysis.rkt"
          
          )
 (define (emit-web)
@@ -184,6 +185,7 @@
   (emitXml topology_via_logic.html "../topology_via_logic.html")
   (emitXml hott.html "../hott.html")
   (emitXml useless.html "../useless.html")
+  (emitXml exercises_in_analysis.html "../exercises_in_analysis.html")
   
   )
 (emit-web)
