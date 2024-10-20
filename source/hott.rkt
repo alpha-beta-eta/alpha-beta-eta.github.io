@@ -1,6 +1,11 @@
 #lang racket
 (provide hott.html)
 (require SMathML)
+(define $prod (Mo "&prod;"))
+(define &split:16 (&split 16))
+(define (Pi x A Bx)
+  (set-attr* (prod (@: x A) Bx)
+             'displaystyle "false"))
 (define $Fin (Mi "Fin" #:attr* '((mathvariant "sans-serif"))))
 (define (&Fin n) (app $Fin n))
 (define Universe $U:script)
@@ -543,7 +548,22 @@
       ". 我们使用名字" (Q $Pi:normal "类型")
       "的原因在于这种类型也可以被视为给定类型上的笛卡尔积.")
    (P "给定类型" (&: $A Universe) "和族" (&: $B (&-> $A Universe))
-      
+      ", 我们可以构造依赖函数的类型"
+      (&: (Pi $x $A (app $B $x)) Universe)
+      ". 这种类型的记号可以有诸多变体, 例如"
+      (MB (&split:16
+           (Pi $x $A (app $B $x))
+           (set-attr*
+            (Pi $x $A (app $B $x))
+            'displaystyle "true")
+           (set-attr*
+            (: $prod (&cm (@: $x $A) (app $B $x)))
+            'displaystyle "false")) ".")
+      "如果" $B "是一个常族, 那么依赖积类型就变成了通常的函数类型:"
+      (MB (&≡ (Pi $x $A $B) (@-> $A $B)) ".")
+      "的确, 所有" $Pi:normal "类型的构造其实是"
+      "相应的通常函数类型上的构造的一种推广.")
+   (P "我们可以"
       )
    (H3 "积类型" #:id "section_product_type")
    (H3 "依赖序对类型 (" $Sigma:normal "类型)")
