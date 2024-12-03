@@ -14,3 +14,8 @@ ms {font-family: JBMono;color: white;background-color: black;}
 cite {font-style: normal;}
 .slide {break-inside: avoid;border: 2px solid black;width: 400px;height: 225px;}
 .label {break-inside: avoid;}
+.dialogue {width: 100%;border-top: 1.5px solid black;break-inside: avoid;}
+.leftd {width: 48%;}
+.middled {width: 15px;}
+.dialogue td {text-align: left;vertical-align: top;}
+.dashed {border: 2.5px dashed white;}

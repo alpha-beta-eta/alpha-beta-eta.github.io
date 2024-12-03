@@ -47,4 +47,17 @@
      (height "225px"))
     (".label"
      (break-inside "avoid"))
+    (".dialogue"
+     (width "100%")
+     (border-top "1.5px solid black")
+     (break-inside "avoid"))
+    (".leftd"
+     (width "48%"))
+    (".middled"
+     (width "15px"))
+    (".dialogue td"
+     (text-align "left")
+     (vertical-align "top"))
+    (".dashed"
+     (border "2.5px dashed white"))
     ))
