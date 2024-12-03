@@ -37,17 +37,6 @@
 (define $perp (Mo "&perp;"))
 (define (&perp W) (^ W $perp))
 (define (@perp W) (@ (&perp W)))
-(define align:thin
-  (Ttable
-   (lambda (d i j)
-     (cond ((= j 0) (set-attr* d 'columnalign "right"))
-           ((= j 2) (set-attr* d 'columnalign "left"))
-           (else d)))))
-(define-syntax-rule (eqn* (x ...) ...)
-  (MB (set-attr*
-       (align:thin
-        (&Table (x ...) ...))
-       'displaystyle "true")))
 (define (orthoproj u v)
   (&i* (~ (inner* u v) (sqrnorm v)) v))
 (define $VerticalBar

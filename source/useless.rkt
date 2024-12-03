@@ -25,6 +25,9 @@
     (H2 (A "函数式微分几何" #:attr* '((href "fdg.html"))))
     (H2 (A "盲点" #:attr* '((href "blind.html"))))
     (H2 (A "高阶范畴逻辑导论" #:attr* '((href "hocl.html"))))
+    (H2 (A "无点拓扑学" #:attr* '((href "pointless.html"))))
+    (H2 (A "代数: 第0章" #:attr* '((href "algebra.html"))))
+    (H2 (A "P423笔记" #:attr* '((href "p423.html"))))
     
     )
    ))
