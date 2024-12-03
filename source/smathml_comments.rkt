@@ -21,5 +21,17 @@
       "但这的确不方便, 且没有必要. 那么, 或许这种机制需要像" (Code "T")
       "一样让用户有选择是否交互的余地. 但是, 似乎把事情做得漂亮相当困难, "
       "所以我卡在这里了. 当我想明白的时候, 我会将其加入SMathML之中.")
+   (H2 "实验性特性")
+   (P "这里记录一些编写博客的时候创造的抽象.")
+   (CodeB "(define $Hom (Mi &quot;Hom&quot;))
+(define Hom
+  (case-lambda
+    ((A B) (appl $Hom A B))
+    ((C A B) (appl (_ $Hom C) A B))))
+(define $Aut (Mi &quot;Aut&quot;))
+(define Aut
+  (case-lambda
+    ((A) (app $Aut A))
+    ((C A) (app (_ $Aut C) A))))")
    
    ))

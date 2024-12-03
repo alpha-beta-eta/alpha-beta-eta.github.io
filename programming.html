@@ -38,7 +38,11 @@
 > (define (area radius)
     (* pi (square radius)))
 > (area 5)
-78.5</code></pre><h3>第1.7节 条件分支</h3><p>条件分支表达了某种选择.</p><h3>第1.8节 <code>and</code>, <code>or</code>, <code>not</code></h3><p>与或非是三种常见的逻辑联结词. 在Scheme中, 和绝大多数编程语言一样, <code>and</code>和<code>or</code>具有短路性质. 也正因如此, <code>and</code>和<code>or</code>显然不是函数, 鉴于它并不遵循通常函数应用的求值规则. 请看以下交互.</p><pre><code>> (and)
+78.5</code></pre><h3>第1.7节 条件分支</h3><p>条件分支表达了某种选择. 在Scheme中, 我们有两种这样的构造: <code>if</code>和<code>cond</code>, 其中<code>cond</code>可以被视为<code>if</code>的句法糖. 首先让我们来看<code>if</code>, 这是更简单的构造.</p><pre><code>(define (abs x)
+  (if (&lt; x 0)
+      (- x)
+      x))</code></pre><p>以上的绝对值函数<code>abs</code>在某种意义上可能是自明的, 但我们仍然最好对其作出一些解释. 这里的<code>if</code>表达式会先对于<code>(&lt; x 0)</code>求值, 然后根据其结果来确定对于<code>(- x)</code>求值还是对于<code>x</code>求值, 并将这个结果作为整个<code>if</code>表达式的值. 机敏的读者应该注意到, <code>if</code>并非函数, 因为它不会对于它的每个参数都进行求值, 因而若当我们试图按照<pre><code>(define (if^ Q A E)
+  (if Q A E))</code></pre>来定义我们自己的<code>if</code>类似物<code>if^</code>, 则会造成问题.</p><div class="exercise"><b>练习.</b> 举一个例子说明为什么在行为上<code>if^</code>并不等价于<code>if</code>? (读者不必立即回答此问题, 之后的练习也是类似.)</div><p>接下来让我们看<code>cond</code>表达式. </p><h3>第1.8节 <code>and</code>, <code>or</code>, <code>not</code></h3><p>与或非是三种常见的逻辑联结词. 在Scheme中, 和绝大多数编程语言一样, <code>and</code>和<code>or</code>具有短路性质. 也正因如此, <code>and</code>和<code>or</code>显然不是函数, 鉴于它并不遵循通常函数应用的求值规则. 请看以下交互.</p><pre><code>> (and)
 #t
 > (and 1)
 1
@@ -141,7 +145,7 @@
   (if (null? lst)
       init
       (proc (car lst)
-            (fold-right proc init (cdr lst)))))</code></pre><p>我们可以使用<code>fold-left</code>和<code>fold-right</code>来表达之前定义的几个列表处理过程.</p><pre><code>(define (map proc lst)
+            (fold-right proc init (cdr lst)))))</code></pre><p>我们应该注意到, 这里的<code>fold-left</code>是尾递归的, 但是<code>fold-right</code>不是尾递归的. 不过, 实际上的确可以将<code>fold-right</code>定义成尾递归的, 这留给读者思考.</p><div class="exercise"><b>练习.</b> 定义尾递归的<code>fold-right</code>.</div><p>我们可以使用<code>fold-left</code>和<code>fold-right</code>来表达之前定义的几个列表处理过程.</p><pre><code>(define (map proc lst)
   (fold-right
    (lambda (a d)
      (cons (proc a) d))
@@ -156,4 +160,8 @@
 (define (reverse lst)
   (fold-left
    (lambda (a d) (cons d a))
-   '() lst))</code></pre></body></html>
+   '() lst))</code></pre><h3>第2.4节 列表处理: 更进一步</h3><p>上一节我们已经讨论了列表处理的最基本的一些模式, 现在我们想要处理一些更加复杂的问题.</p><p>许多时候, 虽然我们希望使用<code>map</code>来对于列表的每个元素施行某种变换, 但是这种变换返回的并不是一个结果, 而是一列结果. 从某种角度来说, 此时列表处理作为有限序列带来的可复合性被稍稍破坏了. 然而, 我们很容易修复这个问题, 通过一个与<code>map</code>类似的过程<code>append-map</code>, 有时也被称为<code>flatmap</code>.</p><pre><code>(define (append-map proc lst)
+  (if (null? lst)
+      '()
+      (append (proc (car lst))
+              (append-map proc (cdr lst)))))</code></pre><p>和<code>map</code>不同的是, <code>append-map</code>使用<code>append</code>将变换的结果连接在一起, 起到了展平的效果, 因而<code>flatmap</code>的确也是一个合适的名字, 这被其他许多编程语言所采用.</p><p>为了刻画<code>append-map</code>的用途, 接下来我们举一个稍微复杂一点的例子, 即所谓的<math><mi>n</mi></math>皇后. 这个问题要求我们枚举出在一个<math><mrow><mi>n</mi><mo>&times;</mo><mi>n</mi></mrow></math>的棋盘上放置<math><mi>n</mi></math>枚皇后棋子并使得这些棋子相互之间无法攻击的所有可能方案.</p><p>在编写程序之前, 我们最好先观察一下问题的结构, 有时简单的观察可以极大地简化程序或者提高效率. 当然, 读者也可以观察良久, 不过那更多是数学家的习惯. 首先, 我们注意到既然皇后可以自由地横行或直行, 那么对于可能的方案而言, 每一列和每一行必恰有一个皇后. 显然, 读者看出来我们可以将方案表示为一个置换. </p></body></html>

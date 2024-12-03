@@ -34,8 +34,6 @@
 (define $log (Mi "log"))
 (define (&log x y)
   (: (_ $log x) y))
-(define (set-compact op)
-  (set-attr* op 'lspace "0" 'rspace "0"))
 (define $->:compact (set-compact $->))
 (define $disj:compact (set-compact $disj))
 (define $conj:compact (set-compact $conj))
@@ -66,6 +64,9 @@
 (define (&NJ . op*)
   (apply appl $NJ (map set-compact op*)))
 (define $NJ:-> (app $NJ $->:compact))
+(define $NK (Mi "NK"))
+(define (&NK . op*)
+  (apply appl $NK (map set-compact op*)))
 (define (&<-> a b)
   (Mrow a $<-> b))
 (define $sqcup (Mo "&sqcup;"))
@@ -198,6 +199,7 @@
 (define $~G
   (_ $~ $G:env))
 (define $cup $union)
+(define $!-_N (_ $entailL $N))
 (define-infix*
   (&sqcap $sqcap)
   (&sqcup $sqcup)
@@ -221,6 +223,7 @@
   (&~G $~G)
   (&cup $cup)
   (&<=G $<=G)
+  (&!-_N $!-_N)
   
   )
 (define GMt
