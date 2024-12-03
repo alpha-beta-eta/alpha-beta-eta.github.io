@@ -89,6 +89,8 @@
          "lattice_theory_notes.rkt"
          "lattice_notes.rkt"
          "hocl.rkt"
+         "macro_notes.rkt"
+         "macro_dsl.rkt"
          
          )
 (define (emit-web)
@@ -194,6 +196,8 @@
   (emitXml lattice_theory_notes.html "../lattice_theory_notes.html")
   (emitXml lattice_notes.html "../lattice_notes.html")
   (emitXml hocl.html "../hocl.html")
+  (emitXml macro_notes.html "../macro_notes.html")
+  (emitXml macro_dsl.html "../macro_dsl.html")
   
   )
 (emit-web)

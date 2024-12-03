@@ -52,6 +52,7 @@
     (H2 (A "同伦类型论" #:attr* '((href "hott.html"))))
     (H2 (A "一些没用的笔记" #:attr* '((href "useless.html"))))
     (H2 (A "格论笔记" #:attr* '((href "lattice_theory_notes.html"))))
+    (H2 (A "关于宏的笔记" #:attr* '((href "macro_notes.html"))))
     
     )
    ))

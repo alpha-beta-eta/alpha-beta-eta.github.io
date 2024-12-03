@@ -1546,27 +1546,25 @@
       "本章呈现了这个发现以及它的一些推论, 例如Kolmogorov从古典逻辑到直觉主义逻辑的"
       "双重否定嵌入对应于" (Em "延续传递风格转换") ".")
    (Heading0 #:level 3 "古典命题逻辑");sec6.1
-   (P "古典逻辑和直觉主义逻辑的不同在于囊括了以下原则:"
+   (P "古典逻辑和直觉主义逻辑的不同在于古典逻辑囊括了以下原则:"
       (Ol #:attr* '((type "i"))
           (Li (Em "Tertium non datur (排中律): ") (&disj $phi (&neg $phi))
               ". 要么" $phi "成立, 要么" $phi "不成立.")
           (Li (Em "双重否定消除: ") (&-> (&neg (&neg $phi)) $phi)
               ". 如果不是" $phi "不成立的情形, 那么" $phi "就成立.")
           (Li (Em "Peirce律: ") (&-> (@-> (@-> $phi $psi) $phi) $phi) ".")
-          (Li (Em "Reductio ad absurdum: ")
-              )
-          )
-      )
-   (&label
-    (set-attr*
-     (&Table
-      ((: (G!- $phi $phi) (@ "Ax")))
-      ((: (: (&rule (G!- $phi $psi) (G!- (&-> $phi $psi))) (@ i.-> "I"))
-          (&space 32) (: (&rule (G!- (&-> $phi $psi)) (G!- $phi) (G!- $psi)) (@ i.-> "E"))))
-      ((: (&rule (G!- (&-> $phi $bottom) $bottom) (G!- $phi)) (@ i.neg "E"))))
-     'frame "solid" 'rowspacing "5.0ex")
-    "图6.1: 古典命题演算")
-   ((example #:n "6.1.2")
+          (Li (Em "Reductio ad absurdum: ") (&-> (@-> (&neg $phi) $phi) $phi)
+              ". 如果假设" $phi "不成立可以推出" $phi ", 那么"
+              $phi "必然成立."))
+      "古典命题演算 (CPC) 的自然演绎系统是通过将直觉主义版本中的"
+      (Em "ex falso") "规则替换为一个用于进行双重否定消除的规则得到的. "
+      "我们研究带有谬的推论性片段; 否定和通常一样还是使用谬定义的.")
+   ((Definition);def6.1.1
+    "推论和谬的古典命题演算的自然演绎呈现" (&NK $-> $bottom)
+    "由图6.1的公理和规则定义. 当" (G!- $phi) "在系统中可以被推导出来时, 我们记"
+    (&!-_N $G:env $phi) " (有时我们省略" (Q $N)
+    "). 我们使用与第2章一致的术语, 记号和约定.")
+   ((Example);ex6.1.2
     (Ol #:attr* '((type "i"))
         (Li "以下是公式" (&-> (@-> $phi $psi) (@-> (&neg $phi) $psi) $psi)
             " (&quot;分类讨论证明&quot;) 的一个推导, 令"
@@ -1603,7 +1601,19 @@
                   (G!- (&neg $phi) $bottom))
                  (G!- $phi)
                  (!- (&-> (@-> (@-> $phi $psi) $phi) $phi)))))))
-   
+   (&label
+    (set-attr*
+     (&Table
+      ((: (G!- $phi $phi) (@ "Ax")))
+      ((: (: (&rule (G!- $phi $psi) (G!- (&-> $phi $psi))) (@ i.-> "I"))
+          (&space 32) (: (&rule (G!- (&-> $phi $psi)) (G!- $phi) (G!- $psi)) (@ i.-> "E"))))
+      ((: (&rule (G!- (&-> $phi $bottom) $bottom) (G!- $phi)) (@ i.neg "E"))))
+     'frame "solid" 'rowspacing "5.0ex")
+    "图6.1: 古典命题演算")
+   ((Example);ex6.1.3
+    (Em "ex falso") "在" (&NK $-> $bottom) "中是一条导出规则. 也就是说, 如果"
+    (G!- $bottom) ", 那么也有" (G!- $phi) ". "
+    )
    (H3 "第6.2节 " (: $lambda $mu) "演算")
    (H3 "第6.3节 ")
    (H3 "第6.4节 逻辑嵌入和CPS转换")

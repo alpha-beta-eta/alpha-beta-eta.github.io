@@ -66,6 +66,9 @@
 (define (&NJ . op*)
   (apply appl $NJ (map set-compact op*)))
 (define $NJ:-> (app $NJ $->:compact))
+(define $NK (Mi "NK"))
+(define (&NK . op*)
+  (apply appl $NK (map set-compact op*)))
 (define (&<-> a b)
   (Mrow a $<-> b))
 (define $sqcup (Mo "&sqcup;"))
@@ -198,6 +201,7 @@
 (define $~G
   (_ $~ $G:env))
 (define $cup $union)
+(define $!-_N (_ $entailL $N))
 (define-infix*
   (&sqcap $sqcap)
   (&sqcup $sqcup)
@@ -221,6 +225,7 @@
   (&~G $~G)
   (&cup $cup)
   (&<=G $<=G)
+  (&!-_N $!-_N)
   
   )
 (define GMt
