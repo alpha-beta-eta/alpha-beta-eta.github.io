@@ -81,5 +81,24 @@
       (CodeB "Syntax-Object -> Syntax-Object")
       "当然, 这种签名正说明宏不能自然地表达牵涉展开上下文的属性的交流通道. "
       "[原注: 宏作者可以通过某种协议将属性编码为句法对象, 但是我们将这种手段视为不自然的.]")
+   (P "Krishnamurthi等人的工作支持宏以micro来解决这个问题. 类似于" (Code "define-macro")
+      ", " (Code "define-micro") "也描述了一个函数, 其消费句法的表示. "
+      "并且, 其可以吸收任意数量的" (Code "Attribute") "值, 这使得micro"
+      "之间可以显式地交流上下文信息:"
+      (CodeB "Syntax-Object -> (Attribute ... -> Output)")
+      "正如这个签名所显示的, micro和宏的另一个不同之处在于其结果是某种任意的类型, 我们称之为"
+      (Code "Output") ". 这个类型对于相互协作的一群micro而言必须是相同的, "
+      "但是不同群的micro之间当然可以是不同的. 对于类似于宏的micro而言, " (Code "Output")
+      "即" (Code "Syntax-Object") ". 与之对比的是, 对于一个嵌入式编译器而言, "
+      (Code "Output") "会是" (Code "AST") ", 这指的是代表目标语言的抽象句法树的类型. "
+      "目标语言可以是Racket, 但是也可以是全然不同的某种东西, 例如GPU汇编代码.")
+   (P "正如这种解释所指出的, DSL的micro应该被视为某个合集的成员. 为了使得这种想法具体化, "
+      "Krishnamurthi等人引入了" (Em "语汇") "的概念. 既然宏和micro的合集确定了DSL的"
+      (Q "词汇") "和" (Q "句子结构") ", 语汇代表了一种词典和语法规则的形式等价物. "
+      "micro自身将被嵌入语言的" (Q "句子") "转换为有意义的 (即可执行的) 程序.")
+   (P "在Krishnamurthi等人的情境下, 语汇以" (Code "(make-vocabulary)")
+      "创建, 并随之带来了两种操作: " (Code "define-macro")
+      "添加micro函数于给定的语汇, 而" (Code "dispatch")
+      "在特定语汇的上下文中应用micro于表达式.")
    
    ))
