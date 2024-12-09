@@ -100,5 +100,43 @@
       "创建, 并随之带来了两种操作: " (Code "define-macro")
       "添加micro函数于给定的语汇, 而" (Code "dispatch")
       "在特定语汇的上下文中应用micro于表达式.")
+   (CodeB ";; type Output = RacketAST
+(define compiler (make-vocabulary))
+_ _ _ elided _ _ _
+(define-micro compiler
+  (if cond then else)
+  ==>
+  (lambda ()
+    (define (expd t)
+      ((dispatch t compiler)))
+    (define cond-ir (expd cond))
+    (define then-ir (expd then))
+    (define else-ir (expd else))
+    (make-AST-if
+     cond-ir then-ir else-ir)))
+_ _ _ elided _ _ _
+(define compiler-language
+  (extend-vocabulary
+   base-language
+   compiler))")
+   (CodeB ";; type Output = RacketType
+(define type-check (make-vocabulary))
+_ _ _ elided _ _ _
+(define-micro type-check
+  (if cond then else)
+  ==>
+  (lambda (Γ)
+    ;; first block
+    (define (tc t)
+      ((dispatch t type-check) Γ))
+    (define cond-type (tc cond))
+    (unless (type-== cond-type Boolean)
+      (error _ _ _ elided _ _ _))
+    (define then-type (tc then))
+    (define else-type (tc else))
+    (unless (type-== then-type else-type)
+      (error _ _ _ elided _ _ _))
+    then-type))
+_ _ _ elided _ _ _")
    
    ))
