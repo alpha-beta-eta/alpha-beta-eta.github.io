@@ -91,6 +91,7 @@
          "hocl.rkt"
          "macro_notes.rkt"
          "macro_dsl.rkt"
+         "pointless.rkt"
          
          )
 (define (emit-web)
@@ -198,6 +199,7 @@
   (emitXml hocl.html "../hocl.html")
   (emitXml macro_notes.html "../macro_notes.html")
   (emitXml macro_dsl.html "../macro_dsl.html")
+  (emitXml pointless.html "../pointless.html")
   
   )
 (emit-web)
