@@ -16,4 +16,25 @@
          (let ((vx (car v)) (vy (cdr v)))
            (ppat vx x (ppat vy y kt kf) kf))
          kf))
-    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))</code></pre></p><p>我印象中, 后半部分最令我捉摸不透的地方实际上是<code>purify-letrec</code>, 我到现在还是没能理解<code>letrec</code>和<code>letrec*</code>的语义, 而且似乎顶层程序的语义也值得好好琢磨. 闭包变换也多花了我一段时间, 因为实际上网上没法找到那次作业的pdf文件. 但是, 我的确可以猜出来大致上要做什么, 而且在某个上过P423课程的人写的作业里, 我找到了比较详尽的描述, 所以没有耗费我太多精力. 实际上, 闭包变换在概念上是比较简单的. 至于是不是有人故意删除了这次作业的文件, 那就不得而知了.</p><p>为了完成这个作业, 除了作业要求材料之外, Andy Keep为了展示nanopass框架而写的两个编译器是值得阅读的, Andy Keep的PhD论文也是值得阅读的. Kent Dybvig的PhD论文, 以及其他一些关于Chez Scheme优化的论文, 同样地令人感兴趣. 有些材料没有那么适切, 但也仍然值得阅读, 比如Appel的Compiling with Continuations, 其刻画了SML/NJ的后端.</p><h2>作业15</h2><p>这次作业仅需要完成<code>parse-scheme</code>, 目的主要是将最初的源语言规约为更加紧凑的形式, 并对于输入进行一些简单的验证, 排除一些基本的错误. 当然, 顺便进行一下<math><mi>&alpha;</mi></math>变换, 使得变量名唯一, 这是之后诸多分析和变换的基础.</p><p>虽然概念上没有什么复杂的地方, 但是写起来有许多细节问题, 导致我当初写得非常难受, 似乎也犯了不少错误. 不过, 最终我的代码和主流也稍微有所不同, 因为我试图解决一类常见但也经常不被注意到的问题, 就是绑定可以引入名字和<q>关键词</q>相同的变量, 这时的处理我选择和一般的Scheme实现一致. 但是, 似乎网上别人上传的作业解答都没有注意到这一点. 当然, 这也不能算很重要就是了.</p></body></html>
+    ((_ v lit kt kf) (if (eqv? v (quote lit)) kt kf))))</code></pre></p><p>我印象中, 后半部分最令我捉摸不透的地方实际上是<code>purify-letrec</code>, 我到现在还是没能理解<code>letrec</code>和<code>letrec*</code>的语义, 而且似乎顶层程序的语义也值得好好琢磨. 闭包变换也多花了我一段时间, 因为实际上网上没法找到那次作业的pdf文件. 但是, 我的确可以猜出来大致上要做什么, 而且在某个上过P423课程的人写的作业里, 我找到了比较详尽的描述, 所以没有耗费我太多精力. 实际上, 闭包变换在概念上是比较简单的. 至于是不是有人故意删除了这次作业的文件, 那就不得而知了.</p><p>为了完成这个作业, 除了作业要求材料之外, Andy Keep为了展示nanopass框架而写的两个编译器是值得阅读的, Andy Keep的PhD论文也是值得阅读的. Kent Dybvig的PhD论文, 以及其他一些关于Chez Scheme优化的论文, 同样地令人感兴趣. 有些材料没有那么适切, 但也仍然值得阅读, 比如Appel的Compiling with Continuations, 其刻画了SML/NJ的后端.</p><h2>作业15</h2><p>这次作业仅需要完成<code>parse-scheme</code>, 目的主要是将最初的源语言规约为更加紧凑的形式, 并对于输入进行一些简单的验证, 排除一些基本的错误. 当然, 顺便进行一下<math><mi>&alpha;</mi></math>变换, 使得变量名唯一, 这是之后诸多分析和变换的基础.</p><p>虽然概念上没有什么复杂的地方, 但是写起来有许多细节问题, 导致我当初写得非常难受, 似乎也犯了不少错误. 不过, 最终我的代码和主流也稍微有所不同, 因为我试图解决一类常见但也经常不被注意到的问题, 就是绑定可以引入名字和<q>关键词</q>相同的变量, 这时的处理我选择和一般的Scheme实现一致. 但是, 似乎网上别人上传的作业解答都没有注意到这一点. 当然, 这也不能算很重要就是了.</p><p><code>parse-scheme</code>这个pass的输入语言的句法如下:<pre><code>&lt;exp> ::= &lt;fixnum>
+       |  &lt;boolean>
+       |  (quote &lt;datum>)
+       |  &lt;var>
+       |  (if &lt;exp> &lt;exp>)
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (set! &lt;var> &lt;exp>)
+       |  (begin &lt;exp>+)
+       |  (lambda (&lt;var>*) &lt;exp>+)
+       |  (let ((&lt;var> &lt;exp>)*) &lt;exp>+)
+       |  (letrec ((&lt;var> &lt;exp>)*) &lt;exp>+)
+       |  (and &lt;exp>*)
+       |  (or &lt;exp>*)
+       |  (&lt;prim> &lt;exp>*)
+       |  (&lt;exp> &lt;exp>*)
+&lt;datum> ::= ()
+         |  &lt;boolean>
+         |  &lt;fixnum>
+         |  (&lt;datum> . &lt;datum>)
+         |  #(&lt;datum>*)
+&lt;boolean> ::= #t
+           |  #f</code></pre>这里当然有一些需要解释的地方, 而且还有一些额外的限制, 但是这些限制没有体现在句法里. </p></body></html>

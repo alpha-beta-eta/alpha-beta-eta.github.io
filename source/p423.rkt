@@ -69,5 +69,30 @@
       "相同的变量, 这时的处理我选择和一般的Scheme实现一致. "
       "但是, 似乎网上别人上传的作业解答都没有注意到这一点. "
       "当然, 这也不能算很重要就是了.")
-   
+   (P (Code "parse-scheme") "这个pass的输入语言的句法如下:"
+      (CodeB "&lt;exp> ::= &lt;fixnum>
+       |  &lt;boolean>
+       |  (quote &lt;datum>)
+       |  &lt;var>
+       |  (if &lt;exp> &lt;exp>)
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (set! &lt;var> &lt;exp>)
+       |  (begin &lt;exp>+)
+       |  (lambda (&lt;var>*) &lt;exp>+)
+       |  (let ((&lt;var> &lt;exp>)*) &lt;exp>+)
+       |  (letrec ((&lt;var> &lt;exp>)*) &lt;exp>+)
+       |  (and &lt;exp>*)
+       |  (or &lt;exp>*)
+       |  (&lt;prim> &lt;exp>*)
+       |  (&lt;exp> &lt;exp>*)
+&lt;datum> ::= ()
+         |  &lt;boolean>
+         |  &lt;fixnum>
+         |  (&lt;datum> . &lt;datum>)
+         |  #(&lt;datum>*)
+&lt;boolean> ::= #t
+           |  #f")
+      "这里当然有一些需要解释的地方, 而且还有一些额外的限制, "
+      "但是这些限制没有体现在句法里. "
+      )
    ))
