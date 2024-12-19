@@ -93,6 +93,7 @@
          "macro_dsl.rkt"
          "pointless.rkt"
          "algebra.rkt"
+         "p423.rkt"
          
          )
 (define (emit-web)
@@ -202,6 +203,7 @@
   (emitXml macro_dsl.html "../macro_dsl.html")
   (emitXml pointless.html "../pointless.html")
   (emitXml algebra.html "../algebra.html")
+  (emitXml p423.html "../p423.html")
   
   )
 (emit-web)
