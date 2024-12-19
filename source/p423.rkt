@@ -148,5 +148,72 @@
       "编译器整体的结构, 实际上非常简单. 每个编译器pass都是独立(成一个文件)的, "
       "只依赖于" (Code "utils.rkt") ", 然后都会provide一个过程. "
       "最后, 有一个文件将这些pass组合在一起, 形成一个完整的编译器.")
+   (P "首先, 我们需要" (Code "unique-symbol")
+      "来生成唯一的标识符, 这是通过一个全局的计数器实现的."
+      (CodeB "(define (make-counter x)
+  (lambda ()
+    (set! x (+ x 1))
+    x))
+(define unique-symbol
+  (let ((counter (make-counter -1)))
+    (lambda (x)
+      (string->symbol
+       (format &quot;~s.~s&quot; x (counter))))))")
+      "这个标识符实际上很有特点, 它将计数器信息保存在了名字里.")
+   (P "其次, 我们需要实现集合. 其实, Racket的确有一个集合数据结构, "
+      "而且效率肯定比我们随便用顺序可达的列表实现的集合要高. "
+      "但是呢, 现在我们的确不在乎编译的效率, 也没想着测试复杂的输入. "
+      "不论如何, 之后都可以再改."
+      (CodeB "(define (set? x)
+  (cond ((null? x) #t)
+        ((memq (car x) (cdr x)) #f)
+        (else (set? (cdr x)))))
+(define (set-cons x s)
+  (if (memq x s)
+      s
+      (cons x s)))
+(define (U s1 s2)
+  (cond ((null? s1) s2)
+        ((memq (car s1) s2) (U (cdr s1) s2))
+        (else (cons (car s1) (U (cdr s1) s2)))))
+(define (I s1 s2)
+  (cond ((null? s1) '())
+        ((memq (car s1) s2) (cons (car s1) (I (cdr s1) s2)))
+        (else (I (cdr s1) s2))))
+(define (D s1 s2)
+  (cond ((null? s1) '())
+        ((memq (car s1) s2) (D (cdr s1) s2))
+        (else (cons (car s1) (D (cdr s1) s2)))))"))
+   (P "接着, 让我们想一想我们对于" (Code "&lt;fixnum>")
+      "的要求, 写下谓词" (Code "target-fixnum?") "."
+      (CodeB "(define (target-fixnum? x)
+  (and (integer? x)
+       (exact? x)
+       (<= (- (expt 2 60)) x (- (expt 2 60) 1))))")
+      "当然, 谓词" (Code "datum?") "也不要忘了."
+      (CodeB "(define (datum? x)
+  (or (null? x) (boolean? x) (target-fixnum? x)
+      (and (pair? x) (datum? (car x)) (datum? (cdr x)))
+      (and (vector? x)
+           (let ((len (vector-length x)))
+             (let loop ((i 0))
+               (cond ((= len i) #t)
+                     ((datum? (vector-ref x i)) (loop (+ i 1)))
+                     (else #f)))))))"))
+   (P "最后, 让我们写下用来解构" (Code "let") "或"
+      (Code "letrec") "绑定的过程, 以及构造" (Code "let")
+      "或" (Code "letrec") "构造的过程. 老实说, 没有必要将"
+      "中间表示设计得看上去和Scheme长得一样, 但是可能"
+      "Kent Dybvig乐意这么做吧. 另外, nanopass本身"
+      "提供了方便解构和构造这类东西的机制, 但是我们没有就是了, "
+      "所以不得不采取这种看起来比较迂回的方法."
+      (CodeB "(define (: bds k)
+  (k (map car bds) (map cadr bds)))
+(define (Let x* e* body)
+  (list 'let (map list x* e*) body))
+(define (Letrec x* e* body)
+  (list 'letrec (map list x* e*) body))"))
+   (P "好了, 差不多就是这样. 如果之后用到什么其他的辅助过程, 那就之后再说. "
+      "接下来, 我们终于开始着手写" (Code "parse-scheme") ".")
    
    ))
