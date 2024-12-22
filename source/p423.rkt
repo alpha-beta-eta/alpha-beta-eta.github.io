@@ -441,9 +441,9 @@
       "我们看到, " (Code "&lt;var>") "变成了"
       (Code "&lt;uvar>") ". 并且, 产生式的种类更少, 也更加规整了.")
    (H2 "作业14: " (Code "convert-complex-datum"))
-   (P "这次作业同样也只需要编写一个pass, 即" (Code "convert-complex-datum")
-      ". 这么来看, P423的作业是越到后面越简单. 这个pass的目的在于将复杂的"
-      (Code "&lt;datum>") "转换为简单的" (Code "&lt;immediate>")
+   (P "这次作业需要编写多个pass, 不过先让我们来完成" (Code "convert-complex-datum")
+      ". 这个pass的目的在于将复杂的" (Code "&lt;datum>")
+      "转换为简单的" (Code "&lt;immediate>")
       ", 其中" (Code "&lt;immediate>") "的句法为"
       (CodeB "&lt;immediate> ::= ()
              |  &lt;boolean>
@@ -573,5 +573,317 @@
                         (k t `((,t ,(convert-datum d)))))
                       (k exp '())))")
    (P "还是先来看开头, 这奠定了代码的基本结构. "
-      )
+      "我们使用了所谓的延续传递风格来返回多值, "
+      "这只是一种可能的手段, 当然还有其他各种写法. "
+      (Code "convert*") "基于" (Code "convert")
+      ", 它意图转换一列表达式, 并将得到的绑定合并起来. "
+      "当然, 更准确地说, " (Code "convert*") "和"
+      (Code "convert") "是一种互递归的关系. "
+      "对于" (Code "(quote ,d)")
+      "的处理和之前并没有本质区别, 只是我们现在将结果传递给"
+      (Q "延续参数") (Code "k") "而已.")
+   (CodeB "      (,uvar (guard (symbol? uvar)) (k uvar '()))
+      ((if ,q ,a ,e)
+       (convert*
+        (cdr exp)
+        (lambda (qae bindings)
+          (k (cons 'if qae) bindings))))
+      ((set! ,uvar ,exp)
+       (convert exp (lambda (exp bindings)
+                      (k `(set! ,uvar ,exp) bindings))))
+      ((begin . ,exp*)
+       (convert* exp* (lambda (exp* bindings)
+                        (k (cons 'begin exp*) bindings))))
+      ((lambda ,x* ,body)
+       (convert body (lambda (body bindings)
+                       (k `(lambda ,x* ,body) bindings))))
+      ((let ,bds ,body)
+       (: bds
+          (lambda (x* e*)
+            (convert*
+             e* (lambda (e* bindings0)
+                  (convert
+                   body (lambda (body bindings1)
+                          (k (Let x* e* body)
+                             (append bindings0 bindings1)))))))))
+      ((letrec ,bds ,body)
+       (: bds
+          (lambda (x* e*)
+            (convert*
+             e* (lambda (e* bindings0)
+                  (convert
+                   body (lambda (body bindings1)
+                          (k (Letrec x* e* body)
+                             (append bindings0 bindings1)))))))))
+      ((,prim . ,rands)
+       (guard (prim? prim))
+       (convert* rands (lambda (rands bindings)
+                         (k (cons prim rands) bindings))))
+      ((,rator . ,rands) (convert* exp k))))
+  (convert exp (lambda (exp bindings)
+                 (if (null? bindings)
+                     exp
+                     `(let ,bindings ,exp)))))")
+   (P "以上是剩下来的代码, 没有什么好说的. "
+      "我们通常遵循这样一种模式, 通过"
+      (Code "convert") "或者" (Code "convert*")
+      "进行转换, 然后对于返回的表达式和绑定加工一下再返回.")
+   (P "现在让我们来看一些例子. 当然, 在这之前, 我们需要将"
+      (Code "convert-complex-datum") "和"
+      (Code "parse-scheme") "连接起来, 通过函数复合"
+      (Code "compose") ".")
+   (CodeB "(define compil
+  (compose convert-complex-datum
+           parse-scheme
+           ))")
+   (P "接着才是例子.")
+   (CodeB "> (compil '(letrec ((append (lambda (l1 l2)
+                              (if (null? l1)
+                                  l2
+                                  (cons (car l1)
+                                        (append (cdr l1) l2))))))
+             (append '(0 1 2) '(3 4 5))))
+'(let ((t.3 (cons '0 (cons '1 (cons '2 '())))) (t.4 (cons '3 (cons '4 (cons '5 '())))))
+   (letrec ((append.0
+             (lambda (l1.1 l2.2)
+               (if (null? l1.1) l2.2 (cons (car l1.1) (append.0 (cdr l1.1) l2.2))))))
+     (append.0 t.3 t.4)))")
+   (CodeB "> (compil '(+ 1 (* 2 3)))
+'(+ '1 (* '2 '3))")
+   (CodeB "> (compil '(vector-length '#(0 1 2)))
+'(let ((t.0
+        (let ((vec.1 (make-vector '3)))
+          (begin
+            (vector-set! vec.1 '0 '0)
+            (vector-set! vec.1 '1 '1)
+            (vector-set! vec.1 '2 '2)
+            vec.1))))
+   (vector-length t.0))")
+   (CodeB "> (compil ''#(#(0) (1) (#t #f)))
+'(let ((t.0
+        (let ((vec.1 (make-vector '3)))
+          (begin
+            (vector-set!
+             vec.1
+             '0
+             (let ((vec.2 (make-vector '1))) (begin (vector-set! vec.2 '0 '0) vec.2)))
+            (vector-set! vec.1 '1 (cons '1 '()))
+            (vector-set! vec.1 '2 (cons '#t (cons '#f '())))
+            vec.1))))
+   t.0)")
+   (P "本部分的最后, 让我们给出" (Code "convert-complex-datum")
+      "的输出语言的句法."
+      (CodeB "&lt;exp> ::= (quote &lt;immediate>)
+       |  &lt;uvar>
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (set! &lt;uvar> &lt;exp>)
+       |  (begin &lt;exp>+)
+       |  (lambda (&lt;uvar>*) &lt;exp>)
+       |  (let ((&lt;uvar> &lt;exp>)*) &lt;exp>)
+       |  (letrec ((&lt;uvar> &lt;exp>)*) &lt;exp>)
+       |  (&lt;prim> &lt;exp>*)
+       |  (&lt;exp> &lt;exp>*)
+&lt;immediate> ::= ()
+             |  &lt;boolean>
+             |  &lt;fixnum>")
+      "实际上句法没有发生很大的变化, 只有" (Code "&lt;datum>")
+      "被替换为了" (Code "&lt;immediate>") ".")
+   (H2 "作业14: " (Code "uncover-assigned"))
+   (P "现在让我们接着完成" (Code "uncover-assigned")
+      ", 这个pass实际上是为了" (Code "convert-assignments")
+      "作准备, 当然" (Code "purify-letrec")
+      "也会用到这里得到的信息. " (Code "uncover-assigned")
+      "是为了分析被赋值了的变量, 然后在这些变量被绑定引入的地方"
+      "标示出来. 正如刚才所说, " (Code "uncover-assigned")
+      "是为了" (Code "convert-assignments")
+      "作准备, " (Code "convert-assignments")
+      "的目的在于消除赋值. 消除赋值的方法是将" (Code "set!")
+      "形式转换为等效的利用" (Code "box")
+      "相关函数的表达式. 为什么要消除赋值呢? "
+      "这是因为在赋值存在的情况下之后的闭包变换难以进行.")
+   (P (Code "uncover-assigned")
+      "写起来当然也非常容易, 不过这次我们最好要先明确其输出语言的句法."
+      (CodeB "&lt;exp> ::= (quote &lt;immediate>)
+       |  &lt;uvar>
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (set! &lt;uvar> &lt;exp>)
+       |  (begin &lt;exp>+)
+       |  (lambda (&lt;uvar>*) (assigned (&lt;uvar>*) &lt;exp>))
+       |  (let ((&lt;uvar> &lt;exp>)*) (assigned (&lt;uvar>*) &lt;exp>))
+       |  (letrec ((&lt;uvar> &lt;exp>)*) (assigned (&lt;uvar>*) &lt;exp>))
+       |  (&lt;prim> &lt;exp>*)
+       |  (&lt;exp> &lt;exp>*)")
+      "我们看到, 只有三种绑定结构" (Code "lambda") ", "
+      (Code "let") ", " (Code "letrec")
+      "的句法发生了变化, 也就是记录了被赋值的变量. 为了明显起见, 这里还使用了"
+      (Code "assigned") "进行提示, 但是从功能上来说这可有可无, 只是便于阅读而已.")
+   (P "编写" (Code "uncover-assigned") "需要我们分析和积累被赋值的变量, "
+      "并自下而上地传递. 当我们碰到绑定结构时, 它会" (Q "截胡")
+      "由它引入且被赋值的变量, 这其实有点让人联想到" (Code "lambda")
+      "绑定自由变量的过程. 诚然如此, 之后当我们进行闭包变换时, 首先要进行"
+      (Code "uncover-free") "来分析自由变量, 而其写法与"
+      (Code "uncover-assigned") "如出一辙. 多说一句, 自下而上地分析"
+      "也保证了我们分析的被赋值变量和自由变量与绑定结构(的遮盖行为)相适配.")
+   (CodeB "(define (uncover-assigned exp)
+  (define (uncover* exp*)
+    (if (null? exp*)
+        (values '() '())
+        (let-values (((exp u*) (uncover (car exp*)))
+                     ((exp* v*) (uncover* (cdr exp*))))
+          (values (cons exp exp*) (U u* v*)))))
+  (define (uncover exp)
+    (match exp
+      ((quote ,i) (values exp '()))
+      (,uvar (guard (symbol? uvar)) (values exp '()))
+      ((if ,q ,a ,e)
+       (let-values (((qae u*) (uncover* (cdr exp))))
+         (values (cons 'if qae) u*)))
+      ((set! ,uvar ,exp)
+       (let-values (((exp u*) (uncover exp)))
+         (values `(set! ,uvar ,exp)
+                 (set-cons uvar u*))))")
+   (P "这是" (Code "uncover-assigned")
+      "的开头, 我展示了一种和" (Code "convert-complex-datum")
+      "不同的返回多值的方法, 也就是使用" (Code "values")
+      ". 这里最值得关注的其实是处理" (Code "(set! ,uvar ,exp)")
+      "的部分, " (Code "uvar") "是被赋值的变量, 当然也不要忘记"
+      (Code "exp") "的被赋值变量. " (Code "set-cons")
+      "和" (Code "U") "类似, 但只是添加一个元素到某个集合中.")
+   (CodeB "      ((begin . ,exp*)
+       (let-values (((exp* u*) (uncover* exp*)))
+         (values (cons 'begin exp*) u*)))
+      ((lambda ,x* ,body)
+       (let-values (((body u*) (uncover body)))
+         (values `(lambda ,x*
+                    (assigned ,(I x* u*) ,body))
+                 (D u* x*))))
+      ((let ,bds ,body)
+       (: bds
+          (lambda (x* e*)
+            (let-values (((e* u*) (uncover* e*))
+                         ((body v*) (uncover body)))
+              (values (Let x* e* `(assigned ,(I x* v*) ,body))
+                      (U u* (D v* x*)))))))
+      ((letrec ,bds ,body)
+       (: bds
+          (lambda (x* e*)
+            (let-values (((e* u*) (uncover* e*))
+                         ((body v*) (uncover body)))
+              (define w* (U u* v*))
+              (values (Letrec x* e* `(assigned ,(I x* w*) ,body))
+                      (D w* x*))))))")
+   (P "接着, 我们应该将注意力集中到三种绑定结构上来: "
+      (Code "lambda") ", " (Code "let") ", " (Code "letrec")
+      ". 处理这三种构造的代码都是清晰的, 只是我想提请读者注意一下"
+      (Code "letrec") "和" (Code "let")
+      "的处理方式的确不同, " (Code "letrec")
+      "的绑定可以管辖到它的右支的那些表达式, 因而需要将"
+      (Code "e*") "的被赋值变量" (Code "u*") "和"
+      (Code "body") "的被赋值变量" (Code "v*")
+      "并为" (Code "w*") ".")
+   (CodeB "      ((,prim . ,rands)
+       (guard (prim? prim))
+       (let-values (((rands u*) (uncover* rands)))
+         (values `(,prim . ,rands) u*)))
+      ((,rator . ,rands) (uncover* exp))))
+  (let-values (((exp u*) (uncover exp)))
+    (if (null? u*)
+        exp
+        (error 'uncover-assigned &quot;unbound assigned variables ~s&quot; u*))))")
+   (P "收尾的部分并不那么有趣, 只是我们需要注意, 我们并不期望存在未被绑定的被赋值变量. "
+      "当然了, 一般来说这不太可能, 因为未被绑定的变量在" (Code "parse-scheme")
+      "那里就被拦截下来了. 不过, 层层设防还是有好处的, 因为笔误是永远也无法排除的.")
+   (P "说点无关紧要的话, 就是我们的转换是" (Q "保守") "的. 何谓保守, "
+      "就是我们没有试图分析什么样的赋值是在" (Em "运行时")
+      "真正可达的, 而是将所有具有嫌疑的变量都一网打尽. "
+      "当然, 根据可计算理论的经典结果, 想要完美地进行这种分析在一般情况下是不可能的. "
+      "因此, 其实绝大多数编译器中的pass都是保守的. "
+      "不过, 的确我们在之后是可以有机会去优化一下的, 不过现在不是好时机.")
+   (P "以下是一些例子, 当然记得更新" (Code "compil") "的定义.")
+   (CodeB "> (compil '(let ((counter (let ((x 0))
+                            (lambda ()
+                              (set! x (+ x 1))
+                              x))))
+             (counter)
+             (counter)
+             (counter)))
+'(let ((counter.0
+        (let ((x.1 '0))
+          (assigned
+           (x.1)
+           (lambda () (assigned () (begin (set! x.1 (+ x.1 '1)) x.1)))))))
+   (assigned () (begin (counter.0) (counter.0) (counter.0))))")
+   (CodeB "> (compil '(letrec ((append (lambda (l1 l2)
+                              (if (null? l1)
+                                  l2
+                                  (cons (car l1)
+                                        (append (cdr l1) l2))))))
+             (append '(0 1 2) '(3 4 5))))
+'(let ((t.3 (cons '0 (cons '1 (cons '2 '()))))
+       (t.4 (cons '3 (cons '4 (cons '5 '())))))
+   (assigned
+    ()
+    (letrec ((append.0
+              (lambda (l1.1 l2.2)
+                (assigned
+                 ()
+                 (if (null? l1.1)
+                   l2.2
+                   (cons (car l1.1) (append.0 (cdr l1.1) l2.2)))))))
+      (assigned () (append.0 t.3 t.4)))))")
+   (H2 "作业14: " (Code "purify-letrec"))
+   (P "老实说, 我并不真正理解" (Code "purify-letrec")
+      ". 但是, 既然它将要做的事情描述得很明确, 只是写一写没有多大问题.")
+   (P (Code "letrec") "的问题在于它太灵活了, 其实对它稍作限制, "
+      "也不会影响任何常见程序的表达. 不过, 既然Scheme的原则就是消除限制, "
+      "那么我就不得不严肃一点思考怎么处理" (Code "letrec") ".")
+   (P "如果一个Scheme实现不提供" (Code "letrec")
+      ", 那么我们可以通过宏来实现" (Code "letrec")
+      ", 其中最简单但也最低效的转换方式是将"
+      (CodeB "(letrec ((x e) ...) body)")
+      "变换为"
+      (CodeB "(let ((x (void)) ...)
+  (let ((t e) ...)
+    (set! x t)
+    ...
+    body))")
+      "其中诸" (Code "t") "是新的变量. 为什么说这种方式低效呢? "
+      "因为它会阻碍之后的优化.")
+   (P (Code "letrec") "并非洪水猛兽, 对于最简单纯粹的" (Code "letrec")
+      ", 我们想直接保留其形式. 何谓纯粹呢? 也就是说, "
+      (Code "letrec") "的右支诸表达式均为" (Code "lambda")
+      "表达式, 并且由该" (Code "letrec") "引入的诸变量均未得到赋值, 例如"
+      (CodeB "(letrec ((even? (lambda (n)
+                  (if (= n 0)
+                      #t
+                      (odd? (- n 1)))))
+         (odd? (lambda (n)
+                 (if (= n 0)
+                     #f
+                     (even? (- n 1))))))
+  (even? 88))"))
+   (P "现在让我们来详细描述作业14里的" (Code "purify-letrec")
+      "的所作所为. 首先, " (Code "letrec") "的右支诸表达式和体"
+      "都会递归地应用这个转换. 接着, 我们将" (Code "letrec")
+      "的绑定分为三种情况, 分别是简单, lambda, 复杂. "
+      "lambda我们已经说过了, 也就是右支是一个" (Code "lambda")
+      "且其绑定至的变量未被赋值. 至于简单和复杂之分, 还是让我引用作业的原文吧."
+      (Blockquote
+       "A simple expression contains no occurrences of the variables bound by the "
+       (Code "letrec") " expression and no applications unless nested within " (Code "lambda")
+       " expressions. The latter constraint prevents simple expressions from reaching a call to "
+       (Code "call/cc") " if we ever add " (Code "call/cc")
+       " to our language. Of course, at that time we would also "
+       "rule out primitive calls to " (Code "call/cc")
+       " itself. It would also make sense to disallow " (Code "letrec")
+       " expressions, to prevent this pass from becoming nonlinear, and to disallow "
+       "other expressions, such as " (Code "lambda")
+       " expressions, to reduce the cost of the " (Q "simple")
+       " check. Use your own judgement on this as long as you do "
+       "treat as simple constants, references to variables not bound by "
+       "the letrec, and primitive calls with simple operands.")
+      "可以看到, 对于简单表达式的判定存在一定的灵活空间. 不过, 简单绑定还不完全等同于"
+      "简单表达式, 它还需要被绑定至的变量没有被赋值. 若是一个绑定不满足这两个条件中的任何一个, "
+      "那么它就是一个复杂绑定.")
+   
    ))
