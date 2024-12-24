@@ -94,6 +94,7 @@
          "pointless.rkt"
          "algebra.rkt"
          "p423.rkt"
+         "clos.rkt"
          
          )
 (define (emit-web)
@@ -204,6 +205,7 @@
   (emitXml pointless.html "../pointless.html")
   (emitXml algebra.html "../algebra.html")
   (emitXml p423.html "../p423.html")
+  (emitXml clos.html "../clos.html")
   
   )
 (emit-web)

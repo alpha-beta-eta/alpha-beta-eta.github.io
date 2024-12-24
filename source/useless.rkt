@@ -28,6 +28,7 @@
     (H2 (A "无点拓扑学" #:attr* '((href "pointless.html"))))
     (H2 (A "代数: 第0章" #:attr* '((href "algebra.html"))))
     (H2 (A "P423笔记" #:attr* '((href "p423.html"))))
+    (H2 (A "Common Lisp面向对象编程" #:attr* '((href "clos.html"))))
     
     )
    ))
