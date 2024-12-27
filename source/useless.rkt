@@ -30,6 +30,7 @@
     (H2 (A "P423笔记" #:attr* '((href "p423.html"))))
     (H2 (A "Common Lisp面向对象编程" #:attr* '((href "clos.html"))))
     (H2 (A "The Little Typer翻译" #:attr* '((href "little_typer.html"))))
+    (H2 (A "游戏设计" #:attr* '((href "game_design.html"))))
     
     )
    ))

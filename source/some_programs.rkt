@@ -414,4 +414,17 @@
     (unless (= i l)
       (p (vector-ref v i))
       (iter (+ i 1)))))")
+   (H2 "自然数")
+   (CodeB "datatype nat = Zero
+             | Succ of nat
+
+fun plus m Zero = m
+  | plus m (Succ n) = Succ(plus m n)
+
+fun mult m Zero = Zero
+  | mult m (Succ n) = plus (mult m n) m
+
+fun expt m Zero = Succ Zero
+  | expt m (Succ n) = mult (expt m n) m")
+   
    ))

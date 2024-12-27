@@ -360,4 +360,14 @@
   (let iter ((i 0))
     (unless (= i l)
       (p (vector-ref v i))
-      (iter (+ i 1)))))</code></pre></body></html>
+      (iter (+ i 1)))))</code></pre><h2>自然数</h2><pre><code>datatype nat = Zero
+             | Succ of nat
+
+fun plus m Zero = m
+  | plus m (Succ n) = Succ(plus m n)
+
+fun mult m Zero = Zero
+  | mult m (Succ n) = plus (mult m n) m
+
+fun expt m Zero = Succ Zero
+  | expt m (Succ n) = mult (expt m n) m</code></pre></body></html>

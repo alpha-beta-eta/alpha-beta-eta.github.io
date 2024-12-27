@@ -51,11 +51,22 @@
      (width "100%")
      (border-top "1.5px solid black")
      (break-inside "avoid"))
+    (".law"
+     (width "100%")
+     (font-family "KaiTi")
+     (border-top "1.5px solid black")
+     (break-inside "avoid"))
+    ("table.law blockquote"
+     (width "60%")
+     (margin "auto")
+     (padding "10px")
+     (border "5px double black"))
     (".leftd"
      (width "48%"))
     (".middled"
      (width "15px"))
     (".dialogue td"
+     (padding "5px")
      (text-align "left")
      (vertical-align "top"))
     (".dashed"

@@ -96,6 +96,7 @@
          "p423.rkt"
          "clos.rkt"
          "little_typer.rkt"
+         "game_design.rkt"
          
          )
 (define (emit-web)
@@ -208,6 +209,7 @@
   (emitXml p423.html "../p423.html")
   (emitXml clos.html "../clos.html")
   (emitXml little_typer.html "../little_typer.html")
+  (emitXml game_design.html "../game_design.html")
   
   )
 (emit-web)

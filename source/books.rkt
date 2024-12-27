@@ -56,12 +56,20 @@
     (Li "数学的建筑")
     (Li "A Survey of Modern Algebra")
     (Li "Beginning Mathematical Logic")
+    (Li "Exercises in Analysis (Part 1)")
+    (Li "ML for the Working Programming")
+    (Li "Purely Functional Data Structures")
+    (Li "Programming in Standard ML")
+    (Li "Semantics Engineering with PLT Redex")
+    (Li "Lectures on the Curry-Howard Isomorphism")
+    
     )
    (H1 "在读的书")
    (Ol
     (Li "Algebra: Chapter 0")
     (Li "Category Theory (Steve Awodey)")
     (Li "Lectures on the Curry-Howard Isomorphism")
+    (Li "The Little Typer")
     
     )
    (H1 "网页收藏 (待读列表?)")

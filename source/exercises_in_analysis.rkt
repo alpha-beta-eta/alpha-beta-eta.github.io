@@ -129,6 +129,77 @@
             )
         )
     )
+   (H4 "第2.1.2小节 拓扑基和子基")
+   ((definition #:n "2.19")
+    "令" (tuple $X $tau) "是一个拓扑空间."
+    (Ol #:attr* '((type "a"))
+        (Li "一个族" (&sube $B:script $tau)
+            "是" $tau "的一个" (B "基")
+            ", 如果每个" (∈ $U $tau)
+            "都是" $B:script "中的某些元素之并.")
+        (Li "一个族" (&sube $Y:script $tau)
+            "是" $tau "的一个" (B "子基")
+            ", 如果" $Y:script
+            "中的集合的所有有限的交之集构成了"
+            $tau "的一个基."))
+    "[注记: 子基的一个等价定义是, " $Y:script
+    "生成了" $tau ", 即" $tau "是包含"
+    $Y:script "的最小的拓扑.]")
+   ((proposition #:n "2.20")
+    "如果" (tuple $X $tau) "是一个拓扑空间, 并且"
+    (&sube $B:script $tau) ", 那么" $B:script
+    "是一个基当且仅当对于每个" (∈ $x $X)
+    "和每个" (∈ $U (app $N:script $x))
+    ", 我们可以找到一个" (∈ $V $B:script)
+    "使得" (∈ $x (&sube $V $U)) ".")
+   ((proof)
+    "如果" $B:script "是一个基, 那么对于"
+    (∈ $x $X) "和" (∈ $U (app $N:script $x))
+    ", 存在" (∈ $W $tau) "满足"
+    (∈ $x $W) "且" (&sube $W $U)
+    ". 既然" $W "是一个开集, 那么其可以表示为"
+    $B:script "的一些元素之并. 因此, 我们可以断言存在"
+    (∈ $V $B:script) "满足" (∈ $x $V)
+    ". 反过来, 如果我们对于每个" (∈ $x $X)
+    "和每个" (∈ $U (app $N:script $x))
+    "都可以找到一个" (∈ $V $B:script)
+    "使得" (∈ $x (&sube $V $U))
+    ", 那么对于任意的" (∈ $W $tau)
+    ", 对于" $W "的每个点" $x
+    ", 我们都可以找到一个" (∈ (app $V $x) $B:script)
+    "满足" (∈ $x (app $V $x)) "且"
+    (&sube (app $V $x) $W)
+    ", 既然" (∈ $W (app $N:script $x))
+    ". 我们考虑" (Union (∈ $x $W) (app $V $x))
+    ", 这个集合显然是" $W "的子集, 并且既然"
+    (∈ $x (app $V $x)) ", 所以" $W
+    "也是该集合的子集. 换言之, "
+    (&= $W (Union (∈ $x $W) (app $V $x)))
+    ". 因为" $W "是任意的开集, 所以这告诉我们"
+    $B:script "是" $tau "的一个基.")
+   ((proposition #:n "2.21")
+    "如果" (tuple $X $tau) "是一个拓扑空间, 并且"
+    $B:script "是" $tau "的一个基, 那么"
+    $U "为开集 (即" (∈ $U $tau) ") 当且仅当对于每个"
+    (∈ $x $U) ", 我们可以找到" (∈ $V $B:script)
+    "使得" (∈ $x (&sube $V $U)) ".")
+   ((proof)
+    "前者推出后者是2.20的一个推论. 对于后者推出前者, "
+    "基本上也可以按照2.20的证明方式推进, 即"
+    (&= $U (Union (∈ $x $U) (app $V $x)))
+    ", 其中" (app $V $x) "是一个满足"
+    (∈ (app $V $x) $B:script) "且"
+    (∈ $x (&sube (app $V $x) $U))
+    "的集合. 鉴于" (&sube $B:script $tau)
+    ", 故" $U "是开集无疑.")
+   (P "注记: 取" (&= $B:script $tau)
+      ", 那么命题2.21即" $U "是开集当且仅当"
+      $U "的每个点都是内部点 (interior point).")
+   ((definition #:n "2.22")
+    "令" $A:script "是" $X "的一个子集族, 那么由"
+    $A:script "生成的拓扑 (记作" (app $tau $A:script)
+    ") 是"
+    )
    (H3 "第2.2节 问题")
    
    (H2 "第3章 测度, 积分和鞅")
