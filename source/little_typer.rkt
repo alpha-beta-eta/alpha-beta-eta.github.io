@@ -829,11 +829,120 @@
         "不过是书写同一个" (Code "Nat") "的不同方式而已."
         (P (Code "one") "和" (Code "1") "是相同的"
            (Code "Nat") "吗?"))
-    (Rd ""
-        ))
+    (Rd "嗯, 如果" (Code "zero") "和" (Code "0")
+        "是相同的" (Code "Nat") "的话, 那么这似乎很合理."))
    ((dialogue)
-    (Ld ""
-        )
+    (Ld "实际上, " (Code "one") "没有意义. 但是, "
+        (Code "(add1 zero)") "是书写数字" (Code "1")
+        "的另一种方式."
+        (P "通过" (Em "定义") "使得" (Code "one")
+           "为" (Code "(add1 zero)") "的确是可行的."
+           (CodeD "(define one
+  (add1 zero))")))
+    (Rd "为什么这个定义周围用虚线框住了呢?"))
+   ((dialogue)
+    (Ld "虚线框意味着这个定义有点问题, "
+        "以至于它不能在之后使用.")
+    (Rd "这个定义有什么问题呢?"
+        (P "看上去很正常啊.")))
+   ((dialogue)
+    (Ld "当定义一个名字时, 有必要先"
+        (Code "claim") "这个名字具有一个类型, 而"
+        (Code "one") "是一个" (Code "Nat") "."
+        (CodeB "(claim one Nat)
+(define one
+  (add1 zero))"))
+    (Rd "因此, " (Code "two") "可以被定义成"
+        (CodeB "(claim two Nat)
+(define two
+  (add1 one))")))
+   ((law)
+    (Center "定义前先声明")
+    (P "使用" (Code "define")
+       "将一个名字和一个表达式联系起来之前需要使用"
+       (Code "claim")
+       "将名字和表达式的类型联系起来."))
+   ((dialogue)
+    (Ld "如果" (Code "1") "是书写" (Code "(add1 zero)")
+        "的另一种方式, 那么书写" (Code "4")
+        "的另一种方式是什么呢?")
+    (Rd "难道不应该是"
+        (CodeB "(add1
+ (add1
+  (add1
+   (add1 zero))))")
+        "吗? 我们不能定义" (Code "four")
+        "来指代这个表达式吗?"))
+   ((dialogue #:id "top-add1")
+    (Ld "当然可以了."
+        (CodeB "(define four
+  (add1
+   (add1
+    (add1
+     (add1 zero)))))")
+        "那么, 再问一下书写" (Code "8")
+        "有另外的方式吗?")
+    (Rd "那必然是"
+        (CodeB "(" (U "add1") "
+ (add1
+  (add1
+   (add1
+    (add1
+     (add1
+      (add1
+       (add1 zero))))))))")))
+   ((dialogue)
+    (Ld (Code "8") "是规范的吗?")
+    (Rd "似乎如此, 但是为什么" (Code "8")
+        "是规范的呢?"))
+   ((dialogue)
+    (Ld "之所以" (Code "8") "是" (Em "规范")
+        "的, 是因为其顶" (Code (U "add1"))
+        "是一个" (Em "构造子(constructor)")
+        ", 并且塞在顶" (Code (U "add1"))
+        "下面的参数, 即" (Code "7")
+        ", 也是规范的."
+        ((comment)
+         (Ref "top-add1") "中的顶" (Code (U "add1"))
+         "只此一次用下划线标注出来以示强调."))
+    (Rd "为什么" (Code "7") ", 亦写作"
+        (CodeB "(add1
+ (add1
+  (add1
+   (add1
+    (add1
+     (add1
+      (add1 zero)))))))")
+        "是规范的呢?"))
+   ((dialogue)
+    (Ld (Code "7") "是规范的完全是同理可得.")
+    (Rd "这意味着" (Code "zero")
+        "必然是规范的, 不然的话" (Code "(add1 zero)")
+        "就不是规范的了."))
+   ((dialogue)
+    (Ld (Code "zero") "的顶是什么呢?")
+    (Rd "必须是" (Code "zero") "."))
+   ((dialogue)
+    (Ld "之所以" (Code "zero") "是规范的, 是因为顶"
+        (Code "zero") "是一个构造子, 并且其没有参数."
+        (CodeB "(add1
+ (+ (add1 zero)
+    (add1
+     (add1 zero))))")
+        "是规范的吗?")
+    (Rd "不是, 因为" (Code "+") "不是构造子."))
+   ((dialogue)
+    (Ld "一个以构造子为顶的表达式被称为一个"
+        (Em "值(value)") "."
+        (P "即便"
+           (CodeB "(add1
+ (+ (add1 zero)
+    (add1
+     (add1 zero))))")
+           "不是规范的, 它的确是一个值.")
+        ((comment)
+         "值也被称为" (Em "典则(canonical)")
+         "表达式."))
     (Rd ""
         ))
    ((dialogue)
