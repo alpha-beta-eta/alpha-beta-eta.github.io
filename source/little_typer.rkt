@@ -1223,19 +1223,88 @@
    ((dialogue)
     (Ld "原子" (Code "'bay") "是一个构造子, 因而原子"
         (Code "'leaf") "也是一个构造子.")
-    (Rd ""
-        ))
+    (Rd (Em "所有") "原子都是构造子吗?"))
    ((dialogue)
-    (Ld ""
-        )
-    (Rd ""
-        ))
+    (Ld "是的, 每个原子都构造其自身."
+        (P "这是不是意味着每个原子都是值?"))
+    (Rd "的确, 因为解释为什么"
+        (P (Code "Atom") "是一个类型")
+        "就是在说原子是" (Code "Atom") "值."))
    ((dialogue)
-    (Ld ""
-        )
-    (Rd ""
-        ))
+    (Ld "嗯."
+        (P "在表达式" (Code "zero")
+           "中, 顶层构造子是什么?"))
+    (Rd "那必然是" (Code "zero")
+        ", 因为" (Code "zero")
+        "是没有参数的构造子."))
+   ((dialogue)
+    (Ld "对于表达式" (Code "'garlic")
+        "而言, 什么是顶层的构造子?")
+    (Rd "原子" (Code "'garlic")
+        "是仅有的构造子, 所以它必然就是顶层的构造子."
+        (P "那么, " (Code "Nat") "是一个构造子吗?")))
+   ((dialogue)
+    (Ld "不是, " (Code "Nat") "并非一个构造子. "
+        (Code "zero") "和" (Code "add1")
+        "是创造" (Em "数据") "的构造子, 而"
+        (Code "Nat") (Em "描述")
+        "了特定的数据, 其要么就是" (Code "zero")
+        ", 要么以" (Code "add1")
+        "为顶, 且以另一个" (Code "Nat")
+        "为其参数."
+        (P (Code "Pair") "是一个构造子吗?"))
+    (Rd "不是, 因为" (Code "Pair") "表达式是在描述以"
+        (Code "cons") "为顶的表达式. 构造子创建"
+        (Em "数据") ", 而不是类型."
+        (P "那么, " (Code "Pair") "应该叫做什么呢?")))
+   ((dialogue)
+    (Ld (Code "Pair") "是一个"
+        (Em "类型构造子(type constructor)")
+        ", 因其构造了一个类型. 类似地, "
+        (Code "Nat") "和" (Code "Atom")
+        "也是类型构造子."
+        (CodeB "(cons zero 'onion)")
+        "是一个"
+        (CodeB "(Pair Atom Atom)")
+        "吗?")
+    (Rd "不是."
+        (P "难道它不应该是一个"
+           (CodeB "(Pair Nat Atom)")
+           "吗?")))
+   ((dialogue)
+    (Ld "的确如此! 但是"
+        (CodeB "(cons 'zero 'onion)")
+        "是一个"
+        (CodeB "(Pair Atom Atom)")
+        "请问"
+        (CodeB "(cons 'basil
+ (cons 'thyme 'oregano))")
+        "的类型是什么?"
+        ((comment)
+         "谢谢Julia Child (1912-2004)."))
+    (Rd "基于我们的所见所闻, 它必然是一个"
+        (CodeB "(Pair Atom
+ (Pair Atom Atom))")
+        ((tcomment)
+         "basil, thyme, oregano分别是罗勒, "
+         "百里香, 牛至, 这是三种典型的香料. "
+         "另外, Julia Child是一位厨师和电视名人.")))
+   ((dialogue)
+    (Ld "诚然如此.")
+    (Rd "好吧, 暂时就那么多了, 我的脑袋要炸了!"))
+   ((dialogue)
+    (Ld "或许你应该再一次阅读这一章. "
+        "判断, 表达式, 类型是本书最重要的概念.")
+    (Rd "在完全读完这一章之后, 或许应该来点新鲜蔬菜."))
    (H2 "从心所欲, 道法自然")
+   ((dialogue)
+    (Ld "ratatouille如何?")
+    (Rd (Em "很好(très bien)") ", 谢谢提问."))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
    ((dialogue)
     (Ld ""
         )
@@ -1247,6 +1316,16 @@
     (Rd ""
         ))
    (H2: "课间: 一叉子Pie")
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
    (H2 "消去所有的自然数!")
    (H2 "小菜一碟, 简单如Pie")
    ((dialogue)
