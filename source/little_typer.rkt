@@ -943,8 +943,77 @@
         ((comment)
          "值也被称为" (Em "典则(canonical)")
          "表达式."))
-    (Rd ""
-        ))
+    (Rd "这个表达式不是规范的, 是因为"
+        (CodeB "(+ (add1 zero)
+   (add1
+    (add1 zero)))")
+        "并非书写" (Code "3") "的最直接方式."))
+   ((law)
+    (Center "值")
+    (P "以构造子为顶的表达式被称为" (Em "值") "."))
+   ((dialogue)
+    (Ld "现在我们给出另一个并非规范的表达式."
+        (CodeB "(+ (add1
+    (add1 zero))
+   (add1 zero))")
+        "这是书写" (Code "3") "的最直接方式吗?")
+    (Rd "肯定不是."
+        (P "准确来说, 构造子究竟是什么呢?")))
+   ((dialogue)
+    (Ld "某些表达式是类型, 例如" (Code "Nat")
+        "和" (Code "(Pair Nat Atom)") "."
+        (P "对于新类型的解释的一部分是要说明其"
+           "构造子为何. 构造子表达式是构造"
+           "具有该类型的表达式的直接方式."))
+    (Rd "构造子的例子有哪些呢?"))
+   ((dialogue)
+    (Ld (Code "Nat") "的构造子是" (Code "zero")
+        "和" (Code "add1") ", 而" (Code "Pair")
+        "的构造子是" (Code "cons") ".")
+    (Rd "值和规范形式之间有何关系?"))
+   ((dialogue)
+    (Ld "在一个值里, 顶层的构造子的参数不必是规范的. "
+        "但如果这些参数的确是规范的, "
+        "那么整个构造子表达式就具有规范形式."
+        (P "所有的值都是规范的吗?"))
+    (Rd "显然不是."
+        (CodeB "(add1
+ (+ (add1 zero)
+    (add1
+     (add1 zero))))")
+        "和"
+        (CodeB "(add1
+ (+ (add1 zero) (add1 one)))")
+        "都是值, 但是它们都不是规范的."))
+   ((law)
+    (Center "值和规范形式")
+    (P "不是所有的值都具有规范形式. "
+       "这是因为构造子的参数不必是规范的. "
+       "每个表达式只有一个规范形式, "
+       "但是有时可能将其写成值的方式不止一种."))
+   ((dialogue)
+    (Ld "以下空白方框里填什么会使得整个表达式"
+        (Em "不") "是一个" (Code "Nat") "值呢?"
+        (CodeB "(add1 "
+               (Span #:attr*
+                     '((style "padding: 6px 25px; border: 1.2px solid white; display: inline-block;"))
+                     "");"" reflects the tricky part of html.
+               ")"))
+    (Rd (Code "'aubergine") "怎么样?"))
+   ((dialogue)
+    (Ld "诚然如此."
+        (CodeB "(add1 'aubergine)")
+        "并非一个" (Code "Nat")
+        "值, 因为" (Code "'aubergine")
+        "是一个" (Code "Atom")
+        "而不是一个" (Code "Nat") "."
+        (P "当填充这样的方框时, 我们的期望是"
+           "作为结果的表达式由某个类型刻画."))
+    (Rd "然而, 若置于该方框里的是任何一个"
+        (Code "Nat") "表达式, 那么整个表达式就"
+        (Em "是") "一个值. 这一整个表达式以"
+        (Code "add1") "为顶, 而" (Code "add1")
+        "是一个" (Code "Nat") "构造子."))
    ((dialogue)
     (Ld ""
         )

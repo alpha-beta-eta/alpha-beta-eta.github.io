@@ -15,7 +15,7 @@ cite {font-style: normal;}
 .slide {break-inside: avoid;border: 2px solid black;width: 400px;height: 225px;}
 .label {break-inside: avoid;}
 .dialogue {width: 100%;border-top: 1.5px solid black;break-inside: avoid;}
-.law {width: 100%;font-family: KaiTi;border-top: 1.5px solid black;break-inside: avoid;}
+.law {width: 100%;border-top: 1.5px solid black;break-inside: avoid;}
 table.law blockquote {width: 60%;margin: auto;padding: 10px;border: 5px double black;}
 .leftd {width: 48%;}
 .middled {width: 15px;}

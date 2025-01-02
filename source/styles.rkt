@@ -53,7 +53,6 @@
      (break-inside "avoid"))
     (".law"
      (width "100%")
-     (font-family "KaiTi")
      (border-top "1.5px solid black")
      (break-inside "avoid"))
     ("table.law blockquote"
