@@ -875,7 +875,8 @@
         "来指代这个表达式吗?"))
    ((dialogue #:id "top-add1")
     (Ld "当然可以了."
-        (CodeB "(define four
+        (CodeB "(claim four Nat)
+(define four
   (add1
    (add1
     (add1
@@ -1084,7 +1085,7 @@
     (Center (Code "zero") "之诫")
     (P (Code "zero") "和" (Code "zero")
        "是相同的" (Code "Nat") "."))
-   ((dialogue)
+   ((dialogue #:id "add1-zero")
     (Ld "如果每个" (Code "add1")
         "的参数是相同的" (Code "Nat")
         ", 那么两个" (Code "add1")
@@ -1095,7 +1096,76 @@
            (CodeB "(add1 zero)")
            "是相同的"
            (CodeB "Nat")))
-    (Rd "这两个表达式都是值. "
+    (Rd "这两个表达式都是值. 这两个值都以" (Code "add1")
+        "为顶, 因此它们的参数应该是相同的"
+        (Code "Nat") "."
+        (P "这两个参数都是" (Code "zero")
+           ", " (Code "zero") "是一个值, 而且"
+           (Code "zero") "和" (Code "zero")
+           "是相同的" (Code "Nat") "值.")))
+   ((law)
+    (Center (Code "add1") "之诫")
+    (P "如果" $n "和" $k "是相同的" (Code "Nat")
+       ", 那么" (Code "(add1 " $n ")") "和"
+       (Code "(add1 " $k ")") "是相同的"
+       (Code "Nat") "."))
+   ((dialogue)
+    (Ld "为什么"
+        (CodeB "(add1 (+ 0 1))")
+        "和"
+        (CodeB "(add1 (+ 1 0))")
+        "是相同的"
+        (CodeB "Nat"))
+    (Rd "这两个" (Code "Nat") "都以" (Code "add1")
+        "为顶, 于是它们都是值."
+        (P "它们之所以相同, 是因为"
+           (CodeB "(+ 0 1)")
+           "和"
+           (CodeB "(+ 1 0)")
+           "是相同的"
+           (CodeB "Nat"))))
+   ((dialogue)
+    (Ld "为什么" (Code "(+ 0 1)")
+        "和" (Code "(+ 1 0)")
+        "是相同的" (Code "Nat") "?")
+    (Rd "这些" (Code "Nat") "并非值, 因而为了判断它们是否相同, "
+        "第一步应该是找出它们的值."
+        (P "这两个表达式都以" (Code "(add1 zero)")
+           "为其一个值, 而" (Ref "add1-zero")
+           "解释了为什么"
+           (CodeB "(add1 zero)")
+           "和"
+           (CodeB "(add1 zero)")
+           "是相同的"
+           (CodeB "Nat"))))
+   ((dialogue)
+    (Ld "很对.")
+    (Rd "是否这意味着" (Code "four")
+        "本可以按照以下方式定义?"
+        (CodeD "(define four
+  (add1
+   (+ (add1 zero)
+      (add1
+       (add1 zero)))))")))
+   ((dialogue)
+    (Ld "为什么有虚线框呢?")
+    (Rd (Code "four")
+        "已经被定义了, 因而不能被再次定义."))
+   ((law)
+    (Center "定义是永恒的")
+    (P "一旦一个名字被" (Code "claim")
+       "了, 那么它就不能被重新" (Code "claim")
+       ". 一旦一个名字被" (Code "define")
+       "了, 那么它就不能被重新" (Code "define") "."))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
         ))
    ((dialogue)
     (Ld ""
