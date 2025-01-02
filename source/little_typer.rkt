@@ -923,7 +923,7 @@
    ((dialogue)
     (Ld (Code "zero") "的顶是什么呢?")
     (Rd "必须是" (Code "zero") "."))
-   ((dialogue)
+   ((dialogue #:id "zero-constructor")
     (Ld "之所以" (Code "zero") "是规范的, 是因为顶"
         (Code "zero") "是一个构造子, 并且其没有参数."
         (CodeB "(add1
@@ -1158,8 +1158,71 @@
        ". 一旦一个名字被" (Code "define")
        "了, 那么它就不能被重新" (Code "define") "."))
    ((dialogue)
-    (Ld ""
-        )
+    (Ld "不过当然了, 一开始" (Code "four")
+        "的确可以像那样定义."
+        (P "实际上, 其他表达式都不能分辨出"
+           (Code "four") "的两种定义之间的不同, "
+           "因为这两个定义了" (Code "four")
+           "为相同的" (Code "Nat") "."))
+    (Rd (Code "cons") "是一个构造子吗?"))
+   ((dialogue)
+    (Ld "是的, " (Code "cons")
+        "构造" (Code "Pair") ".")
+    (Rd "为了对于" (Code "car") "表达式求值, 是否有必要对于"
+        (Code "car") "的参数求值?"))
+   ((dialogue)
+    (Ld "的确. 为了找出一个" (Code "car")
+        "表达式的值, 我们从找出其参数的值开始."
+        (P "关于这参数的值, 我们能说什么呢?"))
+    (Rd "这参数的值以" (Code "cons") "为顶."))
+   ((dialogue)
+    (Ld "在找出参数的值之后, 接下来应该做什么呢?")
+    (Rd "整个表达式的值是" (Code "cons")
+        "的第一个参数."))
+   ((dialogue)
+    (Ld (CodeB "(car
+ (cons (+ 3 5) 'baguette))")
+        "的值是什么?")
+    (Rd (Code "cons") "的第一个参数是"
+        (CodeB "(+ 3 5)")
+        "这并非一个值."))
+   ((dialogue)
+    (Ld "为了找出一个" (Code "car")
+        "表达式的值, 首先找出其参数的值, 这应该是"
+        (Code "(cons " $a " " $d ")") ", 而"
+        (CodeB "(car
+ (cons " $a " " $d "))")
+        "的值然后就是" $a "的" (Em "值") "."
+        (P "如何找出一个" (Code "cdr")
+           "表达式的值呢?")
+        ((comment)
+         "这里的" $a "代表" (Code "car")
+         "而" $d "代表" (Code "cdr") "."))
+    (Rd "就和" (Code "car") "一样, 我们从对于"
+        (Code "cdr") "的参数求值开始, 直至其变为"
+        (Code "(cons " $a " " $d ")") ", 然后"
+        (CodeB "(cdr
+ (cons " $a " " $d "))")
+        "的值就是" $d "的值."
+        (P "所有的构造子都有参数吗?")))
+   ((dialogue)
+    (Ld "当然不是, 回忆一下, "
+        (Ref "zero-constructor")
+        "里的" (Code "zero")
+        "是一个构造子."
+        (P "两个表达式为相同的"
+           (Code "(Pair Atom Nat)")
+           "是什么意思?"))
+    (Rd "这必然意味着每个表达式的值都以"
+        (Code "cons") "为顶, 并且它们的"
+        (Code "car") "是相同的" (Code "Atom") "而"
+        (Code "cdr") "是相同的" (Code "Nat") "."))
+   ((dialogue)
+    (Ld "非常好.")
+    (Rd "原子是构造子吗?"))
+   ((dialogue)
+    (Ld "原子" (Code "'bay") "是一个构造子, 因而原子"
+        (Code "'leaf") "也是一个构造子.")
     (Rd ""
         ))
    ((dialogue)
