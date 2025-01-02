@@ -8,6 +8,16 @@
    (H1 "一些没用的笔记")
    (P "之所以没用, 是因为还没有什么内容.")
    (columnize
+    (H2 (A "绘制数学图形" #:attr* '((href "illustrations.html"))))
+    (H2 (A "计算机辅助设计的几何编程" #:attr* '((href "cad.html"))))
+    (H2 (A "Topos: 逻辑的范畴分析" #:attr* '((href "topos.html"))))
+    (H2 (A "Abel定理" #:attr* '((href "abel.html"))))
+    (H2 (A "数学家学法语" #:attr* '((href "french.html"))))
+    (H2 (A "Geometric Algebra (E. Artin) 翻译"
+           #:attr* '((href "geometric_algebra.html"))))
+    (H2 (A "函数式编程的论域论基础" #:attr* '((href "fp_domain.html"))))
+    (H2 (A "结构证明论" #:attr* '((href "spt.html"))))
+    (H2 (A "抽象Stone对偶笔记" #:attr* '((href "asd.html"))))
     (H2 (A "格论 (Birkhoff)" #:attr* '((href "lattices.html"))))
     (H2 (A "Stone空间翻译" #:attr* '((href "stone_spaces.html"))))
     (H2 (A "OPLSS" #:attr* '((href "oplss.html"))))
