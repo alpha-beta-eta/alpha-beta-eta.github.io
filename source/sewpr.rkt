@@ -1,6 +1,13 @@
 #lang racket
 (provide sewpr.html)
 (require SMathML)
+(define (make-entry name class)
+  (lambda (#:n [n ""])
+    (lambda x*
+      (keyword-apply
+       Div '(#:attr*) `(((class ,class)))
+       (B (format "~a~a." name n)) " " x*))))
+(define tcomment (make-entry "译者注记" "tcomment"))
 (define $FV (Mi "FV" #:attr* '((mathvariant "script"))))
 (define (&FV M) (app $FV M))
 (define (subst M X N)
@@ -706,6 +713,38 @@
       
       )
    (H4 "第3.2节 " $lambda "演算: 句法和规约")
+   (MB (eqn* 
+        ((subst $X_1 $X_1 $M) $= $M)
+        ((subst $X_2 $X_1 $M)
+         $= (: $X_2 ", 其中" (&!= $X_1 $X_2)))
+        ((subst (LAM $X_1 $M_1) $X_1 $M_2)
+         $= (LAM $X_1 $M_1))
+        ((subst (LAM $X_1 $M_1) $X_2 $M_2)
+         $= (LAM $X_3 (subst (subst $M_1 $X_1 $X_3) $X_2 $M_2)))
+        ($ $ (: "其中" (eqn* ($X_1 $!= $X_2)
+                           ($X_3 $!in (&FV (LAM $X_1 $M_1)))
+                           ($X_3 $!in (&FV $M_2)))))
+        ((subst (APP $M_1 $M_2) $X $M_3)
+         $= (APP (subst $M_1 $X $M_3) (subst $M_2 $X $M_3)))))
+   ((tcomment)
+    "这里的想法在于避免" (Em "意外捕获")
+    ", 最主要的是上面第四个分支, 也就是最复杂的那个, 它有三个条件. "
+    "第一个条件是为了限制适用的情况, 和第三个分支进行区别. "
+    "第二个条件和第三个条件才是实质性的, 它们需要联合看待. "
+    "为了解决捕获问题 (虽然你可能还不知道这是什么?), "
+    "但是解决捕获问题的方法, 正如第四个分支所示, 即换名. "
+    "根据数学的经验, 我们已经知道换名不会改变函数的意义, 而"
+    $lambda "演算中的" $alpha "变换正是为了形式化换名操作. "
+    "这里换名的目的是为了避免" $lambda "绑定的新变量"
+    $X_3 "捕获替换进去的" $M_2 "里的自由变量, 所以说要求"
+    (&!in $X_3 (&FV $M_2)) ". 另外, 我们还需要保证"
+    (&!in $X_3 (&FV (LAM $X_1 $M_1))) ", 这是" $alpha
+    "变换本身的要求, 为了避免" $X_3 "去捕获"
+    $M_1 "的自由变量, 当然" $X_1 "本身有没有被捕获是无所谓的, 所以"
+    (&!in $X_3 (&FV (LAM $X_1 $M_1))) "即可. 在"
+    (&!in $X_1 (&FV $M_2)) "的情况下, 令" $X_3
+    "为" $X_1 "也可满足要求, 此时实质上并没有进行换名.")
+   
    (H4 "第3.3节 编码布尔")
    (H4 "第3.4节 编码序对")
    (H4 "第3.5节 编码数字")
