@@ -1,6 +1,8 @@
 #lang racket
 (provide sewpr.html)
 (require SMathML)
+(define $reduc:n
+  (Mo "n" #:attr* '((mathvariant "bold"))))
 (define (make-entry name class)
   (lambda (#:n [n ""])
     (lambda x*
@@ -713,19 +715,33 @@
       
       )
    (H4 "第3.2节 " $lambda "演算: 句法和规约")
-   (MB (eqn* 
-        ((subst $X_1 $X_1 $M) $= $M)
-        ((subst $X_2 $X_1 $M)
-         $= (: $X_2 ", 其中" (&!= $X_1 $X_2)))
-        ((subst (LAM $X_1 $M_1) $X_1 $M_2)
-         $= (LAM $X_1 $M_1))
-        ((subst (LAM $X_1 $M_1) $X_2 $M_2)
-         $= (LAM $X_3 (subst (subst $M_1 $X_1 $X_3) $X_2 $M_2)))
-        ($ $ (: "其中" (eqn* ($X_1 $!= $X_2)
-                           ($X_3 $!in (&FV (LAM $X_1 $M_1)))
-                           ($X_3 $!in (&FV $M_2)))))
-        ((subst (APP $M_1 $M_2) $X $M_3)
-         $= (APP (subst $M_1 $X $M_3) (subst $M_2 $X $M_3)))))
+   (eqn* 
+    ((&FV $X) $= (setE $X))
+    ((&FV (LAM $X $M)) $= (&- (&FV $M) (setE $X)))
+    ((&FV (APP $M_1 $M_2))
+     $= (&cup (&FV $M_1) (&FV $M_2))))
+   (P "我们给出" $FV "的一些例子:"
+      (eqn*
+       ((&FV $x) $= (setE $x))
+       ((&FV (APP $x (APP $y $x)))
+        $= (setE $x $y))
+       ((&FV (LAM $x (APP $x $y)))
+        $= (setE $y))
+       ((&FV (APP $z (LAM $z $z)))
+        $= (setE $z))))
+   (eqn* 
+    ((subst $X_1 $X_1 $M) $= $M)
+    ((subst $X_2 $X_1 $M)
+     $= (: $X_2 ", 其中" (&!= $X_1 $X_2)))
+    ((subst (LAM $X_1 $M_1) $X_1 $M_2)
+     $= (LAM $X_1 $M_1))
+    ((subst (LAM $X_1 $M_1) $X_2 $M_2)
+     $= (LAM $X_3 (subst (subst $M_1 $X_1 $X_3) $X_2 $M_2)))
+    ($ $ (: "其中" (eqn* ($X_1 $!= $X_2)
+                       ($X_3 $!in (&FV (LAM $X_1 $M_1)))
+                       ($X_3 $!in (&FV $M_2)))))
+    ((subst (APP $M_1 $M_2) $X $M_3)
+     $= (APP (subst $M_1 $X $M_3) (subst $M_2 $X $M_3))))
    ((tcomment)
     "这里的想法在于避免" (Em "意外捕获")
     ", 最主要的是上面第四个分支, 也就是最复杂的那个, 它有三个条件. "
@@ -744,6 +760,24 @@
     (&!in $X_3 (&FV (LAM $X_1 $M_1))) "即可. 在"
     (&!in $X_1 (&FV $M_2)) "的情况下, 令" $X_3
     "为" $X_1 "也可满足要求, 此时实质上并没有进行换名.")
+   (P "显然, 替换的定义告诉我们替换不是一个函数. "
+      "[译注: 有的材料区分预项和" $lambda "项, 通过"
+      $alpha "等价. 在这种情况下, " $lambda
+      "项上的替换的确会是函数.]")
+   (P "最终, 为了定义" $lambda "演算的一般规约概念"
+      $reduc:n ", 我们首先定义三种简单的规约概念"
+      (&cm $alpha $beta $eta) "."
+      (eqn*
+       ((LAM $X_1 $M) $alpha (LAM $X_2 (subst $M $X_1 $X_2)))
+       ($ $ (: "其中" (&!in $X_2 (&FV $M))))
+       ((APP (LAM $X $M_1) $M_2)
+        $beta (subst $M_1 $X $M_2))
+       ((LAM $X (APP $M $X)) $eta $M)
+       ($ $ (: "其中" (&!in $X (&FV $M)))))
+      (Ul (Li $alpha "更换了一个函数的形式参数的名字. "
+              )
+          )
+      )
    
    (H4 "第3.3节 编码布尔")
    (H4 "第3.4节 编码序对")
@@ -802,29 +836,29 @@
             ($o^2 $= (setE $+ $- $* $uarr)))
       "其中" (numeral $n) "是表示数字" $n "的numeral.")
    (P $FV "和" (subst $d* $d* $d*) "可以自然地扩展至新的句法上来."
-      (MB (eqn* ((&FV $b) $= $empty)
-                ((&FV $X) $= (setE $X))
-                ((&FV (LAM $X $M)) $= (&- (&FV $M) (setE $X)))
-                ((&FV (APP $M_1 $M_2))
-                 $= (&cup (&FV $M_1) (&FV $M_2)))
-                ((&FV (APP $o^n $M_1 $..h $M_n))
-                 $= (&cup (&FV $M_1) $..c (&FV $M_n)))))
-      (MB (eqn* ((subst $b $X $M) $= $b)
-                ((subst $X_1 $X_1 $M) $= $M)
-                ((subst $X_2 $X_1 $M)
-                 $= (: $X_2 ", 其中" (&!= $X_1 $X_2)))
-                ((subst (LAM $X_1 $M_1) $X_1 $M_2)
-                 $= (LAM $X_1 $M_1))
-                ((subst (LAM $X_1 $M_1) $X_2 $M_2)
-                 $= (LAM $X_3 (subst (subst $M_1 $X_1 $X_3) $X_2 $M_2)))
-                ($ $ (: "其中" (eqn* ($X_1 $!= $X_2)
-                                   ($X_3 $!in (&FV (LAM $X_1 $M_1)))
-                                   ($X_3 $!in (&FV $M_2)))))
-                ((subst (APP $M_1 $M_2) $X $M_3)
-                 $= (APP (subst $M_1 $X $M_3) (subst $M_2 $X $M_3)))
-                ((subst (APP $o^n $M_1 $..h $M_n) $X $M)
-                 $= (APP $o^n (subst $M_1 $X $M) $..h
-                         (subst $M_n $X $M))))))
+      (eqn* ((&FV $b) $= $empty)
+            ((&FV $X) $= (setE $X))
+            ((&FV (LAM $X $M)) $= (&- (&FV $M) (setE $X)))
+            ((&FV (APP $M_1 $M_2))
+             $= (&cup (&FV $M_1) (&FV $M_2)))
+            ((&FV (APP $o^n $M_1 $..h $M_n))
+             $= (&cup (&FV $M_1) $..c (&FV $M_n))))
+      (eqn* ((subst $b $X $M) $= $b)
+            ((subst $X_1 $X_1 $M) $= $M)
+            ((subst $X_2 $X_1 $M)
+             $= (: $X_2 ", 其中" (&!= $X_1 $X_2)))
+            ((subst (LAM $X_1 $M_1) $X_1 $M_2)
+             $= (LAM $X_1 $M_1))
+            ((subst (LAM $X_1 $M_1) $X_2 $M_2)
+             $= (LAM $X_3 (subst (subst $M_1 $X_1 $X_3) $X_2 $M_2)))
+            ($ $ (: "其中" (eqn* ($X_1 $!= $X_2)
+                               ($X_3 $!in (&FV (LAM $X_1 $M_1)))
+                               ($X_3 $!in (&FV $M_2)))))
+            ((subst (APP $M_1 $M_2) $X $M_3)
+             $= (APP (subst $M_1 $X $M_3) (subst $M_2 $X $M_3)))
+            ((subst (APP $o^n $M_1 $..h $M_n) $X $M)
+             $= (APP $o^n (subst $M_1 $X $M) $..h
+                     (subst $M_n $X $M)))))
    (H4 "第4.2节 使用ISWIM进行计算")
    (P "受到Algol 60的call-by-value参数传递机制的启发, Landin以类似的方式"
       "设计了ISWIM的函数. 也就是说, 在ISWIM之中, 一个函数应用在函数取得控制之前"
@@ -855,9 +889,9 @@
       "(place holder). 既然ISWIM的函数只能消化值, 那么变量就总是代表值. "
       "因此, 我们暂时也将变量看成是值. 第4.7节回顾了这个决定.")
    (P "基于对于值的刻画, 现在我们可以定义ISWIM的基本规约概念."
-      (MB (eqn* ((APP (LAM $X $M) $V)
-                 $beta_v:sans-serif
-                 (subst $M $X $V))))
+      (eqn* ((APP (LAM $X $M) $V)
+             $beta_v:sans-serif
+             (subst $M $X $V)))
       "这个关系有别于" $beta ", 因为参数必须是" $V "的成员. "
       "在ISWIM中, 你不能将任意的项替换进函数的体里.")
    (P "限制参数必须是一个值迫使参数表达式的规约在对于函数应用求值之前进行. 例如, "
