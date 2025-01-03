@@ -1,6 +1,7 @@
 #lang racket
 (provide little_typer.html)
 (require SMathML)
+(define (Mid str) (Mi #:attr* '((mathvariant "italic")) str))
 (define (make-entry name class)
   (lambda (#:n [n ""])
     (lambda x*
@@ -1326,12 +1327,56 @@
            "和" (Code "cdr") "的联合."))
     (Rd "怎么做呢?"))
    ((dialogue)
-    (Ld "这需要请出我们的老朋友" $lambda ".")
+    (Ld "这需要请出我们的老朋友" (Code "&lambda;") ".")
     (Rd "这是什么? 我有点陌生."))
    ((dialogue)
-    (Ld ""
-        )
-    (Rd ""
+    (Ld "Oops! 它也被称为" (Code "lambda") "."
+        ((comment)
+         (Code "&lambda;") "可以选择写成"
+         (Code "lambda") "."))
+    (Rd "好吧, " (Code "&lambda;") "可以构造函数."
+        (P "这是不是意味着" (Code "&lambda;")
+           "是一个构造子呢?")))
+   ((dialogue)
+    (Ld "是的, 的确如此, 因为每个长得像"
+        (Code "(&lambda; (" $x_0 " " $x " " $..h
+              ") " (Mid "body") ")")
+        "的表达式都是一个值."
+        (P "这种值的消去子是什么呢?")
+        ((comment)
+         "记号" (M $x "&nbsp;" $..h)
+         "的意思是零个或更多的" $x ", 因此"
+         (M $x_0 "&nbsp;" $x "&nbsp;" $..h)
+         "的意思是一个或更多的" $x "."))
+    (Rd "我们唯一能对函数做的事情就是将其应用于参数上."
+        (P "这样的话函数怎么拥有消去子呢?")))
+   ((dialogue)
+    (Ld "应用函数于参数" (Em "是")
+        "函数的消去子.")
+    (Rd "好吧."))
+   ((law)
+    (Center "消去函数")
+    (P "应用函数于参数" (Em "是")
+       "函数的消去子."))
+   ((dialogue)
+    (Ld (CodeB "(&lambda; (flavor)
+  (cons flavor 'lentils))")
+        "的值是什么?"
+        ((tcomment)
+         "lentils指的是扁豆."))
+    (Rd "它自" (Code "&lambda;")
+        "起, 因而它已经是一个值了."))
+   ((dialogue)
+    (Ld "是的."
+        (CodeB "((&lambda; (flavor)
+   (cons flavor 'lentils))
+ 'garlic)")
+        "的值是什么呢?")
+    (Rd "那必然是" (Code "(cons 'garlic 'lentils)")
+        ", 如果" (Code "&lambda;") "和"
+        (Code "lambda") "的行为一致且" (Code "cons")
+        "是一个构造子的话."
+        
         ))
    ((dialogue)
     (Ld ""
