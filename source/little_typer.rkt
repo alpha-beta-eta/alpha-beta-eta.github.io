@@ -70,8 +70,6 @@
   (keyword-apply
    Td '(#:attr*) '(((class "rightd")))
    html*))
-(define (Cite #:attr* [attr* '()] id)
-  `(cite ,attr* ,(Ref id)))
 (define (Center . html*)
   `(div ((style "text-align: center;")) . ,html*))
 (define little_typer.html
@@ -137,7 +135,7 @@
         ", 因为它是一个单引号后面跟着一个或更多的字母或者连字符."))
    ((dialogue)
     (Ld (Code "'at0m") "是一个" (Code "Atom") "吗?")
-    (Rd "不是, 因为根据" (Cite "atom-definition")
+    (Rd "不是, 因为根据" (Ref "atom-definition")
         ", 原子只能包含字母或者连字符, 而字符"
         (Code "0") "并不是一个字母, 它是数位零."))
    ((dialogue)
@@ -1302,7 +1300,7 @@
     (Ld "ratatouille如何?")
     (Rd (Em "很好(très bien)") ", 谢谢提问."))
    ((dialogue)
-    (Ld (Ref "ch1") "里有构造子和类型构造子, "
+    (Ld "第" (Ref "ch1") "章里有构造子和类型构造子, "
         "分别构造值和类型."
         (P "然而, " (Code "car")
            "既不是构造子也不是类型构造子."))
@@ -1376,7 +1374,36 @@
         ", 如果" (Code "&lambda;") "和"
         (Code "lambda") "的行为一致且" (Code "cons")
         "是一个构造子的话."
-        
+        (P "但是这难道不意味着即便" (Code "cons")
+           "表达式已经是一个值了, " (Code "cons")
+           "的第一个参数仍然会被求值吗?")))
+   ((dialogue)
+    (Ld "不, 并非如此, 但是这是个非常好的问题. "
+        "替换这个" (Code "λ") "表达式的"
+        (Code "flavor") "行为之发生是因为该"
+        (Code "λ") "表达式被应用于了一个参数, "
+        "而不是因为" (Code "cons") "."
+        ((comment)
+         "一致地替换一个变量以一个表达式有时被称为"
+         (Em "替换(substitution)") ".")
+        "这个" (Code "λ") "表达式的体的每个"
+        (Code "flavor") "都会被替换为"
+        (Code "'garlic") ", 不论环绕"
+        (Code "flavor") "的表达式是什么.")
+    (Rd "因此, 也就是说"
+        (CodeB "((λ (root)
+   (cons root
+         (cons (+ 1 2) root)))
+ 'potato)")
+        "的值应该是"
+        (CodeB "(cons 'potato
+      (cons (+ 1 2) 'potato))")
+        "对吗?"))
+   ((dialogue)
+    (Ld "为什么前一个框里的"
+        (CodeB "(+ 1 2)")
+        "不需要计算呢?")
+    (Rd ""
         ))
    ((dialogue)
     (Ld ""
