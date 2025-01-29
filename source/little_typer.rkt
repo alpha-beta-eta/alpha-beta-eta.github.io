@@ -1512,7 +1512,7 @@
     (Rd "参数的名字是不同的. "
         "尽管如此, 这通常无关紧要. "
         "现在紧不紧要呢?"))
-   ((dialogue)
+   ((dialogue #:id "rename")
     (Ld "两个" (Code "λ") "表达式也是相同的, "
         "如果可以通过一致地对于参数换名使得"
         "它们的体变得相同."
@@ -1528,7 +1528,7 @@
         (CodeB "(→ Atom Atom (Pair Atom Atom))")
         "吗?"))
    ((law)
-    (Center "应用的初规则")
+    (Center "应用之初律")
     (P "如果" $f "是一个"
        (CodeB "(→ " $Y " " $X ")")
        "而" $arg "是一个" $Y ", 那么"
@@ -1872,7 +1872,7 @@
         ", 即" (Code "'naught") "."
         (P "为什么" (Code (Dim "n"))
            "是黯淡的?")))
-   ((dialogue)
+   ((dialogue #:id "dim")
     (Ld "黯淡是用来指出" (Code (Dim "n"))
         "在那个" (Code "λ")
         "表达式的体里没有被使用. "
@@ -3786,7 +3786,7 @@
       Nat Nat
       Nat
       p
-      (λ (a d)
+      (λ (a " (Dim "d") ")
         a))))")
         "因为" (Code "elim-Pair")
         "还未被定义, 所以"
@@ -3794,6 +3794,498 @@
         "不是别的什么原因.")
     (Rd "为什么" (Code "elim-Pair")
         "有这么多参数啊?"))
+   ((dialogue)
+    (Ld "在这个定义里, " (Code "elim-Pair")
+        "的前三个参数都是类型" (Code "Nat")
+        ". 前两个参数刻画了要被消去的"
+        (Code "Pair") "的" (Code "car")
+        "部分和" (Code "cdr") "部分的类型. "
+        "这第三个参数" (Code "Nat")
+        "描述了内层的" (Code "λ")
+        "表达式的结果类型."
+        ((comment)
+         "因此, 内层的" (Code "λ")
+         "表达式的参数" (Code "a")
+         "和" (Code (Dim "d"))
+         "的类型也都是" (Code "Nat") "."))
+    (Rd "内层的" (Code "λ") "表达式的意图是什么?"))
+   ((dialogue)
+    (Ld "内层的" (Code "λ") "表达式描述了如何使用"
+        (Code "p") "的值中的信息. 所谓的信息即"
+        (Code "p") "的" (Code "car") "和"
+        (Code "cdr") "部分.")
+    (Rd "为什么" (Code (Dim "d")) "是黯淡的?"))
+   ((dialogue)
+    (Ld "参数名" (Code (Dim "d"))
+        "之所以是黯淡的, 是因为其出现在内层的"
+        (Code "λ") "表达式里, 却未被使用, 就和"
+        (Ref "dim") "一样."
+        (P "现在请定义一个类似的函数" (Code "kdr")
+           ", 其找出一个" (Code "Nat")
+           "序对的" (Code "cdr") "."))
+    (Rd "几乎和" (Code "kar") "一模一样."
+        (CodeB "(claim kdr
+  (→ (Pair Nat Nat)
+    Nat))")
+        (CodeD "(define kdr
+  (λ (p)
+    (elim-Pair
+      Nat Nat
+      Nat
+      p
+      (λ (" (Dim "a") " d)
+        d))))")
+        "这次之所以" (Code (Dim "a"))
+        "是黯淡的, 是因为其在内层的"
+        (Code "λ") "表达式中未被使用, 而"
+        (Code "d") "是正常的. 鉴于"
+        (Code "elim-Pair") "还没有定义, "
+        (Code "kdr") "也被虚框包裹, 就和"
+        (Code "kar") "一样."))
+   ((dialogue)
+    (Ld "的确如此."
+        (P "请编写一个叫做" (Code "swap")
+           "的函数, 其交换一个"
+           (Code "(Pair Nat Atom)")
+           "的" (Code "car") "和"
+           (Code "cdr") "."))
+    (Rd "以下是" (Code "swap") "的类型."
+        (CodeB "(claim swap
+  (→ (Pair Nat Atom)
+    (Pair Atom Nat)))")))
+   ((dialogue)
+    (Ld "现在定义" (Code "swap") ".")
+    (Rd "以下是" (Code "swap")
+        "的定义. 就和" (Code "kar")
+        "和" (Code "kdr")
+        "一样, 其也被包裹在虚框里."
+        (CodeD "(define swap
+  (λ (p)
+    (elim-Pair
+      Nat Atom
+      (Pair Atom Nat)
+      p
+      (λ (a d)
+        (cons d a)))))")))
+   ((dialogue #:id "invalid-type")
+    (Ld "一般说来, " (Code "elim-Pair") "的用法如下:"
+        (CodeB "(elim-Pair
+  " $A " " $D "
+  " $X "
+  " $p "
+  " $f ")")
+        "其中" $p "是一个" (Code "(Pair " $A " " $D ")")
+        ", 而" $f "根据" $p "的" (Code "car")
+        "和" (Code "cdr") "来确定整个表达式的值. "
+        "这个值必然具有类型" $X "."
+        (P (Code "elim-Pair") "的类型是什么?"))
+    (Rd "以下是一个猜测, 可能是"
+        (CodeB "(→ A D
+   X
+   (Pair A D)
+   (→ A D
+     X)
+  X)")
+        "因为" (Code "A") ", " (Code "D")
+        ", " (Code "X") "是前三个参数, 第四个参数是一个"
+        (Code "(Pair A D)") ", 而第五个应该基于一个"
+        (Code "A") "和一个" (Code "D")
+        "作出一个" (Code "X") "来."))
+   ((dialogue)
+    (Ld "但是, 这个表达式里的" (Code "A") ", " (Code "D")
+        ", " (Code "X") "是什么呢?")
+    (Rd (Code "A") ", " (Code "D") ", " (Code "X")
+        "是" (Code "elim-Pair") "的前三个参数?"))
+   ((dialogue)
+    (Ld "它们会引用之前已经定义过的类型吗?")
+    (Rd "不会, 因为它们指的是" (Em "不论什么样的参数") "."))
+   ((dialogue)
+    (Ld "一个表达式中的名字要么引用一个定义, 要么指的是由一个"
+        (Code "λ") "所命名的一个参数. 显然这个表达式里没有"
+        (Code "λ") ", 并且" (Code "A") ", " (Code "D")
+        ", " (Code "X") "也都没有被定义.")
+    (Rd "这必然意味着" (Ref "invalid-type")
+        "中的那个表达式实际上并非一个类型."))
+   ((dialogue)
+    (Ld "的确如此."
+        (P "然而, 这种思维过程的确言之成理. "
+           "回忆一下, 成为一个"
+           (CodeB "(→ " $Y " " $X ")")
+           "是什么意思."))
+    (Rd "一个"
+        (CodeB "(→ " $Y " " $X ")")
+        "是一个" (Code "λ") "表达式, 当接受一个"
+        $Y "时, 产生一个" $X ". 它也可以是一个"
+        "值为这样的" (Code "λ") "表达式的表达式. "
+        "我说的对不对呢?"))
+   ((dialogue)
+    (Ld $Y "和" $X "都是类型吗?")
+    (Rd "必然如此, 否则"
+        (CodeB "(→ " $Y " " $X ")")
+        "就不是一个类型了."))
+   ((dialogue)
+    (Ld "在之前我们提出的" (Code "elim-Pair")
+        "的类型里, " (Code "A") ", " (Code "D")
+        ", " (Code "X") "是类型构造子吗?")
+    (Rd "并非如此, 它们和" (Code "Nat")
+        "或者" (Code "Atom") "不是一种表达式, 因为每次"
+        (Code "elim-Pair") "应用时它们都可能改变, 而"
+        (Code "Nat") "永远是" (Code "Nat") "."))
+   ((dialogue)
+    (Ld "在之前我们提出的" (Code "elim-Pair")
+        "的类型里, " (Code "A") ", " (Code "D")
+        ", " (Code "X") "是被定义来指代类型的名字吗?")
+    (Rd "当然不是, 出于相同的原因, 即每次"
+        (Code "elim-Pair") "应用时它们都可能改变. "
+        "但是, 一旦一个名字被" (Code "define")
+        "了, 它就永远指的是相同的东西了."))
+   ((dialogue)
+    (Ld "这个消去子必然要能够讨论" (Em "任意")
+        "的类型" (Code "A") ", " (Code "D")
+        ", " (Code "X") ".")
+    (Rd "听上去" (Code "→") "没法完成任务."))
+   ((dialogue)
+    (Ld "的确不行, 但是" (Code "Π") "行."
+        ((comment)
+         (Code "Π") "读作" (Q "pie")
+         ", 并且也可以写成" (Code "Pi") "."))
+    (Rd (Code "Π") "是什么意思呢?"))
+   ((dialogue #:id "flip-def")
+    (Ld "以下是一个例子."
+        (CodeB "(claim flip
+  (Π ((A " $U:script ")
+      (D " $U:script "))
+    (→ (Pair A D)
+      (Pair D A))))
+(define flip
+  (λ (" (Dim "A") " " (Dim "D") ")
+    (λ (p)
+      (cons (cdr p) (car p)))))"))
+    (Rd "是不是这意味着一个" (Code "λ")
+        "表达式的类型可以是一个"
+        (Code "Π") "表达式?"))
+   ((dialogue)
+    (Ld "好问题."
+        (P "的确可以."))
+    (Rd "如果说" (Code "Π") "和"
+        (Code "→") "都可以用来描述" (Code "λ")
+        "表达式, 那么它们有什么区别呢?"))
+   ((dialogue)
+    (Ld (CodeB "(flip Nat Atom)")
+        "的值是什么?")
+    (Rd "那必然是" (Code "λ") "表达式"
+        (CodeB "(λ (p)
+  (cons (cdr p) (car p)))")
+        "这是因为" (Code "flip")
+        "被定义为是一个" (Code "λ")
+        "表达式, 而其被应用于了两个参数, "
+        (Code "Nat") "和" (Code "Atom") "."))
+   ((dialogue)
+    (Ld (CodeB "((flip Nat Atom)
+ (cons 17 'apple))")
+        "的值是什么?")
+    (Rd "其是"
+        (CodeB "(cons 'apple 17)")
+        "一个"
+        (CodeB "(Pair Atom Nat)")))
+   ((dialogue)
+    (Ld (Code "Π") "和" (Code "→")
+        "的不同在于一个函数应用于其参数"
+        "这样的表达式的类型."
+        (CodeB "(flip Nat Atom)")
+        "的类型为"
+        (CodeB "(→ (Pair Nat Atom)
+  (Pair Atom Nat))")
+        "这是因为当一个由" (Code "Π")
+        "表达式所描述的表达式被应用时, "
+        "参数表达式将代替" (Code "Π")
+        "表达式的" (Em "体") "里的"
+        (Em "参数名") ".")
+    (Rd (Code "Π") "表达式的体和"
+        (Code "λ") "表达式的体有着怎样的联系呢?"))
+   ((dialogue)
+    (Ld (Code "Π") "表达式和" (Code "λ")
+        "表达式都会引入参数名, 而体是这些名字"
+        "可以使用的地方.")
+    (Rd "什么是" (Em "参数名") "?"))
+   ((dialogue)
+    (Ld (CodeB "(Π ((A " $U:script ")
+    (D " $U:script "))
+  (→ (Pair A D)
+    (Pair D A)))")
+        "在这个" (Code "Π") "表达式里, 参数名是"
+        (Code "A") "和" (Code "D") ". " (Code "Π")
+        "表达式可以有一个或更多的参数名, "
+        "而这些参数名可以出现在" (Code "Π")
+        "表达式的体中.")
+    (Rd (Code "Π") "表达式的" (Em "体")
+        "是什么?"))
+   ((dialogue)
+    (Ld (CodeB "(Π ((A " $U:script ")
+    (D " $U:script "))
+  (→ (Pair A D)
+    (Pair D A)))")
+        "在这个" (Code "Π") "表达式里, 体是"
+        (CodeB "(→ (Pair A D)
+  (Pair D A))")
+        "这个是(" (Code "flip")
+        "所代表的)" (Code "λ")
+        "表达式的体的类型, 这个体由"
+        (Code "Π") "表达式的体所描述."
+        ((tcomment)
+         "这句话读起来稍显冗余."))
+    (Rd (Code "Π") "表达式的体里的"
+        (Code "A") "和" (Code "D")
+        "指的是什么?"))
+   ((law)
+    (Center "应用之中律")
+    (P "如果" $f "是一个"
+       (CodeB "(Π ((" $Y " " $U:script ")) " $X ")")
+       "而" $Z "是一个" $U:script ", 那么"
+       (CodeB "(" $f " " $Z ")")
+       "是一个" $X ", 且其中的每个" $Y
+       "都已被一致地替换为了" $Z ".")
+    ((tcomment)
+     "原文的" $Y "实际上使用的是无衬线字体, 即"
+     (Code "Y") ". 但是, 译者认为" $Y
+     "应该是一个代表句法上的变量的元变量."))
+   ((dialogue)
+    (Ld "体里的" (Code "A") "和" (Code "D")
+        "指的是尚不可知的特定类型. "
+        "不论哪两个类型" $A "和" $D
+        "作为由" (Code "Π") "表达式所描述的"
+        (Code "λ") "表达式的参数, 应用这"
+        (Code "λ") "表达式的结果总是一个"
+        (CodeB "(→ (Pair " $A " " $D ")
+  (Pair " $D " " $A "))")
+        ((tcomment)
+         "请读者注意字体, " (Code "A")
+         "和" $A "相当不同."))
+    (Rd "是不是这意味着"
+        (CodeB "(flip Atom (Pair Nat Nat))")
+        "的类型为"
+        (CodeB "(→ (Pair Atom
+     (Pair Nat Nat))
+  (Pair (Pair Nat Nat)
+    Atom))")
+        "呢?"))
+   ((dialogue)
+    (Ld "对的."
+        (P "但为什么会是如此呢?"))
+    (Rd "变量" (Code "A") "和" (Code "D")
+        "被替换以其相应的参数: "
+        (Code "Atom") "和"
+        (Code "(Pair Nat Nat)") "."))
+   ((dialogue)
+    (Ld (CodeB "(Π ((A " $U:script ")
+    (D " $U:script "))
+  (→ (Pair A D)
+    (Pair D A)))")
+        "和"
+        (CodeB "(Π ((Lemon " $U:script ")
+    (Meringue " $U:script "))
+  (→ (Pair Lemon Meringue)
+    (Pair Meringue Lemon)))")
+        "是相同的类型吗?")
+    (Rd "的确如此, 因为正如" (Ref "rename")
+        "所言, 一致地对于变量换名不会改变任何东西的意义."
+        ((tcomment)
+         "meringue, 蛋白酥.")))
+   ((dialogue)
+    (Ld (CodeB "(Π ((A " $U:script ")
+    (D " $U:script "))
+  (→ (Pair A D)
+    (Pair D A)))")
+        "和"
+        (CodeB "(Π ((A " $U:script ")
+    (D " $U:script "))
+  (→ (Pair
+       (car
+         (cons A D))
+       (cdr
+         (cons A D)))
+    (Pair D A)))")
+        "是相同的类型吗?")
+    (Rd "是的, 因为"
+        (CodeB "(car
+  (cons A D))")
+        "和" (Code "A") "是相同的类型, 而"
+        (CodeB "(cdr
+  (cons A D))")
+        "和" (Code "D") "是相同的类型."))
+   ((dialogue #:id "flip-def2")
+    (Ld "我们可以这样定义" (Code "flip") "吗?"
+        (CodeD "(claim flip
+  (Π ((A " $U:script ")
+      (D " $U:script "))
+    (→ (Pair A D)
+      (Pair D A))))
+(define flip
+  (λ (" (Dim "C") " " (Dim "A") ")
+    (λ (p)
+      (cons (cdr p) (car p)))))"))
+    (Rd "以下是我的猜测."
+        (P "在这个定义里, 外层的" (Code "λ")
+           "表达式中的(参数)名字和" (Code "Π")
+           "表达式中的名字不同. 似乎这个定义"
+           "不应该能够成立. " (Code (Dim "A"))
+           "出现在错误的位置, 而" (Code (Dim "C"))
+           "既不是" (Code "A") "也不是"
+           (Code "D") ".")
+        ((tcomment)
+         "原文的后两个" (Code "A") "和"
+         (Code "D") "本是黯淡的, "
+         "但是译者认为既然它们指的是"
+         (Code "Π") "表达式中的相应变量, "
+         "所以说它们应该是正常颜色更好.")))
+   ((dialogue)
+    (Ld (Ref "flip-def2") "中提出的"
+        (Code "flip") "定义是可以允许的. "
+        "然而, 就像定义" (Code "five")
+        "为意指" (Code "9") "一样, "
+        "这是愚蠢的.")
+    (Rd "为什么可以允许这样的定义呢?"))
+   ((dialogue)
+    (Ld "外层的" (Code "λ") "中的名字不需要匹配"
+        (Code "Π") "表达式中的名字. 外层的"
+        (Code "λ") "表达式中的" (Code (Dim "C"))
+        "与" (Code "Π") "表达式中的" (Code "A")
+        "相对应, 因为它们都是第一个名字. 外层的"
+        (Code "λ") "表达式中的" (Code (Dim "A"))
+        "与" (Code "Π") "表达式中的" (Code "D")
+        "相对应, 因为它们都是第二个名字. "
+        "重要的是参数命名的" (Em "顺序") "."
+        ((comment)
+         "尽管使用不相匹配的名字并非错误, "
+         "但这的确相当令人困惑. "
+         "我们总是使用匹配的名字.")
+        "内层的" (Code "λ") "表达式中的"
+        (Code "p") "与什么相对应?")
+    (Rd "与" (Code "p") "相对应的是"
+        (Code "→") "后跟着的"
+        (Code "(Pair A D)")
+        ", 其给出了内层" (Code "λ")
+        "表达式的参数类型."))
+   ((dialogue)
+    (Ld "如何对于" (Ref "flip-def2")
+        "中的定义里的" (Code (Dim "C"))
+        "和" (Code (Dim "A"))
+        "进行一致换名以改善这个定义?")
+    (Rd "首先, " (Code (Dim "A"))
+        "应该被重命名为" (Code (Dim "D"))
+        ". 接着, " (Code (Dim "C"))
+        "应该被重命名为" (Code (Dim "A"))
+        ". 这不就是" (Ref "flip-def")
+        "中的定义吗?"))
+   ((dialogue)
+    (Ld "现在可以定义" (Code "Pair")
+        "的那个消去子了吗?")
+    (Rd "是的, 其类型应该是"
+        (CodeB "(Π ((A " $U:script ")
+    (D " $U:script ")
+    (X " $U:script "))
+  (→ (Pair A D)
+     (→ A D
+       X)
+    X))")
+        "这看起来很像" (Ref "invalid-type")
+        "里的那个类型."))
+   ((dialogue)
+    (Ld "的确如此."
+        (P (Code "elim-Pair")
+           "的定义是什么?"))
+    (Rd (CodeB "(claim elim-Pair
+  (Π ((A " $U:script ")
+      (D " $U:script ")
+      (X " $U:script "))
+    (→ (Pair A D)
+       (→ A D
+         X)
+      X)))
+(define elim-Pair
+  (λ (" (Dim "A") " " (Dim "D") " " (Dim "X") ")
+    (λ (p f)
+      (f (car p) (cdr p)))))")))
+    ((dialogue)
+    (Ld "现在" (Code "kar") "不需要虚框了."
+        (CodeB "(define kar
+  (λ (p)
+    (elim-Pair
+      Nat Nat
+      Nat
+      p
+      (λ (a " (Dim "d") ")
+        a))))"))
+    (Rd (Code "kdr") "也是."
+        (CodeB "(define kdr
+  (λ (p)
+    (elim-Pair
+      Nat Nat
+      Nat
+      p
+      (λ (" (Dim "a") " d)
+        d))))")))
+   ((dialogue)
+    (Ld (Code "swap") "也是.")
+    (Rd "是的."
+        (CodeB "(define swap
+  (λ (p)
+    (elim-Pair
+      Nat Atom
+      (Pair Atom Nat)
+      p
+      (λ (a d)
+        (cons d a)))))")))
+   ((dialogue)
+    (Ld "尽管一个" (Code "Π") "表达式可以拥有任意数目的参数名, "
+        "还是首先描述单参数" (Code "Π") "表达式为类型的情形最为简单."
+        (P "成为一个"
+           (CodeB "(Π ((" $Y " " $U:script ")) " $X ")")
+           "即是成为一个" (Code "λ") "表达式, 当且被应用于一个类型"
+           $T "时, 将会产生一个表达式, 其类型是将" $X
+           "中的每个" $Y "一致地替换以" $T "的结果."))
+    (Rd "是不是忘了什么?"))
+   ((dialogue)
+    (Ld "也可以是一个表达式, " (Em "其值是")
+        "这样的" (Code "λ") "表达式.")
+    (Rd "不要忘记求值是重要的."
+        (P "这是对于" (Code "Π")
+           "表达式的完整描述了吗?")))
+   ((dialogue)
+    (Ld "不, 还不完全."
+        (P "基于单参数的" (Code "Π") "表达式"
+           (CodeB "(Π ((" $Y " " $U:script ") ("
+                  $Z " " $U:script ")) " $X ")")
+           "该怎样理解呢?"))
+    (Rd "它应该意味着一个" (Code "λ")
+        "表达式 (或者能求值至这样的" (Code "λ")
+        "表达式), 当其被应用于两个类型" $T "和" $S
+        "时, 将会产生一个表达式, 其类型可由一致地将"
+        $X "中的每个" $Y "替换以" $T "然后再将这新的"
+        $X "中的每个" $Z "替换以" $S "获得."
+        ((tcomment)
+         "这里假定" $Y "和" $Z "相异, "
+         "至于不相异的情况该如何解释, "
+         "实际上多个参数的" (Code "Π")
+         "表达式可以理解为单参数" (Code "Π")
+         "表达式的嵌套.")))
+   ((dialogue)
+    (Ld (Code "Π") "表达式可以拥有任意数目的参数, "
+        "而其所描述的" (Code "λ")
+        "表达式有着相同数目的参数."
+        (P "什么表达式具有类型"
+           (CodeB "(Π ((A " $U:script "))
+  (→ A (Pair A A)))")
+           "呢?"))
+    (Rd "比如说以下这个?"
+        (CodeB "(λ (" (Dim "A") ")
+  (λ (a)
+    (cons a a)))")))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
    ((dialogue)
     (Ld ""
         )

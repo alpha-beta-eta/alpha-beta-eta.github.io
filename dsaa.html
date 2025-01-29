@@ -103,7 +103,7 @@
            (vector-swap! v left (- right 1))
            (iter left (- right 1)))
           (else
-           (iter (+ left 1) right)))))</code></pre><p>根据原地 (in-place) 的定义的不同, 快速排序可以是原地的, 也可以不是原地的, 因为它的确要消耗栈的空间.</p><h2>二分搜索</h2><p>据说二分搜索很少有人能够书写正确, 即便是算法研究者也不例外.</p><pre><code>(define (binary-search x v lo hi)
+           (iter (+ left 1) right)))))</code></pre><p>根据原地 (in-place) 的定义的不同, 快速排序可以是原地的, 也可以不是原地的, 因为它的确要消耗栈的空间.</p><h2>二分搜索</h2><p>据说二分搜索很少有人能够书写正确, 即便是算法研究者也不例外. 这里仍然遵循着左闭右开的原则, 以后不再赘述.</p><pre><code>(define (binary-search x v lo hi)
   (if (>= lo hi)
       #f
       (let ((mi (quotient (+ lo hi) 2)))
@@ -112,4 +112,22 @@
           ((> (vector-ref v mi) x)
            (binary-search x v lo mi))
           (else
-           (binary-search x v (+ mi 1) hi))))))</code></pre><h2>杂凑 (哈希)</h2></body></html>
+           (binary-search x v (+ mi 1) hi))))))</code></pre><h2>杂凑 (哈希)</h2><h2>3SUM问题</h2><p><code>3SUM</code>的前条件是<code>v</code>已从小到达排序且元素互异.</p><pre><code>(define (3SUM v)
+  (define l (vector-length v))
+  (let loop ((i 0) (result '()))
+    (cond ((= i l) result)
+          ((>= (vector-ref v i) 0) result)
+          (else
+           (let iter ((j (+ i 1)) (k (- l 1)) (r '()))
+             (if (&lt; j k)
+                 (let* ((a (vector-ref v i))
+                        (b (vector-ref v j))
+                        (c (vector-ref v k))
+                        (s (+ a b c)))
+                   (cond
+                     ((= s 0) (iter (+ j 1)
+                                    (- k 1)
+                                    (cons (list a b c) r)))
+                     ((&lt; s 0) (iter (+ j 1) k r))
+                     (else (iter j (- k 1) r))))
+                 (loop (+ i 1) (append r result))))))))</code></pre><h2>parallel和concurrent的区别</h2><p>parallel指的是一种同时运行多个任务的实际能力, 而concurrent是一种编程抽象, 它维护了一种同时运行多个任务的illusion. concurrent的程序可能的确以parallel的方式运行, 但也可能只是以顺序运行的方式来模拟parallelism.</p></body></html>

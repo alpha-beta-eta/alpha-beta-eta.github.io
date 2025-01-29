@@ -546,6 +546,13 @@
    (P "我们可以通过隐式定义来引入依赖函数: 为了定义"
       (&: $f (Pi $x $A (app $B $x)))
       ", 其中" $f "是要被定义的函数的名字, "
+      "我们需要一个表达式" (&: $Phi:normal (app $B $x))
+      ", 其可能牵涉变量" (&: $x $A) ", 而我们记"
+      (MB (&:≡ (app $f $x) $Phi:normal)
+          ", 对于" (&: $x $A) ".")
+      "或者, 我们也可以使用" (B $lambda "抽象")
+      (MB (&: (lam $x $Phi:normal)
+              (prod (&: $x $A) (app $B $x))) ".")
       )
    (H3 "积类型" #:id "section_product_type")
    (H3 "依赖序对类型 (" $Sigma:normal "类型)")

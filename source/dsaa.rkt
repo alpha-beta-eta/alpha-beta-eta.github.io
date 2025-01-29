@@ -182,7 +182,8 @@
    (P "根据原地 (in-place) 的定义的不同, 快速排序可以是原地的, "
       "也可以不是原地的, 因为它的确要消耗栈的空间.")
    (H2 "二分搜索")
-   (P "据说二分搜索很少有人能够书写正确, 即便是算法研究者也不例外.")
+   (P "据说二分搜索很少有人能够书写正确, 即便是算法研究者也不例外. "
+      "这里仍然遵循着左闭右开的原则, 以后不再赘述.")
    (CodeB "(define (binary-search x v lo hi)
   (if (>= lo hi)
       #f
@@ -194,5 +195,33 @@
           (else
            (binary-search x v (+ mi 1) hi))))))")
    (H2 "杂凑 (哈希)")
+   (H2 "3SUM问题")
+   (P (Code "3SUM") "的前条件是" (Code "v")
+      "已从小到达排序且元素互异.")
+   (CodeB "(define (3SUM v)
+  (define l (vector-length v))
+  (let loop ((i 0) (result '()))
+    (cond ((= i l) result)
+          ((>= (vector-ref v i) 0) result)
+          (else
+           (let iter ((j (+ i 1)) (k (- l 1)) (r '()))
+             (if (&lt; j k)
+                 (let* ((a (vector-ref v i))
+                        (b (vector-ref v j))
+                        (c (vector-ref v k))
+                        (s (+ a b c)))
+                   (cond
+                     ((= s 0) (iter (+ j 1)
+                                    (- k 1)
+                                    (cons (list a b c) r)))
+                     ((&lt; s 0) (iter (+ j 1) k r))
+                     (else (iter j (- k 1) r))))
+                 (loop (+ i 1) (append r result))))))))")
+   (H2 "parallel和concurrent的区别")
+   (P "parallel指的是一种同时运行多个任务的实际能力, "
+      "而concurrent是一种编程抽象, "
+      "它维护了一种同时运行多个任务的illusion. "
+      "concurrent的程序可能的确以parallel的方式运行, "
+      "但也可能只是以顺序运行的方式来模拟parallelism.")
    
    ))

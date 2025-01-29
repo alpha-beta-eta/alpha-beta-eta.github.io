@@ -36,12 +36,12 @@
   (: $lambda (&: x t) $. M))
 (define @tlam (@lize tlam))
 (define fp_domain.html
-  (TmPrelude
+  (TnTmPrelude
    #:title "函数式编程的论域论基础"
    #:css "styles.css"
-   (H1 "函数式编程的论域论基础")
-   (H2 "第1章 引论")
-   (H2 "第2章 PCF及其操作语义")
+   (H1. "函数式编程的论域论基础")
+   (H2. "引论")
+   (H2. "PCF及其操作语义")
    (P "本章我们引入原型函数式编程语言PCF及其操作语义.")
    (P "语言PCF是一个类型化的语言, 其类型集合" (M "Type") "被归纳定义如下"
       (Ul (Li "基本类型" t:nat "是一个类型, 并且")
@@ -73,6 +73,13 @@
      'columnalign "left" 'columnspacing "20.0ex" 'rowspacing "10.0ex")
     "图2.1 PCF的定型规则")
    
-   (H2 "第3章 PCF的Scott模型")
+   (H2. "PCF的Scott模型")
+   (H3. "基本的domain论")
+   (H3. "PCF的domain模型")
+   (H3. "LCF&mdash;&mdash;可计算函数逻辑")
+   (H2. "Computational Adequacy")
+   (H2. "Milner的上下文引理")
+   (H2. "完全抽象问题")
+   (H2. "逻辑关系 (Logical Relations)")
    
    ))

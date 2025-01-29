@@ -18,6 +18,12 @@
     "Ce n'est pas une nation que nous habitons, mais une langue. "
     "Ne vous méprenez pas; notre langue maternelle est notre véritable patrie. "
     "&mdash; Emil Cioran")
+   (Blockquote
+    "At a time when mathematical fashion despises generality (seen as gratuitous " (Q "generalities")
+    ", i.e. vacuities) I affirm the principal force in all my work has been the quest for the "(Q "general.")
+    " In truth I prefer to accent " (Q "unity") " rather than " (Q "generality.")
+    " But for me these are two aspects of one quest. Unity represents the profound aspect, "
+    "and generality the superficial aspect. (A. Grothendieck, Récoltes et Semailles, 1985-87)")
    (H1 "人工语言?")
    (P "试图让机器分析和理解自然语言是全然不可能的事情, 这种不可能性深植于"
       "自然语言本身. 我们要做的事情, 不该是探究现存的自然语言的规律, "
