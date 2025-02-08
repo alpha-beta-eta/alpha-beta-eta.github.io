@@ -1493,7 +1493,7 @@
         "为相同的"
         (CodeB "(→ Nat Atom)")
         "是什么意思呢?"))
-   ((dialogue)
+   ((dialogue #:id "twin")
     (Ld "两个接受 (expect) 相同数目的参数的"
         (Code "λ") "是相同的, 如果它们的体是相同的. "
         "例如, 两个" (Code "λ") "表达式是相同的"
@@ -3980,7 +3980,7 @@
         "被定义为是一个" (Code "λ")
         "表达式, 而其被应用于了两个参数, "
         (Code "Nat") "和" (Code "Atom") "."))
-   ((dialogue)
+   ((dialogue #:id "flip-use")
     (Ld (CodeB "((flip Nat Atom)
  (cons 17 'apple))")
         "的值是什么?")
@@ -4282,8 +4282,98 @@
   (λ (a)
     (cons a a)))")))
    ((dialogue)
-    (Ld ""
-        )
+    (Ld "以下我们为熟悉的表达式取了个名字."
+        (CodeD "(claim twin-Nat
+  (→ Nat
+    (Pair Nat Nat)))
+(define twin-Nat
+  (λ (x)
+    (cons x x)))")
+        (CodeB "(twin-Nat 5)")
+        "的值是什么?"
+        ((comment)
+         "自" (Ref "twin")
+         "起就熟悉了."))
+    (Rd "是"
+        (CodeB "(cons 5 5)")))
+   ((dialogue)
+    (Ld "以下是一个非常类似的定义."
+        (CodeD "(claim twin-Atom
+  (→ Atom
+    (Pair Atom Atom)))
+(define twin-Atom
+  (λ (x)
+    (cons x x)))")
+        (CodeB "(twin-Atom 'cherry-pie)")
+        "的值是什么?")
+    (Rd "是"
+        (CodeB "(cons 'cherry-pie 'cherry-pie)")
+        "这些定义有什么问题? "
+        "为什么它们被虚线框起来了?"
+        ((tcomment)
+         "之所以用虚线框起来, 是因为这些定义不够一般, "
+         "于是不值得定义, 而应该代之以一个更一般的版本.")))
+   ((dialogue)
+    (Ld "之于"
+        (CodeB "(λ (a)
+  (cons a a))")
+        (Code "Nat") "和" (Code "Atom")
+        "没什么特别之处. 因此, 与其对于每个类型写下一个新的定义, "
+        "我们不如使用" (Code "Π") "构建一个一般目的性的"
+        (Code "twin") ", 其可以对于" (Em "任意")
+        "的类型成立.")
+    (Rd "以下即是一般目的性的" (Code "twin") "."
+        (CodeB "(claim twin
+  (Π ((Y U))
+    (→ Y
+      (Pair Y Y))))
+(define twin
+  (λ (Y)
+    (λ (x)
+      (cons x x))))")))
+   ((dialogue)
+    (Ld (Code "(twin Atom)") "的值是什么?")
+    (Rd (Code "(twin Atom)") "是"
+        (CodeB "(λ (x)
+  (cons x x))")))
+   ((dialogue)
+    (Ld (Code "(twin Atom)") "的类型是什么?")
+    (Rd "一致地将"
+        (CodeB "(→ Y
+  (Pair Y Y))")
+        "中的每个" (Code "Y")
+        "替换以" (Code "Atom") "就得到了"
+        (CodeB "(→ Atom
+  (Pair Atom Atom))")))
+   ((dialogue)
+    (Ld (Code "twin-Atom") "的类型和"
+        (Code "(twin Atom)")
+        "的类型之间有什么联系?")
+    (Rd (Code "twin-Atom") "的类型和"
+        (Code "(twin Atom)")
+        "的类型是相同的类型."))
+   ((dialogue)
+    (Ld "接着, 使用一般性的" (Code "twin")
+        "来定义" (Code "twin-Atom") "."
+        (CodeB "(claim twin-Atom
+  (→ Atom
+    (Pair Atom Atom)))"))
+    (Rd "可以使用来自于" (Ref "flip-use") "的技巧."
+        (CodeB "(define twin-Atom
+  (twin Atom))")))
+   ((dialogue)
+    (Ld (CodeB "(twin-Atom 'cherry-pie)")
+        "和"
+        (CodeB "((twin Atom) 'cherry-pie)")
+        "是相同的"
+        (CodeB "(Pair Atom Atom)")
+        "吗?")
+    (Rd "是的, 并且其值 (也是规范形式) 为"
+        (CodeB "(cons 'cherry-pie 'cherry-pie)")
+        "对于甜点而言, 这就是双倍了!"))
+   (H2 "表, 表, 更多的表")
+   ((dialogue)
+    (Ld (Code "Π") "怎么样?")
     (Rd ""
         ))
    ((dialogue)
@@ -4291,7 +4381,7 @@
         )
     (Rd ""
         ))
-   (H2 "表, 表, 更多的表")
+   (H2 "究竟到底是多少?")
    ((dialogue)
     (Ld ""
         )
