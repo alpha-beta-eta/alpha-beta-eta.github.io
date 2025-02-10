@@ -4374,6 +4374,65 @@
    (H2 "表, 表, 更多的表")
    ((dialogue)
     (Ld (Code "Π") "怎么样?")
+    (Rd "美味至极. 尽管如此, 使用餐巾可以使得用餐不那么狼狈."))
+   ((dialogue)
+    (Ld "在我们开始之前, 你有没有"
+        (Ul (Li "烹饪普罗旺斯杂烩,")
+            (Li "吃完两个樱桃派,")
+            (Li "尝试使用带图画的餐巾清理一下,")
+            (Li "理解" (Code "rec-Nat") ", 以及")
+            (Li "休息安睡好"))
+        "呢?")
+    (Rd "这俨然是期望清单."))
+   ((dialogue #:id "nil")
+    (Ld "是的, 不过这些是很好的期望."
+        (CodeB "(claim expectations
+  (List Atom))
+(define expectations
+  (:: 'cooked
+    (:: 'eaten
+      (:: 'tried-cleaning
+        (:: 'understood
+          (:: 'slept nil))))))"))
+    (Rd "这段代码有些令我困惑, 在于以下几个方面:"
+        (Ul (Li (Code "::") "还没有描述,")
+            (Li "类型构造子" (Code "List")
+                "还没有描述, 以及")
+            (Li "原子" (Code "'nil") "已经作为"
+                (Code "step-zerop")
+                "的一部分被使用."))))
+   ((dialogue)
+    (Ld (Code "'nil") "和"
+        (Ref "nil") "里的"
+        (Code "nil") "是相同的吗?")
+    (Rd "不是, 因为" (Ref "nil")
+        "里的" (Code "nil")
+        "并非一个" (Code "Atom")
+        ", 其不以单引号开头."
+        (P (Code "nil") "是一个表达式吗?")))
+   ((dialogue)
+    (Ld (Code "List") "是一个类型构造子. 如果"
+        $E "是一个类型, 那么"
+        (Code "(List " $E ")")
+        "是一个类型."
+        ((comment)
+         "读作" (Q "类型为" $E "的元素的列表")
+         "或者更简单的" (Q $E "的列表") "."))
+    (Rd "那么, 成为一个" (Code "(List " $E ")")
+        "的意思是什么呢?"))
+   ((law)
+    (Center (Code "List") "之律")
+    (P "如果" $E "是一个类型, 那么"
+        (Code "(List " $E ")")
+        "是一个类型."))
+   ((dialogue)
+    (Ld (Code "nil") "是一个"
+        (Code "(List Atom)") "吗?")
+    (Rd "在" (Ref "nil") "里" (Code "nil")
+        "看起来扮演着空列表的角色."))
+   ((dialogue)
+    (Ld ""
+        )
     (Rd ""
         ))
    ((dialogue)
