@@ -658,7 +658,7 @@
     (Rd "这是不是意味着" (Code "Pair")
         "不能和" (Code "car") "与" (Code "cdr")
         "一起使用呢?"))
-   ((dialogue)
+   ((dialogue #:id "type-eval")
     (Ld "不, 完全不是."
         (CodeB "(Pair
  (car
@@ -5178,6 +5178,101 @@
          "或者更简单的"
          (Q $E "的列表, 长度为" $k) "."))
     (Rd "类型可以包含不是类型的表达式吗?"))
+   ((dialogue)
+    (Ld "正如类型可以是对于某个表达式求值的结果一样 (见"
+        (Ref "type-eval")
+        "), 某些类型可以包含其他并非类型的表达式."
+        ((tcomment)
+         "意味不明的类比."))
+    (Rd "那么, 之所以" (Code "(Vec Atom 3)")
+        "是一个类型, 是因为" (Code "Atom")
+        "是一个类型而" (Code "3")
+        "显然是一个" (Code "Nat") "."))
+   ((dialogue)
+    (Ld (CodeB "(Vec
+  (cdr
+    (cons 'pie
+      (List (cdr (cons Atom Nat)))))
+  (+ 2 1))")
+        "是一个类型吗?")
+    (Rd "必然是的, 因为"
+        (CodeB "(cdr
+  (cons 'pie
+    (List (cdr (cons Atom Nat)))))")
+        "和"
+        (CodeB "(List Nat)")
+        "是相同的类型, 且"
+        (CodeB "(+ 2 1)")
+        "和"
+        (CodeB "3")
+        "是相同的" (Code "Nat")
+        ". 这意味着该表达式和"
+        (CodeB "(Vec (List Nat) 3)")
+        "是相同的, 而其 (指后者) 显然是一个类型."))
+   ((dialogue)
+    (Ld (Code "(Vec " $E " zero)")
+        "唯一的构造子是" (Code "vecnil") ".")
+    (Rd "这是因为" (Code "vecnil")
+        "的长度为" (Code "zero") "吗?"))
+   ((dialogue)
+    (Ld "恰是如此."
+        (P (Code "vec::") "是"
+           (CodeB "(Vec " $E " (add1 " $k "))")
+           "唯一的构造子."))
+    (Rd "这里的" $k "是什么?"))
+   ((dialogue)
+    (Ld "这里, " $k "可以是任意的" (Code "Nat") "."
+        (P "当" $e "是一个" $E "而" $es "是一个"
+           (Code "(Vec " $E " " $k ")") "时, "
+           (Code "(vec:: " $e " " $es ")") "是一个"
+           (Code "(Vec " $E " (add1 " $k "))") "."))
+    (Rd "如果一个表达式是一个"
+        (Code "(Vec " $E " (add1 " $k "))")
+        "那么其值至少拥有一个元素, 因而有可能定义"
+        (Code "first") "和" (Code "last")
+        ", 是不是这样呢?"))
+   ((dialogue)
+    (Ld "对的."
+        (CodeB "(vec:: 'oyster vecnil)")
+        "是一个"
+        (CodeB "(Vec Atom 1)")
+        "吗?")
+    (Rd "是的, 因为"
+        (CodeB "'oyster")
+        "是一个"
+        (CodeB "Atom")
+        "而"
+        (CodeB "vecnil")
+        "是一个"
+        (CodeB "(Vec Atom zero)")))
+   ((law)
+    (Center (Code "Vec") "之律")
+    (P "如果" $E "是一个类型而" $k
+       "是一个" (Code "Nat") ", 那么"
+       (Code "(Vec " $E " " $k ")")
+       "是一个类型."))
+   ((law)
+    (Center (Code "vecnil") "之律")
+    (P (Code "vecnil") "是一个"
+       (Code "(Vec " $E " zero)") "."))
+   ((law)
+    (Center (Code "vec::") "之律")
+    (P "如果" $e "是一个" $E "而" $es "是一个"
+       (Code "(Vec " $E " " $k ")") ", 那么"
+       (Code "(vec:: " $e " " $es ")") "是一个"
+       (Code "(Vec " $E " (add1 " $k "))") "."))
+   ((dialogue)
+    (Ld (CodeB "(vec:: 'crimini
+  (vec:: 'shiitake vecnil))")
+        "是一个"
+        (CodeB "(Vec Atom 3)")
+        "吗?")
+    (Rd "不是, 因为其并非恰有三个原子的列表."))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
    ((dialogue)
     (Ld ""
         )
