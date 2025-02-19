@@ -1,6 +1,8 @@
 #lang racket
 (provide little_typer.html)
 (require SMathML)
+(define l-1
+  (Mi "l-1" #:attr* '((mathvariant "script"))))
 (define (Mid str) (Mi #:attr* '((mathvariant "italic")) str))
 (define $arg (Mid "arg"))
 (define $name (Mid "name"))
@@ -9,9 +11,10 @@
 (define $base (Mid "base"))
 (define $step (Mid "step"))
 (define $es (Mid "es"))
+(define $mot (Mid "mot"))
 ;very tricky, difficult to use
-(define (C exp #:constant* [constant* '(nil vecnil)]
-           #:special* [special* '(U l)])
+(define (C exp #:constant* [constant* '(zero nil vecnil Nat Atom)]
+           #:special* [special* '(U l l-1)])
   (define (T exp)
     (match exp
       (,x (guard (symbol? x))
@@ -4773,7 +4776,7 @@
         (CodeB "(add1
   (add1 zero))")
         "或者更为人知的版本是" (Code "2") "."))
-   ((dialogue)
+   ((dialogue #:id "step-length-def")
     (Ld "这个" (Code "rec-List") "表达式将"
         (Code "condiments") "中的每个" (Code "::")
         "都替换为了" (Code "add1") ", 而" (Code "nil")
@@ -5713,6 +5716,287 @@
     (λ (es)
       (tail es))))")))
    (H2 "完全取决于动机")
+   ((dialogue #:id "peas-type0")
+    (Ld "我们的蘑菇派需要少许豌豆搭配. "
+        "是时候定义" (Code "peas")
+        "了, 其产生所需数目的豌豆."
+        (P "什么样的类型表达了这种行为呢?"))
+    (Rd "类型是"
+        (CB '(→ Nat (List Atom)))
+        "因为" (Code "peas")
+        "能够产生任意数目的豌豆."))
+   ((dialogue)
+    (Ld (Code "peas")
+        "到底应该产生多少豌豆呢?")
+    (Rd "看情况咯. (It depends.)"))
+   ((dialogue)
+    (Ld "依赖于什么呢? (What does it depend on?)")
+    (Rd "其依赖于豌豆所需要的数目, 即参数."))
+   ((dialogue)
+    (Ld (Ref "peas-type0") "中的类型"
+        (CB '(→ Nat (List Atom)))
+        "不够特化. 它没有表达出"
+        (Code "peas") (Em "精确地")
+        "产生了其被索取的豌豆数目.")
+    (Rd "豌豆的数目是" (Code "Nat")
+        "参数. 以下的类型有用吗?"
+        (CodeB "(claim peas
+  (Π ((how-many-peas Nat))
+    (Vec Atom how-many-peas)))")))
+   ((dialogue)
+    (Ld "是的, 这个类型表达了作为" (Code "peas")
+        "的参数的豌豆数目依赖于其被索取的数目. "
+        "这样的类型被称为" (Em "依赖类型(dependent type)") "."
+        (P (Code "peas") "可以用"
+           (Code "rec-Nat") "写出来吗?"))
+    (Rd "当然了."
+        (CodeD "(define peas
+  (λ (how-many-peas)
+    (rec-Nat how-many-peas
+      vecnil
+      (λ (" (Dim l-1) " peas" (Sub l-1) ")
+        (vec:: 'pea peas" (Sub l-1) ")))))")))
+   ((law)
+    (Center "依赖类型")
+    (P "由某个不是类型的东西所确定的类型被称为"
+       (Em "依赖类型(dependent type)") "."))
+   ((dialogue)
+    (Ld "这" (Code "peas") "的定义并非表达式. 为了能够使用"
+        (Code "rec-Nat") ", base和step的参数"
+        (Code "peas" (Sub l-1)) "必须具有相同的类型. "
+        "然而, 这里的" (Code "peas" (Sub l-1))
+        "可以是一个" (Code "(Vec Atom 29)")
+        ", 但是" (Code "vecnil") "是一个"
+        (Code "(Vec Atom 0)") "."
+        (P "换言之, 当类型依赖于作为target的" (Code "Nat")
+           "时, " (Code "rec-Nat") "就不能使用了."))
+    (Rd (Code "iter-Nat") "如何呢?"))
+   ((dialogue)
+    (Ld (Code "rec-Nat") "可以做任何" (Code "iter-Nat")
+        "可以做的事情.")
+    (Rd "有什么更强大的东西可用吗?"))
+   ((dialogue)
+    (Ld "那被称为" (Code "ind-Nat") ", 这是"
+        (Q "induction on "(Code "Nat")) "的缩写.")
+    (Rd "什么是" (Code "ind-Nat") "?"))
+   ((dialogue)
+    (Ld (Code "ind-Nat") "和" (Code "rec-Nat")
+        "很像, 除了其允许base和step中几乎是答案的参数 "
+        "(这里是" (Code "peas" (Sub l-1))
+        ") 的类型包括作为target的" (Code "Nat") "."
+        (P "换言之, " (Code "ind-Nat") "用于依赖类型."))
+    (Rd "这里有一个被称为" (Code "how-many-peas")
+        "的" (Code "Nat") "包含在类型"
+        (CodeB "(Vec Atom how-many-peas)")
+        "里, 它是一个依赖类型吗?"))
+   ((dialogue)
+    (Ld "是的, 它依赖于" (Code "Nat") " "
+        (Code "how-many-peas") "."
+        (P "为了与依赖类型打交道, "
+           (Code "ind-Nat") "需要额外的参数: "
+           "为了使用" (Code "ind-Nat")
+           ", 有必要陈述base和step几乎是答案的参数的类型是"
+           (Em "如何") "依赖于作为target的"
+           (Code "Nat") "的."))
+    (Rd "这个额外的参数长什么样呢?"))
+   ((dialogue)
+    (Ld "这个额外的参数, 被称为" (Em "动机(motive)")
+        ", 可以是任意的"
+        (CB '(→ Nat U))
+        "一个" (Code "ind-Nat") "表达式的类型是动机"
+        "应用于作为target的" (Code "Nat") "的结果."
+        ((comment)
+         "感谢Conor McBride (1973-)."))
+    (Rd "所以说动机是一个函数, 其体是一个" $U:script "."))
+   ((dialogue)
+    (Ld "的确如此. 动机解释了" (Em "为什么")
+        "target要被消去."
+        (P (Code "peas") "的动机是什么?"))
+    (Rd "这是个好问题."
+        (P "不过, 至少其类型是清晰的."
+           (CodeB "(claim mot-peas
+  (→ Nat " $U:script "))"))
+        ((comment)
+         (Q "mot") "读作" (Q "moat") ".")))
+   ((law)
+    (Center "对于依赖类型应使用" (Code "ind-Nat"))
+    (P "当" (Code "rec-Nat") "或者" (Code "ind-Nat")
+       "表达式的类型依赖于作为target的" (Code "Nat")
+       "时, 应使用" (Code "ind-Nat") "而非"
+       (Code "rec-Nat") ". " (Code "ind-Nat")
+       "表达式的类型是动机 (motive) 应用于target的结果."))
+   ((dialogue)
+    (Ld "以下就是" (Code "mot-peas") "了."
+        (CodeB "(define mot-peas
+  (λ (k)
+    (Vec Atom k)))")
+        (C '(mot-peas zero)) "的值是什么?")
+    (Rd "它应该是一个" $U:script
+        ", 因而也是类型, 即"
+        (CodeB "(Vec Atom zero)")))
+   ((dialogue)
+    (Ld (Code "peas") "的base必然具有什么类型呢?")
+    (Rd "当然其类型必然为"
+        (CodeB "(Vec Atom zero)")
+        "因为base的值是当" (Code "zero")
+        "为target时的值."))
+   ((dialogue)
+    (Ld (Code "peas") "的base应该是什么呢?")
+    (Rd "其必然是" (Code "vecnil")
+        ", 因为" (Code "vecnil") "是仅有的"
+        (CodeB "(Vec Atom zero)")))
+   ((dialogue)
+    (Ld "这个(类型)也是" (Code "(mot-peas zero)") "."
+        (P (Code "rec-Nat") "中的step的目的是什么?"))
+    (Rd "在" (Code "rec-Nat") "里, step的参数是"
+        (Code "n-1") "和几乎是答案的东西, "
+        "其为消去" (Code "n-1") "得到的值."
+        (P "给定" (Code "n-1") "和几乎是答案的参数, "
+           "step确定了" (Code "(add1 n-1)") "时的值.")))
+   ((dialogue)
+    (Ld (Code "ind-Nat") "里的step的参数也是"
+        (Code "n-1") "和几乎是答案的东西."
+        (P "那么, 几乎是答案的东西的类型是什么?"))
+    (Rd "几乎是答案的东西的类型是动机应用于"
+        (Code "n-1") "的结果, 因为几乎是答案的东西是"
+        "target为" (Code "n-1") "时的值."))
+   ((dialogue)
+    (Ld "对于target " (Code "(add1 n-1)")
+        "而言, 值的类型是什么?")
+    (Rd "一个" (Code "ind-Nat") "表达式的类型"
+        "动机应用于target的结果."))
+   ((dialogue)
+    (Ld "如果动机是" $mot ", 那么step的类型为"
+        (CodeB "(Π ((n-1 Nat))
+  (→ (" $mot " n-1)
+    (" $mot " (add1 n-1))))"))
+    (Rd "举一个" (Code "ind-Nat")
+        "的step的例子呢?"))
+   ((dialogue)
+    (Ld "以下是" (Code "peas") "的step."
+        (CodeB "(claim step-peas
+  (Π ((" l-1 " Nat))
+    (→ (mot-peas " l-1 ")
+      (mot-peas (add1 " l-1 ")))))
+(define step-peas
+  (λ (" (Dim l-1) ")
+    (λ (peas" (Sub l-1) ")
+      (vec:: 'pea peas" (Sub l-1) "))))"))
+    (Rd "为什么" (Code "mot-peas")
+        "在" (Code "step-peas")
+        "的类型里出现了两次?"))
+   ((dialogue)
+    (Ld "好问题."
+        (P (Code "(mot-peas " l-1 ")")
+           "的值是什么?"))
+    (Rd "是" (C '(Vec Atom l-1)) "."))
+   ((law)
+    (Center (Code "ind-Nat") "之律")
+    (P "如果" $target "是一个" (Code "Nat")
+       ", " $mot "是一个"
+       (CB '(→ Nat U))
+       $base "是一个" (Code "(" $mot " zero)")
+       ", 而" $step "是一个"
+       (CodeB "(Π ((n-1 Nat))
+  (→ (" $mot " n-1)
+    (" $mot " (add1 n-1))))")
+       "那么"
+       (CodeB "(ind-Nat " $target "
+  " $mot "
+  " $base "
+  " $step ")")
+       "是一个" (Code "(" $mot " " $target ")") ".")
+    ((tcomment)
+     "这里的变量" (Code "n-1")
+     "其实可以是任意的, 并且从理论上来说" $mot
+     "里不应该存在" (Code "n-1") "的自由出现."))
+   ((law)
+    (Center (Code "ind-Nat") "之第一诫")
+    (P (Code "ind-Nat") "表达式"
+       (CodeB "(ind-Nat zero
+  " $mot "
+  " $base "
+  " $step ")")
+       "和" $base "是相同的"
+       (Code "(" $mot " zero)") "."))
+   ((law)
+    (Center (Code "ind-Nat") "之第二诫")
+    (P (Code "ind-Nat") "表达式"
+       (CodeB "(ind-Nat (add1 " $n ")
+  " $mot "
+  " $base "
+  " $step ")")
+       "和"
+       (CodeB "(" $step " " $n "
+  (ind-Nat " $n "
+    " $mot "
+    " $base "
+    " $step "))")
+       "是相同的" (Code "(" $mot "(add1 " $n "))") "."))
+   ((dialogue)
+    (Ld "这是" (Code "peas" (Sub l-1))
+        "的类型, 其描述了包含" l-1 "个豌豆的列表."
+        (P (CB '(mot-peas (add1 l-1)))
+           "的值如何, 其又意味着什么?"))
+    (Rd "其是"
+        (CB '(Vec Atom (add1 l-1)))
+        "其描述了包含"
+        (CB '(add1 l-1))
+        "个豌豆的列表."))
+   ((law)
+    (Center "自然数上的归纳")
+    (P "通过给出零时的值以及将" $n
+       "时的值转换为" (&+ $n $1)
+       "时的值的方法来构造对于任意自然数的值被称为"
+       (Em "自然数上的归纳") "."))
+   ((dialogue)
+    (Ld "step必须要能够根据对于" (Code l-1)
+        "的值构造出对于" (C '(add l-1)) "的值."
+        (P "再次观察" (Code "step-peas")
+           "的类型, 其在文中到底为何意?"))
+    (Rd "不论" (Code l-1) "是什么" (Code "Nat")
+        ", " (Code "step-peas") "总是接受一个"
+        (CB '(Vec Atom l-1))
+        "然后产生一个"
+        (CB '(Vec Atom (add1 l-1)))
+        "这是通过" (Q "cons") "一个"
+        (Code "'pea") "到前端完成的."))
+   ((dialogue)
+    (Ld "base将"
+        (CodeB "zero")
+        "替换以"
+        (CodeB "vecnil")
+        "因为"
+        (CodeB "vecnil")
+        "是仅有的"
+        (CodeB "(Vec Atom zero)")
+        (Code "step-peas") "将一个"
+        (Code "add1") "替换成什么呢?")
+    (Rd (Code "step-peas") "将每个"
+        (Code "add1") "替换以一个"
+        (Code "vec::") ", 就像"
+        (Ref "step-length-def")
+        "中的" (Code "length")
+        "将一个列表中的每个" (Code "::")
+        "替换以" (Code "add1") "."))
+   ((dialogue)
+    (Ld "现在定义" (Code "peas")
+        "是可能的了, 只需使用"
+        (Code "mot-peas") "和"
+        (Code "step-peas") ".")
+    (Rd "以下是我们的定义."
+        (CodeB "(define peas
+  (λ (how-many-peas)
+    (ind-Nat how-many-peas
+      mot-peas
+      vecnil
+      step-peas)))")))
+   ((dialogue)
+    (Ld (Code "(peas 2)") "的值是什么?"
+        
+        )
+    (Rd ""
+        ))
    ((dialogue)
     (Ld ""
         )

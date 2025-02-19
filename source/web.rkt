@@ -98,6 +98,7 @@
          "zork.rkt"
          "monad.rkt"
          "polynomial_computation.rkt"
+         "measure.rkt"
          
          )
 (define (emit-web)
@@ -212,6 +213,7 @@
   (emitXml zork.html "../zork.html")
   (emitXml monad.html "../monad.html")
   (emitXml polynomial_computation.html "../polynomial_computation.html")
+  (emitXml measure.html "../measure.html")
   
   )
 (emit-web)

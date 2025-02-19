@@ -68,7 +68,7 @@
                  (mref $a $n $n) $x_n)))
     "定义的序列" (@ (_^ $x $n $prime)) "也是一个趋零序列.")
    ((proof)
-    "给定" (&< $epsilon $0) ", 存在" $m "满足对于每个" (&> $n $m)
+    "给定" (&> $epsilon $0) ", 存在" $m "满足对于每个" (&> $n $m)
     "有" (&< (&abs $x_n) (~ $epsilon (&i* $2 $K))) ", 那么"
     (MB (deriv0 (&abs (_^ $x $n $prime))
                 $= (&abs (LC0 (mref $a $n $0) $x_0 (mref $a $n $n) $x_n))
@@ -87,8 +87,30 @@
     ". 也就是说, 对于每个" (&> $n $n_0) ", " (&< (&abs (_^ $x $n $prime)) $epsilon)
     ", 定理也就得到了证明.")
    ((theorem #:n "5")
-    
-    )
+    "如果" (&-> $x_n $xi) "并且系数" (mref $a $mu $nu) "满足额外条件"
+    (Ol #:attr* '((type "a") (start "3"))
+        (Li (MB (&-> (&= (&+ (mref $a $n $0) (mref $a $n $1)
+                             $..c (mref $a $n $n)) $A_n) $1) ".")))
+    "那么亦有"
+    (MB (&-> (&= (_^ $x $n $prime)
+                 (LC0 (mref $a $n $0) $x_0 (mref $a $n $1) $x_1
+                      (mref $a $n $n) $x_n))
+             $xi) "."))
+   ((proof)
+    "现在我们有"
+    (MB (&= (_^ $x $n $prime)
+            (LC0 $A_n $xi (mref $a $n $0) (@- $x_0 $xi)
+                 (mref $a $n $1) (@- $x_1 $xi)
+                 (mref $a $n $n) (@- $x_n $xi))))
+    "根据定理4, 可知由"
+    (MB (&= (_^ $x $n $Prime)
+            (LC0 (mref $a $n $0) (@- $x_0 $xi)
+                 (mref $a $n $1) (@- $x_1 $xi)
+                 (mref $a $n $n) (@- $x_n $xi))))
+    "定义的序列" (@ (_^ $x $n $Prime))
+    "是一个趋零序列, 并且我们还知道" (&-> (&i* $A_n $xi) $xi)
+    ", 故" (&-> (_^ $x $n $prime) $xi) ".")
+   
    (H2 "第3章 正项级数")
    (P "本章我们关心正项级数, 或者至少是非负项级数. 这里两者都被称为正项级数, "
       "也就是说正被理解为非严格的正. 对于这样一个级数" (&sum $a_n)

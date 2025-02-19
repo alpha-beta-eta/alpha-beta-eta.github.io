@@ -121,6 +121,23 @@
         r
         (iter (quotient n b)
               (cons (remainder n b) r)))))")
+   (CodeB "(define (positive-base-convert n b)
+  (let iter ((n n) (r '()))
+    (if (= n 0)
+        r
+        (iter (quotient (- n 1) b)
+              (cons (+ (remainder (- n 1) b) 1)
+                    r)))))")
+   (CodeB "(define (index->label index)
+  (define (integer->upper i)
+    (integer->char (+ i 64)))
+  (let iter ((rest index) (result '()))
+    (if (= rest 0)
+        (list->string result)
+        (iter (quotient (- rest 1) 26)
+              (cons (integer->upper
+                     (add1 (remainder (- rest 1) 26)))
+                    result)))))")
    (H2 "计数器")
    (CodeB "(define (make-counter)
   (let ((x -1))
@@ -426,5 +443,27 @@ fun mult m Zero = Zero
 
 fun expt m Zero = Succ Zero
   | expt m (Succ n) = mult (expt m n) m")
+   (H2 "面向对象 (伪)")
+   (CodeB "(define make-obj
+  (let ((id* '()))
+    (define (add-id! id)
+      (unless (symbol? id)
+        (error 'make-obj &quot;id [~s] should be a symbol.&quot; id))
+      (if (memq id id*)
+          (error 'make-obj &quot;id [~s] has been used.&quot; id)
+          (set! id* (cons id id*))))
+    (lambda (id)
+      (add-id! id)
+      (lambda (msg)
+        (case msg
+          ((get-id) (lambda (self) id))
+          (else #f))))))
+(define (method? x) (procedure? x))
+(define (tell obj msg . arg*)
+  (define method (obj msg))
+  (unless (method? method)
+    (error (get-id obj) &quot;unknown message [~s]&quot; msg))
+  (apply method obj arg*))
+(define (get-id obj) (tell obj 'get-id))")
    
    ))

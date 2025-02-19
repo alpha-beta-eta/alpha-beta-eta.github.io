@@ -75,5 +75,7 @@
     (H2 (A "Schemer看monad" #:attr* '((href "monad.html"))))
     (H2 (A "高效多项式计算" #:attr*
            '((href "polynomial_computation.html"))))
+    (H2 (A "测度论" #:attr* '((href "measure.html"))))
+    
     )
    ))
