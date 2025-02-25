@@ -906,4 +906,29 @@
     (ind-Nat how-many-peas
       mot-peas
       vecnil
-      step-peas)))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd"><code>(peas 2)</code>的值是什么?</td><td class="middled"><sup>26</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>27</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>28</sup></td><td class="rightd"></td></tr></table><h2>课间: 一次吃一块</h2><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>1</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>2</sup></td><td class="rightd"></td></tr></table></body></html>
+      step-peas)))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd"><code>(peas 2)</code>的值是什么?<p>以下是最初的两个计算步骤.<ol><li>| <pre style="display: inline-block"><code>(peas
+  (add1
+    (add1 zero)))</code></pre></li><li>| <pre style="display: inline-block"><code>(ind-Nat (add1
+           (add1 zero))
+  mot-peas
+  vecnil
+  step-peas)</code></pre></li><li>| <pre style="display: inline-block"><code>(step-peas (add1 zero)
+  (ind-Nat (add1 zero)
+    mot-peas
+    vecnil
+    step-peas))</code></pre></li></ol>现在, 请找出其值. 记得参数(有时)无需被求值.</p></td><td class="middled"><sup>26</sup></td><td class="rightd">以下就是了.<ol start="4"><li>| <pre style="display: inline-block"><code>(vec:: 'pea
+  (ind-Nat (add1 zero)
+    mot-peas
+    vecnil
+    step-peas))</code></pre></li></ol>而且, 我们最终可以找出其规范形式.<ol start="5"><li>| <pre style="display: inline-block"><code>(vec:: 'pea
+  (step-peas zero
+    (ind-Nat zero
+      mot-peas
+      vecnil
+      step-peas)))</code></pre></li><li>| <pre style="display: inline-block"><code>(vec:: 'pea
+  (vec:: 'pea
+    (ind-Nat zero
+      mot-peas
+      vecnil
+      step-peas)))</code></pre></li><li>| <pre style="display: inline-block"><code>(vec:: 'pea
+  (vec:: 'pea vecnil))</code></pre></li></ol>这就是规范形式了.</td></tr></table><table class="dialogue"><tr><td class="leftd">如果动机的参数是黯淡的, 那么说明<code>ind-Nat</code>表现得就像是<code>rec-Nat</code>. </td><td class="middled"><sup>27</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>28</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>29</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>30</sup></td><td class="rightd"></td></tr></table><h2>课间: 一次吃一块</h2><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>1</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>2</sup></td><td class="rightd"></td></tr></table></body></html>

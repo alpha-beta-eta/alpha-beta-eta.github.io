@@ -141,8 +141,10 @@
   (set-attr*
    (apply CodeB html*)
    'style "display: inline-block"))
-(define (same-as . x*)
-  (apply Ol (map (lambda (x) (Li "| " x)) x*)))
+(define (same-as #:attr* [attr* '()] . x*)
+  (keyword-apply
+   Ol '(#:attr*) (list attr*)
+   (map (lambda (x) (Li "| " x)) x*)))
 (define little_typer.html
   (TnTmPrelude
    #:title "The Little Typer"
@@ -5993,7 +5995,59 @@
       step-peas)))")))
    ((dialogue)
     (Ld (Code "(peas 2)") "的值是什么?"
-        
+        (P "以下是最初的两个计算步骤."
+           (same-as
+            (CodeI "(peas
+  (add1
+    (add1 zero)))")
+            (CodeI "(ind-Nat (add1
+           (add1 zero))
+  mot-peas
+  vecnil
+  step-peas)")
+            (CodeI "(step-peas (add1 zero)
+  (ind-Nat (add1 zero)
+    mot-peas
+    vecnil
+    step-peas))"))
+           "现在, 请找出其值. "
+           "记得参数(有时)无需被求值."))
+    (Rd "以下就是了."
+        (same-as
+         #:attr* '((start "4"))
+         (CodeI "(vec:: 'pea
+  (ind-Nat (add1 zero)
+    mot-peas
+    vecnil
+    step-peas))"))
+        "而且, 我们最终可以找出其规范形式."
+        (same-as
+         #:attr* '((start "5"))
+         (CodeI "(vec:: 'pea
+  (step-peas zero
+    (ind-Nat zero
+      mot-peas
+      vecnil
+      step-peas)))")
+         (CodeI "(vec:: 'pea
+  (vec:: 'pea
+    (ind-Nat zero
+      mot-peas
+      vecnil
+      step-peas)))")
+         (CodeI "(vec:: 'pea
+  (vec:: 'pea vecnil))"))
+        "这就是规范形式了."))
+   ((dialogue)
+    (Ld "如果动机的参数是黯淡的, 那么说明"
+        (Code "ind-Nat") "表现得就像是"
+        (Code "rec-Nat")
+        ". "
+        )
+    (Rd ""
+        ))
+   ((dialogue)
+    (Ld ""
         )
     (Rd ""
         ))
