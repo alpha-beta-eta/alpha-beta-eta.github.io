@@ -150,12 +150,6 @@
    #:title "The Little Typer"
    #:css "styles.css"
    (H1 "The Little Typer")
-   (P "目前的排版不论从效果还是从实现来看都相当丑陋, 但也只能将就一下了. "
-      "或许只有等到博客进行大型实质性重构时, 我才会考虑这些问题.")
-   (P "和其他小人书一样, 本书也包含大量文字游戏, 这有点难以传达? "
-      "若有必要, 我会添加一些译注.")
-   (H2: "他序")
-   (H2: "自序")
    (H2 "愈是变化, 愈是不变" #:id "ch1")
    ((dialogue)
     (Ld "欢迎回来!")
@@ -6042,13 +6036,29 @@
     (Ld "如果动机的参数是黯淡的, 那么说明"
         (Code "ind-Nat") "表现得就像是"
         (Code "rec-Nat")
-        ". "
-        )
-    (Rd ""
-        ))
+        ". 现在请定义一个函数"
+        (Code "also-rec-Nat")
+        ", 其使用" (Code "ind-Nat")
+        ", 而行为正如" (Code "rec-Nat") "."
+        (CodeB "(claim also-rec-Nat
+  (Π ((X U))
+    (→ Nat
+       X
+       (→ Nat X X)
+      X)))"))
+    (Rd "因为类型并不依赖于target, 所以"
+        (Code (Dim "k")) "是黯淡的."
+        (CodeB "(define also-rec-Nat
+  (λ (X)
+    (λ (target base step)
+      (ind-Nat target
+        (λ (" (Dim "k") ") X)
+        base
+        step))))")))
    ((dialogue)
-    (Ld ""
-        )
+    (Ld "就像" (Code "first") "可以找出一个列表的第一个元素, "
+        (Code "last") "可以找出最后一个元素."
+        (P (Code "last") "的类型应该是什么?"))
     (Rd ""
         ))
    ((dialogue)

@@ -1,6 +1,7 @@
 #lang racket
 (provide measure.html)
 (require SMathML)
+(define Δ $Delta:normal)
 (define $Sup (Mi "sup"))
 (define (Sup c e)
   (ap (__ $Sup c) e))
@@ -11,6 +12,8 @@
   (li0 a b))
 (define (∀ . x*)
   (: $forall (apply ∈ x*)))
+(define (∃ . x*)
+  (: $exists (apply ∈ x*)))
 (define Σ $Sigma:normal)
 (define $\\ (Mo "\\"))
 (define $power $P:script)
@@ -19,14 +22,19 @@
 (define (Seq E)
   (_ (ang0 (_ E $n)) (∈ $n $NN)))
 (define Seq:E (Seq $E))
+(define $cup $union)
 (define-infix*
   (&\\ $\\)
+  (&Δ Δ)
+  (&cup $cup)
   
   )
 (define-@lized-op*
   (@\\ &\\)
   (@union &union)
   (@power &power)
+  (@cap &cap)
+  (@cup &cup)
   
   )
 (define (format-section section)
@@ -155,9 +163,25 @@
             "然而, 就我个人而言, 除非时间紧迫, 否则我将避免使用这个术语, "
             "因为实际上这种对象的许多最有趣的例子并无有用的测度与之关联.")))
    (((entry "无穷并和交"))
-    "如果你还没有见过无穷并, 那么值得驻足观察一下" (Union (∈ $n $NN) $E_n)
-    ". "
-    )
+    "如果你还没有见过无穷并, 那么值得驻足观察一下式子" (Union (∈ $n $NN) $E_n)
+    ". 这是属于集合" $E_n "中的一个或多个的点构成的集合; 我们可以将其写为"
+    (MB (deriv (Union (∈ $n $NN) $E_n)
+               (setI $x (&cm (∃ $n $NN) (∈ $x $E_n)))
+               (&union $E_0 $E_1 $E_2 $..c)))
+    "(我以" $NN "代表自然数集" (setE $0 $1 $2 $3 $..h)
+    ".) 以相同的方式, 记"
+    (MB (deriv (Cap (∈ $n $NN) $E_n)
+               (setI $x (&cm (∈ $x $E_n) (∀ $n $NN)))
+               (&cap $E_0 $E_1 $E_2 $..c)))
+    "测度空间的基本理论的一个特征在于, 与你之前的经验相比, "
+    "它可能需要更多地利用集合操作" $union ", " $cap
+    ", " $\\ " (" (Q "集合差") ": "
+    (&= (&\\ $E $F) (setI $x (&cm (∈ $x $E) (&!in $x $F))))
+    "), " Δ " (" (Q "对称差") ": "
+    (&= (&Δ $E $F) (&union (@\\ $E $F) (@\\ $F $E))
+        (&\\ (@cup $E $F) (@cap $E $F)))
+    "), 并带有无穷并和交所增添的复杂. 我强烈建议在某个时间点花些时间做一做"
+    "1.1.1.X的练习a.")
    (((Entry (Span $sigma "-代数的基本性质") "entry"))
     "如果" Σ "是" $X "的子集的一个" $sigma "-代数, 那么其具有以下性质."
     (Ol #:attr* '((type "a"))
