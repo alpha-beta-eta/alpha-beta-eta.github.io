@@ -30,7 +30,6 @@
            #:attr* '((href "geometric_algebra.html"))))
     (H2 (A "函数式编程的论域论基础" #:attr* '((href "fp_domain.html"))))
     (H2 (A "结构证明论" #:attr* '((href "spt.html"))))
-    (H2 (A "格论 (Birkhoff)" #:attr* '((href "lattices.html"))))
     (H2 (A "OPLSS" #:attr* '((href "oplss.html"))))
     (H2 (A "归纳定义" #:attr* '((href "induc.html"))))
     (H2 (A "元对象协议艺术" #:attr* '((href "mop.html"))))
@@ -80,6 +79,8 @@
     (H2 (A "古典AI笔记" #:attr* '((href "classical_ai.html"))))
     (H2 (A "Stone空间笔记" #:attr* '((href "stone.html"))))
     (H2 (A "无点拓扑笔记" #:attr* '((href "pointless.html"))))
+    (H2 (A "REFAL" #:attr* '((href "refal.html"))))
+    (H2 (A "The Zipper翻译" #:attr* '((href "zipper.html"))))
     
     )
    ))
