@@ -1,0 +1,61 @@
+<html><head><meta charset="utf-8"/><title>The Zipper</title><link href="styles.css" rel="stylesheet"/></head><body><h1>The Zipper (函数式珍珠)</h1><p>本文的作者Gérard Huet以简单明快的笔触优雅地呈现了zipper的想法.</p><h2>Capsule Review</h2><p>几乎每个程序员都曾遇到过表示一个带有作为注意力焦点的子树的树的问题, 其中焦点可以在树中左移, 右移, 上移, 下移. zipper是Huet为一种能够满足这种需求的精致数据结构取的巧妙的名字. 我多么希望我在曾经遇到这种任务时就知道这个数据结构啊, 因为当时我想到的方法和zipper比起来既不高效也不优雅.</p><h2>第1章 引论</h2><h2>第2章 zipper数据结构</h2><p>基本的想法存在着诸多的变体. 首先让我们呈现一个版本, 其适用于具有可变元数的匿名树结点的树, 而树叶所注入的值来源于一个未加刻画的<em>item</em>类型.</p><h3>第2.1节 树, 路径, 和位置</h3><p>我们假定存在一个类型参数<code>item</code>, 其包含了我们想要层次性地操纵的元素; 树结构不过就是层次性的列表, 其将树组织为section. 例如, 在UNIX的文件系统中, item会是文件, 而section则是目录; 而在一个文本编辑器里, item会是字符, 而两个层次的section分别将缓冲区表示为行的列表以及将行表示为字符的列表. 推广这个概念至允许任意多个层次, 那么我们将得到层次性Turing机器的概念, 其纸带位置 (tape position) 可能包含一个符号, 或者是一个来源于更低层级的纸带.</p><p>这里所呈现的算法均以具体的编程语言OCaml写成 (Leroy <i>et al.</i>, 1996). 这些代码很容易翻译为其他编程语言, 不论是否为函数式的, 不论是否是惰性的.</p><pre><code>type tree =
+    Item of item
+  | Section of tree list;;</code></pre><p>现在我们考虑<code>tree</code>中的<code>path</code>.</p><pre><code>type path =
+    Top
+  | Node of tree list * path * tree list;;</code></pre><p>一个<code>path</code>就像一条拉链 (zipper), 其允许人们撕开树结构到一个特定的位置. 一个<code>Node(l,p,r)</code>包含了其哥哥 (elder siblings) 的列表<code>l</code> (自其中最年轻的起), 其父路径<code>p</code>, 以及其弟弟 (younger siblings) 的列表<code>r</code> (自其中最年长的起). [译注: 我怀疑原文作者将最年轻和最年长搞反了, 于是改成了现在这样, 因为这里是越左越年长, 所以说<code>l</code>的开头实际上应该是比当前焦点 (见后文) 年长的里面最年轻的, 而<code>r</code>的开头实际上应该是比当前焦点年轻的里面最年长的.]</p><div class="comment"><b>注记.</b> 一个由路径所表示的树可以有兄弟树, 叔叔树, 曾叔叔树等等, 但是其父是一个路径, 而非像通常的图编辑器 (graph editor) 里那样是一个树.</div><pre><code>type location = Loc of tree * path;;</code></pre><p>一个<code>location</code>由一个突出的<code>tree</code> (其是当前的焦点) 和其<code>path</code> (其代表了周围的上下文) 构成. 注意到一个位置并不对应于树中的一个出现, 而是一个指向某个特定子树与其周围上下文之间连接的弧的指针. [译注: 应该说是一种概念上的指针而非实际上的指针.]</p><div class="example"><b>例子.</b> 假定我们考虑parse算术表达式的树, 以字符串为item. 表达式<math><mrow><mrow><mi>a</mi><mo>&times;</mo><mi>b</mi></mrow><mo>+</mo><mrow><mi>c</mi><mo>&times;</mo><mi>d</mi></mrow></mrow></math>会被parse为树:<pre><code>Section[Section[Item &quot;a&quot;; Item &quot;*&quot;; Item &quot;b&quot;];
+        Item &quot;+&quot;;
+        Section[Item &quot;c&quot;; Item &quot;*&quot;; Item &quot;d&quot;]];;</code></pre>树中第二个乘法符号的位置是 [译注: 我猜为什么这里没有以<code>;;</code>作结, 是因为这是pretty print的输出而不是手写的程序]:<pre><code>Loc(Item &quot;*&quot;,
+    Node([Item &quot;c&quot;],
+         Node([Item &quot;+&quot;; Section [Item &quot;a&quot;; Item &quot;*&quot;; Item &quot;b&quot;]],
+              Top,
+              []),
+         [Item &quot;d&quot;]))</code></pre></div><h3>第2.2节 树中导航的原语</h3><pre><code>let go_left (Loc(t,p)) = match p with
+    Top -> failwith &quot;left of top&quot;
+  | Node(l::left,up,right) -> Loc(l,Node(left,up,t::right))
+  | Node([],up,right) -> failwith &quot;left of first&quot;;;
+
+let go_right (Loc(t,p)) = match p with
+    Top -> failwith &quot;right of top&quot;
+  | Node(left,up,r::right) -> Loc(r,Node(t::left,up,right))
+  | _ -> failwith &quot;right of last&quot;;;
+
+let go_up (Loc(t,p)) = match p with
+    Top -> failwith &quot;up of top&quot;
+  | Node(left,up,right) -> Loc(Section((rev left) @ (t::right)),up);;
+
+let go_down (Loc(t,p)) = match t with
+    Item(_) -> failwith &quot;down of item&quot;
+  | Section(t1::trees) -> Loc(t1,Node([],p,trees))
+  | _ -> failwith &quot;down of empty&quot;;;</code></pre><div class="comment"><b>注记.</b> 除了<code>go_up</code>之外的导航原语都只需要常量时间, 而<code>go_up</code>所消耗的时间正比于<code>list_length(left)</code>.</div><p>我们可以利用这些原语编写访问当前树的第<math><mi>n</mi></math>个儿子的函数.<pre><code>let nth loc = nthrec
+  where rec nthrec = function
+    1 -> go_down(loc)
+  | n -> if n>0 then go_right(nthrec (n-1))
+                else failwith &quot;nth expects a positive integer&quot;;;</code></pre></p><h3>第2.3节 改变, 插入, 和删除</h3><p>我们可以局部地改变当前位置的结构:</p><pre><code>let change (Loc(_,p)) t = Loc(t,p);;</code></pre><p>向左或者向右插入是自然且廉价的:</p><pre><code>let insert_right (Loc(t,p)) r = match p with
+    Top -> failwith &quot;insert of top&quot;
+  | Node(left,up,right) -> Loc(t,Node(left,up,r::right));;
+
+let insert_left (Loc(t,p)) l = match p with
+    Top -> failwith &quot;insert of top&quot;
+  | Node(left,up,right) -> Loc(t,Node(l::left,up,right));;
+
+let insert_down (Loc(t,p)) t1 = match t with
+    Item(_) -> failwith &quot;down of item&quot;
+  | Section(sons) -> Loc(t1,Node([],p,sons));;</code></pre><p>我们可能也想要实现一个删除原语. 我们可以选择可能的话就向右移动, 否则就向左移动, 以及在空表的情形下向上移动.</p><pre><code>let delete (Loc(_,p)) = match p with
+    Top -> failwith &quot;delete of top&quot;
+  | Node(left,up,r::right) -> Loc(r,Node(left,up,right))
+  | Node(l::left,up,[]) -> Loc(l,Node(left,up,[]))
+  | Node([],up,[]) -> Loc(Section[],up);;</code></pre><p>我们应该注意到<code>delete</code>并非一个简单的操作.</p><p>我们相信以上的数据类型和操作足以用来以应用性但高效的方式编写一个结构编辑器的内核.</p><h2>第3章 基本想法的变体</h2><h3>第3.1节 伤疤</h3><p>如果一个算法的某个频繁操作需要在树中先上再下到相同的位置, 那么总是闭合section是很浪费时间的 (也浪费空间和垃圾回收时间, 等等). 或许在结构中留下<q>伤疤</q>会比较好, 其允许直接访问之前记下来的已访问位置. 因此, 我们将(非空的)section替换为记忆了一个树和其兄弟的三元组:</p><pre><code>type memo_tree =
+    Item of item
+  | Siblings of memo_tree list * memo_tree * memo_tree list;;
+
+type memo_path =
+    Top
+  | Node of memo_tree list * memo_path * memo_tree list;;
+
+type memo_location = Loc of memo_tree * memo_path;;</code></pre><p>基于这些新的结构, 我们可以呈现简化了的上下操作.</p><pre><code>let go_up_memo (Loc(t,p)) = match p with
+    Top -> failwith &quot;up of top&quot;
+  | Node(left,p',right) -> Loc(Siblings(left,t,right),p');;
+
+let go_down_memo (Loc(t,p)) = match t with
+    Item(_) -> failwith &quot;down of item&quot;
+  | Siblings(left,t',right) -> Loc(t',Node(left,p,right));;</code></pre><p>修改其他原语的任务则留给读者完成.</p><h3>第3.2节 一阶项</h3><p>到目前为止, 我们的结构完全是无类型的&mdash;&mdash;甚至我们的树结点都没有标签. </p></body></html>
