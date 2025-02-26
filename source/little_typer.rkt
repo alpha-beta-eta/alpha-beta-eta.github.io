@@ -5928,7 +5928,7 @@
     " $mot "
     " $base "
     " $step "))")
-       "是相同的" (Code "(" $mot "(add1 " $n "))") "."))
+       "是相同的" (Code "(" $mot " (add1 " $n "))") "."))
    ((dialogue)
     (Ld "这是" (Code "peas" (Sub l-1))
         "的类型, 其描述了包含" l-1 "个豌豆的列表."
@@ -5947,7 +5947,7 @@
        (Em "自然数上的归纳") "."))
    ((dialogue)
     (Ld "step必须要能够根据对于" (Code l-1)
-        "的值构造出对于" (C '(add l-1)) "的值."
+        "的值构造出对于" (C '(add1 l-1)) "的值."
         (P "再次观察" (Code "step-peas")
            "的类型, 其在文中到底为何意?"))
     (Rd "不论" (Code l-1) "是什么" (Code "Nat")
@@ -5989,7 +5989,7 @@
       step-peas)))")))
    ((dialogue)
     (Ld (Code "(peas 2)") "的值是什么?"
-        (P "以下是最初的两个计算步骤."
+        (P "以下是最初的三个计算步骤."
            (same-as
             (CodeI "(peas
   (add1
@@ -6005,7 +6005,9 @@
     vecnil
     step-peas))"))
            "现在, 请找出其值. "
-           "记得参数(有时)无需被求值."))
+           "记得参数(有时)无需被求值.")
+        ((tcomment)
+         "不知道为什么, 原文说是两个步骤."))
     (Rd "以下就是了."
         (same-as
          #:attr* '((start "4"))
@@ -6055,23 +6057,657 @@
         (λ (" (Dim "k") ") X)
         base
         step))))")))
-   ((dialogue)
+   ((dialogue #:id "last-claim")
     (Ld "就像" (Code "first") "可以找出一个列表的第一个元素, "
         (Code "last") "可以找出最后一个元素."
         (P (Code "last") "的类型应该是什么?"))
-    (Rd ""
-        ))
+    (Rd "此列表必然是非空的, 这意味着我们可以应用和"
+        (Code "first") "的类型相同的想法."
+        (CodeB "(claim last
+  (Π ((E " $U:script ")
+      (" $l:script " Nat))
+    (→ (Vec E (add1 " $l:script "))
+      E)))")))
    ((dialogue)
-    (Ld ""
-        )
-    (Rd ""
-        ))
+    (Ld "如果一个列表只包含一个" (Code "Atom")
+        ", 那么哪个" (Code "Atom") "是最后一个呢?")
+    (Rd "显然只有一种可能."))
    ((dialogue)
-    (Ld ""
-        )
-    (Rd ""
-        ))
+    (Ld (CodeB "(last Atom zero
+  (vec:: 'flour vecnil))")
+        "的规范形式是什么?")
+    (Rd "以下是我的猜测. 这个问题没有意义, "
+        "因为列表包含的是一个元素而不是零个元素."))
+   ((dialogue)
+    (Ld (Code "(last Atom zero)")
+        "的类型是什么?"
+        (P "请记得Currying."))
+    (Rd (Code "(last Atom zero)") "的类型为"
+        (CodeB "(→ (Vec Atom (add1 zero))
+  Atom)")
+        "因此, 前一个框中的问题, 实际上是有意义的!"))
+   ((dialogue)
+    (Ld (CodeB "(last Atom zero
+  (vec:: 'flour vecnil))")
+        "的规范形式是什么?")
+    (Rd "那必然是" (Code "'flour") "."))
+   ((dialogue)
+    (Ld "的确如此."
+        (P "使用这个洞察, " (Code "base-last")
+           "的类型是什么?"))
+    (Rd "base在(作为target的)" (Code "Nat") "为"
+        (Code "zero") "时使用."
+        (CodeB "(claim base-last
+  (Π ((E " $U:script "))
+    (→ (Vec E (add1 zero))
+      E)))")))
+   ((dialogue)
+    (Ld (Code "base-last") "的定义是什么?")
+    (Rd "其使用" (Code "head") "以获得一个"
+        (Code "(Vec E (add1 zero))")
+        "中的唯一元素."
+        (CodeB "(define base-last
+  (λ (" (Dim "E") ")
+    (λ (es)
+      (head es))))")
+        ((tcomment)
+         "原文是" (Code "(Vec Atom (add1 zero))")
+         ", 这可能是一个笔误.")))
+   ((dialogue)
+    (Ld "这是我们第一次遇到base是一个函数的情况. "
+        "根据动机, base和step的几乎是答案的参数都是函数."
+        (P "当base是一个函数而step将一个几乎是答案的函数"
+           "转换为另一个函数时, 整个" (Code "ind-Nat")
+           "表达式当然也是在构造一个函数.")
+        ((tcomment)
+         "虽然实际的动机还没有给出, 但是读者应该料想得到."))
+    (Rd (Code "λ") "表达式是值吗?"))
+   ((dialogue)
+    (Ld "是的, 因为" (Code "λ") "是一个构造子.")
+    (Rd "函数的确是值."))
+   ((dialogue)
+    (Ld (Code "ind-Nat") "表达式的类型是"
+        "动机应用于target的结果, 这个target是要被消去的"
+        (Code "Nat") "."
+        (P "当抵达base时, 作为target的" (Code "Nat")
+           "是什么?"))
+    (Rd "应该是" (Code "zero") ", 这就是base的意义所在."))
+   ((dialogue)
+    (Ld "动机应用于" (Code "zero") "的结果是base的类型."
+        (P "请找出一个可以用作动机的表达式."))
+    (Rd (CodeB "(Π ((" $E " " $U:script ")
+    (" $k " Nat))
+  (→ (Vec " $E " (add1 " $k "))
+    " $E "))")
+        "怎么样呢? 将" $E "填上列表元素的类型而"
+        $k "填上" (Code "zero") "就得到了base的类型."
+        ((tcomment)
+         "这里使用的元变量" $E "和" $k "实际上是不必要的, "
+         "或者说可以算是一种误用.")))
+   ((law)
+    (Center (Code "ind-Nat") "的base的类型")
+    (P "在" (Code "ind-Nat") "之中, base的类型是"
+       "动机应用于作为target的" (Code "zero") "的结果."))
+   ((dialogue)
+    (Ld "很接近了, 但并不那么正确."
+        (P (Code "ind-Nat") "的动机会被应用于" (Code "zero")
+           ", 但是应用一个" (Code "Π") "表达式并无意义. "
+           (Code "ind-Nat") "的动机应该是一个函数, "
+           "而非函数的类型."))
+    (Rd "啊, 所以说那必然是"
+        (CodeB "(λ (E k)
+  (→ (Vec E (add1 k))
+    E))")
+        "其可以被应用于列表元素的类型和" (Code "zero")
+        "以得到base的类型."))
+   ((dialogue)
+    (Ld "现在定义" (Code "last") "的动机."
+        (CodeB "(claim mot-last
+  (→ " $U:script " Nat
+    " $U:script "))"))
+    (Rd "以下就是了."
+        (CodeB "(define mot-last
+  (λ (E k)
+    (→ (Vec E (add1 k))
+      E)))")))
+   ((dialogue)
+    (Ld (CodeB "(mot-last Atom)")
+        "的类型和值分别是什么?")
+    (Rd "类型是"
+        (CB '(→ Nat U))
+        "而值为"
+        (CodeB "(λ (k)
+  (→ (Vec Atom (add1 k))
+    Atom))")))
+   ((dialogue)
+    (Ld "这就像什么?")
+    (Rd (Ref "twin-Atom") "里的" (Code "twin-Atom")
+        ". 应用" (Code "mot-last") "于一个" $U:script
+        "将产生一个适合用于" (Code "ind-Nat") "的动机."))
+   ((dialogue)
+    (Ld "此时base的类型的值是什么? 这个类型即"
+        (Code "(mot-last Atom zero)"))
+    (Rd "应该是类型"
+        (CodeB "(→ (Vec Atom (add1 zero))
+  Atom)")))
+   ((dialogue)
+    (Ld (CB '(mot-last Atom (add1 l-1)))
+        "的值是什么?")
+    (Rd "应该是"
+        (CodeB "(→ (Vec Atom (add1
+               (add1 " l-1 ")))
+  Atom)")))
+   ((dialogue)
+    (Ld (Code "last") "的step的目的何在?")
+    (Rd (Code "last") "的step将" (Code l-1)
+        "时的几乎答案转换为对于" (C '(add1 l-1))
+        "的答案."
+        (P "换言之, " (Code "last")
+           "的step将一个获取一个"
+           (CB '(Vec E (add1 l-1)) #:constant* '(E))
+           "中的最后一个元素的函数变为一个获取一个"
+           (CB '(Vec E (add1 (add1 l-1)))
+               #:constant* '(E))
+           "中的最后一个元素的函数. "
+           "为什么这里有两个" (Code "add1") "?")))
+   ((dialogue)
+    (Ld "外层的" (Code "add1")
+        "作为类型的一部分是为了保证送给" (Code "last")
+        "的列表至少拥有一个元素. 内层的" (Code "add1")
+        "来源于将" (C '(add1 l-1)) "传递给"
+        (Code "mot-last") ".")
+    (Rd "外层的" (Code "add1") "使得函数完全, 而内层的"
+        (Code "add1") "是出于" (Code "ind-Nat") "之律."))
+   ((dialogue)
+    (Ld "step的类型是什么?")
+    (Rd "step的类型必然是"
+        (CodeB "(→ (→ (Vec E (add1 " l-1 "))
+     E)
+  (→ (Vec E (add1
+              (add1 " l-1 ")))
+    E))")
+        "因为step必须要根据一个"
+        (CB '(mot-last E l-1)
+            #:constant* '(E))
+        "构造出一个"
+        (CB '(mot-last E (add1 l-1))
+            #:constant* '(E))))
+   ((dialogue)
+    (Ld "这个类型如何以文字解释?")
+    (Rd "step将一个对于"
+        (CB '(add1 l-1))
+        "而言的"
+        (CodeB "last")
+        "函数转换为一个对于"
+        (CB '(add1 (add1 l-1)))
+        "而言的"
+        (CodeB "last")
+        "函数."
+        ((tcomment)
+         "原文分别是" (Code $l:script)
+         "和" (Code "(add1 " $l:script ")")
+         ", 但是译者自作主张改成了以上的形式.")))
+   ((law)
+    (Center (Code "ind-Nat") "的step的类型")
+    (P "在" (Code "ind-Nat") "之中, step必须要接受两个参数: 某个类型为"
+       (Code "Nat") "的" (Code "n") "和一个几乎是答案的东西, "
+       "其类型是动机" $mot "应用于" (Code "n")
+       "的结果. step返回的答案的类型是动机应用于"
+       (Code "(add1 n)") "的结果. step的类型是:"
+       (CodeB "(Π ((n Nat))
+  (→ (" $mot " n)
+    (" $mot " (add1 n))))")))
+   ((dialogue #:id "step-last")
+    (Ld "以下是" (Code "step-last") "的声明."
+        (CodeB "(claim step-last
+  (Π ((E U)
+      (" l-1 " Nat))
+    (→ (mot-last E " l-1 ")
+      (mot-last E (add1 " l-1 ")))))")
+        "现在请定义" (Code "step-last") ".")
+    (Rd (Code "last" (Sub l-1))
+        "是几乎正确的函数, 但是只是对于拥有"
+        (C '(add1 l-1)) "个元素的列表而言的, "
+        "因而其接受拥有" (C '(add1 (add1 l-1)))
+        "个元素的列表的" (Code "tail")
+        "作为参数."
+        (CodeB "(define step-last
+  (λ (" (Dim "E") " " (Dim l-1) ")
+    (λ (last" (Sub l-1) ")
+      (λ (es)
+        (last" (Sub l-1) " (tail es))))))")
+        ((tcomment)
+         "原文有误, 已修正.")))
+   ((dialogue)
+    (Ld "内层的" (Code "λ") "表达式的参数"
+        (Code "es") "的类型是什么?")
+    (Rd (Code "es") "是一个"
+        (CB '(Vec E (add1 (add1 l-1)))
+            #:constant* '(E))))
+   ((dialogue)
+    (Ld "为什么这是" (Code "es") "的类型呢?")
+    (Rd "整个这内层的" (Code "λ")
+        "表达式的类型为"
+        (CB '(mot-last E (add1 l-1))
+            #:constant* '(E))
+        "而这个类型和"
+        (CodeB "(→ (Vec E (add1
+            (add1 " l-1 ")))
+  E)")
+        "是相同的类型. 因此, 该" (Code "λ")
+        "表达式的参数, 即" (Code "es")
+        ", 应该是一个"
+        (CB '(Vec E (add1 (add1 l-1)))
+            #:constant* '(E))))
+   ((dialogue)
+    (Ld "聪明."
+        (P (Code "(tail es)")
+           "的类型是什么?"))
+    (Rd (Code "(tail es)") "的类型为"
+        (CB '(Vec E (add1 l-1))
+            #:constant* '(E))
+        "其是几乎准备好的函数的适切参数的类型."
+        ((tcomment)
+         "这个函数即" (Code "last" (Sub l-1)) ".")))
+   ((dialogue)
+    (Ld (Ref "step-last") "中的较外层" (Code "λ")
+        "表达式里的" (Code "last" (Sub l-1))
+        "的类型是什么?")
+    (Rd (Code "last" (Sub l-1)) "的类型为"
+        (CodeB "(→ (Vec E (add1 " l-1 "))
+  E)")
+        "即" (C '(mot-last E l-1) #:constant* '(E))
+        "之值."))
+   ((dialogue)
+    (Ld "现在是时候定义" (Code "last") "了, 其"
+        (Code "claim") "出现在"
+        (Ref "last-claim") "之中.")
+    (Rd "以下就是了."
+        (CodeB "(define last
+  (λ (E " $l:script ")
+    (ind-Nat " $l:script "
+      (mot-last E)
+      (base-last E)
+      (step-last E))))")))
+   ((dialogue)
+    (Ld (CodeB "(last Atom 1
+  (vec:: 'carrot
+    (vec:: 'celery vecnil)))")
+        "的规范形式是什么?"
+        (P "以下是我们计算的开始."
+           (same-as
+            (CodeI "(last Atom (add1 zero)
+  (vec:: 'carrot
+    (vec:: 'celery vecnil)))")
+            (CodeI "((ind-Nat (add1 zero)
+   (mot-last Atom)
+   (base-last Atom)
+   (step-last Atom))
+  (vec:: 'carrot
+    (vec:: 'celery vecnil)))")
+            (CodeI "((step-last Atom zero
+   (ind-Nat zero
+     (mot-last Atom)
+     (base-last Atom)
+     (step-last Atom)))
+  (vec:: 'carrot
+    (vec:: 'celery vecnil)))"))))
+    (Rd "感谢帮助. 以下是更多的计算."
+        (same-as
+         #:attr* '((start "4"))
+         (CodeI "((λ (es)
+   ((ind-Nat zero
+      (mot-last Atom)
+      (base-last Atom)
+      (step-last Atom))
+     (tail es)))
+  (vec:: 'carrot
+    (vec:: 'celery vecnil)))")
+         (CodeI "((ind-Nat zero
+   (mot-last Atom)
+   (base-last Atom)
+   (step-last Atom))
+  (tail
+    (vec:: 'carrot
+      (vec:: 'celery
+        vecnil))))")
+         (CodeI "(base-last Atom
+  (tail
+    (vec:: 'carrot
+      (vec:: 'celery
+        vecnil))))"))
+        ((tcomment)
+         "原文漏了一个编号.")))
+   ((dialogue)
+    (Ld "这是规范形式吗?")
+    (Rd "并非如此, 还需要更多的步骤."
+        (same-as
+         #:attr* '((start "7"))
+         (CodeI "((λ (es)
+   (head es))
+  (tail
+    (vec:: 'carrot
+      (vec:: 'celery
+        vecnil))))")
+         (CodeI "(head
+  (tail
+    (vec:: 'carrot
+      (vec:: 'celery
+        vecnil))))")
+         (CodeI "(head
+  (vec:: 'celery vecnil))")
+         (CodeI "'celery"))))
+   ((dialogue)
+    (Ld "漂亮."
+        (P "现在休息一下, 或许可以来点养生的蘑菇派."))
+    (Rd "听起来很不错的样子."))
+   ((dialogue)
+    (Ld "猜猜" (Code "drop-last") "的意思是什么.")
+    (Rd "想必是丢掉一个" (Code "Vec")
+        "里的最后一个元素."))
+   ((dialogue)
+    (Ld "猜得不错!"
+        (P (Code "(drop-last Atom 3 vecnil)")
+           "是什么?"))
+    (Rd "它不由某个类型描述, 正如"
+        (CodeB "(first Atom 3 vecnil)")
+        (CodeB "(last Atom 3 vecnil)")
+        (CodeB "(rest Atom 3 vecnil)")
+        "也不由类型描述一样."
+        (P "这个类型必然包含一个其中带有"
+           (Code "add1") "的" (Code "Vec") ".")
+        ((tcomment)
+         (Q "这个") "意即" (Q (Code "drop-last") "的") ".")))
+   ((dialogue #:id "drop-last-claim")
+    (Ld "这是坚实的思考方式."
+        (P (Code "drop-last") "的类型是什么?"))
+    (Rd (Code "drop-last") "使得列表的长度收缩了一."
+        (CodeB "(claim drop-last
+  (Π ((E " $U:script ")
+      (" $l:script " Nat))
+    (→ (Vec E (add1 " $l:script "))
+      (Vec E " $l:script "))))")))
+   ((dialogue #:id "base-drop-last")
+    (Ld (Code "base-drop-last") "是什么?")
+    (Rd "base应该找出拥有一个元素的列表的"
+        (CodeB "drop-last")
+        "也就是"
+        (CodeB "vecnil")
+        "因为最后一个元素就是那唯一的元素."
+        (CodeB "(claim base-drop-last
+  (Π ((E " $U:script "))
+    (→ (Vec E (add1 zero))
+      (Vec E zero))))
+(define base-drop-last
+  (λ (" (Dim "E") ")
+    (λ (" (Dim "es") ")
+      vecnil)))")))
+   ((dialogue)
+    (Ld "以下对于" (Code "base-drop-last")
+        "的定义也能成立吗?"
+        (CodeD "(define base-drop-last
+  (λ (" (Dim "E") ")
+    (λ (es)
+      (tail es))))"))
+    (Rd "这个定义总是能产生相同的值, "
+        "但是没能同样清晰地传达想法."
+        (P "我们的意图在于" (Code "base-drop-last")
+           "总是忽略列表的最后一个元素.")))
+   ((dialogue)
+    (Ld "听起来很对."
+        (P "不过为什么上面的定义要用虚线框住呢?"))
+    (Rd "只是得到正确的答案是没有价值的, 如果我们不"
+        (Em "知道") "为什么正确的话. "
+        "理解答案至少和拥有正确答案同等重要."))
+   ((law)
+    (Center "可读的表达式")
+    (P "只是得到正确的答案是没有价值的, 如果我们不"
+       (Em "知道") "为什么正确的话. "
+       "理解答案至少和拥有正确答案同等重要."))
+   ((dialogue)
+    (Ld "看来某人一直在认真听讲!"
+        (P (Code "mot-drop-last") "是什么?"))
+    (Rd (Code "mot-drop-last")
+        "需要表达" (Code "drop-last")
+        "总是在构造长度小一的" (Code "Vec") "."
+        (CodeB "(claim mot-drop-last
+  (→ " $U:script " Nat
+    " $U:script "))
+(define mot-drop-last
+  (λ (E k)
+    (→ (Vec E (add1 k))
+      (Vec E k))))")))
+   ((dialogue)
+    (Ld "太快了, 请解释一下.")
+    (Rd "在" (Code "ind-Nat") "之中, 应用动机于"
+        (Code "zero") "得到的就是base的类型. "
+        "这意味着我们可以反过来将"
+        (Ref "base-drop-last")
+        "中base的类型里的"
+        (Code "zero") "替换成参数" (Code "k")
+        "以" (Code "mot-drop-last") "."
+        ((tcomment)
+         (Code "mot-drop-last")
+         "这里是一个动词.")))
+   ((dialogue)
+    (Ld "这是一个敏锐的观察. "
+        "这种方法并不总是成立, "
+        "但的确是一个好的起点."
+        (P "将特定的常量替换以变量并用该变量的"
+           (Code "λ") "包裹的行为被称为"
+           (Em "抽象出常量(abstracting over constants)")
+           ", 并且我们经常使用这种方法. "
+           "这里, 动机对于" (Code "base-drop-last")
+           "里的" (Code "zero") "进行抽象."))
+    (Rd (Code "step-drop-last")
+        "的类型遵循" (Code "ind-Nat") "之律."
+        (CodeB "(claim step-drop-last
+  (Π ((E " $U:script ")
+      (" l-1 " Nat))
+    (→ (mot-drop-last E " l-1 ")
+      (mot-drop-last E (add1 " l-1 ")))))")))
+   ((dialogue #:id "step-drop-last")
+    (Ld "那么" (Code "step-drop-last")
+        "该如何定义?")
+    (Rd "想出" (Code "step-drop-last")
+        "需要动动脑子."
+        (CodeB "(define step-drop-last
+  (λ (" (Dim "E") " " (Dim l-1) ")
+    (λ (drop-last" (Sub l-1) ")
+      (λ (es)
+        (vec:: (head es)
+          (drop-last" (Sub l-1) "
+            (tail es)))))))")))
+   ((dialogue)
+    (Ld "这是令人熟悉的归纳模式:"
+        (CodeB "step-drop-last")
+        "将一个对于"
+        (CodeB "(Vec E (add1 " l-1 "))")
+        "成立的"
+        (CodeB "drop-last")
+        "转换为一个对于"
+        (CodeB "(Vec E (add1 (add1 " l-1 ")))")
+        "成立的"
+        (CodeB "drop-last")
+        "这个转换是如何工作的呢?")
+    (Rd "正如"
+        (CodeB "step-last")
+        "使用其几乎是答案的参数, 即"
+        (Code "last" (Sub l-1))
+        ", 以找出它自己的"
+        (Code "(tail es)") "的"
+        (Code "last") ","
+        (CodeB "step-drop-last")
+        "也使用其几乎是答案的参数, 即"
+        (Code "drop-last" (Sub l-1))
+        ", 以找出它自己的"
+        (Code "(tail es)") "的"
+        (Code "drop-last") "."
+        (P "根据" (Code "mot-drop-last")
+           ", 由" (Code "step-drop-last")
+           "产生的函数必须还要给那个列表添加一个元素. "
+           "因此, " (Ref "step-drop-last")
+           "里的最内层的" (Code "λ")
+           "表达式使用" (Code "vec::")
+           "将" (Code "es") "的" (Code "head")
+           (Q "cons") "到"
+           (CodeB "(drop-last" (Sub l-1)
+                  " (tail es))")
+           "上去.")
+        ((tcomment)
+         "原文有误, 已修正.")))
+   ((dialogue)
+    (Ld (Code "drop-last") "的" (Code "claim")
+        "出现在" (Ref "drop-last-claim") "里."
+        (P "现在请定义" (Code "drop-last") "."))
+    (Rd "这个事情只是把我们已经得到的碎片拼接起来."
+        (CodeB "(define drop-last
+  (λ (E " $l:script ")
+    (ind-Nat " $l:script "
+      (mot-drop-last E)
+      (base-drop-last E)
+      (step-drop-last E))))")))
+   ((dialogue)
+    (Ld "是的, " (Code "drop-last") "现在已得到定义."
+        (P "有时找出之后会被用到的函数是方便的. 例如, "
+           (Code "(drop-last Atom 2)")
+           "可以找出任意由三个" (Code "Atom")
+           "构成的列表的前两个元素.")
+        (P "请找出"
+           (CodeB "(drop-last Atom
+  (add1
+    (add1 zero)))")
+           "之值以阐明这是如何成立的."))
+    (Rd "以下是找出其值的图表."
+        (same-as
+         (CodeI "(drop-last Atom
+  (add1
+    (add1 zero)))")
+         (CodeI "(ind-Nat (add1
+           (add1 zero))
+  (mot-drop-last Atom)
+  (base-drop-last Atom)
+  (step-drop-last Atom))")
+         (CodeI "(step-drop-last
+  Atom (add1 zero)
+  (ind-Nat (add1 zero)
+    (mot-drop-last Atom)
+    (base-drop-last Atom)
+    (step-drop-last Atom)))")
+         (CodeI "(λ (es)
+  (vec:: (head es)
+    ((ind-Nat (add1 zero)
+       (mot-drop-last Atom)
+       (base-drop-last Atom)
+       (step-drop-last Atom))
+      (tail es))))"))))
+   ((dialogue)
+    (Ld "很好&mdash;&mdash;" (Code "λ")
+        "表达式的确也是值. "
+        "为了找出规范形式, 则需要更多的步骤. "
+        "以下则是第一步."
+        (same-as
+         #:attr* '((start "5"))
+         (CodeI "(λ (es)
+  (vec:: (head es)
+    ((step-drop-last Atom zero
+       (ind-Nat zero
+         (mot-drop-last Atom)
+         (base-drop-last Atom)
+         (step-drop-last Atom)))
+      (tail es))))"))
+        "现在轮到你来找出规范形式了.")
+    (Rd "在第6步里, " (Code "es")
+        "被一致地换名为了" (Code "ys")
+        ", 这是为了明确这内层的"
+        (Code "λ") "表达式有着自己的变量."
+        (same-as
+         #:attr* '((start "6"))
+         (CodeI "(λ (es)
+  (vec:: (head es)
+    ((λ (ys)
+       (vec:: (head ys)
+         ((ind-Nat zero
+            (mot-drop-last Atom)
+            (base-drop-last Atom)
+            (step-drop-last Atom))
+           (tail ys))))
+      (tail es))))"))))
+   ((dialogue)
+    (Ld "将" (Code "es") "换名为"
+        (Code "ys") "其实当然是没有必要的, "
+        "因为变量名总是由包裹它的最内层" (Code "λ")
+        "所绑定, 不过使得表达式更容易理解总归是一个想法."
+        (P "以下是新的两步."
+           (same-as
+            #:attr* '((start "7"))
+            (CodeI "(λ (es)
+  (vec:: (head es)
+    (vec:: (head (tail es))
+      ((ind-Nat zero
+         (mot-drop-last Atom)
+         (base-drop-last Atom)
+         (step-drop-last Atom))
+        (tail (tail es))))))")
+            (CodeI "(λ (es)
+  (vec:: (head es)
+    (vec:: (head (tail es))
+      (base-drop-last Atom
+        (tail (tail es))))))"))))
+    (Rd "几乎就要到终点了."
+        (same-as
+         #:attr* '((start "9"))
+         (CodeI "(λ (es)
+  (vec:: (head es)
+    (vec:: (head (tail es))
+      ((λ (" (Dim "ys") ") vecnil)
+        (tail (tail es))))))")
+         (CodeI "(λ (es)
+  (vec:: (head es)
+    (vec:: (head (tail es))
+      vecnil)))"))
+        "规范形式显然要比最初的表达式更容易理解!"))
+   ((dialogue)
+    (Ld (Em "C'est magnifique!")
+        " 想必你已经累了.")
+    (Rd "的确如此, 而且也很饿."))
    (H2: "课间: 一次吃一块")
+   ((dialogue)
+    (Ld "有时该怎么写下Pie表达式并不是显而易见的.")
+    (Rd "那就是空白方框的作用, 是吧?"))
+   ((dialogue)
+    (Ld "的确如此. 然而, 绝大多数键盘都不容易输入空白方框."
+        (P "与其输入空白方框, 不如使用" (Code "TODO")
+           "形式来保留表达式里之后要完成的部分."))
+    (Rd "什么是" (Code "TODO") "?"))
+   ((dialogue)
+    (Ld (Code "TODO") "是一个表达式, "
+        "它是代表某个其他表达式的占位符. 一个"
+        (Code "TODO") "可以具有任意的类型, "
+        "而Pie会追踪哪个" (Code "TODO")
+        "应该具有哪个类型.")
+    (Rd (Code "TODO") "可以怎么用呢?"))
+   ((dialogue)
+    (Ld "每个" (Code "TODO") "都来自于某个特定的位置. "
+        "这里, 我们以框号引用它们. 在本书之外使用Pie时, "
+        "则有其他合适的手段."
+        (P "试着输入"
+           (CodeB "(claim peas
+  TODO)")
+           "看看会发生什么."))
+    (Rd ""
+        ))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
+   (H2 "选一个数字, 任意的数字")
    ((dialogue)
     (Ld ""
         )

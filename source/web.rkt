@@ -103,6 +103,7 @@
          "classical_ai.rkt"
          "stone.rkt"
          "pointless.rkt"
+         "refal.rkt"
          
          )
 (define (emit-web)
@@ -222,6 +223,7 @@
   (emitXml classical_ai.html "../classical_ai.html")
   (emitXml stone.html "../stone.html")
   (emitXml pointless.html "../pointless.html")
+  (emitXml refal.html "../refal.html")
   
   )
 (emit-web)
