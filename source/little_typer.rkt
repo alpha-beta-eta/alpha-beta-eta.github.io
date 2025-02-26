@@ -6059,8 +6059,58 @@
     (Ld "就像" (Code "first") "可以找出一个列表的第一个元素, "
         (Code "last") "可以找出最后一个元素."
         (P (Code "last") "的类型应该是什么?"))
-    (Rd ""
-        ))
+    (Rd "此列表必然是非空的, 这意味着我们可以应用和"
+        (Code "first") "的类型相同的想法."
+        (CodeB "(claim last
+  (Π ((E " $U:script ")
+      (" $l:script " Nat))
+    (→ (Vec E (add1 " $l:script "))
+      E)))")))
+   ((dialogue)
+    (Ld "如果一个列表只包含一个" (Code "Atom")
+        ", 那么哪个" (Code "Atom") "是最后一个呢?")
+    (Rd "显然只有一种可能."))
+   ((dialogue)
+    (Ld (CodeB "(last Atom zero
+  (vec:: 'flour vecnil))")
+        "的规范形式是什么?")
+    (Rd "以下是我的猜测. 这个问题没有意义, "
+        "因为列表包含的是一个元素而不是零个元素."))
+   ((dialogue)
+    (Ld (Code "(last Atom zero)")
+        "的类型是什么?"
+        (P "请记得Currying."))
+    (Rd (Code "(last Atom zero)") "的类型为"
+        (CodeB "(→ (Vec Atom (add1 zero))
+  Atom)")
+        "因此, 前一个框中的问题, 实际上是有意义的!"))
+   ((dialogue)
+    (Ld (CodeB "(last Atom zero
+  (vec:: 'flour vecnil))")
+        "的规范形式是什么?")
+    (Rd "那必然是" (Code "'flour") "."))
+   ((dialogue)
+    (Ld "的确如此."
+        (P "使用这个洞察, " (Code "base-last")
+           "的类型是什么?"))
+    (Rd "base在(作为target的)" (Code "Nat") "为"
+        (Code "zero") "时使用."
+        (CodeB "(claim base-last
+  (Π ((E " $U:script "))
+    (→ (Vec E (add1 zero))
+      E)))")))
+   ((dialogue)
+    (Ld (Code "base-last") "的定义是什么?")
+    (Rd "其使用" (Code "head") "以获得一个"
+        (Code "(Vec E (add1 zero))")
+        "中的唯一元素."
+        (CodeB "(define base-last
+  (λ (" (Dim "E") ")
+    (λ (es)
+      (head es))))")
+        ((tcomment)
+         "原文是" (Code "(Vec Atom (add1 zero))")
+         ", 这可能是一个笔误.")))
    ((dialogue)
     (Ld ""
         )

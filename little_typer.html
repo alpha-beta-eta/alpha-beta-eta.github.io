@@ -942,4 +942,17 @@
       (ind-Nat target
         (λ (<span style="color: grey;">k</span>) X)
         base
-        step))))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd">就像<code>first</code>可以找出一个列表的第一个元素, <code>last</code>可以找出最后一个元素.<p><code>last</code>的类型应该是什么?</p></td><td class="middled"><sup>28</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>29</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>30</sup></td><td class="rightd"></td></tr></table><h2>课间: 一次吃一块</h2><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>1</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>2</sup></td><td class="rightd"></td></tr></table></body></html>
+        step))))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd">就像<code>first</code>可以找出一个列表的第一个元素, <code>last</code>可以找出最后一个元素.<p><code>last</code>的类型应该是什么?</p></td><td class="middled"><sup>28</sup></td><td class="rightd">此列表必然是非空的, 这意味着我们可以应用和<code>first</code>的类型相同的想法.<pre><code>(claim last
+  (Π ((E <math><mi mathvariant="script">U</mi></math>)
+      (<math><mi mathvariant="script">l</mi></math> Nat))
+    (→ (Vec E (add1 <math><mi mathvariant="script">l</mi></math>))
+      E)))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd">如果一个列表只包含一个<code>Atom</code>, 那么哪个<code>Atom</code>是最后一个呢?</td><td class="middled"><sup>29</sup></td><td class="rightd">显然只有一种可能.</td></tr></table><table class="dialogue"><tr><td class="leftd"><pre><code>(last Atom zero
+  (vec:: 'flour vecnil))</code></pre>的规范形式是什么?</td><td class="middled"><sup>30</sup></td><td class="rightd">以下是我的猜测. 这个问题没有意义, 因为列表包含的是一个元素而不是零个元素.</td></tr></table><table class="dialogue"><tr><td class="leftd"><code>(last Atom zero)</code>的类型是什么?<p>请记得Currying.</p></td><td class="middled"><sup>31</sup></td><td class="rightd"><code>(last Atom zero)</code>的类型为<pre><code>(→ (Vec Atom (add1 zero))
+  Atom)</code></pre>因此, 前一个框中的问题, 实际上是有意义的!</td></tr></table><table class="dialogue"><tr><td class="leftd"><pre><code>(last Atom zero
+  (vec:: 'flour vecnil))</code></pre>的规范形式是什么?</td><td class="middled"><sup>32</sup></td><td class="rightd">那必然是<code>'flour</code>.</td></tr></table><table class="dialogue"><tr><td class="leftd">的确如此.<p>使用这个洞察, <code>base-last</code>的类型是什么?</p></td><td class="middled"><sup>33</sup></td><td class="rightd">base在(作为target的)<code>Nat</code>为<code>zero</code>时使用.<pre><code>(claim base-last
+  (Π ((E <math><mi mathvariant="script">U</mi></math>))
+    (→ (Vec E (add1 zero))
+      E)))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd"><code>base-last</code>的定义是什么?</td><td class="middled"><sup>34</sup></td><td class="rightd">其使用<code>head</code>以获得一个<code>(Vec E (add1 zero))</code>中的唯一元素.<pre><code>(define base-last
+  (λ (<span style="color: grey;">E</span>)
+    (λ (es)
+      (head es))))</code></pre><div class="tcomment"><b>译注.</b> 原文是<code>(Vec Atom (add1 zero))</code>, 这可能是一个笔误.</div></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>35</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>36</sup></td><td class="rightd"></td></tr></table><h2>课间: 一次吃一块</h2><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>1</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>2</sup></td><td class="rightd"></td></tr></table></body></html>
