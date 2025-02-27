@@ -5928,7 +5928,7 @@
     " $mot "
     " $base "
     " $step "))")
-       "是相同的" (Code "(" $mot "(add1 " $n "))") "."))
+       "是相同的" (Code "(" $mot " (add1 " $n "))") "."))
    ((dialogue)
     (Ld "这是" (Code "peas" (Sub l-1))
         "的类型, 其描述了包含" l-1 "个豌豆的列表."
@@ -6111,6 +6111,41 @@
         ((tcomment)
          "原文是" (Code "(Vec Atom (add1 zero))")
          ", 这可能是一个笔误.")))
+   ((dialogue)
+    (Ld "这是我们第一次遇到base是一个函数的情况. "
+        "根据动机, base和step的几乎是答案的参数都是函数."
+        (P "当base是一个函数而step将一个几乎是答案的函数"
+           "转换为另一个函数时, 整个" (Code "ind-Nat")
+           "表达式当然也是在构造一个函数.")
+        ((tcomment)
+         "虽然实际的动机还没有给出, 但是读者应该料想得到."))
+    (Rd (Code "λ") "表达式是值吗?"))
+   ((dialogue)
+    (Ld "是的, 因为" (Code "λ") "是一个构造子.")
+    (Rd "函数的确是值."))
+   ((dialogue)
+    (Ld (Code "ind-Nat") "表达式的类型是"
+        "动机应用于target的结果, 这个target是要被消去的"
+        (Code "Nat") "."
+        (P "当抵达base时, 作为target的" (Code "Nat")
+           "是什么?"))
+    (Rd "应该是" (Code "zero") ", 这就是base的意义所在."))
+   ((dialogue)
+    (Ld "动机应用于" (Code "zero") "的结果是base的类型."
+        (P "请找出一个可以用作动机的表达式."))
+    (Rd (CodeB "(Π ((" $E " " $U:script ")
+    (" $k " Nat))
+  (→ (Vec " $E " (add1 " $k "))
+    " $E "))")
+        "怎么样呢? 将" $E "填上列表元素的类型而"
+        $k "填上" (Code "zero") "就得到了base的类型."
+        ((tcomment)
+         "这里使用的元变量" $E "和" $k "实际上是不必要的, "
+         "或者说可以算是一种误用.")))
+   ((law)
+    (Center (Code "ind-Nat") "的base的类型")
+    (P "在" (Code "ind-Nat") "之中, base的类型是"
+       "动机应用于作为target的" (Code "zero") "的结果."))
    ((dialogue)
     (Ld ""
         )
