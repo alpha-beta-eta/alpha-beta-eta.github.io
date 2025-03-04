@@ -5711,7 +5711,7 @@
   (λ (" (Dim "E") " " (Dim "l") ")
     (λ (es)
       (tail es))))")))
-   (H2 "完全取决于动机")
+   (H2 "完全取决于动机" #:id "ch7")
    ((dialogue #:id "peas-type0")
     (Ld "我们的蘑菇派需要少许豌豆搭配. "
         "是时候定义" (Code "peas")
@@ -6695,6 +6695,27 @@
            (CodeB "(claim peas
   TODO)")
            "看看会发生什么."))
+    (Rd "Pie会回之以"
+        (CodeB "Frame 4:2.3: TODO: U")
+        "而其所提及的" (Code "TODO")
+        "的确是出现在第4框的表达式的第2行第3列位置上的一个"
+        $U:script "."))
+   ((dialogue)
+    (Ld "现在试试"
+        (CodeB "(claim peas
+  (Pi ((n Nat))
+    TODO))")
+        "其更接近于第" (Ref "ch7") "章里的"
+        (Code "peas") "的类型.")
+    (Rd "Pie会回之以"
+        (CodeB "Frame 5:3.5: TODO:
+ n : Nat
+--------------
+ U")
+        "但是这个水平线是什么意思呢?"))
+   ((dialogue)
+    (Ld ""
+        )
     (Rd ""
         ))
    ((dialogue)
