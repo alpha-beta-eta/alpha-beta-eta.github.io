@@ -14,6 +14,12 @@
       "我多么希望我在曾经遇到这种任务时就知道这个数据结构啊, "
       "因为当时我想到的方法和zipper比起来既不高效也不优雅.")
    (H2. "引论")
+   (P "纯粹应用性的编程范式的主要缺陷在于许多高效的算法都依赖于数据结构的破坏性操作, "
+      "这些数据结构有位向量, 字符数组, 或者什么其他的可变按层次分类结构, "
+      "但是纯粹应用性的数据结构不能直接地模拟它们. "
+      "对于这种问题的一种著名解决方案是所谓的" (Em "函数式数组")
+      " (Paulson, 1991). "
+      )
    (H2. "zipper数据结构")
    (P "基本的想法存在着诸多的变体. 首先让我们呈现一个版本, "
       "其适用于具有可变元数的匿名树结点的树, "
@@ -153,5 +159,65 @@ let go_down_memo (Loc(t,p)) = match t with
    (H3. "一阶项")
    (P "到目前为止, 我们的结构完全是无类型的&mdash;&mdash;"
       "甚至我们的树结点都没有标签. "
-      )
+      "我们有了某种LISP风格的结构编辑器, "
+      "但是更多地面向" (Q "拼接 (splicing)") "操作而非通常的"
+      (Code "rplaca") "和" (Code "rplacd") "原语.")
+   (P "如果我们想要为抽象句法树实现一种树操纵编辑器, "
+      "那么我们需要标记树结点以运算符名称. "
+      "如果我们为此目的使用item, 那么这意味着采用通常的LISP"
+      "对于一阶项的编码方式: " (appl $F $T_1 $..h $T_n)
+      "被编码为树" (Code "Section[Item(F); T1; ...; Tn]")
+      ". 一种与之对偶的解决方案, 由组合子逻辑所启发, "
+      "其中的类组合子结构遵循应用的顺序: "
+      (Code "Section[Tn; ...; T1; Item(F)]")
+      ". 然而, 这两种方案都不尊重元数 (arity).")
+   (P "这里我们不会再追究这种一般性变体形式的细节, "
+      "而是考虑如何使zipper的想法适应于" (Em "特定")
+      "的给定了元数的运算符的签名, "
+      "要求树编辑能够维护相对于元数的良形式性 (well-formedness).")
+   (P "基本上, 对于签名的每个" $n "元构造子" $F
+      ", 我们都联系以" $n "个路径运算符" (appl 'Node $F $i)
+      ", 其中" (&<= $1 $i $n) "且每个运算符的元数都是"
+      $n ", 它们是用来下到一个" $F "项的第" $i "个子项的. "
+      "更精确地说, 每个" (appl 'Node $F $i)
+      "具有一个路径参数和" (&- $n $1)
+      "个项参数用于保存当前焦点的兄弟.")
+   (P "以下我们展示了对应于二叉树的结构:")
+   (CodeB "type binary_tree =
+    Nil
+  | Cons of binary_tree * binary_tree;;
+
+type binary_path =
+    Top
+  | Left of binary_path * binary_tree
+  | Right of binary_tree * binary_path;;
+
+type binary_location = Loc of binary_tree * binary_path;;
+
+let change (Loc(_,p)) t = Loc(t,p);;
+
+let go_left (Loc(t,p)) = match p with
+    Top -> failwith &quot;left of top&quot;
+  | Left(father,right) -> failwith &quot;left of Left&quot;
+  | Right(left,father) -> Loc(left,Left(father,t));;
+
+let go_right (Loc(t,p)) = match p with
+    Top -> failwith &quot;right of top&quot;
+  | Left(father,right) -> Loc(right,Right(t,father))
+  | Right(left,father) -> failwith &quot;right of Right&quot;;;
+
+let go_up (Loc(t,p)) = match p with
+    Top -> failwith &quot;up of top&quot;
+  | Left(father,right) -> Loc(Cons(t,right),father)
+  | Right(left,father) -> Loc(Cons(left,t),father);;
+
+let go_first (Loc(t,p)) = match t with
+    Nil -> failwith &quot;first of Nil&quot;
+  | Cons(left,right) -> Loc(left,Left(p,right));;
+
+let go_second (Loc(t,p)) = match t with
+    Nil -> failwith &quot;second of Nil&quot;
+  | Cons(left,right) -> Loc(right,Right(left,p));;")
+   (P "二叉树上高效的破坏性算法可以用这些全然应用性的原语编写. "
+      "这些原语都只需要常量时间, 因为它们都可以被归结为局部的指针操纵.")
    ))
