@@ -239,7 +239,7 @@
         ((comment)
          "感谢Per Martin-Löf (1942–)."))
     (Rd "判断的要义在于什么?"))
-   ((dialogue)
+   ((dialogue #:id "judgment")
     (Ld "一个判断是一个人对于一个表达所采取的一个态度. "
         "当我们得以获知什么东西时, 我们就在作出一个判断." (Br)
         "关于" (Code "Atom") "和" (Code "'courgette")
@@ -7014,10 +7014,10 @@ Frame 13:11.21: TODO:
    ((law)
     (Center (Code "=") "之律")
     (P "一个表达式"
-        (CB '(= X from to))
-        "是一个类型, 如果" $X
-        "是一个类型, " $from "是一个" $X
-        ", 而" $to "也是一个" $X "."))
+       (CB '(= X from to))
+       "是一个类型, 如果" $X
+       "是一个类型, " $from "是一个" $X
+       ", 而" $to "也是一个" $X "."))
    ((dialogue)
     (Ld "是的, " (Code "=") "是另一种构造依赖类型的方式, 因为"
         $from "和" $to "无需是类型."
@@ -7088,14 +7088,57 @@ Frame 13:11.21: TODO:
         "可以这么读:"
         (Blockquote
          (Q "表达式" (Code "'apple") "和" (Code "'apple")
-            "是相等的" (Code "Atom") "."))
+            "是相等的" (Code "Atom")) ".")
         (CodeB "(= Nat (+ 2 2) 4)")
         "怎么读作陈述呢?")
     (Rd (Blockquote
-         (Q "二加二等于四."))
+         (Q "二加二等于四"))
         "怎么样?"))
    ((dialogue)
     (Ld "是的, 很好.")
+    (Rd (Blockquote
+         (Q "三加四等于七"))
+        "和"
+        (Blockquote
+         (Code "(+ 3 4)") "和" (Code "7")
+         "是相同的" (Code "Nat"))
+        "有什么区别?"))
+   ((dialogue)
+    (Ld "陈述"
+        (Blockquote
+         (Q "三加四等于七"))
+        "是另一种写下类型"
+        (CodeB "(= Nat (+ 3 4) 7)")
+        "的方法, 其" (Em "是") "一个表达式, 但是"
+        (Blockquote
+         (Code "(+ 3 4)") "和" (Code "7")
+         "是相同的" (Code "Nat"))
+        "是一个" (Em "关于") "表达式的判断."
+        (P (Ref "judgment") "描述了判断. "
+           "一个判断不是一个表达式, "
+           "而是一个人在思考表达式时所采取的态度."))
+    (Rd "以下是一个判断:"
+        (Blockquote
+         (Q "三加四等于七") "是一个类型.")))
+   ((dialogue)
+    (Ld "你的观察十分敏锐."
+        (P (Code "=") "表达式不仅是类型, 还可以读作陈述."))
+    (Rd "还有其他的什么类似的吗?"))
+   ((dialogue)
+    (Ld "一个" (Code "Π") "表达式可以读作"
+        (Q "对于每个 (for every)")
+        ". 考虑以下例子:"
+        (CodeB "(Π ((n Nat))
+  (= Nat (+ 1 n) (add1 n)))")
+        "可以读作"
+        (Blockquote
+         (Q "对于每个" (Code "Nat") " " $n
+            ", " (C '(+ 1 n)) "等于"
+            (C '(add1 n))) "."))
+    (Rd "好的, 但是将类型读作陈述的目的何在?"))
+   ((dialogue)
+    (Ld ""
+        )
     (Rd ""
         ))
    ((dialogue)
