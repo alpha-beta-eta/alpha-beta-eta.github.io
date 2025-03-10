@@ -7251,7 +7251,7 @@ Frame 13:11.21: TODO:
          "创造捕获了判断形式背后想法的表达式有时被称为是在"
          (Em "内化(internalize)") "判断形式."))
     (Rd "为什么这如此重要呢?"))
-   ((dialogue)
+   ((dialogue #:id "plus1-equals-add1")
     (Ld "表达式可以与其他表达式一起使用."
         (P "通过将" (Code "Π") "和" (Code "=")
            "组合, 我们可以表达对于任意" (Code "Nat")
@@ -7260,6 +7260,72 @@ Frame 13:11.21: TODO:
            (CodeB "(claim +1=add1
   (Π ((n Nat))
     (= Nat (+ 1 n) (add1 n))))")))
+    (Rd (Code "+1=add1") "的定义显然有一个位于顶层的"
+        (Code "λ") ", 因为其类型的顶层有一个"
+        (Code "Π") "."
+        (CodeD "(define +1=add1
+  (λ (n)
+    " (Frame "          ") "))")))
+   ((dialogue)
+    (Ld "这是一个坚实的开始, 但是方框里应该填什么呢?")
+    (Rd "根据" (Code "λ") "之律,"
+        (CodeB "(= Nat (+ 1 n) (add1 n))")
+        "是这个" (Code "λ") "表达式的体的类型."
+        ((tcomment)
+         "这里是反用其律.")))
+   ((dialogue)
+    (Ld "是的, 这个方框里填的应该是一个"
+        (CodeB "(= Nat (+ 1 n) (add1 n))")
+        "那么, 这个方框的类型的规范形式是什么?")
+    (Rd "方框的类型的规范形式是"
+        (CodeB "(= Nat (add1 n) (add1 n))")
+        "因为"
+        (CodeB "(+ 1 n)")
+        "的规范形式为"
+        (CodeB "(add1 n)")
+        "我知道了, 所以说" (Ref "plus1-equals-add1")
+        "的方框里填的表达式应该是"
+        (CodeB "(same (add1 n))")))
+   ((dialogue)
+    (Ld "正确."
+        (P "现在请完成定义."))
+    (Rd "以下就是了."
+        (CodeB "(define +1=add1
+  (λ (n)
+    (same (add1 n))))")))
+   ((dialogue)
+    (Ld (Code "+1=add1") "证明了什么陈述呢?")
+    (Rd "这个陈述是"
+        (Blockquote
+         (Q "对于每个" (Code "Nat") " " $n
+            ", " (C '(+ 1 n)) "等于"
+            (C '(add1 n))) ".")))
+   ((dialogue)
+    (Ld "以下是另外一个陈述."
+        (Blockquote
+         (Q "对于每个" (Code "Nat") " " $n
+            ", " (C '(incr n)) "等于"
+            (C '(add1 n))) ".")
+        "请将其翻译为类型.")
+    (Rd "让我们称其为" (Code "incr=add1") "."
+        (CodeB "(claim incr=add1
+  (Π ((n Nat))
+    (= Nat (incr n) (add1 n))))")))
+   ((dialogue)
+    (Ld "现在请定义" (Code "incr=add1") ".")
+    (Rd "难道这不就像" (Code "+1=add1") "吗?"
+        (CodeD "(define incr=add1
+  (λ (n)
+    (same (add1 n))))")))
+   ((dialogue)
+    (Ld "并非如此."
+        (CodeB "(incr n)")
+        "的规范形式是什么?")
+    (Rd ""
+        ))
+   ((dialogue)
+    (Ld ""
+        )
     (Rd ""
         ))
    ((dialogue)
