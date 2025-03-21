@@ -8159,7 +8159,10 @@ Frame 13:11.21: TODO:
          "Leibniz律也指如果对于一个为真的任何事情对于另外一个也为真, "
          "那么它们是相等的. "
          "感谢Gottfried Wilhelm Leibniz (1646–1716)."))
-    (Rd "这和" (Code "replace") "有什么关系吗?"))
+    (Rd "这和" (Code "replace") "有什么关系吗?"
+        ((tcomment)
+         "至少对于译者而言, 这其实并非Leibniz律 (或者说同一者不可区分原理), "
+         "因为相等 (equality) 和同一 (identity) 是不同的概念.")))
    ((dialogue)
     (Ld (Code "replace") "比" (Code "cong")
         "更为强大, 因为任何对于" (Code "cong")
@@ -8694,7 +8697,7 @@ Frame 13:11.21: TODO:
          "也提及了" (Code "+")
          "的第一个参数的" (Code "add1")
          "可以提到" (Code "+") "的外面.")))
-   ((law)
+   ((law #:id "law-observation-+")
     (Center "关于" (Code "+") "的观察")
     (P "不论" (Code "Nat") " " $j "和" $k "为何,"
        (CB '(+ (add1 j) k))
@@ -8702,10 +8705,212 @@ Frame 13:11.21: TODO:
        (CB '(add1 (+ j k)))
        "是相同的" (Code "Nat") "."))
    ((dialogue)
-    (Ld ""
-        )
-    (Rd ""
-        ))
+    (Ld "运用这个关于" (Code "+") "的观察,"
+        (same-as
+         (CodeI "(twice (add1 n-1))")
+         (CodeI "(+ (add1 n-1) (add1 n-1))")
+         (CodeI "(add1
+  (+ n-1 (add1 n-1)))"))
+        (Code "cong") "可以胜任证明的工作吗?")
+    (Rd "表达式"
+        (CodeB "(cong twice=double" (Sub "n-1") "
+  (+ 2))")
+        "是一个"
+        (CodeB "(= Nat
+  (add1
+    (add1 (+ n-1 n-1)))
+  (add1
+    (add1 (double n-1))))")
+        "其并非相同的类型."
+        ((tcomment)
+         "说的是其和"
+         (CodeB "(= Nat
+  (add1
+    (+ n-1 (add1 n-1)))
+  (add1
+    (add1 (double n-1))))")
+         "并非相同的类型.")))
+   ((dialogue)
+    (Ld "虽然并非相同的类型, 但是"
+        (Em "近乎于") "相同的类型.")
+    (Rd "将类型中的"
+        (CodeB "(add1 (+ n-1 n-1))")
+        "替换以"
+        (CodeB "(+ n-1 (add1 n-1))")
+        "则能解决问题."))
+   ((dialogue)
+    (Ld "鉴于"
+        (Blockquote
+         (CodeB "(add1 (+ n-1 n-1))")
+         "等于"
+         (CodeB "(+ n-1 (add1 n-1))"))
+        (Code "replace") "可以将" (Code "+")
+        "的第二个参数的" (Code "add1")
+        "移到外面来.")
+    (Rd "是的, 因为" (Code "replace")
+        "适用的条件在于某个东西的类型" (Em "近乎")
+        "满足要求, 而不满足要求的部分又等于某个"
+        "可以使得整个类型满足要求的东西."))
+   ((dialogue)
+    (Ld "在这种情况下,"
+        (CodeB "(cong twice=double" (Sub "n-1") "
+  (+ 2))")
+        "满足要求的部分是什么?")
+    (Rd (CodeB "(= Nat
+  (add1
+    " (WB "                  ") ")
+  (add1
+    (add1 (double n-1))))")
+        "白色方块之外的一切都正合适."))
+   ((dialogue)
+    (Ld "现在请定义动机."
+        ((tcomment)
+         (Code "replace") "表达式的动机.")
+        (Code "mot-step-twice=double")
+        "需要一个额外的参数, 正如" (Code "step-*") "."
+        (CodeB "(claim mot-step-twice=double
+  (→ Nat Nat " $U:script "))"))
+    (Rd "白色方块的位置变成了" (Code "λ")
+        "表达式(所绑定)的变量."
+        (CodeB "(define mot-step-twice=double
+  (λ (n-1 k)
+    (= Nat
+      (add1
+        k)
+      (add1
+        (add1 (double n-1))))))")))
+   ((dialogue)
+    (Ld (Code "replace") "表达式的target是什么呢?")
+    (Rd "表达式"
+        (CodeB "(add1 (+ n-1 n-1))")
+        "应该替换以"
+        (CodeB "(+ n-1 (add1 n-1))")
+        "故target应为"
+        (CodeB "(add1+=+add1 n-1 n-1)")))
+   ((dialogue)
+    (Ld "以下是到目前为止的定义."
+        (CodeD "(define step-twice=double
+  (λ (n-1)
+    (λ (twice=double" (Sub "n-1") ")
+      (replace (add1+=+add1 n-1 n-1)
+        (mot-step-twice=double n-1)
+        " (Frame "               ") "))))"))
+    (Rd "base应该是类型近乎正确的表达式, 即"
+        (CodeB "(cong twice=double" (Sub "n-1") "
+  (+ 2))")))
+   ((dialogue)
+    (Ld (Code "step-twice=double")
+        "的完整定义是什么呢?")
+    (Rd (CodeB "(define step-twice=double
+  (λ (n-1)
+    (λ (twice=double" (Sub "n-1") ")
+      (replace (add1+=+add1 n-1 n-1)
+        (mot-step-twice=double n-1)
+        (cong twice=double" (Sub "n-1") "
+          (+ 2))))))")
+        ((tcomment)
+         "原文这里有一句废话, 译者删去了.")))
+   ((dialogue)
+    (Ld "最后, 我们应该把"
+        (Code "twice=double")
+        "的虚线框去掉.")
+    (Rd "到目前为止, 每个" (Code "replace")
+        "表达式的类型都以" (Code "=") "为顶."
+        (CodeB "(define twice=double
+  (λ (n)
+    (ind-Nat n
+      mot-twice=double
+      (same zero)
+      step-twice=double)))")))
+   ((dialogue)
+    (Ld "你说得很对. 不过, 之所以" (Code "replace")
+        "有用, 是因为通过编写合适的动机, "
+        "其可以具有任意的类型."
+        (P "请找出"
+           (Blockquote
+            (Q (Code "(twice 17)") "等于"
+               (Code "(double 17)")))
+           "的两个证明.")
+        (CodeB "(claim twice=double-of-17
+  (= Nat (twice 17) (double 17)))
+(claim twice=double-of-17-again
+  (= Nat (twice 17) (double 17)))"))
+    (Rd "如果一个陈述对于每个" (Code "Nat")
+        "都为真, 那么其也对于" (Code "17")
+        "为真. 一种证明的方式为应用"
+        (Code "twice=double")
+        "于" (Code "17") "."
+        (CodeB "(define twice=double-of-17
+  (twice=double 17))")
+        "这类似于" (Ref "twin-Atom")
+        "里的" (Code "twin-Atom") "."))
+   ((dialogue)
+    (Ld "另一个证明是什么呢?")
+    (Rd (Code "(twice 17)") "和"
+        (Code "(double 17)")
+        "已经是相同的" (Code "Nat")
+        "了, 故也可以使用" (Code "same") "."
+        (CodeB "(define twice=double-of-17-again
+  (same 34))")))
+   ((dialogue)
+    (Ld "实际上, " (Code "(same 34)") "甚至是"
+        (CodeB "twice=double-of-17")
+        "的值."
+        (P "请定义一个叫做" (Code "twice-Vec")
+           "的函数, 其会复制一个" (Code "Vec")
+           "里的每个元素. 例如,"
+           (CodeB "(twice-Vec Atom 3
+  (vec:: 'chocolate-chip
+    (vec:: 'oatmeal-raisin
+      (vec:: 'vanilla-wafer
+        vecnil))))")
+           "的规范形式为"
+           (CodeB "(vec:: 'chocolate-chip
+  (vec:: 'chocolate-chip
+    (vec:: 'oatmeal-raisin
+      (vec:: 'oatmeal-raisin
+        (vec:: 'vanilla-wafer
+          (vec:: 'vanilla-wafer
+            vecnil))))))")))
+    (Rd "其类型应该是什么呢?"))
+   ((dialogue)
+    (Ld "正如名字所暗示的那样, "
+        "这个函数将会构造一个具有"
+        (Code "twice")
+        "倍那么多元素的"
+        (Code "Vec") "."
+        (CodeB "(claim twice-Vec
+  (Π ((E " $U:script ")
+      (" $l:script " Nat))
+    (→ (Vec E " $l:script ")
+      (Vec E (twice " $l:script ")))))"))
+    (Rd "听上去有点困难."))
+   ((dialogue)
+    (Ld "为什么呢?")
+    (Rd "鉴于其类型依赖于一个" (Code "Nat")
+        ", 这暗示了该函数应该使用" (Code "ind-Nat")
+        "定义, 并且step应该使用两次"
+        (Code "vec::") "."
+        (P "为了使用" (Code "vec::")
+           ", 意图的长度必须以" (Code "add1")
+           "为顶. 然而, (作为结果的)这个"
+           (Code "Vec") "的长度将会只有一个"
+           (Code "add1") "位于顶层.")
+        ((tcomment)
+         "所以说问题在于使用两次" (Code "vec::")
+         "和长度的顶层只有一个" (Code "add1")
+         "不相匹配.")))
+   ((dialogue)
+    (Ld "为什么长度的顶层只有一个"
+        (Code "add1") "呢?")
+    (Rd "根据"
+        (A "关于" (Code "+") "的观察"
+           #:attr* '((href "#law-observation-+")))
+        ","
+        (CodeB "(twice (add1 n-1))")
+        "和"
+        (CodeB "(add1 (+ n-1 (add1 n-1)))")
+        "是相同的" (Code "Nat") "."))
    ((dialogue)
     (Ld ""
         )
