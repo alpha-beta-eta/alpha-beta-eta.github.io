@@ -1,13 +1,26 @@
 #lang racket
 (provide linear_logic_notes.html)
 (require SMathML)
+(define $\|- (Mo "&vdash;"))
+(define (&\|- . x*)
+  (let-values (((y* z*) (split-at-right x* 1)))
+    (: (apply &cm y*) $\|- (car z*))))
+(define $UnderBrace (Mo "&UnderBrace;"))
+(define UnderBrace
+  (case-lambda
+    ((x) (Munder x $UnderBrace))
+    ((x y) (Munder (UnderBrace x) y))))
+(define Δ $Delta:normal)
+(define Δ^ (&prime Δ))
 (define $lolli (Mo "&multimap;"))
 (define $-o $lolli)
 (define $o* (Mo "&otimes;"))
+(define $o*:id (Mi "&otimes;"))
+(define $rule:⊗R (: $o*:id $R))
 (define $dumb (Mi "-"))
-(define $eph (Mo "eph" #:attr* '((mathvariant "italic"))))
+(define $eph (Mi "eph" #:attr* '((mathvariant "italic"))))
 (define (&eph prop)
-  (: prop $eph))
+  (: prop (&space 2) $eph))
 (define (Menclose #:attr* [attr* '()] . xml*)
   `(menclose ,attr* . ,xml*))
 (define (Menclose:updiagonalstrike #:attr* [attr* '()] . xml*)
@@ -546,12 +559,43 @@
       (&o* $A $B) ", 如果我们既有" $A "也有" $B ":"
       (MB (&rule (&eph $A) (&eph $B)
                  (&eph (&o* $A $B))))
-      "但是这已经造成了问题, 比如说我们想要表明"
+      "但是这已经造成了问题, 比如说如果我们想要表明"
       (MB (&rule (&eph (&o* $A $B))
                  (&eph (&o* $B $A))))
-      "是一条导出推理规则, 那么"
+      "是一条导出推理规则, 那么证明可能会写成以下这样:"
+      (MB (&rule*
+           (&eph (&o* $A $B))
+           ((&split 8)
+            (&eph $A) (&eph $B))
+           (&eph (&o* $B $A))))
+      "一点小的恼人之处在于最后一条规则的前提的顺序是错误的. "
+      "然而, 更重要的地方在于, "
       )
    (H3. "资源和目标")
+   (P "现在我们转移到一种记号上来, 其主要的判断显式追踪了"
+      "我们在推理过程中所有使用了的瞬态命题. 我们写下"
+      (MB (&\|-
+           (UnderBrace (&cm (&eph $A_1) $..h (&eph $A_n)) Δ)
+           (&eph $C)))
+      "将" Δ "的部分视为" (Em "资源(resources)") "而" $C
+      "当成我们要达成的目标 (goal). "
+      "为了证明这个东西, 我们需要在我们可以达成" $C
+      "的证明中使用" Δ "的所有资源" (Em "恰好一次(exactly once)")
+      ". 这是来源于Gentzen的" (Em "相继式演算(sequent calculus)")
+      "的" (Em "相继式(sequent)") "的一个例子, "
+      "[Gen35]这篇开创性论文标志着证明论作为研究主题的开始. "
+      "然而, Gentzen的论文具有允许我们复制或者擦除假设的结构规则, "
+      "但是在这里被有意省略了. [译注: 结构规则从指称或者语义角度来看是显然的, "
+      "然而从证明论的角度来看反而是相继式演算里最重要的部分. "
+      "线性逻辑实际上可以说始于这样的观察.]")
+   (P "以相继式的记号, 我们现在可以写下"
+      (MB (&rulel
+           #:label $rule:⊗R
+           (&\|- Δ (&eph $A))
+           (&\|- Δ^ (&eph $B))
+           (&\|- Δ Δ^ (&eph (&o* $A $B)))))
+      
+      )
    (H3. "identity和cut")
    (H3. "cut归约")
    (H3. "线性implication")
