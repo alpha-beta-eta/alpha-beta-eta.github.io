@@ -2,6 +2,7 @@
 (provide linear_logic_notes.html)
 (require SMathML)
 (define $->E (_ $-> $E))
+(define $->R (_ $-> $R))
 (define $\|- (Mo "&vdash;"))
 (define (&\|- . x*)
   (let-values (((y* z*) (split-at-right x* 1)))
@@ -13,6 +14,7 @@
     ((x y) (Munder (UnderBrace x) y))))
 (define Δ $Delta:normal)
 (define Δ^ (&prime Δ))
+(define Δ^^ (&Prime Δ))
 (define $lolli (Mo "&multimap;"))
 (define $-o $lolli)
 (define $o* (Mo "&otimes;"))
@@ -121,8 +123,9 @@
       (error 'compose-proof-instance*
              "invalid proof composition:\n~s\n~s"
              conclusion* premise*))))
-(define (compose-proof-instance* rule-instance . proof-instance*)
-  (check-validity proof-instance* rule-instance)
+(define (compose-proof-instance* #:check? [check? #t] rule-instance . proof-instance*)
+  (when check?
+    (check-validity proof-instance* rule-instance))
   (let ((proof* (map proof-instance-proof proof-instance*))
         (label (rule-instance-label rule-instance))
         (conclusion (rule-instance-conclusion rule-instance)))
@@ -136,7 +139,7 @@
   (cond ((assq label env) => cdr)
         (else (error 'render-proof-tree
                      "unknown rule ~s" label))))
-(define (render-proof-tree env tree)
+(define (render-proof-tree env tree #:check? [check? #t])
   (define (interp-rule rule)
     (match rule
       ((,label . ,arg*)
@@ -146,7 +149,10 @@
       ((<= ,rule . ,proof*)
        (define r (interp-rule rule))
        (define p* (map interp proof*))
-       (apply compose-proof-instance* r p*))
+       (keyword-apply
+        compose-proof-instance*
+        '(#:check?) (list check?)
+        r p*))
       ((prop ,prop)
        (instantiate-prop prop))
       (,rule
@@ -200,6 +206,7 @@
   (&lolli $lolli)
   (&o* $o*)
   (&->E $->E)
+  (&->R $->R)
   
   )
 (define $step (Const "step"))
@@ -226,6 +233,41 @@
                      ,proof
                      (prop ,(&edge at x)))
                 x*)))))
+(define make-id-instance
+  (lambda (prop)
+    (make-rule-instance
+     (list $) (&id prop)
+     (&\|- prop prop))))
+(define make-cut-instance
+  (lambda (Δ A Δ^ C)
+    (make-rule-instance
+     (list (&\|- Δ A)
+           (&\|- Δ^ A C))
+     (&cut A)
+     (&\|- Δ Δ^ C))))
+(define make-⊗R-instance
+  (lambda (Δ A Δ^ B)
+    (make-rule-instance
+     (list (&\|- Δ A)
+           (&\|- Δ^ B))
+     $rule:⊗R
+     (&\|- Δ Δ^ (&o* $A $B)))))
+(define make-⊗L-instance
+  (lambda (Δ A B C)
+    (if (equal? Δ $)
+        (make-rule-instance
+         (list (&\|- A B C))
+         $rule:⊗L
+         (&\|- (&o* A B) C))
+        (make-rule-instance
+         (list (&\|- Δ A B C))
+         $rule:⊗L
+         (&\|- Δ (&o* A B) C)))))
+(define env:⊗
+  `((id . ,make-id-instance)
+    (cut . ,make-cut-instance)
+    (⊗R . ,make-⊗R-instance)
+    (⊗L . ,make-⊗L-instance)))
 (define linear_logic_notes.html
   (TnTmPrelude
    #:title "线性逻辑笔记"
@@ -667,45 +709,64 @@
       "第一条标准是检查我们是否能够通过对于更小类型的identity规则的使用"
       "来消除对于复合类型的identity规则的使用. "
       "这意味着左规则和右规则配合得足够充分以至于我们可以推导出identity规则的实例."
-      (let* ((make-id-instance
-              (lambda (prop)
-                (make-rule-instance
-                 (list $) (&id prop)
-                 (&\|- prop prop))))
-             (make-⊗R-instance
-              (lambda (Δ A Δ^ B)
-                (make-rule-instance
-                 (list (&\|- Δ A)
-                       (&\|- Δ^ B))
-                 $rule:⊗R
-                 (&\|- Δ Δ^ (&o* $A $B)))))
-             (make-⊗L-instance
-              (lambda (Δ A B C)
-                (if (equal? Δ $)
-                    (make-rule-instance
-                     (list (&\|- A B C))
-                     $rule:⊗L
-                     (&\|- (&o* A B) C))
-                    (make-rule-instance
-                     (list (&\|- Δ A B C))
-                     $rule:⊗L
-                     (&\|- Δ (&o* A B) C)))))
-             (env:⊗ `((id . ,make-id-instance)
-                      (⊗R . ,make-⊗R-instance)
-                      (⊗L . ,make-⊗L-instance))))
-        (MB (&->E (render-proof-tree
-                   env:⊗
-                   `(id ,(&o* $A $B)))
-                  (render-proof-tree
-                   env:⊗
-                   `(<= (⊗L ,$ ,$A ,$B ,(&o* $A $B))
-                        (<= (⊗R ,$A ,$A ,$B ,$B)
-                            (id ,$A)
-                            (id ,$B)))))))
-      
-      )
+      (MB (&->E (render-proof-tree
+                 env:⊗
+                 `(id ,(&o* $A $B)))
+                (render-proof-tree
+                 env:⊗
+                 `(<= (⊗L ,$ ,$A ,$B ,(&o* $A $B))
+                      (<= (⊗R ,$A ,$A ,$B ,$B)
+                          (id ,$A)
+                          (id ,$B))))))
+      "我们使用" $->E "表示展开一个identity规则"
+      "为一个使用更小的命题的identity规则的证明. "
+      "这之所以被称为展开 (expansion), "
+      "是因为证明变得更大, 即便命题变得更小.")
+   (P "请注意我们是如何使用" (&o* $A $B)
+      "的左规则和右规则的, "
+      "并且它们的确配合良好以能够推导出对于"
+      (&o* $A $B) "而言的identity规则.")
    (H3. "cut归约")
+   (P "另一种判断规则是cut, 其也可以用来判断"
+      "相同联结词的左规则和右规则是否配合良好. "
+      "这次我们需要表明我们可以归约a cut at "
+      (&o* $A $B) "为cuts at " $A " and " $B "."
+      (MB (render-proof-tree
+           env:⊗
+           `(<= (cut ,(&cm Δ Δ^) ,(&o* $A $B)
+                     ,Δ^^ ,$C)
+                (⊗R ,Δ ,$A ,Δ^ ,$B)
+                (⊗L ,Δ^^ ,$A ,$B ,$C))))
+      (MB $->R)
+      (MB (render-proof-tree
+           #:check? #f ;attention!
+           env:⊗
+           `(<= (cut ,Δ^ ,$B ,(&cm Δ Δ^^) ,$C)
+                (prop ,(&\|- Δ^ $B))
+                (cut ,Δ ,$A ,(&cm Δ^^ $B) ,$C))))
+      "[译注: 译者实现了一个用于排版证明树的DSL, "
+      "但是相当受限, 尤其是其检查证明的合法性的机制过于严格, "
+      "以至于我这里必须放弃合法性检查. "
+      "另外, 这个证明树和原文稍有区别, 因为它没有调整其中一些顺序. "
+      "严格地说, 交换顺序应该编码为结构规则, "
+      "但是这个讲义为了简单起见只是非形式化地处理交换.] "
+      "我们再次看到了资源处于平衡状态: "
+      "我们在证明并使用" (&o* $A $B)
+      "时并不会获得或者损失任何的资源.")
+   (P "之后的讲座里我们将会看到, "
+      "cut归约实际上是线性逻辑的一些计算性解释背后的引擎.")
    (H3. "线性implication")
+   (P "最后, 我们回到表达推理规则的原始问题上来. "
+      "想法在于用一个quarter交换两个dime和一个nickel的规则"
+      (MB (&rule
+           $quarter
+           ((&split 8)
+            $dime $dime $nickel)))
+      "变成了"
+      (MB (&-o $quarter (&o* $dime $dime $nickel)))
+      "除了 (except that) 规则本身是永恒的, 而命题不是, "
+      "除非我们采取特殊安排.")
+   
    (H2. "和谐")
    (H3. "乘性单位元")
    (H3. "和谐的失败")
