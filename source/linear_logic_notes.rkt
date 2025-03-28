@@ -1,6 +1,7 @@
 #lang racket
 (provide linear_logic_notes.html)
 (require SMathML)
+(define $->E (_ $-> $E))
 (define $\|- (Mo "&vdash;"))
 (define (&\|- . x*)
   (let-values (((y* z*) (split-at-right x* 1)))
@@ -34,6 +35,10 @@
 (define const:e $e:sans-serif)
 (define (Const str)
   (Mi str #:attr* '((mathvariant "sans-serif"))))
+(define $id (Const "id"))
+(define (&id A) (_ $id A))
+(define $cut (Const "cut"))
+(define (&cut A) (_ $cut A))
 (define $edge (Const "edge"))
 (define (&edge x y)
   (appl $edge x y))
@@ -194,6 +199,7 @@
   (&-o $-o)
   (&lolli $lolli)
   (&o* $o*)
+  (&->E $->E)
   
   )
 (define $step (Const "step"))
@@ -621,12 +627,83 @@
       "我们不能随意地发明这样的联结词的左规则和右规则. "
       "最终我们希望我们的系统里的逻辑命题有着符合期望的含义, "
       "不论是从直觉角度还是从形式角度. "
-      "接下来的一节解释了一些我们可以运用的标准.")
+      "接下来的章节里解释了一些我们可以运用的标准.")
    (H3. "identity和cut")
    (P "从基础上来讲, 我们需要在左侧的资源和右侧的目标之间达成平衡. "
       "这种平衡独立于我们所拥有的特定的联结词集合&mdash;&mdash;"
       "其应该对于任意的命题成立.")
-   
+   (P "第一条规则, 叫做" (Em "identity")
+      ", 陈述了一个资源" $A "自身应该总是足够能达成目标" $A "."
+      (MB (&rulel
+           #:label (&id $A)
+           $
+           (&\|- (&eph $A) (&eph $A))))
+      "在这条规则里, 我们必须足够谨慎, 不应该引入任何额外的未使用资源, "
+      "因为其解释是严苛的 (tight): 任何资源都必须恰好用到一次. "
+      "我们经常将规则所应用于的命题附到规则名称的下标上, "
+      "因为这样的信息在我们对于相继式演算的研究中是重要的.")
+   (P "第二条规则, 叫做" (Em "cut") ", 陈述了相反方向的事实: "
+      "达成一个目标" $A "允许 (license) 我们假设 (assume) "
+      $A "作为一个资源."
+      (MB (&rulel
+           #:label (&cut $A)
+           (&\|- Δ (&eph $A))
+           (&\|- Δ^ (&eph $A) (&eph $C))
+           (&\|- Δ Δ^ (&eph $C))))
+      "在这条规则里, 我们需要小心地将来源于两段前提的假设组合起来, "
+      "这当然也是因为前提中的资源都必须恰好被使用一次 "
+      "(不论是在对于" $A "的证明中还是在使用了" $A
+      "的对于" $C "的证明中).")
+   (P "这两条规则有时被称为" (Em "判断规则(judgmental rule)")
+      ", 因为其关心的是判断的本质 "
+      "(这里指的是judgments of being a resource and a goal), 或者说"
+      (Em "结构规则(structural rule)")
+      ", 因为其并不检视命题, 而只检视相继式的结构.")
+   (P "本次讲座的剩余部分里我们将会省略判断注记 (judgment annotation) "
+      $eph ", 因为暂时这些注记总是相同的.")
+   (H3. "identity展开")
+   (P "接下来我们开始讨论应用于检查我们对于联结词的定义的标准, "
+      "在于左规则和右规则是否相互一致. "
+      "第一条标准是检查我们是否能够通过对于更小类型的identity规则的使用"
+      "来消除对于复合类型的identity规则的使用. "
+      "这意味着左规则和右规则配合得足够充分以至于我们可以推导出identity规则的实例."
+      (let* ((make-id-instance
+              (lambda (prop)
+                (make-rule-instance
+                 (list $) (&id prop)
+                 (&\|- prop prop))))
+             (make-⊗R-instance
+              (lambda (Δ A Δ^ B)
+                (make-rule-instance
+                 (list (&\|- Δ A)
+                       (&\|- Δ^ B))
+                 $rule:⊗R
+                 (&\|- Δ Δ^ (&o* $A $B)))))
+             (make-⊗L-instance
+              (lambda (Δ A B C)
+                (if (equal? Δ $)
+                    (make-rule-instance
+                     (list (&\|- A B C))
+                     $rule:⊗L
+                     (&\|- (&o* A B) C))
+                    (make-rule-instance
+                     (list (&\|- Δ A B C))
+                     $rule:⊗L
+                     (&\|- Δ (&o* A B) C)))))
+             (env:⊗ `((id . ,make-id-instance)
+                      (⊗R . ,make-⊗R-instance)
+                      (⊗L . ,make-⊗L-instance))))
+        (MB (&->E (render-proof-tree
+                   env:⊗
+                   `(id ,(&o* $A $B)))
+                  (render-proof-tree
+                   env:⊗
+                   `(<= (⊗L ,$ ,$A ,$B ,(&o* $A $B))
+                        (<= (⊗R ,$A ,$A ,$B ,$B)
+                            (id ,$A)
+                            (id ,$B)))))))
+      
+      )
    (H3. "cut归约")
    (H3. "线性implication")
    (H2. "和谐")
