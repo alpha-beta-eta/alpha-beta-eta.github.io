@@ -124,7 +124,9 @@
      (keyword-apply
       &rulel
       '(#:label) (list label)
-      (append premise* (list conclusion)))
+      (if (null? premise*)
+          (list $ conclusion) ;tricky!
+          (append premise* (list conclusion))))
      conclusion)))
 (define (check-validity proof-instance* rule-instance)
   (let ((conclusion* (map proof-instance-conclusion proof-instance*))
@@ -143,7 +145,9 @@
      (keyword-apply
       &rulel
       '(#:label) (list label)
-      (append proof* (list conclusion)))
+      (if (null? proof*)
+          (list $ conclusion) ;tricky!
+          (append proof* (list conclusion))))
      conclusion)))
 (define (lookup label env)
   (cond ((assq label env) => cdr)
@@ -249,7 +253,7 @@
 (define make-id-instance
   (lambda (prop)
     (make-rule-instance
-     (list $) (&id prop)
+     (list) (&id prop)
      (&\|- prop prop))))
 (define make-cut-instance
   (lambda (Δ A Δ^ C)
@@ -399,6 +403,13 @@
        (list (&\|- Δ B C))
        $rule:&L2
        (&\|- Δ (&& A B) C))))
+(define $rule:⊤R (: $top $R))
+(define (rule:⊤R Δ)
+  (make-rule-instance
+   (list)
+   $rule:⊤R
+   (&\|- Δ $top)))
+(define $rule:⊤L (: $top $L))
 (define env:linear
   `((id . ,make-id-instance)
     (cut . ,make-cut-instance)
@@ -413,6 +424,7 @@
     (&R . ,rule:&R)
     (&L1 . ,rule:&L1)
     (&L2 . ,rule:&L2)
+    (⊤R . ,rule:⊤R)
     ;though, linear logic does not include the weakening rule!
     (weaken . ,make-weaken-instance)
     ))
@@ -1167,10 +1179,53 @@
            (render-proof-tree
             env:linear
             `(cut ,Δ ,$B ,Δ^ ,$C))))
-      
-      )
+      "identity展开为"
+      (MB (&->E
+           (render-proof-tree
+            env:linear
+            `(id ,(&& $A $B)))
+           (render-proof-tree
+            env:linear
+            `(<= (&R ,(&& $A $B) ,$A ,$B)
+                 (<= (&L1 ,$ ,$A ,$B ,$A)
+                     (id ,$A))
+                 (<= (&L2 ,$ ,$A ,$B ,$B)
+                     (id ,$B)))))))
    (H3. "加性单位元")
+   (P "就像乘性合取具有单位元" $unit
+      "一样, 加性合取也存在零元的版本. "
+      "这个单位元是" $top " (读作" (Q (Em "top"))
+      "). 和之前一样, 其规则也可由加性合取的规则系统地推导出来. "
+      "右规则具有零个前提, 将资源" Δ
+      "传播到它们所有身上. [译注: 原文是all of them, "
+      "指的是每个作为前提的相继式的右侧的命题. "
+      "因为现在没有前提, 所以它们的加性合取应该是" $top
+      ".] " (&& $A $B) "具有两个conjunct, "
+      "因此存在两条左规则; " $top "具有零个conjunct, "
+      "因此只有零条左规则."
+      (MB ((&split 16)
+           (render-proof-tree
+            env:linear
+            `(⊤R ,Δ))
+           (: "没有" $rule:⊤L "规则")))
+      "当然了, 现在没有cut归约, 因为" $top
+      "没有左规则. [译注: 因此, 没有办法在相继式的左侧引入" $top
+      ".] 但是, 我们仍然有一个identity展开."
+      (MB (&->E
+           (render-proof-tree
+            env:linear
+            `(id ,$top))
+           (render-proof-tree
+            env:linear
+            `(⊤R ,$top)))))
    (H3. "析取")
+   (P "我们已经看到alternative合取代表了某种选择. "
+      "如果我们拥有一个资源" (&& $A $B)
+      ", 那么我们可以在我们的证明中选择使用" $A
+      "或者" $B ". 如果我们有了一个目标" (&& $A $B)
+      ", 那么我们需要考虑两种使用方式.")
+   (P "析取和加性合取是对称的. "
+      )
    (H3. "析取单位元")
    (H3. "永恒事实")
    ))
