@@ -1,6 +1,13 @@
 #lang racket
 (provide linear_logic_notes.html)
 (require SMathML)
+(define $equiv (Mo "&equiv;"))
+(define $≡ $equiv)
+(define (NU var exp)
+  (: (@ $nu var) exp))
+(define $\| (Mo "|"))
+(define (para-compose P Q)
+  (@\| P Q))
 (define (subst term exp var)
   (: term (cur0 (&/ exp var))))
 (define $:: (Mo "::"))
@@ -228,6 +235,9 @@
   (&->R $->R)
   (&& $&)
   (&:: $::)
+  (&\| $\|)
+  (&equiv $equiv)
+  (&≡ $≡)
   
   )
 (define $step (Const "step"))
@@ -434,7 +444,11 @@
     ))
 (define-@lized-op*
   (@o* &o*)
+  (@\| &\|)
+  
   )
+(define $fn (Const "fn"))
+(define (&fn P) (app $fn P))
 (define linear_logic_notes.html
   (TnTmPrelude
    #:title "线性逻辑笔记"
@@ -1265,10 +1279,109 @@
       $A_i "的进程" $P_i " (" (&<= $1 $i $n)
       ") 一起时, 其沿着信道" $x "提供服务" $A
       ". 所有的变量" $x_i "都必须是互异的. "
-      )
+      "这其实只是对于一个相继式" (&\|- Δ $A)
+      "的装饰, 其唯一地标记了结论以及" Δ
+      "中的所有资源. 对于资源我们仍然写下"
+      Δ ", 不过现在它们被标记以信道.")
+   (P "提供和使用服务是相对应的 (counterparts), "
+      "但是它们并不相同. 因此, 形式上, "
+      "相继式右侧的判断" (&: $x $A)
+      "和相继式左侧的判断" (&: $x_i $A_i)
+      "应该被认为是不同的. "
+      "既然我们总是可以凭借位置来分辨判断的意图, "
+      "那么两者我们都会使用相同的记号.")
+   (P "进程随着沿信道的交互演化. 故信道" $x_i
+      "上的交互会产生 (engender) 状态上的变化, "
+      "而相同的信道不能再以相同的类型被使用了. "
+      "因此, 这里的turnstile符号" (Q $\|-) "代表的是"
+      (Em "线性假言判断(linear hypothetical judgment)")
+      " [CCP03], 其中每个前件 (antecedent) "
+      "都必须恰被使用一次. 也就是说, "
+      "上下文并不服从于弱化或者收缩规则, "
+      "但是重新排列是允许的, "
+      "因为前件被标识以唯一的名字.")
+   (P "即便还没有定义任何特定种类的服务, "
+      "一些原则应该是对于一般性的判断成立. "
+      "我们先讨论这些原则, "
+      "因为它们对于剩余部分的发展也是重要的指引.")
    (H3. "作为复合的cut")
+   (P "当一个进程" $P "沿着" $x (Em "提供") "服务"
+      $A ", 且另一个进程" $Q "沿着" $x
+      (Em "使用") "服务" $A
+      "时, 这两者可以被复合以至于它们沿着"
+      $x "进行通信."
+      (MB (&rulel
+           #:label $cut
+           (&\|- Δ (&:: $P (&: $x $A)))
+           (&\|- Δ^ (&: $x $A)
+                 (&:: $Q (&: $z $C)))
+           (&\|- Δ Δ^
+                 (&:: (NU $x (para-compose $P $Q))
+                      (&: $z $C)))))
+      "复合的进程表达式将" $P "和" $Q
+      "并置于一个" (Em "并行复合(parallel composition)")
+      (para-compose $P $Q) "之中, 其共享着" $x
+      "作为一个" (Em "私有(private)")
+      "信道, 这是由" (Em "名称限制(name restriction)")
+      (@ $nu $x) "所指示的. "
+      "注意到这条规则蕴含着某种隐式的重命名, "
+      "因为" $P "提供" $A "所沿着的信道必须与"
+      $Q "使用" $A "所沿着的信道等同起来. 在"
+      $pi "演算中, " (NU $x $P) "是以" $P
+      "为作用域的变量" $x "的绑定子 (binder).")
+   (P "从纯粹逻辑的角度看待, 这不过就是线性逻辑中的"
+      (Em "cut") "规则:"
+      (MB (render-proof-tree
+           env:linear
+           `(cut ,Δ ,$A ,Δ^ ,$C)))
+      "我们使用线性逻辑的一种直觉主义版本实际上是有点不同寻常的, "
+      "也就是说, 每个相继式的右侧只有一个 (singleton). "
+      "这并非绝对本质性的 (见[Abr93], 其提供了一个相关的古典逻辑对应物), "
+      "但是它精简了系统的判断澄清 (judgmental justification). "
+      "它也反映了提供和使用服务之间内蕴 (intrinsic) 的不对称性, "
+      "尽管我们将会看到它们的关联是相当紧密的. "
+      "这也有助于建立依赖类型论.")
    (H3. "作为forwarding的identity")
+   
    (H3. "将cut复合")
+   (P "多重并行复合应该只在其间交互需要时同步 (synchronize). "
+      "从证明论的角度来说, 这意味着相继cut的顺序应该是无足轻重的. "
+      "相对应的律 (law) 作为重写规则并无固有的方向 (orientation), "
+      "因此我们应该将其想成是结构证明等价. 我们留给读者写出"
+      "简单的proof figures. 在进程演算方面, 我们得到了相应的"
+      (Em "structural congruence")
+      ". [译注: 我不太会翻译congruence, 它总是在各种地方出现, "
+      "然后总是指代一种等价关系.]"
+      (eqn*
+       ((NU $x (para-compose (NU $y (para-compose $P $Q)) $R))
+        $≡
+        (NU $y (para-compose $P (NU $x (para-compose $Q $R)))))
+       ($ $ (: "只要" (&cm (&!in $x (&fn $P)) (&!in $y (&fn $R)))))
+       ((NU $x (para-compose $P (NU $y (para-compose $Q $R))))
+        $≡
+        (NU $y (para-compose $Q (NU $x (para-compose $P $R)))))
+       ($ $ (: "只要" (&cm (&!in $x (&fn $Q)) (&!in $y (&fn $P))))))
+      "这些可由更基本的结构等价推导出来, "
+      "也就是并行复合的结合律和作用域挤出 (scope extrusion)."
+      (eqn*
+       ((para-compose
+         (para-compose $P $Q) $R)
+        $≡
+        (para-compose
+         $P (para-compose $Q $R))
+        "结合律")
+       ((para-compose $P $Q)
+        $≡
+        (para-compose $Q $P)
+        "交换律")
+       ((para-compose
+         $P (NU $x $Q))
+        $≡
+        (NU $x (para-compose $P $Q))
+        "作用域挤出")
+       ($ $ $ (: "只要" (&!in $x (&fn $P)))))
+      
+      )
    (H3. "输入")
    (H3. "归约")
    (H3. "例子: 硬币交换")
