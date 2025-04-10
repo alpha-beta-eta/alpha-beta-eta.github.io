@@ -9434,9 +9434,93 @@ Frame 13:11.21: TODO:
         ", 而" (Code "cdr")
         "是一个" (Code "(Vec E 0)") "."))
    ((dialogue)
-    (Ld ""
-        )
-    (Rd ""
+    (Ld (Code "step-list→vec") "给一个"
+        (CodeB "(Σ ((" $l:script " Nat))
+  (Vec E " $l:script "))")
+        "添加一个元素."
+        (P "那么这更长的" (Code "Vec")
+           "的类型该是什么呢?"))
+    (Rd (CodeB "(Σ ((" $l:script " Nat))
+  (Vec E (add1 " $l:script ")))")
+        "如何? 因为这个" (Code "Vec")
+        "的长度多了一."))
+   ((dialogue)
+    (Ld "更好的类型实际上是"
+        (CodeB "(Σ ((" $l:script " Nat))
+  (Vec E " $l:script "))")
+        "这是因为这里使用" (Code "Σ")
+        "的要义在于我们需要有一个序对, 其"
+        (Code "car") "部分是整个" (Code "cdr")
+        "部分的长度. 使" (Code "car")
+        "变得更大并不需要改变类型."
+        (P "请定义step."))
+    (Rd "step的类型遵循着" (Code "rec-List")
+        "的通常配方."
+        (CodeD "(claim step-list→vec
+  (Π ((E " $U:script "))
+    (→ E (List E) (Σ ((" $l:script " Nat))
+                    (Vec E " $l:script "))
+      (Σ ((" $l:script " Nat))
+        (Vec E " $l:script ")))))")
+        "为了定义" (Code "step-list→vec")
+        ", " (Code "Σ") "的消去子是必要的. "
+        "是不是" (Code "car") "和"
+        (Code "cdr") "也能消去" (Code "Σ")
+        "呢?"))
+   ((dialogue)
+    (Ld "是的. 如果" $p "是一个"
+        (CodeB "(Σ ((" $x " " $A "))
+  " $D ")")
+        "那么" (C '(car p))
+        "是一个" $A ".")
+    (Rd "这就和" (C '(Pair A D))
+        "是一样的."))
+   ((dialogue)
+    (Ld "但是, " (Code "cdr") "有一些不同."
+        (P "如果" $p "是一个"
+           (CodeB "(Σ ((" $x " " $A "))
+  " $D ")")
+           "那么" (C '(cdr p))
+           "的类型是" $D
+           ", 且其中的每个" $x
+           "都已被一致地替换为了"
+           (C '(car p)) "."))
+    (Rd "如果" $D "中没有" $x
+        ", 那么这岂不是和第1章的"
+        (Code "Pair")
+        "如出一辙?"))
+   ((dialogue)
+    (Ld "的确如此."
+        (P "如果" $p "是一个"
+           (CodeB "(Σ ((" $l:script " Nat))
+  (Vec Atom " $l:script "))")
+           "那么" (C '(car p))
+           "的类型是什么呢?"))
+    (Rd (C '(car p)) "是一个"
+        (Code "Nat") "."))
+   ((dialogue)
+    (Ld "如果" $p "是一个"
+        (CodeB "(Σ ((" $l:script " Nat))
+  (Vec Atom " $l:script "))")
+        "那么" (C '(cdr p))
+        "的类型是什么呢?")
+    (Rd (C '(cdr p)) "是一个"
+        (C '(Vec Atom (car p))) "."
+        (P "因此, " (Code "Σ")
+           "是另一种构造依赖类型的方式.")))
+   ((dialogue)
+    (Ld "以下是" (Code "step-list→vec") "."
+        (CodeD "(define step-list→vec
+  (λ (" (Dim "E") ")
+    (λ (e " (Dim "es") " list→vec" (Sub "es") ")
+      (cons (add1 (car list→vec" (Sub "es") "))
+        (vec:: e (cdr list→vec" (Sub "es") "))))))")
+        "请解释一下.")
+    (Rd "以下是我的解释."
+        (Ol (Li "内层的" (Code "λ")
+                "表达式的体"
+                )
+            )
         ))
    ((dialogue)
     (Ld ""
