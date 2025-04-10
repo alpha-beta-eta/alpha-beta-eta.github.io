@@ -9417,10 +9417,11 @@ Frame 13:11.21: TODO:
         ", 而" (Code "vecnil")
         "具有" (Code "0") "个元素."
         (CodeD "(define list→vec
-  (λ (E es)
-    (rec-List es
-      (cons 0 vecnil)
-      " (Frame "               ") ")))")))
+  (λ (E)
+    (λ (es)
+      (rec-List es
+        (cons 0 vecnil)
+        " (Frame "               ") "))))")))
    ((dialogue)
     (Ld "为什么"
         (CodeB "(cons 0 vecnil)")
@@ -9518,9 +9519,41 @@ Frame 13:11.21: TODO:
         "请解释一下.")
     (Rd "以下是我的解释."
         (Ol (Li "内层的" (Code "λ")
-                "表达式的体"
-                )
-            )
+                "表达式的体以" (Code "cons")
+                "为顶, 因为其必须要构造一个"
+                (Code "Σ") ".")
+            (Li "内层" (Code "λ")
+                "表达式的体的"
+                (Code "car") "是"
+                (CodeB "(add1 (car list→vec" (Sub "es") "))")
+                "因为" (Code "step-list→vec")
+                "所构造的" (Code "Vec") "比"
+                (CodeB "(cdr list→vec" (Sub "es") ")")
+                "多一个元素.")
+            (Li "内层" (Code "λ")
+                "表达式的体的"
+                (Code "cdr") "比"
+                (Code "list→vec" (Sub "es"))
+                "的" (Code "cdr")
+                "多一个元素, 即" (Code "e")
+                ", 于是" (Code "vec::")
+                "将其作为新元素加到开头."))))
+   ((dialogue)
+    (Ld "现在请给出" (Code "list→vec")
+        "的完整定义.")
+    (Rd "只需给方框填上"
+        (Code "(step-list→vec E)")
+        "即可."
+        (CodeD "(define list→vec
+  (λ (E)
+    (λ (es)
+      (rec-List es
+        (cons 0 vecnil)
+        (step-list→vec E)))))")))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
         ))
    ((dialogue)
     (Ld ""

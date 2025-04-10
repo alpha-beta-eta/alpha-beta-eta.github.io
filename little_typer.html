@@ -1705,10 +1705,11 @@ Frame 13:11.21: TODO:
   (λ (E)
     (λ (es)
       <span style="border: 2px solid white; display: inline-block;">               </span>)))</code></pre></p></td><td class="middled"><sup>25</sup></td><td class="rightd">框里的表达式必须要检查<code>es</code>是<code>nil</code>还是说以<code>::</code>为顶. <code>rec-List</code>可以胜任此项任务, 而其target应该是<code>es</code>.</td></tr></table><table class="dialogue"><tr><td class="leftd">的确如此.<p>那么, base应该是什么呢?</p></td><td class="middled"><sup>26</sup></td><td class="rightd">base是<code>es</code>为<code>nil</code>时的值. 这显然应该是<code>vecnil</code>, 而<code>vecnil</code>具有<code>0</code>个元素.<pre class="dashed"><code>(define list→vec
-  (λ (E es)
-    (rec-List es
-      (cons 0 vecnil)
-      <span style="border: 2px solid white; display: inline-block;">               </span>)))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd">为什么<pre><code>(cons 0 vecnil)</code></pre>是一个<pre><code>(Σ ((<math><mi mathvariant="script">l</mi></math> Nat))
+  (λ (E)
+    (λ (es)
+      (rec-List es
+        (cons 0 vecnil)
+        <span style="border: 2px solid white; display: inline-block;">               </span>))))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd">为什么<pre><code>(cons 0 vecnil)</code></pre>是一个<pre><code>(Σ ((<math><mi mathvariant="script">l</mi></math> Nat))
   (Vec E <math><mi mathvariant="script">l</mi></math>))</code></pre>呢?</td><td class="middled"><sup>27</sup></td><td class="rightd">因为<code>car</code>是一个<code>Nat</code>, 具体来说这里是<code>0</code>, 而<code>cdr</code>是一个<code>(Vec E 0)</code>.</td></tr></table><table class="dialogue"><tr><td class="leftd"><code>step-list→vec</code>给一个<pre><code>(Σ ((<math><mi mathvariant="script">l</mi></math> Nat))
   (Vec E <math><mi mathvariant="script">l</mi></math>))</code></pre>添加一个元素.<p>那么这更长的<code>Vec</code>的类型该是什么呢?</p></td><td class="middled"><sup>28</sup></td><td class="rightd"><pre><code>(Σ ((<math><mi mathvariant="script">l</mi></math> Nat))
   (Vec E (add1 <math><mi mathvariant="script">l</mi></math>)))</code></pre>如何? 因为这个<code>Vec</code>的长度多了一.</td></tr></table><table class="dialogue"><tr><td class="leftd">更好的类型实际上是<pre><code>(Σ ((<math><mi mathvariant="script">l</mi></math> Nat))
@@ -1725,4 +1726,9 @@ Frame 13:11.21: TODO:
   (λ (<span style="color: grey;">E</span>)
     (λ (e <span style="color: grey;">es</span> list→vec<sub>es</sub>)
       (cons (add1 (car list→vec<sub>es</sub>))
-        (vec:: e (cdr list→vec<sub>es</sub>))))))</code></pre>请解释一下.</td><td class="middled"><sup>34</sup></td><td class="rightd">以下是我的解释.<ol><li>内层的<code>λ</code>表达式的体</li></ol></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>35</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>36</sup></td><td class="rightd"></td></tr></table><h2>第11章 所有的列表生来相等</h2><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>1</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>2</sup></td><td class="rightd"></td></tr></table></body></html>
+        (vec:: e (cdr list→vec<sub>es</sub>))))))</code></pre>请解释一下.</td><td class="middled"><sup>34</sup></td><td class="rightd">以下是我的解释.<ol><li>内层的<code>λ</code>表达式的体以<code>cons</code>为顶, 因为其必须要构造一个<code>Σ</code>.</li><li>内层<code>λ</code>表达式的体的<code>car</code>是<pre><code>(add1 (car list→vec<sub>es</sub>))</code></pre>因为<code>step-list→vec</code>所构造的<code>Vec</code>比<pre><code>(cdr list→vec<sub>es</sub>)</code></pre>多一个元素.</li><li>内层<code>λ</code>表达式的体的<code>cdr</code>比<code>list→vec<sub>es</sub></code>的<code>cdr</code>多一个元素, 即<code>e</code>, 于是<code>vec::</code>将其作为新元素加到开头.</li></ol></td></tr></table><table class="dialogue"><tr><td class="leftd">现在请给出<code>list→vec</code>的完整定义.</td><td class="middled"><sup>35</sup></td><td class="rightd">只需给方框填上<code>(step-list→vec E)</code>即可.<pre class="dashed"><code>(define list→vec
+  (λ (E)
+    (λ (es)
+      (rec-List es
+        (cons 0 vecnil)
+        (step-list→vec E)))))</code></pre></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>36</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>37</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>38</sup></td><td class="rightd"></td></tr></table><h2>第11章 所有的列表生来相等</h2><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>1</sup></td><td class="rightd"></td></tr></table><table class="dialogue"><tr><td class="leftd"></td><td class="middled"><sup>2</sup></td><td class="rightd"></td></tr></table></body></html>
