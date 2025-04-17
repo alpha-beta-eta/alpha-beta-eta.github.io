@@ -10195,6 +10195,35 @@ Frame 13:11.21: TODO:
     (Rd "已经迫不及待了!"))
    (H2 "所有的列表生来相等")
    ((dialogue)
+    (Ld "吃完所有的粥之后, 是时候来杯配上瑞典甜点的午后咖啡了!")
+    (Rd "哈! " (Em "Fika") "."
+        ((tcomment)
+         "在瑞典语中, fika指的是"
+         (Q "在一起喝咖啡, 吃甜点聊天的休憩时刻") ".")))
+   ((dialogue)
+    (Ld "以下是我们" (Em "fika") "的甜点清单 (list)."
+        (CodeB "(claim treats
+  (Vec Atom 3))
+(define treats
+  (vec:: 'kanelbullar
+    (vec:: 'plättar
+      (vec:: 'prinsesstårta
+        vecnil))))")
+        ((comment)
+         (Em "kanelbullar") "是肉桂卷, "
+         (Em "plättar") "是配有浆果的小煎饼, "
+         (Em "prinsesstårta")
+         "是一种由一层层海绵蛋糕, 果酱和卡仕达组成, "
+         "外面覆盖着绿色杏仁糖霜的蛋糕."))
+    (Rd "听起来很棒! 但是, " (Code "treats")
+        "和" (Code "drinks")
+        "该如何组合到一起呢?"
+        (CodeB "(claim drinks
+  (List Atom))
+(define drinks
+  (:: 'coffee
+    (:: 'cocoa nil)))")))
+   ((dialogue)
     (Ld ""
         )
     (Rd ""
