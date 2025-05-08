@@ -11139,6 +11139,106 @@ Frame 13:11.21: TODO:
         ", 我们可以使用一个" (Code "Σ")
         "表达式."))
    ((dialogue)
+    (Ld "一个" (Q "存在")
+        "陈述具有两个重要的部分: "
+        "一个是存在的这个东西的类型, "
+        "另一个是其所具有的性质."
+        (P "这里, 存在的东西的类型为" (Code "Nat")
+           ", 而其性质为恰好是偶" (Code "Nat")
+           "的一半. 这分别对应于" (Q "存在")
+           "陈述的证据的" (Code "car")
+           "和" (Code "cdr") "部分."))
+    (Rd "那么" (Code "Even") "该长什么样呢?"))
+   ((dialogue)
+    (Ld "偶性 (evenness) 的定义可以被写成是返回一个类型的函数."
+        (CodeB "(claim Even
+  (→ Nat " $U:script "))
+(define Even
+  (λ (n)
+    (Σ ((half Nat))
+      (= Nat n (double half)))))")
+        (Code "(Even 10)") "的值是什么呢?")
+    (Rd (CodeB "(Even 10)")
+        "的值为"
+        (CodeB "(Σ ((half Nat))
+  (= Nat 10 (double half)))")
+        ((tcomment)
+         "根据前文的定义, 其实" (Code "twice")
+         "比" (Code "double")
+         "更贴切, 但是作者也有自己的考量, "
+         "还请读者耐心阅读.")))
+   ((dialogue)
+    (Ld "类型" (Code "(Even 10)")
+        "中有什么值呢?")
+    (Rd "这些值看起来像" (C '(cons a d)) ", 其中"
+        (CodeB $a)
+        "是一个" (Code "Nat") ", 而"
+        (CodeB $d)
+        "是一个"
+        (CB '(= Nat 10 (double a)))))
+   ((dialogue)
+    (Ld "请找出" $a "和" $d "使得"
+        (CB '(cons a d))
+        "是一个"
+        (CodeB "(Even 10)"))
+    (Rd $a "显然应该是" (Code "5")
+        ", 因为" (Code "5")
+        "是" (Code "10") "的一半, 而"
+        (CodeB "(same 10)")
+        "是一个"
+        (CodeB "(= Nat 10 (double 5))")))
+   ((dialogue)
+    (Ld "这就是证明" (Code "10")
+        "为偶数所需的."
+        (P "那么, 证明本身是什么呢?"))
+    (Rd "这个证明即"
+        (CodeB "(cons 5
+  (same 10))")))
+   ((dialogue)
+    (Ld "这很正确. 那么" (Code "0") "如何呢?")
+    (Rd (Code "0") "的一半还是" (Code "0") "."
+        (CodeB "(claim zero-is-even
+  (Even 0))
+(define zero-is-even
+  (cons 0
+    (same 0)))")))
+   ((dialogue)
+    (Ld (Code "Even") "还可以怎么定义呢?")
+    (Rd "用" (Code "+") "也行."
+        (CodeD "(define Even
+  (λ (n)
+    (Σ ((half Nat))
+      (= Nat n (+ half half)))))")))
+   ((dialogue)
+    (Ld "这当然是成立的, 毕竟"
+        (Blockquote
+         (Q "对于每个" $n ", "
+            (C '(twice n)) "等于"
+            (C '(double n))) ".")
+        "尽管这两个函数总是返回相等的答案, "
+        "有时其中一个比另一个更容易使用, "
+        "以其更快变成值. "
+        "就这里的情形而言, " (Code "+")
+        "以及基于" (Code "+")
+        "的" (Code "twice")
+        "会在第二个参数上遗留一个"
+        (Code "add1")
+        ", 而" (Code "double")
+        "会立刻将两个" (Code "add1")
+        "搬运到顶层.")
+    (Rd ""
+        ))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
+        ))
+   ((dialogue)
     (Ld ""
         )
     (Rd ""
