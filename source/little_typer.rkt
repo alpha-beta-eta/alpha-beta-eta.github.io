@@ -8839,7 +8839,7 @@ Frame 13:11.21: TODO:
           (+ 2))))))")
         ((tcomment)
          "原文这里有一句废话, 译者删去了.")))
-   ((dialogue)
+   ((dialogue #:id "twice-equals-double-def")
     (Ld "最后, 我们应该把"
         (Code "twice=double")
         "的虚线框去掉.")
@@ -11226,8 +11226,43 @@ Frame 13:11.21: TODO:
         ", 而" (Code "double")
         "会立刻将两个" (Code "add1")
         "搬运到顶层.")
-    (Rd ""
-        ))
+    (Rd "正如" (Ref "twice-equals-double-def")
+        "中的对于" (Code "twice=double")
+        "的证明所言."
+        ((tcomment)
+         (Code "twice=double")
+         "的证明也就是"
+         (Code "twice=double")
+         "的定义.")))
+   ((dialogue)
+    (Ld "以下陈述该如何写成一个类型呢?"
+        (Blockquote
+         (Q "比每个偶数大二的数字仍为偶数") "."))
+    (Rd "好问题."))
+   ((dialogue)
+    (Ld "在将陈述转换为类型时, "
+        "更具描述性 (descriptive) 的表达可能更加实用."
+        (P "以下是言称相同陈述的另一方式:"
+           (Blockquote
+            (Q "对于每个自然数" $n
+               ", 如果" $n "是偶数, 那么"
+               (&+ $2 $n) "也是偶数") ".")))
+    (Rd (Q "每个") "听起来像是" (Code "Π") "."
+        (CodeB "(claim +two-even
+  (Π ((n Nat))
+    (→ (Even n)
+      (Even (+ 2 n)))))")))
+   ((dialogue)
+    (Ld "现在请证明它.")
+    (Rd "显然, 这个证明需要用到" (Code "ind-Nat")
+        ", 鉴于类型依赖于一个" (Code "Nat") "."))
+   ((dialogue)
+    (Ld "实际上不用归纳法也能证明."
+        (P "不过, 定义的哪些部分是能够立即写出的呢?"))
+    (Rd "以下是一个开始..."
+        (CodeD "(define +two-even
+  (λ (n e" (Sub "n") ")
+    " (Frame "...这里该填什么呢?") "))")))
    ((dialogue)
     (Ld ""
         )
