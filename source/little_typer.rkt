@@ -121,6 +121,12 @@
 (define $to (Mid "to"))
 (define $lt (Mid "lt"))
 (define $rt (Mid "rt"))
+(define $lt_1 (_ $lt $1))
+(define $lt_2 (_ $lt $2))
+(define $rt_1 (_ $rt $1))
+(define $rt_2 (_ $rt $2))
+(define $base-left (Mid "base-left"))
+(define $base-right (Mid "base-right"))
 ;very tricky, difficult to use
 (define (C exp #:constant* [constant* '(zero nil vecnil Nat Atom)]
            #:special* [special* '(U l l-1)])
@@ -314,7 +320,7 @@
    (H2: "自序")
    (P "一个程序的类型描述了其行为. " (Em "依赖类型")
       "是一个语言的一等公民, 这使得它们比其他种类的类型强大得多. "
-      "使用这样一种对于类型和程序而言的语言允许程序的描述"
+      "使用这样一种对待类型和程序的语言允许程序的描述"
       "就和其所描述的程序同等强大.")
    (P "如果你会编写程序, 那么你就能够编写证明. "
       "这或许令人惊讶&mdash;&mdash;毕竟对于大部分人而言, "
@@ -7608,11 +7614,11 @@ Frame 13:11.21: TODO:
         "中立表达式不以构造子为顶."
         ((tcomment)
          "译者认为" (Code "(λ (" $x ") (" $f " " $x "))")
-         "不一定是规范的, 因为虽然表达式" $f
-         "是中立的, 但是其并不一定是规范的. "
-         "若" $f "并非规范, 那么"
-         (Code "(λ (" $x ") (" $f " " $x "))")
-         "的体尚有进一步归约的可能性, 故并非规范."))
+         "不一定是规范的. 例如, 如果" $f
+         "是一个变量, 代表一个具有两个参数的函数, 那么"
+         (Code "(" $f " " $x ")")
+         "仍然是一个函数, 并且这个表达式还是中立的, "
+         "可以按照原文的方式进一步展开."))
     (Rd "还有其他这样的类型吗?"))
    ((dialogue)
     (Ld "是的."
@@ -11723,8 +11729,8 @@ Frame 13:11.21: TODO:
    ((law)
     (Center (Code "Either") "之律")
     (P "如果" $L "是一个类型而" $R
-        "是一个类型, 那么"
-        (C '(Either L R)) "是一个类型."))
+       "是一个类型, 那么"
+       (C '(Either L R)) "是一个类型."))
    ((dialogue)
     (Ld "其存在两个构造子. 如果" $lt
         "是一个" $L ", 那么"
@@ -11736,7 +11742,595 @@ Frame 13:11.21: TODO:
         (P "何时两个类型为" (C '(Either L R))
            "的值是相同的呢?"))
     (Rd "基于之前的类型, 以下是我的猜测."
-        
+        (P "如果" $lt_1 "和" $lt_2
+           "是相同的" $L ", 那么"
+           (Code "(left " $lt_1 ")") "和"
+           (Code "(left " $lt_2 ")")
+           "是相同的" (C '(Either L R)) ".")))
+   ((dialogue)
+    (Ld "到目前为止, 你说得很好. "
+        "不过, 还有要补充的吗?")
+    (Rd "是的, 还有一点. 如果" $rt_1 "和"
+        $rt_2 "是相同的" $R ", 那么"
+        (Code "(right " $rt_1 ")") "和"
+        (Code "(right " $rt_2 ")")
+        "是相同的" (C '(Either L R)) "."))
+   ((law)
+    (Center (Code "left") "之律")
+    (P "如果" $lt "是一个" $L ", 那么"
+       (C '(left lt)) "是一个"
+       (C '(Either L R)) "."))
+   ((law)
+    (Center (Code "right") "之律")
+    (P "如果" $rt "是一个" $R ", 那么"
+       (C '(right rt)) "是一个"
+       (C '(Either L R)) "."))
+   ((dialogue)
+    (Ld "还有其他可能性吗?")
+    (Rd "或许没有了."))
+   ((dialogue)
+    (Ld "的确以上就是所有(相同)的可能了."
+        (P (Code "Either")
+           "的消去子叫做"
+           (Code "ind-Either") "."))
+    (Rd "这并不令人意外."))
+   ((dialogue)
+    (Ld (Code "ind-Either") "拥有两个base, 但却没有step."
+        (P "为什么呢?"))
+    (Rd "这是因为尽管存在两种构造一个" (C '(Either L R))
+        "的方式, 但是" (Code "left") "和" (Code "right")
+        "都不会以某个" (C '(Either L R)) "作为参数."))
+   ((dialogue)
+    (Ld "那么, " (Code "ind-Either") "可以引入递归吗?")
+    (Rd "当然不行了, 这是因为" (Code "Either")
+        "的两个构造子" (Code "left") "和" (Code "right")
+        "均不是递归性的."))
+   ((dialogue)
+    (Ld "在一个" (Code "ind-Either") "表达式"
+        (CodeB "(ind-Either " $target "
+  " $mot "
+  " $base-left "
+  " $base-right ")")
+        "之中, " $target "是一个"
+        (C '(Either L R)) ".")
+    (Rd $mot "解释了为何" $target "会被消去吗?"))
+   ((dialogue)
+    (Ld "和往常一样, 的确如此. " $mot "的类型是一个"
+        (CB '(→ (Either L R) U))
+        $base-left "解释了对于每个" (Code "left")
+        "而言, 动机是" (Em "如何")
+        "满足的. 换言之, " $base-left "的类型为"
+        (CodeB "(Π ((x " $L "))
+  (" $mot " (left x)))"))
+    (Rd $base-right "的类型以相同的方式构建吗?"
+        ((tcomment)
+         "左边的标识符" (Code "x")
+         "也可以是其他符号, 这或许无需多言, "
+         "鉴于前面也有一些类似的情形. "
+         "关于绑定 (binding) 的微妙细节, "
+         "读者想必也是清楚的.")))
+   ((dialogue)
+    (Ld "的确如此, " $base-right
+        "解释了对于每个" (Code "right")
+        "而言, 动机是" (Em "如何") "满足的."
+        (P $base-right "的类型是什么呢?"))
+    (Rd $base-right "的类型为"
+        (CodeB "(Π ((y " $R "))
+  (" $mot " (right y)))")
+        "鉴于" (Q "每个 (every)")
+        "在写成类型时会变为" (Code "Π") "."))
+   ((dialogue)
+    (Ld (CodeB "(ind-Either (left " $x ")
+  " $mot "
+  " $base-left "
+  " $base-right ")")
+        "的值是什么呢?")
+    (Rd "其为" (Code "(" $base-left " " $x ")")
+        "的值, 这其实是可用的表达式之中唯一具有正确类型的."
+        ((tcomment)
+         "读者应该注意这里的" $x
+         "的字体和前面的" (Code "x")
+         "不同, 因为" $x "是一个类型为" $L
+         "的元变量.")))
+   ((dialogue)
+    (Ld (CodeB "(ind-Either (right " $y ")
+  " $mot "
+  " $base-left "
+  " $base-right ")")
+        "的值是什么呢?")
+    (Rd "其是" (Code "(" $base-right " " $y ")")
+        "的值, 出于相同的原因."))
+   ((law)
+    (Center (Code "ind-Either") "之律")
+    (P "如果" $target "是一个" (C '(Either L R))
+       ", " $mot "是一个"
+       (CB '(→ (Either L R) U))
+       $base-left "是一个"
+       (CodeB "(Π ((x " $L "))
+  (" $mot " (left x)))")
+       "而" $base-right "是一个"
+       (CodeB "(Π ((y " $R "))
+  (" $mot " (right y)))")
+       "那么"
+       (CodeB "(ind-Either " $target "
+  " $mot "
+  " $base-left "
+  " $base-right ")")
+       "是一个" (Code "(" $mot " " $target ")") "."))
+   ((law)
+    (Center (Code "ind-Either") "之第一诫")
+    (P (CodeB "(ind-Either (left " $x ")
+  " $mot "
+  " $base-left "
+  " $base-right ")")
+       "和" (Code "(" $base-left " " $x ")")
+       "是相同的" (Code "(" $mot " (left " $x "))") "."))
+   ((law)
+    (Center (Code "ind-Either") "之第二诫")
+    (P (CodeB "(ind-Either (right " $y ")
+  " $mot "
+  " $base-left "
+  " $base-right ")")
+       "和" (Code "(" $base-right " " $y ")")
+       "是相同的" (Code "(" $mot " (right " $y "))") "."))
+   ((dialogue #:id "even-or-odd-claim")
+    (Ld "现在我们知道该如何将之前的陈述写成类型了, 即"
+        (Blockquote
+         (Q "每个自然数都是偶数或者奇数") ".")
+        (CodeB "(claim even-or-odd
+  (Π ((n Nat))
+    (Either (Even n) (Odd n))))"))
+    (Rd "这是一条关于所有" (Code "Nat")
+        "的声明, 那么其证明需要使用"
+        (Code "ind-Nat") "吗?"))
+   ((dialogue)
+    (Ld "是的, 的确如此."
+        (P (Code "mot-even-or-odd")
+           "描述了消去的意图. "
+           "请尝试在不先找出base的情况下定义动机."
+           (CodeB "(claim mot-even-or-odd
+  (→ Nat " $U:script "))")))
+    (Rd "我们可以对于" (Ref "even-or-odd-claim")
+        "中的" (Code "n") "进行抽象."
+        (CodeB "(define mot-even-or-odd
+  (λ (k)
+    (Either (Even k) (Odd k))))")))
+   ((dialogue)
+    (Ld "不错的选择."
+        (P "base是什么呢?"))
+    (Rd "这个base是一个"
+        (CodeB "(Either (Even zero) (Odd zero))")
+        "而" (Code "zero") "恰好是一个偶数."))
+   ((dialogue)
+    (Ld "听起来有点熟悉?")
+    (Rd "当然咯."
+        (P "这个base应该是"
+           (CodeB "(left zero-is-even)"))))
+   ((dialogue)
+    (Ld "是的."
+        (P "step的类型是什么呢?"))
+    (Rd "step的类型可以使用动机得到."
+        (CodeB "(claim step-even-or-odd
+  (Π ((n-1 Nat))
+    (→ (mot-even-or-odd n-1)
+      (mot-even-or-odd (add1 n-1)))))")))
+   ((dialogue)
+    (Ld "现在请定义" (Code "step-even-or-odd") ".")
+    (Rd "以下是我们的开始..."
+        (CodeD "(define step-even-or-odd
+  (λ (n-1)
+    (λ (e-or-o" (Sub "n-1") ")
+      " (Frame "...但是这里该填什么呢?") ")))")))
+   ((dialogue)
+    (Ld (Code "e-or-o" (Sub "n-1")) "的类型是什么?")
+    (Rd "这个类型来源于step的声明."
+        (same-as
+         (CodeI "(mot-even-or-odd n-1)")
+         (CodeI "(Either (Even n-1) (Odd n-1))"))))
+   ((dialogue)
+    (Ld (Code "Either") "的消去子是什么?")
+    (Rd "当然是" (Code "ind-Either") "了."))
+   ((dialogue)
+    (Ld "所以说请消去它.")
+    (Rd "以下是一个带有三个要填的空白方框的版本."
+        (CodeD "(define step-even-or-odd
+  (λ (n-1)
+    (λ (e-or-o" (Sub "n-1") ")
+      (ind-Either e-or-o" (Sub "n-1") "
+        " (Frame "                    ") "
+        " (Frame "                    ") "
+        " (Frame "                    ") "))))")))
+   ((dialogue)
+    (Ld "这真是不错的开始."
+        (P "动机是什么呢?"))
+    (Rd "根据" (Code "step-even-or-odd")
+        "的声明, 这个消去过程应该产生一个"
+        (CodeB "(mot-even-or-odd (add1 n-1))")))
+   ((dialogue #:id "step-even-or-odd-def2")
+    (Ld "这次请尝试使用" (Code "λ")
+        "表达式而不是单独定义动机. "
+        "动机的参数是消去的target, "
+        "不过这个消去并没有产生依赖于target的类型, "
+        "故动机的参数是黯淡的."
+        ((tcomment)
+         "这里或许应该理解为消去所产生的值的类型"
+         "并不依赖于其target."))
+    (Rd "比起单独定义动机, 使用"
+        (Code "λ") "表达式要短上许多."
+        (CodeD "(define step-even-or-odd
+  (λ (n-1)
+    (λ (e-or-o" (Sub "n-1") ")
+      (ind-Either e-or-o" (Sub "n-1") "
+        (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+          (mot-even-or-odd
+            (add1 n-1)))
+        " (Frame "                    ") "
+        " (Frame "                    ") "))))")))
+   ((dialogue)
+    (Ld "是的, 的确更短. 不过, 更短不总是意味着更容易阅读. "
+        "每次动笔编写程序时, "
+        "请比较两种风格并判断到底哪一种更容易理解."
+        (P "当" (Code "n-1") "为偶数时, "
+           (Code "(add1 n-1)") "为奇数的证据是什么呢?"))
+    (Rd "这个证据可以由" (Code "add1-even→odd")
+        "构造出来."))
+   ((dialogue)
+    (Ld (Ref "step-even-or-odd-def2")
+        "的第一个空白方框是一个"
+        (CodeB "(→ (Even n-1)
+  (Either
+    (Even (add1 n-1))
+    (Odd (add1 n-1))))"))
+    (Rd (Code "ind-Either") "之律言称"
+        (Code "left") "的base应该是一个"
+        (CodeB "(Π ((x " $L "))
+  (" $mot " (left x)))")
+        "那么为什么这个空白方框的类型不以"
+        (Code "Π") "为顶呢?"))
+   ((dialogue)
+    (Ld "这个类型的确以" (Code "Π")
+        "为顶, 因为" (Code "→") "是" (Code "Π")
+        "在其参数未被用到时的另一种写法, 见"
+        (Ref "arrow-and-pi") ".")
+    (Rd "鉴于" (Code "(add1 n-1)")
+        "是奇数, 所以我们应该使用"
+        (Code "right") ":"
+        (CodeB "(λ (e" (Sub "n-1") ")
+  (right
+    (add1-even→odd n-1 e" (Sub "n-1") ")))")))
+   ((dialogue)
+    (Ld "是这样的."
+        (P "那么, 第二个空白方框该填什么呢?"))
+    (Rd "在这个方框里, " (Code "n-1")
+        "为奇数. 因此, " (Code "(add1 n-1)")
+        "是偶数, 而我们应该使用" (Code "left") ":"
+        (CodeB "(λ (o" (Sub "n-1") ")
+  (left
+    (add1-odd→even n-1 o" (Sub "n-1") ")))")))
+   ((dialogue)
+    (Ld "现在请将以上部件组装为"
+        (Code "step-even-or-odd")
+        "的定义.")
+    (Rd "给空白方框填上就行."
+        (CodeB "(define step-even-or-odd
+  (λ (n-1)
+    (λ (e-or-o" (Sub "n-1") ")
+      (ind-Either e-or-o" (Sub "n-1") "
+        (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+          (mot-even-or-odd
+            (add1 n-1)))
+        (λ (e" (Sub "n-1") ")
+          (right
+            (add1-even→odd
+              n-1 e" (Sub "n-1") ")))
+        (λ (o" (Sub "n-1") ")
+          (left
+            (add1-odd→even
+              n-1 o" (Sub "n-1") ")))))))")))
+   ((dialogue)
+    (Ld "现在请定义" (Code "even-or-odd") ".")
+    (Rd "所有组件皆已就位."
+        (CodeB "(define even-or-odd
+  (λ (n)
+    (ind-Nat n
+      mot-even-or-odd
+      (left zero-is-even)
+      step-even-or-odd)))")))
+   ((dialogue)
+    (Ld (Code "even-or-odd") "是对于"
+        (Blockquote
+         (Q "每个自然数都是偶数或者奇数"))
+        "的证明, 但是这又不仅仅是一个证明"
+        "&mdash;&mdash;"
+        "其是一个" (Code "λ")
+        "表达式, 在接受一个参数时会产生一个值.")
+    (Rd "其总是会产生一个值, "
+        "鉴于所有函数都是完全的."
+        (P "这个值很有趣吗?")))
+   ((dialogue)
+    (Ld "让我们看看."
+        (P (Code "(even-or-odd 2)")
+           "的值是什么?"))
+    (Rd "这是个有趣的问题."))
+   ((dialogue)
+    (Ld "请为冗长的" (Q "相同于")
+        "图表作好准备, 以下是我们的开始."
+        (same-as
+         (CodeI "(even-or-odd 2)")
+         (CodeI "((λ (n)
+   (ind-Nat n
+     mot-even-or-odd
+     (left zero-is-even)
+     step-even-or-odd))
+ 2)")
+         (CodeI "(ind-Nat 2 ...)")
+         (CodeI "(step-even-or-odd
+  1
+  (ind-Nat 1 ...))"))
+        "在这个图表里, 省略号"
+        (Code "...") "代表"
+        (Code "ind-Nat") "或者"
+        (Code "ind-Either")
+        "的参数压根没有发生变化.")
+    (Rd "接着写."
+        (same-as
+         #:attr* '((start "5"))
+         (CodeI "((λ (n-1)
+   (λ (e-or-o" (Sub "n-1") ")
+     (ind-Either e-or-o" (Sub "n-1") "
+       (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+         (mot-even-or-odd
+           (add1 n-1)))
+       (λ (e" (Sub "n-1") ")
+         (right
+           (add1-even→odd
+             n-1 e" (Sub "n-1") ")))
+       (λ (o" (Sub "n-1") ")
+         (left
+           (add1-odd→even
+             n-1 o" (Sub "n-1") "))))))
+ 1 (ind-Nat 1 ...))"))))
+   ((dialogue)
+    (Ld "在每一步时, 请寻找表达式中变与不变的部分."
+        (P "请你试着识别出现了多次的动机, base和step."))
+    (Rd "target是什么情况呢?"))
+   ((dialogue)
+    (Ld "一般而言, target鲜有重复, 不过也值得一看."
+        (same-as
+         #:attr* '((start "6"))
+         (CodeI "((λ (e-or-o" (Sub "n-1") ")
+   (ind-Either e-or-o" (Sub "n-1") "
+     (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+       (mot-even-or-odd 2))
+     (λ (e" (Sub "n-1") ")
+       (right
+         (add1-even→odd
+           1 e" (Sub "n-1") ")))
+     (λ (o" (Sub "n-1") ")
+       (left
+         (add1-odd→even
+           1 o" (Sub "n-1") ")))))
+ (ind-Nat 1 ...))")
+         (CodeI "(ind-Either (ind-Nat 1 ...)
+  (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+    (mot-even-or-odd 2))
+  (λ (e" (Sub "n-1") ")
+    (right
+      (add1-even→odd
+        1 e" (Sub "n-1") ")))
+  (λ (o" (Sub "n-1") ")
+    (left
+      (add1-odd→even
+        1 o" (Sub "n-1") "))))")))
+    (Rd "啊, 这是因为一旦找到了target的值之后, "
+        "就会开始选择base或者step."
+        (same-as
+         #:attr* '((start "8"))
+         (CodeI "(ind-Either
+  (step-even-or-odd
+    0
+    (ind-Nat 0 ...))
+  (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+    (mot-even-or-odd 2))
+  (λ (e" (Sub "n-1") ")
+    (right
+      (add1-even→odd
+        1 e" (Sub "n-1") ")))
+  (λ (o" (Sub "n-1") ")
+    (left
+      (add1-odd→even
+        1 o" (Sub "n-1") "))))")
+         (CodeI "(ind-Either
+  ((λ (n-1)
+     (λ (e-or-o" (Sub "n-1") ")
+       (ind-Either e-or-o" (Sub "n-1") "
+         ...)))
+   0 (ind-Nat 0 ...))
+  (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+    (mot-even-or-odd 2))
+  (λ (e" (Sub "n-1") ")
+    (right
+      (add1-even→odd
+        1 e" (Sub "n-1") ")))
+  (λ (o" (Sub "n-1") ")
+    (left
+      (add1-odd→even
+        1 o" (Sub "n-1") "))))"))))
+   ((dialogue)
+    (Ld (same-as
+         #:attr* '((start "10"))
+         (CodeI "(ind-Either
+  ((λ (e-or-o" (Sub "n-1") ")
+     (ind-Either e-or-o" (Sub "n-1") "
+       (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+         (mot-even-or-odd 1))
+       (λ (e" (Sub "n-1") ")
+         (right
+           (add1-even→odd
+             0 e" (Sub "n-1") ")))
+       (λ (o" (Sub "n-1") ")
+         (left
+           (add1-odd→even
+             0 o" (Sub "n-1") ")))))
+   (ind-Nat 0 ...))
+  (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+    (mot-even-or-odd 2))
+  (λ (e" (Sub "n-1") ")
+    (right
+      (add1-even→odd
+        1 e" (Sub "n-1") ")))
+  (λ (o" (Sub "n-1") ")
+    (left
+      (add1-odd→even
+        1 o" (Sub "n-1") "))))")))
+    (Rd (same-as
+         #:attr* '((start "11"))
+         (CodeI "(ind-Either
+  ((λ (e" (Sub "n-1") ")
+     (right
+       (add1-even→odd
+         0 e" (Sub "n-1") ")))
+   zero-is-even)
+  (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+    (mot-even-or-odd 2))
+  (λ (e" (Sub "n-1") ")
+    (right
+      (add1-even→odd
+        1 e" (Sub "n-1") ")))
+  (λ (o" (Sub "n-1") ")
+    (left
+      (add1-odd→even
+        1 o" (Sub "n-1") "))))")
+         (CodeI "(ind-Either
+  (right
+    (add1-even→odd
+      0 zero-is-even))
+  (λ (" (Dim "e-or-o" (Sub "n-1")) ")
+    (mot-even-or-odd 2))
+  (λ (e" (Sub "n-1") ")
+    (right
+      (add1-even→odd
+        1 e" (Sub "n-1") ")))
+  (λ (o" (Sub "n-1") ")
+    (left
+      (add1-odd→even
+        1 o" (Sub "n-1") "))))"))))
+   ((dialogue)
+    (Ld (same-as
+         #:attr* '((start "13"))
+         (CodeI "((λ (o" (Sub "n-1") ")
+   (left
+     (add1-odd→even
+       1 o" (Sub "n-1") ")))
+ (add1-even→odd
+   0 zero-is-even))")))
+    (Rd (same-as
+         #:attr* '((start "14"))
+         (CodeI "(left
+  (add1-odd→even
+    1
+    (add1-even→odd
+      0
+      zero-is-even)))"))
+        "这个图表目前的最后一个表达式是一个值."
+        (P "Whew!")))
+   ((dialogue)
+    (Ld (CodeB "(left
+  (add1-odd→even
+    1
+    (add1-even→odd
+      0
+      zero-is-even)))")
+        "的确是一个值."
+        (P "我们可以从这个值中了解到什么信息呢?"))
+    (Rd "根据这个值, 显然我们可以判断出" (Code "2")
+        "是偶数, 因为这个值以" (Code "left") "为顶."))
+   ((dialogue)
+    (Ld "在当前的情况下, 还有更多的信息值得挖掘."
+        (P "请找出"
+           (CodeB "(left
+  (add1-odd→even
+    1
+    (add1-even→odd
+      0
+      zero-is-even)))")
+           "的规范形式."))
+    (Rd "找出这个规范形式的第一步是将"
+        (Code "add1-odd→even")
+        "替换为其定义."))
+   ((dialogue)
+    (Ld "是这样的."
+        (same-as
+         #:attr* '((start "15"))
+         (CodeI "(left
+  ((λ (" (Dim "n") " o" (Sub "n") ")
+     (cons (add1 (car o" (Sub "n") "))
+       (cong (cdr o" (Sub "n") ") (+ 1))))
+    1
+    (add1-even→odd
+      0
+      zero-is-even)))"))
+        "下一步是什么呢?")
+    (Rd "下一步是将" (Code (Dim "n"))
+        "替换为" (Code "1") "以及将"
+        (Code "add1-even→odd")
+        "替换为其定义."
+        (same-as
+         #:attr* '((start "16"))
+         (CodeI "(left
+  ((λ (o" (Sub "n") ")
+     (cons (add1 (car o" (Sub "n") "))
+       (cong (cdr o" (Sub "n") ") (+ 1))))
+    ((λ (" (Dim "n") " e" (Sub "n") ")
+       (cons (car e" (Sub "n") ")
+         (cong (cdr e" (Sub "n") ") (+ 1))))
+      0
+      zero-is-even)))"))))
+   ((dialogue)
+    (Ld "然后我们应该顺便展开"
+        (Code "zero-is-even")
+        "的定义."
+        (same-as
+         #:attr* '((start "17"))
+         (CodeI "(left
+  ((λ (o" (Sub "n") ")
+     (cons (add1 (car o" (Sub "n") "))
+       (cong (cdr o" (Sub "n") ") (+ 1))))
+    ((λ (e" (Sub "n") ")
+       (cons (car e" (Sub "n") ")
+         (cong (cdr e" (Sub "n") ")
+           (+ 1))))
+      zero-is-even)))")
+         (CodeI "(left
+  ((λ (o" (Sub "n") ")
+     (cons (add1 (car o" (Sub "n") "))
+       (cong (cdr o" (Sub "n") ") (+ 1))))
+    ((λ (e" (Sub "n") ")
+       (cons (car e" (Sub "n") ")
+         (cong (cdr e" (Sub "n") ")
+           (+ 1))))
+      (cons 0 (same 0)))))"))
+        "接着呢?")
+    (Rd "接着, 找出" (Code "e" (Sub "n"))
+        "的" (Code "car") "和" (Code "cdr")
+        "部分."
+        (same-as
+         #:attr* '((start "19"))
+         (CodeI "(left
+  ((λ (o" (Sub "n") ")
+     (cons (add1 (car o" (Sub "n") "))
+       (cong (cdr o" (Sub "n") ") (+ 1))))
+    (cons 0
+      (cong (same 0) (+ 1)))))"))
+        "下一步似乎我们应该找出"
+        (CodeB "(cong (same 0) (+ 1))")
+        "的值, 而根据" (Code "cong")
+        "之诫, 其值为"
+        (CodeB "(same 1)")))
+   ((dialogue)
+    (Ld ""
+        )
+    (Rd ""
         ))
    ((dialogue)
     (Ld ""
