@@ -8,6 +8,7 @@
    (H1 "一些没用的笔记")
    (P "我又幻想了.")
    (columnize
+    (H2 (A "摆弄SICP图形语言" #:attr* '((href "picture.html"))))
     (H2 (A "The Ship of Theseus" #:attr* '((href "Ship-of-Theseus.html"))))
     (H2 (A "语义工程和PLT Redex笔记" #:attr* '((href "sewpr.html"))))
     (H2 (A "Miscellaneous Notes" #:attr* '((href "misc.html"))))

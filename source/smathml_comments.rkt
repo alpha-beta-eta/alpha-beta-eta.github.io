@@ -35,6 +35,31 @@
     ((C A) (app (_ $Aut C) A))))")
    (CodeB "(define (_cm A . x*)
   (_ A (apply &cm x*)))")
+   (CodeB "(define (|[]| a b)
+  (: $lb a $cm b $rb))
+(define (|()| a b)
+  (: $lp a $cm b $rp))
+(define (|[)| a b)
+  (: $lb a $cm b $rp))
+(define (|(]| a b)
+  (: $lp a $cm b $rb))")
+   (CodeB "(define-syntax-rule (define-simple* (&id $id str) ...)
+  (begin
+    (define $id (Mi str))
+    ...
+    (define (&id x) (app $id x))
+    ...))")
+   (CodeB "(define (MBL label exp)
+  (MB (Mtable #:attr*
+              '((columnalign &quot;left center right&quot;)
+                (width &quot;100%&quot;))
+              (Mtr (Mtd (Mphantom label))
+                   (Mtd exp)
+                   (Mtd label)))))")
+   (CodeB "(define app*
+  (case-lambda
+    ((f x) (app f x))
+    ((f g . arg*) (app f (apply app* g arg*)))))")
    (H2 "关于引用")
    (P "之前我的设计太过局限, 让引用在一开始就生成, "
       "然而更好的方式是将其设计成一个接受上下文信息的函数. "

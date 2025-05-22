@@ -3,11 +3,27 @@
 (require SMathML)
 (define (|[]| a b)
   (: $lb a $cm b $rb))
+(define (|()| a b)
+  (: $lp a $cm b $rp))
+(define (|[)| a b)
+  (: $lb a $cm b $rp))
+(define (|(]| a b)
+  (: $lp a $cm b $rb))
 (define (lc . arg*)
   (apply &+ (map2 &i* arg*)))
 (define $conv (Mi "conv"))
 (define (&conv S)
   (app $conv S))
+(define $\|
+  (Mo "|" #:attr* '((stretchy "true"))))
+(define (SetI a b)
+  (: $lc a $\| b $rc))
+(define ∀
+  (case-lambda
+    ((x) (: $forall x))
+    ((x . arg*) (: $forall (apply ∈ x arg*)))))
+(define (&∀ P . arg*)
+  (: P (apply ∀ arg*)))
 (define cmu15458.html
   (TnTmPrelude
    #:title "CMU 15-458 离散微分几何笔记"
@@ -69,5 +85,31 @@
    ((definition #:n ". 单纯形 (simplex)")
     "一个" $k "-单纯形是" (&+ $k $1) "个仿射无关的点的凸包, "
     "这些点被我们称为顶点 (vertex).")
-   
+   ((example)
+    "一个" $0 "-单纯形是一个点, 一个" $1 "-单纯形是一个线段, 一个"
+    $2 "-单纯形是一个三角形, 一个" $3 "-单纯形是一个四面体, 在"
+    (&>= $k $4) "的情况下一个" $k "-单纯形没有什么人类可以直接想象的几何直观.")
+   ((definition #:n ". 重心坐标 (barycentric coordinate)")
+    "我们可以使用重心坐标以更显式地描述一个单纯形. 如果一个" $k
+    "-单纯形" $sigma "的" (&+ $k $1) "个顶点为" (&cm $p_0 $..h $p_k)
+    ", 那么我们可以将" $sigma "的每个点表示为其顶点的凸组合 (convex combination). "
+    "换言之, 我们要求权重都" (&>= $ $0) "且这些权重之和为" $1
+    ". 而且, 单纯形" $sigma "其实就是由其顶点的所有凸组合构成的集合."
+    (MB (&= $sigma
+            (SetI (sum (&= $i $0) $k (&i* $t_i $p_i))
+                  (&cm (&= (sum (&= $i $0) $k $t_i) $1)
+                       (&∀ (&>= $t_i $0) $i)))))
+    "这些权重" $t_i "就被称为重心坐标. 更一般地说, "
+    "一些点的所有凸组合构成的集合形成了这些点的凸包, "
+    "不论其是否是仿射无关的.")
+   ((definition #:n ". 标准单纯形 (standard simplex)")
+    "标准" $n "-单纯形是点集"
+    (MB (&:= $sigma
+             (SetI (∈ (tu0 $x_0 $..h $x_n)
+                      (^ $RR (&+ $n $1)))
+                   (&cm (&= (sum (&= $i $0) $n $x_i) $1)
+                        (&∀ (&>= $x_i $0) $i)))) "."))
+   ((definition #:n ". 单纯复形 (simplicial complex)")
+    
+    )
    ))

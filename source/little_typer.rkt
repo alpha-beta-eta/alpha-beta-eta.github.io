@@ -12644,7 +12644,10 @@ Frame 13:11.21: TODO:
         "而言的" (Code "list-ref") "呢?")
     (Rd "对于" (Code "n-1") "而言的"
         (Code "list-ref")
-        "可以被应用于列表的尾部 (tail)."))
+        "可以被应用于列表的尾部 (tail)."
+        ((tcomment)
+         "按照之前的习惯, 或许左边的" (Code "n")
+         "应该写成" (Code "(add1 n-1)") ".")))
    ((dialogue)
     (Ld "请完成以下定义."
         (CodeD "(define step-list-ref
@@ -12757,7 +12760,12 @@ Frame 13:11.21: TODO:
         ", " $U:script ", 以及" (Code "Trivial")
         "也总是类型.")
     (Rd "这可真简单."
-        (P (Code "Absurd") "的值有什么呢?")))
+        (P (Code "Absurd") "的值有什么呢?")
+        ((tcomment)
+         "这里所说的" (Q (Code "Absurd") "的值")
+         ", 指的并不是与表达式" (Code "Absurd")
+         "相同的值, 而是具有类型" (Code "Absurd")
+         "的值, 下面出现相同表述时也是这样理解.")))
    ((law)
     (Center (Code "Absurd") "之律")
     (P (Code "Absurd") "是一个类型."))
@@ -12792,6 +12800,234 @@ Frame 13:11.21: TODO:
     (P "每个具有类型" (Code "Absurd")
        "的表达式都是中立的, "
        "而它们都是相同的."))
+   ((dialogue)
+    (Ld "尽管并没有方法可以构造一个"
+        (Code "Absurd") "的值, 但是"
+        (Code "Absurd") "却有一个消去子."
+        (P "一种看待消去子的角度是将其当作暴露"
+           "一个构造子之中所蕴含的信息的手段, "
+           "另一种看待消去子的角度是将其当作"
+           "为这个类型的每个值挑选 (pick) "
+           "某个新表达式的方法."))
+    (Rd (Code "length") "为每个" (Code "List")
+        "挑选一个" (Code "Nat") ", 而"
+        (Code "peas") "为每个" (Code "Nat")
+        " " $l:script "挑选一个"
+        (C '(Vec Atom l)) "."))
+   ((dialogue)
+    (Ld "通过为每个值挑选一个新的表达式, "
+        "消去子表达式自身有着由动机所给出的类型."
+        (P "为了使用" (Code "Absurd")
+           "的消去子, 只需要为每个" (Code "Absurd")
+           "的值提供一个新的表达式."))
+    (Rd "并不存在" (Code "Absurd") "的值."))
+   ((dialogue)
+    (Ld "诚然如此."
+        (P (Code "Absurd") "的消去子 (叫做"
+           (Code "ind-Absurd") ") 既没有"
+           "base也没有step, 因为并不存在"
+           (Code "Absurd") "的值."))
+    (Rd "那会是什么样的呢?"))
+   ((dialogue)
+    (Ld "其只有一个target和一个动机."
+        (P "表达式"
+           (CodeB "(ind-Absurd " $target "
+  " $mot ")")
+           "是一个" $mot ", 如果"
+           $target "是一个" (Code "Absurd")
+           ", 而" $mot "是一个" $U:script "."))
+    (Rd "为什么" $mot "不是一个函数呢?"))
+   ((dialogue)
+    (Ld "并无" (Code "Absurd")
+        "的值可提供给动机作为其target."
+        (P "其他消去子的动机要取参数的原因"
+           "在于消去子表达式的类型可以提及target. "
+           "这对于" (Code "ind-Absurd")
+           "的动机而言是不必要的, "
+           "因为永远也不会有一个(作为"
+           (Code "Absurd") "的值的)target."))
+    (Rd "既然" $target "永远也不会是一个值, 那么"
+        (Code "ind-Absurd") "的用意何在呢?"))
+   ((law)
+    (Center (Code "ind-Absurd") "之律")
+    (P "表达式"
+       (CodeB "(ind-Absurd " $target "
+  " $mot ")")
+       "是一个" $mot ", 如果"
+       $target "是一个" (Code "Absurd")
+       ", 而" $mot "是一个" $U:script "."))
+   ((dialogue)
+    (Ld "它是用来表达某个表达式永远也不能被求值, "
+        "换言之就是这个表达式永远是中立的.")
+    (Rd "而中立表达式尚不能被求值的原因在于"
+        "其变量的值还尚未可知."))
+   ((dialogue)
+    (Ld "对于每个" (Code "Nat") " " $n
+        ", " (C '(Fin n)) "应该是一个具有"
+        $n "个值的类型."
+        (CodeB "(claim Fin
+  (→ Nat " $U:script "))")
+        "表达式" (Code "(Fin zero)")
+        "的值应该是什么呢?")
+    (Rd "类型" (Code "(Fin zero)")
+        "应该具有零个值, 所以说"
+        (Code "Absurd") "是合适的."))
+   ((dialogue)
+    (Ld "以下是对于" (Code "Fin") "的定义的开始."
+        (CodeD "(define Fin
+  (λ (n)
+    (iter-Nat n
+      Absurd
+      " (Frame (make-string 15 #\space)) ")))")
+        "空白方框里该填上什么东西呢?")
+    (Rd "空白方框里要填的是" (Code "Fin")
+        "的step, 其应该将一个具有" (Code "n-1")
+        "个值的类型转换为一个具有" (Code "n")
+        "个值的类型."
+        ((tcomment)
+         "按照之前的习惯, 或许这里的" (Code "n")
+         "应该写成" (Code "(add1 n-1)") ".")))
+   ((dialogue)
+    (Ld "以下类型有多少个值呢?"
+        (CodeB "(Maybe Absurd)"))
+    (Rd "只有一个, 那就是"
+        (CodeB "(nothing Absurd)")
+        "其规范形式为"
+        (CodeB "(right sole)")
+        ((tcomment)
+         "到现在为止, 读者可以看出来其实本书中的"
+         (Q "值") "有着多种不同的含义, "
+         "一种含义是本书开头章节所引入的"
+         "良类型的以构造子/类型构造子为顶的表达式, "
+         "另一种含义则在本章频繁出现, "
+         "其要求的是或可以说成" (Q "真正的值")
+         ", 其中不含有未确定下意义的变量之类的东西.")))
+   ((dialogue)
+    (Ld (Code "Either") "的构造子"
+        (Code "left") "呢?")
+    (Rd "那需要一个" (Code "Absurd")
+        "的值, 但是实际上并不存在"
+        (Code "Absurd") "的值."))
+   ((dialogue #:id "Fin2")
+    (Ld "以下类型有多少个值呢?"
+        (CodeB "(Maybe
+  (Maybe Absurd))"))
+    (Rd "存在两种可能性:"
+        (CodeB "(nothing (Maybe Absurd))")
+        "以及"
+        (CodeB "(just (Maybe Absurd)
+  (nothing Absurd))")))
+   ((dialogue)
+    (Ld "基于以上的例子, 如果一个类型"
+        $X "有着" $n "个值, 那么"
+        (CB '(Maybe X))
+        "有着多少个值呢?")
+    (Rd "其拥有" (C '(add1 n))
+        "个值, 因为" (Code "Maybe")
+        "总是会添加一个值, 即"
+        (C '(nothing X)) "."))
+   ((dialogue #:id "Fin-def")
+    (Ld "的确如此.")
+    (Rd "以下就是" (Code "Fin") "的定义了."
+        (CodeB "(define Fin
+  (λ (n)
+    (iter-Nat n
+      Absurd
+      Maybe)))")))
+   ((dialogue)
+    (Ld "表达式" (Code "(Fin 1)")
+        "的规范形式是什么呢?")
+    (Rd (same-as
+         (CodeI "(Fin 1)")
+         (CodeI "(Maybe Absurd)")
+         (CodeI "(Either Absurd Trivial)"))
+        "这个类型拥有" (Code "1") "个值."))
+   ((dialogue)
+    (Ld "表达式" (Code "(Fin 2)")
+        "的规范形式是什么呢?")
+    (Rd "其是"
+        (CodeB "(Maybe
+  (Maybe Absurd))")
+        "或者更准确地说应该是"
+        (CodeB "(Either (Either Absurd
+          Trivial)
+  Trivial)")
+        "这个类型拥有" (Code "2") "个值."
+        ((tcomment)
+         "不过, 读者其实应该知道"
+         (CodeB "(Maybe
+  (Maybe Absurd))")
+         "并非规范形式, "
+         "但是其离规范形式相差的也就只是展开"
+         (Code "Maybe") "的定义并进行直截了当的"
+         $beta "代入而已.")))
+   ((dialogue)
+    (Ld "为了使用" (Code "Fin")
+        "来从一个" (Code "Vec")
+        "之中挑选出元素, "
+        "我们有必要决定哪个" (Code "Fin")
+        "指向哪个元素."
+        (P "当一个" (Code "Vec")
+           "有着" (C '(add1 n))
+           "个元素时, 我们使用"
+           (C '(fzero n))
+           "来从这个" (Code "Vec")
+           "之中找出其第一个元素."
+           (CodeB "(claim fzero
+  (Π ((n Nat))
+    (Fin (add1 n))))")))
+    (Rd "这是因为当长度为" (Code "zero")
+        "时其中并无元素."))
+   ((dialogue)
+    (Ld "请你再看一眼" (Ref "Fin-def")
+        "之中对于" (Code "Fin")
+        "的定义, 另一种写下" (Code "fzero")
+        "的类型的方式是什么呢?")
+    (Rd (Code "iter-Nat") "会在其target以"
+        (Code "add1") "为顶时应用其step, 故"
+        (Code "fzero") "的类型和"
+        (CodeB "(Π ((n Nat))
+  (Maybe (Fin n)))")
+        "是相同的类型."))
+   ((dialogue)
+    (Ld "在这个类型之中, " (Code "(Fin n)")
+        "的值有什么呢?")
+    (Rd "那取决于" (Code "n") "的值."))
+   ((dialogue)
+    (Ld "这意味着" (Code "fzero")
+        "的定义的一个好选择是...")
+    (Rd "..." (Code "(nothing (Fin n))")
+        ", 即便它是某个东西 (something) "
+        "而不是什么都不是 (nothing)."))
+   ((dialogue)
+    (Ld "很好的选择, 现在请定义"
+        (Code "fzero") ".")
+    (Rd "以下就是了."
+        (CodeB "(define fzero
+  (λ (n)
+    (nothing (Fin n))))")))
+   ((dialogue)
+    (Ld "正如" (C '(fzero n))
+        "指向了一个"
+        (C '(Vec X (add1 n)))
+        "的头部, " (Code "fadd1")
+        "指向了其尾部中的某个地方."
+        (CodeB "(claim fadd1
+  (Π ((n Nat))
+    (→ (Fin n)
+      (Fin (add1 n)))))"))
+    (Rd "为什么这里的两个" (Code "Fin")
+        "有着不同的参数呢?"))
+   ((dialogue)
+    (Ld "看一看" (Ref "Fin2")
+        ", " (Code "(Fin 2)")
+        "拥有两个值, 其中第一个是"
+        (CodeB "(nothing (Maybe Absurd))")
+        "也就是" (Code "(fzero 1)") "."
+        (P "另外一个值是什么呢?"))
+    (Rd "另一个是"
+        (CodeB "(just (Maybe Absurd)
+  (nothing Absurd))")))
    ((dialogue)
     (Ld ""
         )
