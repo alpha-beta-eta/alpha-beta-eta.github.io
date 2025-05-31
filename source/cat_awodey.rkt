@@ -3,9 +3,19 @@
 (require SMathML)
 (define $<=_A (_ $<= $A))
 (define $<=_B (_ $<= $B))
+(define $& (Mo "&amp;"))
 (define-infix*
   (&<=_A $<=_A)
-  (&<=_B $<=_B))
+  (&<=_B $<=_B)
+  (&& $&))
+(define $.
+  (Mo "." #:attr* '((lspace "0"))))
+(define (card A)
+  (&abs A))
+(define (∃ Q P)
+  (: $exists Q $. P))
+(define (_cm A . x*)
+  (_ A (apply &cm x*)))
 (define todo.svg
   (Svg
    #:attr* '((width "320")
@@ -34,7 +44,8 @@
   (&dom $dom "dom")
   (&cod $cod "cod"))
 (define-@lized-op*
-  (@compose &compose))
+  (@compose &compose)
+  (@_cm _cm))
 (define (make-cat str)
   (Mi str #:attr* '((mathvariant "bold"))))
 (define-syntax-rule (define-cat* (id str) ...)
@@ -43,7 +54,8 @@
     ...))
 (define-cat*
   (Sets "Sets")
-  (Pos "Pos"))
+  (Pos "Pos")
+  (Rel "Rel"))
 (define $fin (Mi "fin"))
 (define Sets_fin (_ Sets $fin))
 (define (MBL label exp)
@@ -88,7 +100,8 @@
   (begin (define id (Entry name class))
          ...))
 (define-Entry*
-  (Definition "定义" "definition"))
+  (Definition "定义" "definition")
+  (Remark "评注" "remark"))
 (define cat_awodey.html
   (TnTmPrelude
    #:title "范畴论笔记"
@@ -357,6 +370,45 @@
        (Li "到目前为止我们已经考虑了的范畴是有时叫做"
            (Em "具体范畴(concrete category)")
            "的东西的例子. 非形式化地说, "
+           "存在着这样的范畴, 其对象是集合, "
+           "可能装备有某种结构, 而箭头是特定的函数, "
+           "可能保持结构 (我们将在之后看到这个想法"
+           "并非逻辑一致的; 见评注1.7). "
+           "但是, 实际上一种理解范畴论的方式全然在于"
+           (Q "不用元素 (doing without elements)") "而代之以箭头. "
+           "让我们来看看一些例子, "
+           "其中这种观点并不仅是可选的, 而是不可避免的." (Br)
+           "令" Rel "是以下范畴: 取集合为对象而二元关系为箭头. "
+           "也就是说, 一个箭头" (Arrow $f $A $B)
+           "是一个任意的子集" (&sube $f (&c* $A $B))
+           ". 一个集合" $A "上的恒等箭头即是恒等关系,"
+           (MB (&= $1_A
+                   (&sube (setI (∈ (tu0 $a $a)
+                                   (&c* $A $A))
+                                (∈ $a $A))
+                          (&c* $A $A))) ".")
+           "给定" (&sube $R (&c* $A $B)) "和"
+           (&sube $S (&c* $B $C)) ", 我们可以根据"
+           (MB (∈ (tu0 $a $c) (&compose $S $R))
+               "当且仅当"
+               (∃ $b (&& (∈ (tu0 $a $b) $R)
+                         (∈ (tu0 $b $c) $S))))
+           "定义复合" (&compose $S $R)
+           ", 即" $R "和" $S "的" (Q "关系积 (relative product)")
+           ". 我们将表明" Rel "确为一个范畴的工作留作练习. "
+           "(要做什么呢?)" (Br)
+           "要举另外一个箭头并非" (Q "函数") "的范畴的例子, "
+           "令对象为有限集合" (&cm $A $B $C) "而一个箭头"
+           (Arrow $F $A $B) "是一个由自然数构成的矩阵"
+           (&= $F (_cm (@_cm $n $i $j) (&< $i $a) (&< $j $b)))
+           ", 其中" (&= $a (card $A)) "而" (&= $b (card $B))
+           ". 符号" (card $C) "表示一个集合" $C "的元素数目. "
+           "箭头的复合无非是通常的矩阵乘法, "
+           "而恒等箭头即是通常的单位矩阵. "
+           "这里的对象的目的仅是为了保证矩阵乘法有定义, "
+           "但是矩阵并非对象之间的函数.")
+       (Li (Em "有限范畴") (Br)
+           "当然了, 范畴的对象也不必是集合. "
            )
        )
    (H3. "同构")
