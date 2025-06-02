@@ -160,6 +160,14 @@
     (&sube $S $K:script) "的链接"
     (MB (&:= (&Lk $S)
              (&\\ (&Cl (&St $S))
-                  (&St (&Cl $S)))) ".")
-    )
+                  (&St (&Cl $S)))) "."))
+   
+   (H2. "流形 (manifold)")
+   
+   (H2. "外代数 (exterior algebra)")
+   
+   (H2. $k "-形式")
+   
+   (H2. "微分形式")
+   
    ))

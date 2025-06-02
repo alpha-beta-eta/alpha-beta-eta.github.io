@@ -23,16 +23,6 @@
       "所以我卡在这里了. 当我想明白的时候, 我会将其加入SMathML之中.")
    (H2 "实验性特性")
    (P "这里记录一些编写博客的时候创造的抽象.")
-   (CodeB "(define $Hom (Mi &quot;Hom&quot;))
-(define Hom
-  (case-lambda
-    ((A B) (appl $Hom A B))
-    ((C A B) (appl (_ $Hom C) A B))))
-(define $Aut (Mi &quot;Aut&quot;))
-(define Aut
-  (case-lambda
-    ((A) (app $Aut A))
-    ((C A) (app (_ $Aut C) A))))")
    (CodeB "(define (_cm A . x*)
   (_ A (apply &cm x*)))")
    (CodeB "(define (|[]| a b)
@@ -49,17 +39,23 @@
     ...
     (define (&id x) (app $id x))
     ...))")
-   (CodeB "(define (MBL label exp)
+   (CodeB "(define (MBL label . exp*)
   (MB (Mtable #:attr*
               '((columnalign &quot;left center right&quot;)
                 (width &quot;100%&quot;))
               (Mtr (Mtd (Mphantom label))
-                   (Mtd exp)
+                   (apply Mtd exp*)
                    (Mtd label)))))")
    (CodeB "(define app*
   (case-lambda
     ((f x) (app f x))
     ((f g . arg*) (app f (apply app* g arg*)))))")
+   (CodeB "(define (map-toggle flag proc lst)
+  (cond ((null? lst) '())
+        (flag (cons (proc (car lst))
+                    (map-toggle (not flag) proc (cdr lst))))
+        (else (cons (car lst)
+                    (map-toggle (not flag) proc (cdr lst))))))")
    (H2 "关于引用")
    (P "之前我的设计太过局限, 让引用在一开始就生成, "
       "然而更好的方式是将其设计成一个接受上下文信息的函数. "
