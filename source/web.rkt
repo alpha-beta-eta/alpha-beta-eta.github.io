@@ -115,7 +115,7 @@
          "continuation.rkt"
          "cmu15458.rkt"
          "picture.rkt"
-         
+         "catlog.rkt"
          )
 (define (emit-web)
   (emitCss styles.css "../styles.css")
@@ -246,6 +246,7 @@
   (emitXml continuation.html "../continuation.html")
   (emitXml cmu15458.html "../cmu15458.html")
   (emitXml picture.html "../picture.html")
+  (emitXml catlog.html "../catlog.html")
   
   )
 (emit-web)
