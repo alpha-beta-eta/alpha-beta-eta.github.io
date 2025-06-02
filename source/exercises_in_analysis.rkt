@@ -1,6 +1,11 @@
 #lang racket
 (provide exercises_in_analysis.html)
 (require SMathML)
+(define $int (Mi "int"))
+(define (&int E)
+  (ap $int E))
+(define (closure E)
+  (OverBar E))
 (define (H4. #:attr* [attr* '()] #:id [id #f] #:switch? [switch? #f] . html*)
   `(,(build-%heading #:present heading-present #:cite heading-cite
                      #:level 4 #:id id #:switch? switch?)
@@ -201,15 +206,30 @@
    (P "度量空间最重要的性质之一是完备性, 而许多分析学的基础结果都严重依赖于该性质. "
       "完备性是藉由所谓的Baire纲定理而成为强大的工具的.")
    ((Definition)
-    
-    )
+    "令" (tu0 $X $d_X) "是一个度量空间. 一个集合" (&sube $E $X)
+    "被称为是无处稠密 (nowhere dense), 如果" (&= (&int (closure $E)) $empty)
+    ". 一个集合" (&sube $E $X) "被称为是meager的或者第一纲的, 如果"
+    $E "可以被写成是可数无处稠密集合之并. 如果" (&sube $E $X)
+    "不是第一纲的, 那么我们就称其为第二纲的.")
    ((Theorem)
+    "(Baire纲定理)" (Br)
+    "如果" (tu0 $X $d_X) "是一个完备度量空间, 那么"
+    (Ol #:attr* '((type "a"))
+        (Li "可数多开稠密集之交在" $X "中仍然是稠密的;")
+        (Li "如果" (&= $X (Union (&>= $n $1) $C_n))
+            ", 其中" (&sube $C_n $X) "是闭集, 那么至少存在一个"
+            (&>= $n_0 $1) "使得" (&!= (&int (_ $C $n_0)) $empty) ".")))
+   ((proof)
     
     )
    ((Corollary)
-    
-    )
+    (Ol #:attr* '((type "a"))
+        (Li "一个完备度量空间是第二纲的.")
+        (Li "在一个完备度量空间之中, 一个meager集合具有空的内部, "
+            "即其补在" $X "中稠密.")))
    ((Theorem)
+    "(Cantor交定理)" (Br)
+    "如果" (tu0 $X $d_X) "是一个度量空间, 那么以下陈述是等价的:"
     
     )
    (H4. "连续函数和一致连续函数")

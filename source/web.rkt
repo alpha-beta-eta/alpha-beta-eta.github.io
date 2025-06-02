@@ -115,6 +115,8 @@
          "continuation.rkt"
          "cmu15458.rkt"
          "picture.rkt"
+         "catlog.rkt"
+         "game_programming.rkt"
          
          )
 (define (emit-web)
@@ -246,6 +248,8 @@
   (emitXml continuation.html "../continuation.html")
   (emitXml cmu15458.html "../cmu15458.html")
   (emitXml picture.html "../picture.html")
+  (emitXml catlog.html "../catlog.html")
+  (emitXml game_programming.html "../game_programming.html")
   
   )
 (emit-web)

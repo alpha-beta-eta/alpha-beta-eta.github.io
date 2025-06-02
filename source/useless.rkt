@@ -87,6 +87,8 @@
     (H2 (A "PiHKAL翻译" #:attr* '((href "pihkal.html"))))
     (H2 (A "延续和自然语言" #:attr* '((href "continuation.html"))))
     (H2 (A "离散微分几何笔记" #:attr* '((href "cmu15458.html"))))
+    (H2 (A "范畴逻辑引论" #:attr* '((href "catlog.html"))))
+    (H2 (A "游戏编程" #:attr* '((href "game_programming.html"))))
     
     )
    ))
