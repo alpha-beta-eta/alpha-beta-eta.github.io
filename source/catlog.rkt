@@ -1,6 +1,15 @@
 #lang racket
 (provide catlog.html)
 (require SMathML)
+(define $. (Mo "."))
+(define (∀ R P)
+  (: $forall R $. P))
+(define (∃ R P)
+  (: $exists R $. P))
+(define-infix*
+  (&conj $conj))
+(define-@lized-op*
+  (@conj &conj))
 (define catlog.html
   (TnTmPrelude
    #:title "范畴逻辑引论"
@@ -26,7 +35,27 @@
       "在一阶逻辑之中, 一个群可以被描述为一个集合" $G
       "带有一个二元操作" (func $d* (&c* $G $G) $G)
       ", 其满足两条一阶公理:"
-      
+      (MB (∀ (∈ $x $y $z $G)
+             (associate &d* $x $y $z)))
+      (MB (∃ (∈ $e $G)
+             (∀ (∈ $x $G)
+                (∃ (∈ $y $G)
+                   (@conj
+                    (&= (&d* $e $x)
+                        (&d* $x $e)
+                        $x)
+                    (&= (&d* $x $y)
+                        (&d* $y $x)
+                        $e))))))
+      "更仔细地观察这些公理的逻辑形式, "
+      "我们会发现第二条公理 "
+      "(其表达了单位元和逆元的存在性) "
+      "有点不尽如人意, 因为它牵涉嵌套的量词. "
+      "不仅这会使得解释复杂化, "
+      "而且其也并非真正必要, "
+      "鉴于一个群中的单位元和逆元是唯一确定的. "
+      "因此, 我们可以将它们添加到结构之中"
+      "并重新表述如下. "
       )
    (H2. "命题逻辑")
    (H2. "一阶逻辑")
