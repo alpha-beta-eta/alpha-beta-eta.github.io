@@ -120,6 +120,7 @@
          "implicit.rkt"
          "manifolds.rkt"
          "set_theory.rkt"
+         "godel.rkt"
          
          )
 (define (emit-web)
@@ -256,6 +257,7 @@
   (emitXml implicit.html "../implicit.html")
   (emitXml manifolds.html "../manifolds.html")
   (emitXml set_theory.html "../set_theory.html")
+  (emitXml godel.html "../godel.html")
   
   )
 (emit-web)

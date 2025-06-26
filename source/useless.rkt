@@ -91,6 +91,7 @@
     (H2 (A "游戏编程" #:attr* '((href "game_programming.html"))))
     (H2 (A "隐函数定理" #:attr* '((href "implicit.html"))))
     (H2 (A "集合论" #:attr* '((href "set_theory.html"))))
+    (H2 (A "没有(太多)眼泪的Gödel" #:attr* '((href "godel.html"))))
     
     )
    ))

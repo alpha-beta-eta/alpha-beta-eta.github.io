@@ -1,6 +1,6 @@
 #lang racket
 (provide picture.html)
-(require SMathML)
+(require SMathML "painter3d.rkt")
 (define picture.html
   (TmPrelude
    #:title "摆弄SICP图形语言"
@@ -197,4 +197,7 @@
       (Q "面") "的渲染, 因为存在遮挡顺序问题. "
       "不以SVG格式而以某种立体格式输出可能是正确的解决方法, "
       "虽然这只是将渲染的问题转嫁给了别人来解决就是了.")
+   (P "想说的大概就是这么多了, 以下是一些例子.")
+   example0.svg
+   example1.svg
    ))

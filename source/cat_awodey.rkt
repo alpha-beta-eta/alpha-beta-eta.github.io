@@ -1,6 +1,10 @@
 #lang racket
 (provide cat_awodey.html)
 (require SMathML)
+(define $<=:id (Mi "&le;"))
+(define $meet $conj)
+(define $join $disj)
+(define $0^ (&prime $0))
 (define (_@ X a)
   (_ (@ X) a))
 (define (restrict f A)
@@ -124,7 +128,9 @@
   (&d*_M $d*_M)
   (&d*_N $d*_N)
   (&cong $cong)
-  (&rrarr $rrarr))
+  (&rrarr $rrarr)
+  (&meet $meet)
+  (&join $join))
 (define $QQ^+ (^ $QQ $+))
 (define (powerset X)
   (app $P:script X))
@@ -220,7 +226,9 @@
   (Groups "Groups")
   (CatP "P")
   (Graphs "Graphs")
-  (Top "Top"))
+  (Top "Top")
+  (Rings "Rings")
+  (BA "BA"))
 (define (free-category G)
   (app CatC G))
 (define $fin (Mi "fin"))
@@ -279,6 +287,10 @@
   (Warning "警告" "warning")
   (Example "例子" "example")
   (Proposition "命题" "proposition"))
+(define ((tcomment #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "tcomment")))
+   (B (format "译者注记~a." n)) " " x*))
 (define UMP:free-monoid.svg
   (Svg
    #:attr* '((width "480")
@@ -2260,10 +2272,153 @@
       (Q "投影性 (projective)") ": 一个对象" $P
       "被称为是" (Em "投影性")
       "的, 如果对于任意的满态射"
-      
-      )
+      (Epi $e $E $X) "和箭头" (Arrow $f $P $X)
+      ", 存在某个(未必唯一的)箭头"
+      (Arrow (OverBar $f) $P $E) "满足"
+      (&= (&compose $e (OverBar $f)) $f)
+      ", 如以下图表所示:"
+      todo.svg
+      "我们称" (Em $f " lifts across " $e)
+      ". 任意进入某个投影对象的满态射都显然可以split. "
+      "{译注: 进入的意思是以该对象为陪域.} "
+      "投影对象或许可以被认为是拥有一种更为"
+      (Q "自由") "的结构, 因而允许"
+      (Q "更多的箭头") ".")
+   (P "选择公理可以推出所有的集合都是投影性的, "
+      "因而在许多(但并非全部!)的代数范畴之中"
+      "自由对象也是投影性的. 读者应该能够证明, "
+      "在任意的范畴之中, 一个投影对象的任何"
+      "retract也都是投影性的.")
+   ((tcomment)
+    "现在我们证明一下以上的论断. 对于任意的范畴"
+    CatC "中的一个投影对象" $P ", 如果" $Q "是" $P
+    "的一个retract, 那么根据定义, 存在一对箭头"
+    (Arrow $a $Q $P) "和" (Arrow $b $P $Q)
+    "使得" (&= (&compose $b $a) $1_Q)
+    ". 对于满态射" (Epi $e $E $X) "和任意的箭头"
+    (Arrow $g $Q $X) ", 我们知道"
+    (Arrow (&compose $g $b) $P $X)
+    ". 鉴于" $P "是一个投影对象, 那么存在一个箭头"
+    (Arrow (OverBar (&compose $g $b)) $P $E)
+    "使得"
+    (&= (&compose $e (OverBar (&compose $g $b)))
+        (&compose $g $b))
+    ", 这可以推出"
+    (MB (deriv
+         (&compose
+          $e (@compose
+              (OverBar (&compose $g $b))
+              $a))
+         (&compose
+          (@compose
+           $e (OverBar (&compose $g $b)))
+          $a)
+         (&compose (@compose $g $b) $a)
+         (&compose $g (@compose $b $a))
+         (&compose $g $1_Q)
+         $g))
+    "令" (Arrow (OverBar $g) $Q $E) "为"
+    (&compose (OverBar (&compose $g $b)) $a)
+    ", 那么" (&= (&compose $e (OverBar $g)) $g)
+    ", 这告诉我们" $Q "也是一个投影对象.")
    (H3. "始对象和终对象" #:id "initial-and-terminal")
+   (P "我们现在考虑对于范畴" Sets "中的空集和单元素集"
+      "以及一般性的范畴之中具有类似结构的对象进行抽象刻画.")
+   ((Definition)
+    "在任意的范畴" CatC "之中, 一个对象"
+    (Ul (Li $0 "是" (Em "始(initial)")
+            "的, 如果对于任意的对象" $C
+            ", 存在唯一的态射"
+            (MB (&-> $0 $C) ";"))
+        (Li $1 "是" (Em "终(terminal)")
+            "的, 如果对于任意的对象" $C
+            ", 存在唯一的态射"
+            (MB (&-> $C $1) "."))))
+   (P "和单态射和满态射的情况一样, "
+      "我们应该注意到以上的定义中存在着某种"
+      (Q "对偶性") ". 精确地说, " CatC
+      "中的一个终对象恰是" (&op CatC)
+      "中的一个始对象. 第3章中我们将会系统地考虑这种对偶性.")
+   (P "首先, 观察到始对象和终对象的概念是简单的UMP, "
+      "这样的对象在同构下是唯一确定的, 就像之前的自由幺半群.")
+   ((Proposition)
+    (Em "始对象(终对象)在同构意义下是唯一确定的."))
+   ((proof)
+    "实际上, 如果" $C "和" $C^ "都是同一范畴中的始对象(或者终对象), "
+    "那么存在" (Em "唯一") "的同构" (&-> $C $C^)
+    ". 的确如此, 设" $0 "和" $0^ "都是某个范畴" CatC
+    "之中的始对象; 那么, 以下的图表使得" $0 "和" $0^
+    "是唯一同构的这一事实变得清晰起来:"
+    todo.svg
+    "至于终对象, 应用前述论证于" (&op CatC) ".")
+   ((Example)
+    (Ol (Li "在" Sets "之中, 空集是始对象而任意的单元素集都是终对象. "
+            "观察到" Sets "只有一个始对象而却有许多终对象 "
+            "(这回答了是否有" (&cong Sets (&op Sets)) "的问题).")
+        (Li "在" Cat "之中, 范畴" Cat0 " (没有对象也没有箭头) "
+            "是始对象而范畴" Cat1 " (一个对象和它的恒等箭头) "
+            "是终对象.")
+        (Li "在" Groups "之中, 单元素的群" (Em "既是")
+            "始对象" (Em "又是") "终对象 (向量空间和线性变换的范畴也是类似的, "
+            "幺半群和幺半群同态的范畴亦是如此). 但是, 在" Rings
+            " (含幺交换环的范畴) 之中, 整数环" $ZZ
+            "是始对象 (而" (&= $0 $1) "的单元素环是终对象).")
+        (Li "一个" (Em "布尔代数") "是一个偏序集" $B
+            ", 其装备了两个突出的元素" $0 "和" $1
+            ", 二元运算" (Q "join") (&join $a $b) "和"
+            (Q "meet") (&meet $a $b) ", 以及一个幺元运算"
+            (Q "补") (&neg $b) ". 以下是其必须满足的条件:"
+            (eqn*
+             ($ (&<= $0 $a) $)
+             ($ (&<= $a $1) $)
+             ((: (&<= $a $c) "且" (&<= $b $c))
+              "当且仅当"
+              (&<= (&join $a $b) $c))
+             ((: (&<= $c $a) "且" (&<= $c $b))
+              "当且仅当"
+              (&<= $c (&meet $a $b)))
+             ((&<= $a (&neg $b))
+              "当且仅当"
+              (&= (&meet $a $b) $0))
+             ($ (&= (&neg (&neg $a)) $a) $))
+            "这里也存在着一种等价的定义, "
+            "其为全然等式性的刻画而不牵涉序关系. "
+            "布尔代数的一个典型例子是一个集合"
+            $X "的所有子集" (&sube $A $X)
+            "构成的幂集" (powerset $X)
+            ", 其由包含关系" (&sube $A $B)
+            "有序化, 而布尔运算为空集"
+            (&= $0 $empty) ", 全集"
+            (&= $1 $X) ", 并集与交集作为join和meet, "
+            "以及相对补" (&- $X $A) "作为"
+            (&neg $A) ". 一个令人熟悉的特别例子是二元素的布尔代数"
+            (&= $2 (setE $0 $1)) " (其或可以取幂集"
+            (powerset $1) "), 有时其也被视为" (Q "真值集")
+            ", 以逻辑运算析取, 合取, 否定作为布尔运算. "
+            "这在布尔代数的范畴" BA "里是一个始对象. "
+            BA "的箭头是布尔同态, 即保持额外结构的函子"
+            (Functor $h $B $B^) ", 意即满足"
+            (&= (app $h $0) $0) ", "
+            (&= (app $h (&join $a $b))
+                (&join (app $h $a) (app $h $b)))
+            ", 诸如此类. 单元素的布尔代数 (例如"
+            (powerset $0) ") 是终对象.")
+        (Li "在一个偏序集之中, 一个对象是始对象当且仅当其是最小元素, "
+            "一个对象是终对象当且仅当其是最大元素, "
+            "这是平然的. 因此, 例如, 任意的布尔代数两者皆有. "
+            "显然, 一个范畴" (Em "不必拥有")
+            "始对象或者终对象; 例如, 偏序集"
+            (tu0 $ZZ $<=:id) "两者皆无.")
+        (Li "对于任意的范畴" CatC "和任意的对象"
+            (∈ $X CatC) ", 恒等箭头"
+            (Arrow $1_X $X $X)
+            "在切片范畴" (slice CatC $X)
+            "里是一个终对象而在余切片范畴"
+            (coslice $X CatC)
+            "里是一个始对象.")))
    (H3. "广义元素")
+   (P "让我们考虑进出始对象和终对象的箭头. "
+      )
    (H3. "积")
    (H3. "积的例子")
    (H3. "带有积的范畴")

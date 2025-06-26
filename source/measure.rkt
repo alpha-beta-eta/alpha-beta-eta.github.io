@@ -1,8 +1,19 @@
 #lang racket
 (provide measure.html)
 (require SMathML)
+(define $infimum (Mi "inf"))
+(define $supremum (Mi "sup"))
+(define infimum
+  (case-lambda
+    ((X) (ap $infimum X))))
+(define supremum
+  (case-lambda
+    ((X) (ap $supremum X))))
+(define $~ (Mo "~"))
 (define (\]\[ a b)
   (: $rb a $cm b $lb))
+(define (\[\[ a b)
+  (: $lb a $cm b $lb))
 (define Δ $Delta:normal)
 (define $Sup (Mi "sup"))
 (define (Sup c e)
@@ -31,6 +42,7 @@
   (&\\ $\\)
   (&Δ Δ)
   (&cup $cup)
+  (&~ $~)
   
   )
 (define-@lized-op*
@@ -296,7 +308,10 @@
     (Ol #:attr* '((type "a"))
         (Li "集合" (setI $n (&>= $n $4)) ", " $ZZ
             ", " $QQ "使得这样的过程能够成立的共同特征在于它们都是"
-            (Q "可数的") ". "
+            (Q "可数的") ". 为了我们这里的目的, "
+            "对于可数性的最自然定义如下: 一个集合" $K
+            "是" (B "可数的") ", 要么其为空, 要么存在一个从"
+            $NN "到" $K "的满射. "
             )
         )
     )
@@ -420,10 +435,16 @@
             "(提示: 证明由所有截线均为Borel集合的" $RR^2
             "的子集构成的族是一个包含所有开集的" $RR^2
             "的子集的" $sigma "-代数.)")
-        (Li "令" (&sube $G $RR) "是一个开集. "
-            )
-        )
-    )
+        (Li "令" (&sube $G $RR) "是一个开集. 证明"
+            $G "可以唯一地表示为开区间 (" $G
+            "的" (Q "分量") ") 的一个可数族"
+            $I:script " (可能为空) 之并, "
+            "其中我们要求这个族内的诸开区间两两不相交. "
+            "(提示: 对于" (∈ $x $y $G) ", 称"
+            (&~ $x $y) "如果" $x "和" $y
+            "之间的每个点都属于" $G ". 表明"
+            $~ "是一个等价关系. 令" $I:script
+            "是其等价类的集合.)")))
    (((entry "注记和评论"))
     
     )
@@ -445,11 +466,51 @@
     "被称为" (B $X "上的一个测度") ".")
    ((Remark)
     (Ol #:attr* '((type "a"))
+        (Li (B $inf "的使用: ")
+            "在以上定义的iii之中, 我声明" $mu
+            "是一个取值于" (Q (\[\] $0 $inf))
+            "之中的函数, 此即由非负实数构成的集合但又加入了"
+            (Q $inf) ". 我期望你已经在分析学中遇到对于符号"
+            $inf "的各种各样的运用了; 我希望你意识到"
+            "这个符号在不同的上下文之中有着相当不同的意思, "
+            "而每次使用都有必要建立清晰的约定. "
+            (Q "测度的" $inf) "对应于无限长度或者面积或者体积的概念. "
+            "我们需要于其上执行的基本操作是加法: 对于"
+            (∈ $a (\[\[ $0 $inf))
+            " (也就是对于每个实数" (&>= $a $0) "), "
+            (&= (&+ $inf $a) (&+ $a $inf) $inf)
+            ", 另外" (&= (&+ $inf $inf) $inf)
+            ". 这将" (\[\] $0 $inf) "渲染为了一个加法下的半群. "
+            "声明对于每个" (∈ $a $RR) "都有"
+            (&= (&- $inf $a) $inf) "是相当安全的; "
+            "但是我们必须绝对抵制解释公式" (&- $inf $inf)
+            ". 至于乘法, 实际上对于" (&> $a $0) "而言通常将公式"
+            (&d* $inf $inf) ", " (&d* $a $inf) ", "
+            (&d* $inf $a) "都解释为" $inf
+            "是正确的, 而一般来说" (&= (&d* $0 $inf) (&d* $inf $0))
+            "可以取为" $0 "." (Br)
+            (\[\] $0 $inf) "上我们也有一个自然的全序, 对于每个"
+            (∈ $a (\[\[ $a $inf)) "记" (&< $a $inf)
+            ". 这给出了" (\[\] $0 $inf)
+            "的任意(非空)子集的上确界和下确界的想法; "
+            "并且将" (infimum $empty) "解释为" $inf
+            "常常是正确的, 但是每次相关情况时我都将尽量"
+            "提示读者以这条特别的约定. 我们也有极限的概念; 如果"
+            (Seq $u) "是" (\[\] $0 $inf) "中的一个序列, "
+            "那么其收敛至" (∈ $u (\[\] $0 $inf)) ", 如果"
+            (Ul (Li "对于每个" (&< $v $u) ", 存在一个"
+                    (∈ $n_0 $NN) "使得对于每个"
+                    (&>= $n $n_0) "都有" (&<= $v $u_n) ";")
+                (Li "对于每个" (&> $v $u) ", 存在一个"
+                    (∈ $n_0 $NN) "使得对于每个"
+                    (&>= $n $n_0) "都有" (&>= $v $u_n) "."))
+            "当然, 如果" (&= $u $0) "或者" (&= $u $inf)
+            ", 其中之一的条件将虚空地成立.")
         (Li ""
             )
         )
     )
-   (((entry "测度空间的基本性质"))
+   (((entry "测度空间的基本性质") #:id "measure-space-basic-properties")
     "令" (tu0 $X Σ $mu) "是一个测度空间."
     (Ol #:attr* '((type "a"))
         (Li "如果" (∈ $E $F Σ) "且" (&= (&cap $E $F) $empty) ", 那么"
@@ -475,6 +536,62 @@
                     (Inf (∈ $n $NN) (ap $mu $E_n))) "."))))
    ((proof)
     (Ol #:attr* '((type "a"))
+        (Li ""
+            )
+        )
+    )
+   (((entry "可忽略集合"))
+    "令" (tu0 $X Σ $mu) "是任意的测度空间."
+    (Ol #:attr* '((type "a"))
+        (Li "一个集合" (&sube $A $X) "是"
+            (B "可忽略的") " (或者说" (B "null")
+            "), 如果存在一个集合" (∈ $E Σ)
+            "满足" (&sube $A $E) "且"
+            (&= (ap $mu $E) $0)
+            ". (若是对于涉及的是哪一个测度存疑, "
+            "我会写下" (B $mu "-可忽略的") ".)")
+        (Li "令" $N:script "是" $X
+            "的可忽略子集的族, 那么i. "
+            (∈ $empty $N:script)
+            ". ii. 如果" (&sube $A (∈ $B $N:script))
+            ", 那么" (∈ $A $N:script)
+            ". iii. 如果" (Seq $A) "是"
+            $N:script "中的任意序列, 那么"
+            (∈ (Union (∈ $n $NN) $A_n) $N:script)
+            ". " $P:bold-script
+            " i. " (&= (ap $mu $empty) $0)
+            ". ii. 存在一个" (∈ $E Σ) "满足"
+            (&= (ap $mu $E) $0) "且"
+            (&sube $B $E) "; 现在" (&sube $A $E)
+            ". iii. 对于每个" (∈ $n $NN)
+            ", 选择一个" (∈ $E_n Σ) "满足"
+            (&sube $A_n $E_n) "且"
+            (&= (ap $mu $E_n) $0) ". 现在"
+            (&= $E (∈ (Union (∈ $n $NN) $E_n) Σ))
+            "而"
+            (&sube (Union (∈ $n $NN) $A_n)
+                   (Union (∈ $n $NN) $E_n))
+            ", 并且根据"
+            (Ref "measure-space-basic-properties")
+            "的d有"
+            (&<= (app $mu (Union (∈ $n $NN) $E_n))
+                 (sum (&= $n $0) $inf (ap $mu $E_n)))
+            ", 故"
+            (&= (app $mu (Union (∈ $n $NN) $E_n)) $0)
+            ". " $Q:bold-script (Br)
+            "我将称" $N:script "为" $mu "的"
+            (B "零理想 (null ideal)")
+            ". (满足这里条件i-iii的一个集族被称为一个集合的"
+            (B $sigma "-理想") ".)")
+        (Li "一个集合" (&sube $A $X) "是" (B "conegligible")
+            "的, 如果" (&\\ $X $A) "是可忽略的; "
+            "换言之, 存在一个可测集合" (&sube $E $A)
+            "使得" (&= (app $mu (&\\ $X $E)) $0)
+            ". 注意到i. " $X "是conegligible的. ii. 如果"
+            (&sube $A $B $X) "而" $A "是conegligible的, 那么"
+            $B "是conegligible的. iii. 如果" (Seq $A)
+            "是conegligible集合的序列, 那么"
+            (Cap (∈ $n $NN) $A_n) "是conegligible的.")
         (Li ""
             )
         )
