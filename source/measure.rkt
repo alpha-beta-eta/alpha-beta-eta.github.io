@@ -615,6 +615,38 @@
             )
         )
     )
+   (((entry "Carathéodory的方法: 定理"))
+    "令" $X "是一个集合而" $theta "是" $X "上的一个外测度, 置"
+    (MB (&= Σ (setI $E
+                    (: (&sube $E $X)
+                       ", 对于每个" (&sube $A $X)
+                       ", 都有"
+                       (&= (ap $theta $A)
+                           (&+ (app $theta (&cap $A $E))
+                               (app $theta (&\\ $A $E))))))))
+    "那么" Σ "是" $X "的子集的一个" $sigma "-代数. "
+    "通过对于" (∈ $E Σ) "记" (&= (ap $mu $E) (ap $theta $E))
+    "定义" (func $mu Σ (\[\] $0 $inf)) "; 那么"
+    (tu0 $X Σ $mu) "是一个测度空间.")
+   ((proof)
+    (Ol #:attr* '((type "a"))
+        (Li ""
+            )
+        )
+    )
+   ((Remark)
+    
+    )
+   (H3. $RR "上的Lebesgue测度")
+   
+   (H3. $RR^r "上的Lebesgue测度")
+   
+   (H2. "积分")
+   
+   (H3. "可测函数")
+   
+   (H3. "积分的定义")
+   
    (H1. "广阔的基础")
    (H1. "测度代数")
    (H1. "拓扑测度空间")
