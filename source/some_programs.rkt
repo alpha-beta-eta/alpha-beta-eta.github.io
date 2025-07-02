@@ -513,5 +513,28 @@ fun expt m Zero = Succ Zero
 (define (reify q s)
   (let ((q (walk* q s)))
     (walk* q (reify-s q '()))))")
+   (H2 "根据语法生成随机句子")
+   (CodeB "(define *grammar*
+  '((sentence -> (noun-phrase verb-phrase))
+    (noun-phrase -> (Article Noun))
+    (verb-phrase -> (Verb noun-phrase))
+    (Article -> the a)
+    (Noun -> man ball woman table)
+    (Verb -> hit took saw liked)))
+(define (random-select lst)
+  (list-ref lst (random (length lst))))
+(define (lookup symbol grammar)
+  (cond ((assq symbol grammar)
+         => (lambda (line)
+              (random-select (cddr line))))
+        (else
+         (error 'lookup &quot;unknown symbol ~s with respect to grammar ~s&quot;
+                symbol grammar))))
+(define (generate symbol grammar)
+  (define more (lookup symbol grammar))
+  (if (symbol? more)
+      (list more)
+      (append-map (curryr generate grammar) more)))
+(generate 'sentence *grammar*)")
    
    ))

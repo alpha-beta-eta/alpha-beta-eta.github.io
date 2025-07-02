@@ -10,6 +10,8 @@
 (define @sum (compose pare sum))
 (define (&delta i j)
   (appl $delta i j))
+(define (∃ x P)
+  (: $exists x $cm P))
 (define misc.html
   (TmPrelude
    #:title "misc"
@@ -19,7 +21,13 @@
       "这总是令我异常烦躁.")
    ((example)
     "空集" $empty "可以被视为一个拓扑空间, 其上装备的拓扑必然是" (setE $empty) ".")
-   
+   ((proposition)
+    "对于群" $G "的子群" $H ", 如果" $1_G "是" $G "的幺元, " $1_H
+    "是" $H "的幺元, 那么" (&= $1_G $1_H) ".")
+   ((proof)
+    (MB (&= (&i* $1_H $1_H) $1_H
+            (&i* $1_H $1_G)))
+    "根据消去律, " (&= $1_H $1_G) ".")
    (H1 "算术")
    ((theorem)
     "对于" (&in (&cm $a $b) $NN) "且" (&!= $b $0) ", 如果" $r "是" $a "除以" $b "的余数, 那么"
@@ -302,5 +310,20 @@
         (Li $f "右可逆当且仅当" $f "是满射. (需要选择公理)")))
    ((theorem)
     "在选择公理下, 升链条件等价于极大条件, 降链条件等价于极小条件 (良基关系).")
-   
+   ((theorem)
+    "对于函数" (func $f $X $Y) "和" $Y "中的集族"
+    (_@ $A_i (∈ $i $I)) ", 我们有"
+    (MB (&= (ap (inv $f) (pare (Union (∈ $i $I) $A_i)))
+            (Union (∈ $i $I) (app (inv $f) $A_i))) "."))
+   ((proof)
+    "对于" (∈ $x $X) ", 我们知道"
+    (MB (∈ $x (ap (inv $f) (pare (Union (∈ $i $I) $A_i)))))
+    "等价于"
+    (MB (∈ (app $f $x) (Union (∈ $i $I) $A_i)))
+    "等价于"
+    (MB (∃ (∈ $i $I) (∈ (app $f $x) $A_i)))
+    "等价于"
+    (MB (∃ (∈ $i $I) (∈ $x (app (inv $f) $A_i))))
+    "等价于"
+    (MB (∈ $x (Union (∈ $i $I) (app (inv $f) $A_i)))))
    ))

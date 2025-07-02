@@ -7,7 +7,7 @@
    #:css "styles.css"
    (H1 "愚者 " (A "RSS" #:attr* '((href "rss.xml"))) " "
        (A "网站介绍" #:attr* '((href "intro.html"))))
-   (P "近来我删去了一些内容, 主要是为了重写.")
+   (P "我写下这些笔记的目的, 主要是为了遗忘.")
    (columnize
     (H2 (A "编程语言的邀请" #:attr* '((href "notes/pl.pdf"))) ": "
         (A "程序集" #:attr* '((href "notes/pl.zip"))))
@@ -30,5 +30,9 @@
     (H2 (A "有趣的链接" #:attr* '((href "ilinks.html"))))
     (H2 (A "胡言乱语" #:attr* '((href "huyan.html"))))
     (H2 (A "友情链接" #:attr* '((href "links.html"))))
+    (H2 (A "书评" #:attr* '((href "reviews.html"))))
+    (H2 (A "范畴论笔记" #:attr* '((href "cat_awodey.html"))))
+    (H2 (A "(瞎写的)游戏编程" #:attr* '((href "game_programming.html"))))
+    
     )
    ))

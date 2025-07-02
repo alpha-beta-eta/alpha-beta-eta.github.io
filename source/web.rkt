@@ -122,6 +122,7 @@
          "set_theory.rkt"
          "godel.rkt"
          "fear-of-macros.rkt"
+         "reviews.rkt"
          
          )
 (define (emit-web)
@@ -260,6 +261,7 @@
   (emitXml set_theory.html "../set_theory.html")
   (emitXml godel.html "../godel.html")
   (emitXml fear-of-macros.html "../fear-of-macros.html")
+  (emitXml reviews.html "../reviews.html")
   
   )
 (emit-web)

@@ -35,3 +35,5 @@
   (case-lambda
     ((k u) (&+ $..c (&i* k u)))
     ((k u . arg*) (&+ (&i* k u) (apply LC0 arg*)))))
+(define (_@ A x)
+  (_ (@ A) x))

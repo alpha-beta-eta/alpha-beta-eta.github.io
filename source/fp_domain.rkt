@@ -74,6 +74,13 @@
     "图2.1 PCF的定型规则")
    
    (H2. "PCF的Scott模型")
+   (P "本章我们引入一种结构, 其中Dana Scott解释了PCF语言 (及其逻辑LCF). "
+      "(See Scott [1969] for a reprint of a widely circulated "
+      (Q "underground") " paper from 1969 where this interpretation "
+      "was presented for the first time.) "
+      "但是在此之前, 我们将会讨论PCF的指称语义的一般形式并"
+      "试图找出我们所施加的结构要求的动机.")
+   
    (H3. "基本的domain论")
    (H3. "PCF的domain模型")
    (H3. "LCF&mdash;&mdash;可计算函数逻辑")
@@ -81,5 +88,9 @@
    (H2. "Milner的上下文引理")
    (H2. "完全抽象问题")
    (H2. "逻辑关系 (Logical Relations)")
+   (H2. $D_sigma "的一些结构性质")
+   (H2. "递归domain方程的解")
+   (H2. "完全抽象模型的刻画")
+   (H2. "作为PCF模型的顺序domain")
    
    ))

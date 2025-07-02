@@ -17,7 +17,6 @@
     (H2 (A "分析笔记" #:attr* '((href "analysis_notes.html"))))
     (H2 (A "线性代数笔记"
            #:attr* '((href "linear_algebra_notes.html"))))
-    (H2 (A "范畴论笔记" #:attr* '((href "cat_awodey.html"))))
     (H2 (A "组合学笔记" #:attr* '((href "combinatorics_notes.html"))))
     (H2 (A "绘制数学图形" #:attr* '((href "illustrations.html"))))
     (H2 (A "计算机辅助设计的几何编程" #:attr* '((href "cad.html"))))
@@ -88,7 +87,6 @@
     (H2 (A "延续和自然语言" #:attr* '((href "continuation.html"))))
     (H2 (A "离散微分几何笔记" #:attr* '((href "cmu15458.html"))))
     (H2 (A "范畴逻辑引论" #:attr* '((href "catlog.html"))))
-    (H2 (A "游戏编程" #:attr* '((href "game_programming.html"))))
     (H2 (A "隐函数定理" #:attr* '((href "implicit.html"))))
     (H2 (A "集合论" #:attr* '((href "set_theory.html"))))
     (H2 (A "没有(太多)眼泪的Gödel" #:attr* '((href "godel.html"))))

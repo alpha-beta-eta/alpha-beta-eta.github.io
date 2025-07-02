@@ -1,6 +1,22 @@
 #lang racket
 (provide cat_awodey.html)
 (require SMathML)
+(define (subst termA termB var)
+  (: termA (bra0 (&/ termB var))))
+(define $.:compact
+  (Mo "." #:attr* '((lspace "0") (rspace "0"))))
+(define (Lam x M)
+  (: $lambda x $.:compact M))
+(define (Lamb x M)
+  (: $lambda x M))
+(define (map2* f . x*)
+  (map2 f x*))
+(define $c*^ (&prime $c*))
+(define (&lambda f)
+  (ap $lambda f))
+(define (LeftRightDiagram A x B y C)
+  (MB A (^^ $<- (pad x)) B
+      (^^ $-> (pad y)) C))
 (define $<=:id (Mi "&le;"))
 (define $meet $conj)
 (define $join $disj)
@@ -130,7 +146,8 @@
   (&cong $cong)
   (&rrarr $rrarr)
   (&meet $meet)
-  (&join $join))
+  (&join $join)
+  (&c*^ $c*^))
 (define $QQ^+ (^ $QQ $+))
 (define (powerset X)
   (app $P:script X))
@@ -146,6 +163,8 @@
   (_ A (apply &cm x*)))
 (define (_prime A x)
   (_^ A x $prime))
+(define (_inv A x)
+  (_^ A x $-1))
 (define todo.svg
   (Svg
    #:attr* '((width "320")
@@ -200,10 +219,17 @@
   (&range $range "range")
   (&dom $dom "dom")
   (&cod $cod "cod")
-  (&darr $darr "&darr;"))
+  (&darr $darr "&darr;")
+  (&fst $fst "fst")
+  (&snd $snd "snd"))
 (define-@lized-op*
   (@compose &compose)
-  (@_cm _cm))
+  (@_cm _cm)
+  (@c* &c*)
+  (@\|-> &\|->)
+  (@cm &cm)
+  (@: &:)
+  (@Lam Lam))
 (define (make-cat str)
   (Mi str #:attr* '((mathvariant "bold"))))
 (define-syntax-rule (define-cat* (id str) ...)
@@ -448,6 +474,82 @@
      (make-pt2 210 30))
     #:offset (make-vec2 -6 24)
     $dom)))
+(define set-product.svg
+  (Svg
+   #:attr* '((width "360")
+             (height "195")
+             (stroke "black")
+             (style "display: block; margin: auto;"))
+   (Defs arrow-head)
+   (:FO (make-pt2 180 15) $1)
+   (:FO (make-pt2 25 165) $A)
+   (:FO (make-pt2 330 165) $B)
+   (:FO (make-pt2 160 165) (&c* $A $B))
+   (:arrow-prop (pt2+ (make-pt2 180 5)
+                      (make-vec2 10 10))
+                (pt2+ (make-pt2 20 165)
+                      (make-vec2 10 10)))
+   (:arrow-prop (pt2+ (make-pt2 180 5)
+                      (make-vec2 0 10))
+                (pt2+ (make-pt2 340 165)
+                      (make-vec2 0 10)))
+   (:arrow-prop (pt2+ (make-pt2 163 165)
+                      (make-vec2 8 5))
+                (pt2+ (make-pt2 25 165)
+                      (make-vec2 8 5)))
+   (:arrow-prop (pt2+ (make-pt2 163 165)
+                      (make-vec2 17 5))
+                (pt2+ (make-pt2 330 165)
+                      (make-vec2 17 5))
+                #:prop 0.65)
+   (set-dotted
+    (:arrow-prop (pt2+ (make-pt2 180 15)
+                       (make-vec2 3 5))
+                 (pt2+ (make-pt2 180 165)
+                       (make-vec2 3 5))))
+   (:FO (make-pt2 92 80) $a)
+   (:FO (make-pt2 270 80) $b)
+   (:FO (make-pt2 190 90) (tu0 $a $b))
+   (:FO (make-pt2 95 175) $pi_1)
+   (:FO (make-pt2 250 175) $pi_2)))
+(define UMP:product.svg
+  (Svg
+   #:attr* '((width "360")
+             (height "195")
+             (stroke "black")
+             (style "display: block; margin: auto;"))
+   (Defs arrow-head)
+   (:FO (make-pt2 175 15) $X)
+   (:FO (make-pt2 25 165) $A)
+   (:FO (make-pt2 330 165) $B)
+   (:FO (make-pt2 175 165) $P)
+   (:arrow-prop (pt2+ (make-pt2 180 5)
+                      (make-vec2 10 10))
+                (pt2+ (make-pt2 20 165)
+                      (make-vec2 10 10)))
+   (:arrow-prop (pt2+ (make-pt2 180 5)
+                      (make-vec2 0 10))
+                (pt2+ (make-pt2 340 165)
+                      (make-vec2 0 10)))
+   (:arrow-prop (pt2+ (make-pt2 163 165)
+                      (make-vec2 8 5))
+                (pt2+ (make-pt2 25 165)
+                      (make-vec2 8 5)))
+   (:arrow-prop (pt2+ (make-pt2 163 165)
+                      (make-vec2 17 5))
+                (pt2+ (make-pt2 330 165)
+                      (make-vec2 17 5))
+                #:prop 0.65)
+   (set-dotted
+    (:arrow-prop (pt2+ (make-pt2 180 15)
+                       (make-vec2 3 5))
+                 (pt2+ (make-pt2 180 165)
+                       (make-vec2 3 5))))
+   (:FO (make-pt2 85 80) $x_1)
+   (:FO (make-pt2 270 80) $x_2)
+   (:FO (make-pt2 190 90) $u)
+   (:FO (make-pt2 95 175) $p_1)
+   (:FO (make-pt2 250 175) $p_2)))
 (define cat_awodey.html
   (TnTmPrelude
    #:title "范畴论笔记"
@@ -1533,7 +1635,9 @@
       "是合集"
       (MB (setI
            (∈ (tu0 $f $g) (&c* $C_1 $C_1))
-           (&= (&cod $f) (&dom $g))) "."))
+           (&= (&cod $f) (&dom $g))) ".")
+      "{译注: 译者感觉这里顺序似乎颠倒了, 但是实际上也有人采取这样的约定, "
+      "不过我不知道作者是怎么想的, 或许只是笔误而已.}")
    (P "然后, 从" CatC "到一个范畴" CatD
       "的一个函子" (Functor $F CatC CatD)
       "是一对函数"
@@ -2141,7 +2245,7 @@
     "之中, 每个箭头既是单态射又是满态射. 为什么呢?")
    (P "现在, 和前文对偶地, " Sets "中的满态射恰为满射的函数 (练习!); "
       "然而, 作为对比的是, 在许多令人熟悉的范畴之中, "
-      "满态射不仅仅是满射的同态, 如以下例子所示.")
+      "满态射和满射的同态并不等价, 如以下例子所示.")
    ((Example #:id "N2Z")
     "在幺半群和幺半群同态的范畴" Mon
     "之中, 存在一个单态的同态"
@@ -2163,6 +2267,10 @@
      ", 那么" (&= $f $g)
      ". {译注: " (restrict $f $N) "其实就相当于"
      (&compose $f $i) ", 其中" $i "是前述的嵌入.}"))
+   ((tcomment)
+    "这个例子其实更加特殊, 因为它给出了一个既是单态射"
+    "又是满态射但却并非同构的例子. 不过, "
+    "另外一个方向倒是正确的.")
    (P "首先, 我们注意到"
       (MB (deriv (app $f (&- $n))
                  (app $f (&+ (_ (@ $-1) $1)
@@ -2486,9 +2594,533 @@
       $M ", 存在多少个具有形式" (&-> $1 $M)
       "的箭头呢? 只有一个! 另外, "
       "一个布尔代数有多少个点呢?")
-   
+   (P "鉴于一般情形下一个对象并不由其点所确定, 引入"
+      (Em "广义元素(generalized element)")
+      "这一设备是方便的, 其是任意的箭头"
+      (MB (Arrow $x $X $A))
+      "(带有任意的定义域" $X "), 可以被视为" $A
+      "的" (Em "泛化(generalized)") "或者"
+      (Em "可变(variable)")
+      "元素. 计算机科学家和逻辑学家有时将箭头"
+      (&-> $1 $A) "想成是常量或者封闭项, "
+      "而将一般箭头" (&-> $X $A)
+      "想成是任意的项. 总结:")
+   ((Example)
+    (Ol (Li "考虑" Pos "中的箭头"
+            (Arrow (&cm $f $g) $P $Q)
+            ", 那么" (&= $f $g)
+            "当且仅当对于所有的"
+            (Arrow $x $1 $P)
+            ", 我们都有"
+            (&= (&i* $f $x) (&i* $g $x))
+            ". 在这种意义下, 可以说偏序集"
+            (Q "拥有足够多的点")
+            "用来分离箭头.")
+        (Li "与之相对的是, 在" Mon
+            "之中, 对于同态"
+            (Arrow (&cm $h $j) $M $N)
+            ", 我们总有"
+            (&= (&i* $h $x) (&i* $j $x))
+            ", 其中" (Arrow $x $1 $M)
+            "是任意的箭头, 这是因为只存在着一个这样的点"
+            $x ". 因此, 幺半群"
+            (Q "并没有足够多的点") ".")
+        (Li "但是在任意的范畴" CatC
+            "之中, 对于任意的箭头"
+            (Arrow (&cm $f $g) $C $D)
+            ", 我们总有" (&= $f $g)
+            "当且仅当对于所有的"
+            (Arrow $x $X $C) "都有"
+            (&= (&i* $f $x) (&i* $g $x))
+            "成立 (为什么?). 因此, "
+            "可以说所有的对象都拥有足够多的广义元素.")
+        (Li "实际上, 往往考虑具有某种特定形式"
+            (&-> $T $A) "的广义元素就够了, "
+            "也就是对于特定的" (Q "测试") "对象" $T
+            ". 我们很快就要考虑这件事情.")))
+   (P "广义元素也对于" (Q "测试") "各种各样的条件有用. "
+      "例如, 考虑具有以下形状的图表:"
+      (MB $X (__^^ $rrarr (pad $x^) (pad $x))
+          $A (^^ $-> (pad $f)) $B)
+      "箭头" $f "是单态射当且仅当" (&!= $x $x^)
+      "可以推出" (&= (&i* $f $x) (&i* $f $x^))
+      ", 也就是说, 恰当" $f
+      (Q "在广义元素上是单射") ".")
+   (P "类似地, 在任意的范畴" CatC "之中, "
+      "为了测试一个方块是否交换,"
+      todo.svg
+      "我们将有" (&= (&i* $alpha $f) (&i* $beta $g))
+      ", 恰当对于所有的广义元素" (Arrow $x $X $A)
+      "都有" (&= (&i* $alpha $f $x) (&i* $beta $g $x))
+      " (仅取" (&= $x (Arrow $1_A $A $A)) "即可看出).")
+   ((Example)
+    "广义元素和常量元素相比可以用来"
+    (Q "揭示更多的结构") ". 例如, 考虑以下的偏序集"
+    $X "和" $A ":"
+    (MB (&= $X (setE (&cm (&<= $x $y) (&<= $x $z)))))
+    (MB (&= $A (setE (&<= $a $b $c))))
+    "存在着一个保序的双射" (Arrow $f $X $A) ", 其定义为"
+    (MB (&cm (&= (app $f $x) $a)
+             (&= (app $f $y) $b)
+             (&= (app $f $z) $c)) ".")
+    "很容易看出来" $f "在范畴" Pos
+    "之中既是单态射又是满态射; "
+    "然而, 显然其也并非同构. "
+    "{译注: 前半句容易是因为这个保序映射(通过遗忘)也是映射, "
+    "而其作为映射既是单射又是满射; "
+    "后半句看" $f "作为映射的逆是否保序即可.} "
+    "我们想说" $X "和" $A "是" (Q "不同的结构")
+    ", 而诚然它们并非同构恰是说明此事. "
+    "但是既然如此, 如何" (Em "证明")
+    "它们" (Em "并非") "同构的呢? "
+    "(难道说要藉由某个其他的" (&-> $X $A) "吗?) "
+    "在一般情形下, 这种事情可能相当困难.")
+   (P "一种证明两个对象并非同构的方法是使用"
+      (Q "不变量") ": 同构所保持的属性. "
+      "如果两个对象根据某个不变量是不同的, "
+      "那么它们就不可能是同构的. "
+      "广义元素提供了一种简单的方式来定义不变量. "
+      "例如, " $X "和" $A "的全局元素的数目是相同的, "
+      "即这两个集合都有三个元素. "
+      "但是, 如果转而考虑" (Q $2 "-元素")
+      ", 即以偏序集" (&= $2 (setE (&<= $0 $1)))
+      "作为一个" (Q "测试对象") ", 那么"
+      $X "有" $5 "个这样的元素, " $A
+      "却有" $6 "个. 既然这些数目是不变量, "
+      "那么这两个偏序集就不可能是同构的. "
+      "更细致地说, 我们可以定义对于任意的偏序集"
+      $P "而言的数值不变量"
+      (MB (&= (card (Hom $2 $P))
+              (: (Hom $2 $P)
+                 "的元素数目")) ".")
+      "那么, 如果" (&cong $P $Q)
+      ", 很容易看出来"
+      (&= (card (Hom $2 $P))
+          (card (Hom $2 $Q)))
+      ", 因为任意的同构"
+      (MB $P (__^^ $rlarr (pad $j) (pad $i)) $Q)
+      "也给出了另一个同构"
+      (MB (Hom $2 $P)
+          (__^^ $rlarr (pad (_ $j $*:id))
+                (pad (_ $i $*:id)))
+          (Hom $2 $Q))
+      "其由复合定义:"
+      (MB (&= (app (_ $i $*:id) $f)
+              (&i* $i $f)))
+      (MB (&= (app (_ $j $*:id) $g)
+              (&i* $j $g)))
+      "其中" (Arrow $f $2 $P) "而"
+      (Arrow $g $2 $Q)
+      ". 的确如此, 实际上其是"
+      (Hom $X $dummy)
+      "总为一个函子这一非常一般性的事实的特殊情形, "
+      "而函子总是保持同构的.")
+   ((Example)
+    "正如在之前的例子里, " (Q "坐落于")
+    "某个特定对象" $T "的广义元素"
+    (Arrow $t $T $A) "往往是特别具有" (Q "揭露性的")
+    ". 我们可以几何地将这样的元素想成是"
+    (Q "形状" $T "在" $A "中的轮廓")
+    ", 正如偏序集的范畴中的一个箭头" (&-> $2 $P)
+    "是形状" (&<= $p $p^) "在" $P
+    "中的一个轮廓. 例如, 正如我们已经看到了的, "
+    "在幺半群的范畴之中, 从终幺半群出发的箭头提供不了任何信息, "
+    "而那些从一个生成元上的自由幺半群" (free-monoid $1)
+    "出发的箭头足够用以区分同态, 意即两个同态"
+    (Arrow (&cm $f $g) $M $M^)
+    "相等, 如果它们与所有这样的箭头的复合都相等. "
+    "{译注: " (Q "一个生成元上的自由幺半群")
+    "的原文是" (Q "the free monoid on one generator")
+    ", 意即由单独某个生成元所生成的自由幺半群. "
+    "当然这些幺半群都是同构的, 所以我们可以将它们视为同一个, "
+    "于是原文使用的冠词是" (Q "the") ".} "
+    "既然我们知道" (&= (free-monoid $1) $NN)
+    ", 即自然数的幺半群, 我们可以将坐落在" (free-monoid $1)
+    "的广义元素" (&-> (free-monoid $1) $M) "想成是"
+    (Q "形状" $NN "在" $M "中的轮廓")
+    ". 实际上, 根据" (free-monoid $1)
+    "的UMP, 潜在集" (forget $M) "因而是 (或者应该说同构于) "
+    "由所有这样的轮廓构成的集合" (Hom Mon $NN $M) ", 鉴于"
+    (MB (&cong (forget $M)
+               (Hom Sets $1 (forget $M))
+               (Hom Mon $NN $M)) ".")
+    "{译注: 我们已经知道" (&\|-> $f (OverBar $f))
+    "是一个单射, 而对于"
+    (Arrow $m (free-monoid $1) $M)
+    ", 容易看出"
+    (&= (OverBar (&compose (forget $m) $i)) $m)
+    ".} 在这种意义下, 从某个幺半群出发的箭头"
+    "由其施加于所有的形状" $NN
+    "在这个幺半群中的轮廓上的影响 (effect) "
+    "所确定. {译注: 这句话和前一句话没有十分紧密的逻辑联系, "
+    "更像是对于例子开头引入幺半群时的话语的重述. "
+    "不过, 或许可以再解释一下, 其实根据UMP, "
+    "我们知道" (Arrow $m $NN $M) "完全由值"
+    (app $m $1) "确定, 这里的" $1
+    "是自然数, 而且其可以是任意的" $M
+    "的元素, 明白这点就足以知道为什么从"
+    (free-monoid $1) "出发的箭头足以用来区分同态"
+    (Arrow (&cm $f $g) $M $M^) "了.}")
    (H3. "积")
+   (P "接下来, 我们将看到对于一个范畴之中的两个对象之积的范畴论定义. "
+      "这首先是由Mac Lane在1950年给出的, "
+      "而这可能是范畴论用来定义数学基本概念的最早例子.")
+   (P "所谓" (Q "定义") ", 我这里的意思是一个抽象构造, "
+      "这已经在之前有所涉及, 其基于一个范畴中的对象和箭头. "
+      "并且和之前一样, 我们所要做的是给出一个UMP, "
+      "其在同构意义下确定了当前所关心的结构, "
+      "范畴论中通常都是这样. 在之后的章节里, "
+      "我们还会有诸多其他的这种构造的例子.")
+   (P "让我们从考虑集合的积开始. 对于集合" $A "和" $B
+      ", " $A "和" $B "的" (Em "笛卡尔积")
+      "是序对的集合"
+      (MB (&= (&c* $A $B)
+              (setI (tu0 $a $b)
+                    (&cm (∈ $a $A)
+                         (∈ $b $B)))) ".")
+      "观察到存在着两个" (Q "坐标投影")
+      (MB $A (^^ $<- (pad $pi_1)) (&c* $A $B)
+          (^^ $-> (pad $pi_2)) $B)
+      "其满足"
+      (MB (&cm (&= (appl $pi_1 $a $b) $a)
+               (&= (appl $pi_2 $a $b) $b)) ".")
+      "的确如此, 对于任意的元素" (∈ $c (&c* $A $B))
+      ", 我们都有"
+      (MB (&= $c (tu0 (ap $pi_1 $c) (ap $pi_2 $c))) ".")
+      "这种情况由以下图表所精确捕获:"
+      set-product.svg
+      "将元素代之以广义元素, 我们就得到了以下定义.")
+   ((Definition)
+    "在任意的范畴" CatC "中, 对于对象" $A "和" $B
+    "而言, 一个" (Em "积图表(product diagram)")
+    "由一个对象" $P "和箭头"
+    (LeftRightDiagram $A $p_1 $P $p_2 $B)
+    "构成, 其满足以下的UMP:" (Br)
+    "对于任意的具有形式"
+    (LeftRightDiagram $A $x_1 $X $x_2 $B)
+    "的图表, 都存在着唯一的" (Arrow $u $X $P)
+    "使得以下图表"
+    UMP:product.svg
+    "交换. 换言之, 即" (&= $x_1 (&i* $p_1 $u))
+    "而" (&= $x_2 (&i* $p_2 $u)) ".")
+   ((Remark)
+    "和其他UMP一样, 其具有两个部分:"
+    (Ul (Li (Em "存在性")
+            ": 存在着某个" (Arrow $u $X $P)
+            "使得" (&= $x_1 (&i* $p_1 $u))
+            "而" (&= $x_2 (&i* $p_2 $u)) ".")
+        (Li (Em "唯一性")
+            ": 对于任意的" (Arrow $v $X $P)
+            ", 如果" (&= $x_1 (&i* $p_1 $v))
+            "且" (&= $x_2 (&i* $p_2 $v))
+            ", 那么" (&= $v $u) ".")))
+   ((Proposition)
+    (Em "积在同构下唯一确定."))
+   ((proof)
+    "设"
+    (LeftRightDiagram $A $p_1 $P $p_2 $B)
+    "和"
+    (LeftRightDiagram $A $q_1 $Q $q_2 $B)
+    "是" $A "和" $B "之积, 那么既然" $Q
+    "是一个积, 存在着唯一的"
+    (Arrow $i $P $Q) "使得"
+    (&= (&compose $q_1 $i) $p_1) "而"
+    (&= (&compose $q_2 $i) $p_2)
+    ". 类似地, 既然" $P "是一个积, 那么存在着唯一的"
+    (Arrow $j $Q $P) "使得"
+    (&= (&compose $p_1 $j) $q_1) "而"
+    (&= (&compose $p_2 $j) $q_2) "."
+    todo.svg
+    "通过复合, 我们得到" (&= (&compose $p_1 $j $i) $p_1)
+    "而" (&= (&compose $p_2 $j $i) $p_2)
+    ". 既然也有" (&= (&compose $p_1 $1_P) $p_1) "而"
+    (&= (&compose $p_2 $1_P) $p_2)
+    ", 根据唯一性条件可知" (&= (&compose $j $i) $1_P)
+    ". 类似地, 我们可以证明" (&= (&compose $i $j) $1_Q)
+    ". 因此, " (Arrow $i $P $Q) "是一个同构.")
+   (P "如果" $A "和" $B "具有一个积, "
+      "那么我们对于一个这样的积记下"
+      (LeftRightDiagram
+       $A $p_1 (&c* $A $B) $p_2 $B)
+      "然后, 之于定义中出现的" (&cm $X $x_1 $x_2)
+      ", 我们将"
+      (MB (Arrow $u $X (&c* $A $B))
+          "记为"
+          (tupa0 $x_1 $x_2) "."))
+   (P "然而, 我们应该注意到对于一对对象, "
+      "范畴里可能存在着许多不同的积. "
+      "例如, 给定一个积" (&cm (&c* $A $B) $p_1 $p_2)
+      "和任意的同构" (Arrow $h $Q (&c* $A $B)) ", 图表"
+      (&cm $Q (&compose $p_1 $h) (&compose $p_2 $h))
+      "也是" $A "和" $B "的一个积. {译注: 原文写的是"
+      (Arrow $h (&c* $A $B) $Q) ", 但是实际上应该是"
+      (Arrow $h $Q (&c* $A $B)) ", 不然的话都没有办法进行复合.}")
+   ((tcomment)
+    "让我们对于前一段作简单的补充说明, 即为何"
+    (&cm $Q (&compose $p_1 $h) (&compose $p_2 $h))
+    "也是" $A "和" $B "的一个积. 对于箭头"
+    (Arrow $x_1 $X $A) "和" (Arrow $x_2 $X $B)
+    ", 我们知道存在唯一的箭头"
+    (Arrow (tupa0 $x_1 $x_2) $X (&c* $A $B))
+    "使得"
+    (&= (&compose $p_1 (tupa0 $x_1 $x_2)) $x_1) "而"
+    (&= (&compose $p_2 (tupa0 $x_1 $x_2)) $x_2)
+    ". 现在设" $h "的逆为" (Arrow $g (&c* $A $B) $Q)
+    ", 那么" (Arrow (&compose $g (tupa0 $x_1 $x_2)) $X $Q)
+    "满足"
+    (MB (deriv
+         (&compose (@compose $p_1 $h)
+                   (@compose $g (tupa0 $x_1 $x_2)))
+         (&compose $p_1 (@compose $h $g)
+                   (tupa0 $x_1 $x_2))
+         (&compose $p_1 (tupa0 $x_1 $x_2))
+         $x_1))
+    "而"
+    (MB (deriv
+         (&compose (@compose $p_2 $h)
+                   (@compose $g (tupa0 $x_1 $x_2)))
+         (&compose $p_2 (@compose $h $g)
+                   (tupa0 $x_1 $x_2))
+         (&compose $p_2 (tupa0 $x_1 $x_2))
+         $x_2))
+    "这解决了存在性的部分, 那么现在让我们来说明唯一性. "
+    "假如对于" (Arrow $x_1 $X $A) "和" (Arrow $x_2 $X $B)
+    ", 箭头" (Arrow (&cm $f_1 $f_2) $X $Q)
+    "都符合我们的要求, 那么我们发现"
+    (MB (&= (&compose (@compose $p_1 $h) $f_1)
+            $x_1
+            (&compose $p_1 (@compose $h $f_1))))
+    (MB (&= (&compose (@compose $p_2 $h) $f_1)
+            $x_2
+            (&compose $p_2 (@compose $h $f_1))))
+    (MB (&= (&compose (@compose $p_1 $h) $f_2)
+            $x_1
+            (&compose $p_1 (@compose $h $f_2))))
+    (MB (&= (&compose (@compose $p_2 $h) $f_2)
+            $x_2
+            (&compose $p_2 (@compose $h $f_2))))
+    "鉴于" (&cm (&c* $A $B) $p_1 $p_2)
+    "也是一个积, 根据唯一性条件, 我们可以得到"
+    (MB (&= (&compose $h $f_1)
+            (&compose $h $f_2)))
+    "于是"
+    (MB (deriv $f_1
+               (&compose $1_Q $f_1)
+               (&compose (@compose $g $h) $f_1)
+               (&compose $g (@compose $h $f_1))
+               (&compose $g (@compose $h $f_2))
+               (&compose (@compose $g $h) $f_2)
+               (&compose $1_Q $f_2)
+               $f_2))
+    "这就说明了唯一性. 当然了, " (&= $f_1 $f_2)
+    "也可以通过" (Q "同构也是单态射") "直接推得.")
+   (P "现在一个" (Em "进入") "某个积的箭头"
+      (MB (Arrow $f $X (&c* $A $B)))
+      "和一对箭头"
+      (MB (&cm (Arrow $f_1 $X $A)
+               (Arrow $f_2 $X $B)))
+      "是" (Q "相同的东西")
+      ". 因此, 基本上我们可以遗忘这样的箭头 {译注: 指"
+      $f "这样的}, 在于它们由箭头的序对唯一地确定. "
+      "但是, 如果一个范畴具有积, 那么我们可以获得有用的东西; "
+      "即, 让我们来考虑从积" (Em "出发") "的箭头"
+      (MB (Arrow $g (&c* $A $B) $Y))
+      "这样一个" $g "是一个" (Q "具有两个变元的函数")
+      "; 对于任意的两个广义元素" (Arrow $f_1 $X $A)
+      "和" (Arrow $f_2 $X $B) ", 我们有一个元素"
+      (Arrow (&i* $g (tupa0 $f_1 $f_2)) $X $Y)
+      ". 这样的箭头" (Arrow $g (&c* $A $B) $Y)
+      "不可" (Q "归约") "至任何更为基本的东西, "
+      "但是进入积的箭头却可以 (实际上, 它们和"
+      (Q "指数对象") $Y^B "的概念有关, 通过"
+      (Q "currying") (Arrow (&lambda $g) $A $Y^B)
+      "; 我们将于第6章进一步讨论这个东西).")
+   ((tcomment)
+    "对于前一段, 或许有些该解释的东西. 首先, 开头的"
+    (MB (Arrow $f $X (&c* $A $B)))
+    "和"
+    (MB (&cm (Arrow $f_1 $X $A)
+             (Arrow $f_2 $X $B)))
+    "是" (Q "相同的东西")
+    ", 这里的意思是" $f "和" (&cm $f_1 $f_2)
+    "之间可以相互确定. 由" (&cm $f_1 $f_2)
+    "确定" $f "是直接的UMP. 而反过来, 如果我们拥有的是"
+    $f ", 那么可以取" (&= $f_1 (&compose $p_1 $f))
+    "和" (&= $f_2 (&compose $p_2 $f))
+    ", 此情形下" $f "则是由" $f_1 "和" $f_2
+    "在UMP下确定的, 并且易知如果" (_prime $f $1)
+    "和" (_prime $f $2) "所确定的箭头也是"
+    $f ", 那么" (&= $f_1 (_prime $f $1))
+    "且" (&= $f_2 (_prime $f $2))
+    ", 鉴于UMP中出现的复合操作的确是一个运算, "
+    "也就是说只能给出同一个结果. 另外, "
+    "原文这里最后的括号或许有点令人迷惑, "
+    "一个是" (Q "它们") "指的是"
+    (Q "像" $g "这样的箭头")
+    ", 另一个是原文的" (Q (&lambda $f))
+    "在译者看来应该是一个笔误, 其实应该是"
+    (Q (&lambda $g)) ", 也不知为何会这样.")
    (H3. "积的例子")
+   (Ol (Li "我们已经见过了集合的笛卡尔积. "
+           "注意到如果我们对于序对"
+           (tupa0 $a $b) "选择了不同的定义, "
+           "那么我们就得到了不同的集合"
+           (MB (&c* $A $B) "和"
+               (&c*^ $A $B))
+           "它们每个都是一个积(的一部分), "
+           "因而它们是同构的. "
+           "例如, 我们可以置"
+           (MB (&= (tupa0 $a $b)
+                   (setE (setE $a) (setE $a $b))))
+           (MB (&= (&prime (tupa0 $a $b))
+                   (tupa0 $a (tupa0 $a $b)))))
+       (Li "诸如幺半群或者群这样的" (Q "结构化集合")
+           "的积经常可以被构造为其潜在集合的积, "
+           "而运算则是" (Em "逐分量的")
+           ": 例如, 如果" $G "和" $H
+           "是群, 那么" (&c* $G $H)
+           "可以按照以下方式构造出来: 取"
+           (&c* $G $H) "的潜在集为集合"
+           (setI (tupa0 $g $h)
+                 (&cm (∈ $g $G) (∈ $h $H)))
+           ", 并定义二元运算为"
+           (MB (&= (apply &d* (map2* tupa0 $g $h $g^ $h^))
+                   (apply tupa0 (map2* &d* $g $g^ $h $h^))))
+           "单位元为"
+           (MB (&= $u (tupa0 $u_G $u_H)))
+           "逆为"
+           (MB (&= (inv (tupa0 $a $b))
+                   (tupa0 (inv $a) (inv $b))))
+           "投影同态" (&-> (&c* $G $H) $G)
+           "显然是" (&\|-> (tupa0 $g $h) $g)
+           ", 另一个投影同态是类似的.")
+       (Li "类似地, 对于范畴" CatC "和" CatD
+           ", 我们已经定义过了由对象和序对和箭头的序对构成的范畴"
+           (MB (&c* CatC CatD))
+           "和显然的投影函子一道, 这的确构成了"
+           Cat "中的一个积 (当" CatC "和" CatD
+           "都为小范畴时). (检查这个事实: "
+           "对于这样定义的积范畴验证UMP.) "
+           "{译注: 范畴之积是更为一般的操作, 而"
+           Cat "仅由小范畴(和其间函子)构成.}" (Br)
+           "作为特殊情形, 我们可以将偏序集的积和幺半群的积"
+           "当作范畴的积. (检查这个事实: "
+           "鉴于投影和唯一的配对函数总是单调的, "
+           Cat "中我们所构造的偏序集之积也是" Pos
+           "中的一个积, " Mon "的情况是类似的.)")
+       (Li "令" $P "是一个偏序集并考虑元素"
+           (∈ $p $q $P) "的一个积. 我们必然有"
+           (MB (&<= (&c* $p $q) $p))
+           (MB (&<= (&c* $p $q) $q))
+           "并且如果"
+           (MB (&<= $x $p) "且" (&<= $x $q))
+           "那么我们需要"
+           (MB (&<= $x (&c* $p $q)))
+           "你看出来这个操作" (&c* $p $q)
+           "是什么了吗? 它不过就是通常被称为"
+           (Em "最大下界") "的东西: "
+           (&= (&c* $p $q) (&meet $p $q))
+           ". 我们之后将会看到, "
+           "许多其他格论概念也是范畴论概念的特殊情形.")
+       (Li "(对于那些知道点关于拓扑的东西的人.) "
+           "让我们来说明如通常所定义的那样的两个"
+           (Em "拓扑空间") (&cm $X $Y)
+           "之积, 的确是" Top "中的一个积, "
+           Top "即拓扑空间和连续函数的范畴. "
+           "因此, 设我们拥有空间" $X "和" $Y
+           ", 以及积空间" (&c* $X $Y)
+           "和它的投影"
+           (LeftRightDiagram
+            $X $p_1 (&c* $X $Y) $p_2 $Y)
+           "回忆一下, " (open (&c* $X $Y))
+           "由具有形式" (&c* $U $V)
+           "的基本开集生成, 其中"
+           (∈ $U (open $X)) "而"
+           (∈ $V (open $Y))
+           ", 因而每个"
+           (∈ $W (open (&c* $X $Y)))
+           "都是一个这样的基本开集之并."
+           (Ul (Li "显然, " $p_1 "是连续的, 因为"
+                   (&= (ap (_inv $p $1) $U)
+                       (&c* $U $Y)) ".")
+               (Li "对于任意的连续函数"
+                   (Arrow $f_1 $Z $X) "和"
+                   (Arrow $f_2 $Z $Y) ", 令"
+                   (Arrow $f $Z (&c* $X $Y))
+                   "是函数" (&= $f (tupa0 $f_1 $f_2))
+                   ". 我们正需要看出" $f "何以是连续的.")
+               (Li "对于任意的"
+                   (∈ (&= $W (Union $i (@c* $U_i $V_i)))
+                      (open (&c* $X $Y)))
+                   ", "
+                   (&= (app (inv $f) $W)
+                       (Union $i (app (inv $f) (&c* $U_i $V_i))))
+                   ", 故证明" (app (inv $f) (&c* $U $V))
+                   "是开集就足够了. 然而, 我们有"
+                   (MB (deriv
+                        (app (inv $f) (&c* $U $V))
+                        (app (inv $f)
+                             (&cap (@c* $U $Y)
+                                   (@c* $X $V)))
+                        (&cap (app (inv $f) (&c* $U $Y))
+                              (app (inv $f) (&c* $X $V)))
+                        (&cap (app (@compose (inv $f) (_inv $p $1)) $U)
+                              (app (@compose (inv $f) (_inv $p $2)) $V))
+                        (&cap (app (_inv $f $1) $U)
+                              (app (_inv $f $2) $V))))
+                   "鉴于" $f_1 "和" $f_2 "都是连续函数, "
+                   (app (_inv $f $1) $U) "和"
+                   (app (_inv $f $2) $V) "都是开集. "
+                   "{译注: 其实更严谨地说, 还需要论证" $f
+                   "的唯一性, 只不过这是显然的.}"
+                   (Br)
+                   "以下的图表精确地捕获了我们手头上的情况:"
+                   todo.svg)))
+       (let ((poly (&+ $x^2 (&i* $2 $y))))
+         (Li "(对于那些熟悉类型论的人.) "
+             "让我们来考虑(简单类型)" $lambda
+             "演算的" (Em "类型的范畴")
+             ". " $lambda "演算是对于函数的描述和操作的一种形式化, "
+             "其基于" (Q "变量绑定") "和函数 (functional) 求值的概念. "
+             "例如, 对于实多项式函数的表达式" poly ", 在"
+             $lambda "演算中对于函数" (&\|-> $y poly)
+             " (对于每个固定的值" $x ") 我们写成"
+             (Lam $y poly) ", 而对于函数值函数"
+             (&\|-> $x (@\|-> $y poly)) "我们写成"
+             (Lamb $x (Lam $y poly)) "." (Br)
+             "形式地, " $lambda "演算由以下资料构成."
+             (Ul (Li "类型: "
+                     (&c* $A $B) ", "
+                     (&-> $A $B) ", ... (由一些基本类型生成)")
+                 (Li "项:"
+                     (MB (set-attr*
+                          (&Table
+                           ((&: (&cm $x $y $z $..h) $A)
+                            (: "(对于每个类型" $A "的变量)"))
+                           ((&cm (&: $a $A) (&: $b $B) $..h)
+                            "(可能有一些具类型的常量)")
+                           ((&: (tupa0 $a $b) (&c* $A $B))
+                            (@cm (&: $a $A) (&: $b $B)))
+                           ((&fst $c) (@: $c (&c* $A $B)))
+                           ((&snd $c) (@: $c (&c* $A $B)))
+                           ((ap $c $a)
+                            (@cm (&: $c (&-> $A $B))
+                                 (&: $a $A)))
+                           ((&: (Lam $x $b) (&-> $A $B))
+                            (@cm (&: $x $A) (&: $b $B))))
+                          'columnalign "right left")))
+                 (Li "等式:"
+                     (eqn*
+                      ((&fst (tupa0 $a $b)) $= $a)
+                      ((&snd (tupa0 $a $b)) $= $b)
+                      ((tupa0 (&fst $c) (&snd $c)) $= $c)
+                      ((ap (@Lam $x $b) $a)
+                       $= (subst $b $a $x))
+                      ((Lam $x (ap $c $x))
+                       $= (: $c (&space 6) "(" $x "不在" $c "之中)")))))
+             "项上的关系" 
+             ))
+       )
    (H3. "带有积的范畴")
    (H3. "同态集")
    (H3. "练习")
