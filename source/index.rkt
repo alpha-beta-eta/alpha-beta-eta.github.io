@@ -30,5 +30,7 @@
     (H2 (A "有趣的链接" #:attr* '((href "ilinks.html"))))
     (H2 (A "胡言乱语" #:attr* '((href "huyan.html"))))
     (H2 (A "友情链接" #:attr* '((href "links.html"))))
+    (H2 (A "书评" #:attr* '((href "reviews.html"))))
+    
     )
    ))
