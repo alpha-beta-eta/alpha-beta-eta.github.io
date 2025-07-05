@@ -483,8 +483,92 @@ number?)
       (Code "format-id") "的, 算是一种实现细节.")
    (P "你可能听说过" (Code "syntax-case")
       "的语句可以包含一个可选的" (Q "guard")
-      "或者说" (Q "fender") "表达式, "
-      )
+      "或者说" (Q "fender")
+      "表达式. 一个语句不仅可能是"
+      (CodeB "[&lt;pattern> &lt;template>]")
+      "还可能是"
+      (CodeB "[&lt;pattern> &lt;guard> &lt;template>]")
+      "让我们为" (Code "our-struct") "添加guard表达式."
+      (CodeB "> (require (for-syntax racket/syntax))
+> (define-syntax (our-struct stx)
+    (syntax-case stx ()
+      [(_ id (fields ...))
+       ; Guard or &quot;fender&quot; expression:
+       (for-each (lambda (x)
+                   (unless (identifier? x)
+                     (raise-syntax-error #f &quot;not an identifier&quot; stx x)))
+                 (cons #'id (syntax->list #'(fields ...))))
+       (with-syntax ([pred-id (format-id #'id &quot;~a?&quot; #'id)])
+         #`(begin
+             ; Define a constructor.
+             (define (id fields ...)
+               (apply vector (cons 'id  (list fields ...))))
+             ; Define a predicate.
+             (define (pred-id v)
+               (and (vector? v)
+                    (eq? (vector-ref v 0) 'id)))
+             ; Define an accessor for each field.
+             #,@(for/list ([x (syntax->list #'(fields ...))]
+                           [n (in-naturals 1)])
+                  (with-syntax ([acc-id (format-id #'id &quot;~a-~a&quot; #'id x)]
+                                [ix n])
+                    #`(define (acc-id v)
+                        (unless (pred-id v)
+                          (error 'acc-id &quot;~a is not a ~a struct&quot; v 'id))
+                        (vector-ref v ix))))))]))
+; Now the same misuse gives a better error message:
+> (our-struct &quot;blah&quot; (&quot;blah&quot; &quot;blah&quot;))
+eval:86:0: our-struct: not an identifier
+  at: &quot;blah&quot;
+  in: (our-struct &quot;blah&quot; (&quot;blah&quot; &quot;blah&quot;))")
+      "之后, 我们将会看到" (Code "syntax-parse")
+      "做类似的事情将会更加容易.")
+   (H3. "为嵌套哈希查找使用点记号")
+   (P "之前的例子将一些标识符连接起来形成新的标识符, "
+      "而这里我们要做相反的事情: 将标识符拆成数个部分.")
+   (P "其他的语言中你经常可以看到点记法, 例如在JavaScript中使用JSON. "
+      "迭代使用点记法在Racket中的等价物往往是繁琐的, 例如"
+      (CodeB "foo = js.a.b.c;")
+      "可能要写成"
+      (CodeB "(hash-ref (hash-ref (hash-ref js 'a) 'b) 'c)")
+      "或许我们可以编写一个辅助函数, 使得类似的事情变得更为容易和清晰."
+      (CodeB "; This helper function:
+> (define/contract (hash-refs h ks [def #f])
+    ((hash? (listof any/c)) (any/c) . ->* . any)
+    (with-handlers ([exn:fail? (const (cond [(procedure? def) (def)]
+                                            [else def]))])
+      (for/fold ([h h])
+        ([k (in-list ks)])
+        (hash-ref h k))))
+; Lets us say:
+> (hash-refs js '(a b c))
+&quot;value&quot;")
+      "这已经是不错了, 但是或许我们还可以用宏做得更好."
+      (CodeB "; This macro:
+> (require (for-syntax racket/syntax))
+> (define-syntax (hash.refs stx)
+    (syntax-case stx ()
+      ; If the optional ‘default' is missing, use #f.
+      [(_ chain)
+       #'(hash.refs chain #f)]
+      [(_ chain default)
+       (let* ([chain-str (symbol->string (syntax->datum #'chain))]
+              [ids (for/list ([str (in-list (regexp-split #rx&quot;\\\\.&quot; chain-str))])
+                     (format-id #'chain &quot;~a&quot; str))])
+         (with-syntax ([hash-table (car ids)]
+                       [keys       (cdr ids)])
+           #'(hash-refs hash-table 'keys default)))]))
+; Gives us &quot;sugar&quot; to say this:
+> (hash.refs js.a.b.c)
+&quot;value&quot;
+; Try finding a key that doesn't exist:
+> (hash.refs js.blah)
+#f
+; Try finding a key that doesn't exist, specifying the default:
+> (hash.refs js.blah 'did-not-exist)
+'did-not-exist")
+      "的确可行.")
+   
    (H2. "句法参数")
    (H2. (Code "racket/splicing") "的要义为何?")
    (H2. "健壮的宏: " (Code "syntax-parse"))
