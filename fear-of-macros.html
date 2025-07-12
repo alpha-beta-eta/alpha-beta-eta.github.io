@@ -336,4 +336,58 @@ eval:99:0: hash.refs: Expected hash.key
 > (hash.refs js.)
 eval:100:0: hash.refs: Expected hash.key
   at: js.
-  in: (hash.refs js. #f)</code></pre>还算可以, 但是这种错误处理在某种意义上有点恼人, 使得逻辑的主干部分不那么明晰.</p><p>说到底, 很难说使用<code>hash-refs</code>还是<code>hash.refs</code>更加清晰, 但是至少Racket提供了这样的选择.</p><h2>第5章 句法参数</h2><h2>第6章 <code>racket/splicing</code>的要义为何?</h2><h2>第7章 健壮的宏: <code>syntax-parse</code></h2><h2>第8章 参考和致谢</h2></body></html>
+  in: (hash.refs js. #f)</code></pre>还算可以, 但是这种错误处理在某种意义上有点恼人, 使得逻辑的主干部分不那么明晰.</p><p>说到底, 很难说使用<code>hash-refs</code>还是<code>hash.refs</code>更加清晰, 但是至少Racket提供了这样的选择.</p><h2>第5章 句法参数</h2><p><q>照应if</q>是一个流行的宏的例子. 例如, 我们可以将<pre><code>(let ([tmp (big-long-calculation)])
+  (if tmp
+      (foo tmp)
+      #f))</code></pre>写成<pre><code>(aif (big-long-calculation)
+     (foo it)
+     #f)</code></pre>换言之, 当condition为真时, 标识符<code>it</code>会被自动创建并置为condition之值. 似乎定义这个宏可能很简单:<pre><code>> (define-syntax-rule (aif condition true-expr false-expr)
+    (let ([it condition])
+      (if it
+          true-expr
+          false-expr)))
+> (aif #t (displayln it) (void))
+it: undefined;
+ cannot reference an identifier before its definition
+  in module: 'program</code></pre>当然了, 这么简单不太可能.</p><h2>第6章 <code>racket/splicing</code>的要义为何?</h2><h2>第7章 健壮的宏: <code>syntax-parse</code></h2><h3>第7.1节 函数的错误处理策略</h3><ol><li>完全不处理:<pre><code>> (define (misuse s)
+    (string-append s &quot; snazzy suffix&quot;))
+; User of the function:
+> (misuse 0)
+string-append: contract violation
+  expected: string?
+  given: 0
+  argument position: 1st
+  other arguments...:
+   &quot; snazzy suffix&quot;
+; I guess I goofed, but – what is this &quot;string-append&quot; of which you
+; speak??</code></pre></li><li>手工编写错误处理代码:<pre><code>> (define (misuse s)
+    (unless (string? s)
+      (error 'misuse &quot;expected a string, but got ~a&quot; s))
+    (string-append s &quot; snazzy suffix&quot;))
+; User of the function:
+> (misuse 0)
+misuse: expected a string, but got 0
+; I goofed, and understand why! It's a shame the writer of the
+; function had to work so hard to tell me.</code></pre></li><li>使用合同 (contract):<pre><code>> (define/contract (misuse s)
+    (string? . -> . string?)
+    (string-append s &quot; snazzy suffix&quot;))
+; User of the function:
+> (misuse 0)
+misuse: contract violation
+  expected: string?
+  given: 0
+  in: the 1st argument of
+      (-> string? string?)
+  contract from: (function misuse)
+  blaming: program
+   (assuming the contract is correct)
+  at: eval:131.0
+; I goofed, and understand why! I'm happier, and I hear the writer of
+; the function is happier, too.</code></pre></li><li>使用Typed Racket:<pre><code>#lang typed/racket</code></pre><pre><code>> (: misuse (String -> String))
+> (define (misuse s)
+    (string-append s &quot; snazzy suffix&quot;))
+> (misuse 0)
+eval:3:0: Type Checker: type mismatch
+  expected: String
+  given: Zero
+  in: 0</code></pre></li></ol><h3>第7.2节 宏的错误处理策略</h3><p>对于宏而言, 我们也有着类似的选择.<ol><li>完全不处理, 不过在宏的情况下错误信息可能更加糟糕.</li><li>手工编写错误处理代码, 但是既给编写者添加了负担, 也给阅读者增添了麻烦.</li><li>使用<code>syntax-parse</code>. 对于宏而言, 这相当于使用合同或者类型.</li></ol></p><h3>第7.3节 使用<code>syntax-parse</code></h3><p>原作者其实还没有写这个部分就是了, 而是建议阅读<a href="https://docs.racket-lang.org/syntax/stxparse-intro.html">Introduction</a>. </p><h2>第8章 参考和致谢</h2></body></html>

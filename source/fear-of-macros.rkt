@@ -615,8 +615,95 @@ eval:100:0: hash.refs: Expected hash.key
       "还是" (Code "hash.refs") "更加清晰, "
       "但是至少Racket提供了这样的选择.")
    (H2. "句法参数")
+   (P (Q "照应if") "是一个流行的宏的例子. 例如, 我们可以将"
+      (CodeB "(let ([tmp (big-long-calculation)])
+  (if tmp
+      (foo tmp)
+      #f))")
+      "写成"
+      (CodeB "(aif (big-long-calculation)
+     (foo it)
+     #f)")
+      "换言之, 当condition为真时, 标识符" (Code "it")
+      "会被自动创建并置为condition之值. "
+      "似乎定义这个宏可能很简单:"
+      (CodeB "> (define-syntax-rule (aif condition true-expr false-expr)
+    (let ([it condition])
+      (if it
+          true-expr
+          false-expr)))
+> (aif #t (displayln it) (void))
+it: undefined;
+ cannot reference an identifier before its definition
+  in module: 'program")
+      "当然了, 这么简单不太可能.")
    
    (H2. (Code "racket/splicing") "的要义为何?")
+   
    (H2. "健壮的宏: " (Code "syntax-parse"))
+   (H3. "函数的错误处理策略")
+   (Ol (Li "完全不处理:"
+           (CodeB "> (define (misuse s)
+    (string-append s &quot; snazzy suffix&quot;))
+; User of the function:
+> (misuse 0)
+string-append: contract violation
+  expected: string?
+  given: 0
+  argument position: 1st
+  other arguments...:
+   &quot; snazzy suffix&quot;
+; I guess I goofed, but – what is this &quot;string-append&quot; of which you
+; speak??"))
+       (Li "手工编写错误处理代码:"
+           (CodeB "> (define (misuse s)
+    (unless (string? s)
+      (error 'misuse &quot;expected a string, but got ~a&quot; s))
+    (string-append s &quot; snazzy suffix&quot;))
+; User of the function:
+> (misuse 0)
+misuse: expected a string, but got 0
+; I goofed, and understand why! It's a shame the writer of the
+; function had to work so hard to tell me."))
+       (Li "使用合同 (contract):"
+           (CodeB "> (define/contract (misuse s)
+    (string? . -> . string?)
+    (string-append s &quot; snazzy suffix&quot;))
+; User of the function:
+> (misuse 0)
+misuse: contract violation
+  expected: string?
+  given: 0
+  in: the 1st argument of
+      (-> string? string?)
+  contract from: (function misuse)
+  blaming: program
+   (assuming the contract is correct)
+  at: eval:131.0
+; I goofed, and understand why! I'm happier, and I hear the writer of
+; the function is happier, too."))
+       (Li "使用Typed Racket:"
+           (CodeB "#lang typed/racket")
+           (CodeB "> (: misuse (String -> String))
+> (define (misuse s)
+    (string-append s &quot; snazzy suffix&quot;))
+> (misuse 0)
+eval:3:0: Type Checker: type mismatch
+  expected: String
+  given: Zero
+  in: 0")))
+   (H3. "宏的错误处理策略")
+   (P "对于宏而言, 我们也有着类似的选择."
+      (Ol (Li "完全不处理, 不过在宏的情况下错误信息可能更加糟糕.")
+          (Li "手工编写错误处理代码, 但是既给编写者添加了负担, "
+              "也给阅读者增添了麻烦.")
+          (Li "使用" (Code "syntax-parse")
+              ". 对于宏而言, 这相当于使用合同或者类型.")))
+   (H3. "使用" (Code "syntax-parse"))
+   (P "原作者其实还没有写这个部分就是了, 而是建议阅读"
+      (A #:attr* '((href "https://docs.racket-lang.org/syntax/stxparse-intro.html"))
+         "Introduction")
+      ". "
+      )
    (H2. "参考和致谢")
    ))
