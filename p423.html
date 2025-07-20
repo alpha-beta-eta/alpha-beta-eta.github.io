@@ -1071,9 +1071,9 @@
                      (k (Letrec x* e* body)
                         (D (U u* v*) x*)))))))))</code></pre><p>以上代码几乎只是常规而已. 不过, 或许应该再强调一下, <code>letrec</code>的右支受到<code>letrec</code>绑定的管辖, 而<code>let</code>的右支不会受到<code>let</code>绑定的管辖. 因此, 计算自由变量的代码也不太一样.</p><pre><code>      ((,prim . ,rands)
        (guard (prim? prim))
-       (uncover rands
-                (lambda (rands u*)
-                  (k (cons prim rands) u*))))
+       (uncover* rands
+                 (lambda (rands u*)
+                   (k (cons prim rands) u*))))
       ((,rator . ,rands) (uncover* exp k))))
   (uncover
    exp (lambda (exp u*)
@@ -1147,4 +1147,258 @@
                          (x.1)
                          (begin (set-box! x.1 (+ (unbox x.1) '1)) (unbox x.1))))))
               t.3)))))
-   (begin (counter.0) (counter.0) (counter.0)))</code></pre><h2>作业12: <code>convert-closures</code></h2><p>顾名思义, <code>convert-closures</code>进行闭包变换, 不过实际上它只是闭包变换的第一步, 而或许<code>uncover-free</code>应该算作闭包变换的第零步.</p></body></html>
+   (begin (counter.0) (counter.0) (counter.0)))</code></pre><h2>作业12: <code>convert-closures</code></h2><p>顾名思义, <code>convert-closures</code>进行闭包变换, 不过实际上它只是闭包变换的第一步, 而或许<code>uncover-free</code>应该算作闭包变换的第零步. 对于这个变换, 我们最好先明确句法.</p><pre><code>&lt;exp> ::= (quote &lt;immediate>)
+       |  &lt;uvar>
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (begin &lt;exp>+)
+       |  (let ((&lt;uvar> &lt;exp>)*) &lt;exp>)
+       |  (letrec ((&lt;label> (lambda (&lt;uvar> &lt;uvar>*)
+                              (bind-free (&lt;uvar> &lt;uvar>*) &lt;exp>)))*)
+            (closures ((&lt;uvar> &lt;label> &lt;uvar>*)*) &lt;exp>))
+       |  (&lt;prim> &lt;exp>*)
+       |  (&lt;exp> &lt;exp> &lt;exp>*)</code></pre><p>只有<code>letrec</code>和非原语应用的句法发生了变换, 但是仅凭这句法的改变并不容易看出来这个变换究竟是在做什么. 实际上, 这个变换主要是为接下来的一步<code>introduce-procedure-primitives</code>作准备. 之后的<code>lambda</code>将不包含有自由变量, 转而引入了一个新的参数, 这也就是为什么新的句法之中<code>lambda</code>至少会拥有一个参数, 这个参数出现在第一个位置上, 代表所谓的<q>闭包指针 (closure pointer)</q>. 什么是闭包指针呢? 顾名思义, 指向闭包的东西. 那么闭包是什么呢? 这个应该没有Schemer不理解. 简而言之, 技术性地, 一个闭包是一个向量, 其由一个<q>函数指针 (标签)</q>和诸自由变量的值构成, 而所谓的函数指针里的函数, 其实就是这里不包含自由变量的新<code>lambda</code>. <code>bind-free</code>形式里的参数, 第一个位置上的也是闭包指针, 之后的则是各个自由变量. 之后我们会看到, <code>lambda</code>里原本的自由变量将会从闭包的分量之中提取出来. <code>closures</code>形式只是为引入闭包作准备, 这里每个闭包的数据分别是闭包的名字, 函数指针 (标签), 还有自由变量. 我们之后将会引入构造闭包的原语. 非原语应用的句法改变也是为了配合之后的变换, 此时我们知道在精心安排之下, 出现在rator位置的表达式, 其值应该是(作为向量的)闭包. 这个闭包实际上不能直接应用, 而之后的应用将会变为取出闭包的函数指针, 将闭包和实际参数传递给函数指针. 我们在这里所要做的事情只是复制rator罢了, 并避免可能的重复求值.</p><pre><code>(define (convert-closures exp)
+  (define (convert exp)
+    (match exp
+      ((quote ,i) exp)
+      (,x (guard (symbol? x)) x)
+      ((if ,q ,a ,e)
+       `(if ,(convert q)
+            ,(convert a)
+            ,(convert e)))
+      ((begin . ,exp*)
+       (cons 'begin (map convert exp*)))
+      ((let ,bds ,body)
+       (: bds
+          (lambda (x* e*)
+            (let ((e* (map convert e*))
+                  (body (convert body)))
+              (Let x* e* body)))))</code></pre><p>开头平平无奇, 只是照常而已.</p><pre><code>      ((letrec ,bds ,body)
+       (: bds
+          (lambda (x* e*)
+            (define label*
+              (map unique-label x*))
+            (define lam*
+              (map (lambda (e)
+                     (match e
+                       ((lambda ,x* (free ,f* ,body))
+                        (define cp
+                          (unique-symbol 'cp))
+                        `(lambda ,(cons cp x*)
+                           (bind-free
+                            ,(cons cp f*)
+                            ,(convert body))))))
+                   e*))
+            (define free**
+              (map (lambda (e)
+                     (match e
+                       ((lambda ,x* (free ,f* ,body))
+                        f*)))
+                   e*))
+            (define closure*
+              (map (lambda (x label free*)
+                     `(,x ,label . ,free*))
+                   x* label* free**))
+            (Letrec
+             label* lam*
+             `(closures ,closure* ,(convert body))))))</code></pre><p>对于<code>letrec</code>的处理是主要的复杂所在, 但是我们所要做的只是生成所需的数据, 例如标签和闭包指针的名字, 最后再按描述将它们放在一起.</p><pre><code>      ((,prim . ,exp*)
+       (guard (prim? prim))
+       (cons prim (map convert exp*)))
+      ((,rator . ,rand*)
+       (let ((rator (convert rator))
+             (rand* (map convert rand*)))
+         (if (symbol? rator)
+             `(,rator ,rator . ,rand*)
+             (let ((t (unique-symbol 't)))
+               `(let ((,t ,rator))
+                  (,t ,t . ,rand*))))))))
+  (convert exp))</code></pre><p>对于非原始应用的处理需要小心一点, 因为复制rator必须要避免重复求值, 这是由引入额外的<code>let</code>绑定完成的.</p><p>最后让我们给出一些例子.</p><pre><code>> (compil
+   '(lambda (x)
+      (lambda (y)
+        (lambda (m)
+          ((m x) y)))))
+'(letrec ((t.3$6
+           (lambda (cp.7 x.0)
+             (bind-free
+              (cp.7)
+              (letrec ((t.4$8
+                        (lambda (cp.9 y.1)
+                          (bind-free
+                           (cp.9 x.0)
+                           (letrec ((t.5$10
+                                     (lambda (cp.11 m.2)
+                                       (bind-free
+                                        (cp.11 x.0 y.1)
+                                        (let ((t.12 (m.2 m.2 x.0)))
+                                          (t.12 t.12 y.1))))))
+                             (closures ((t.5 t.5$10 x.0 y.1)) t.5))))))
+                (closures ((t.4 t.4$8 x.0)) t.4))))))
+   (closures ((t.3 t.3$6)) t.3))</code></pre><pre><code>> (compil
+   '(let ((x 0) (y 1) (z 2))
+      (let ((counter (lambda ()
+                       (set! x (+ x 1))
+                       (set! z (+ z 2))
+                       (cons x z))))
+        (counter)
+        (counter)
+        (counter))))
+'(let ((t.5 '2) (y.1 '1) (t.4 '0))
+   (let ((z.2 (box t.5)) (x.0 (box t.4)))
+     (letrec ((counter.3$6
+               (lambda (cp.7)
+                 (bind-free
+                  (cp.7 x.0 z.2)
+                  (begin
+                    (set-box! x.0 (+ (unbox x.0) '1))
+                    (set-box! z.2 (+ (unbox z.2) '2))
+                    (cons (unbox x.0) (unbox z.2)))))))
+       (closures
+        ((counter.3 counter.3$6 x.0 z.2))
+        (begin
+          (counter.3 counter.3)
+          (counter.3 counter.3)
+          (counter.3 counter.3))))))</code></pre><pre><code>> (compil
+   '(letrec ((even? (lambda (n)
+                      (if (= n 0)
+                          #t
+                          (odd? (- n 1)))))
+             (odd? (lambda (n)
+                     (if (= n 0)
+                         #f
+                         (even? (- n 1))))))
+      (even? 88)))
+'(letrec ((odd?.1$4
+           (lambda (cp.6 n.3)
+             (bind-free
+              (cp.6 even?.0)
+              (if (= n.3 '0) '#f (even?.0 even?.0 (- n.3 '1))))))
+          (even?.0$5
+           (lambda (cp.7 n.2)
+             (bind-free
+              (cp.7 odd?.1)
+              (if (= n.2 '0) '#t (odd?.1 odd?.1 (- n.2 '1)))))))
+   (closures
+    ((odd?.1 odd?.1$4 even?.0) (even?.0 even?.0$5 odd?.1))
+    (even?.0 even?.0 '88)))</code></pre><h2>作业13: <code>optimize-known-call</code></h2><p>之前我们已经提及这个步骤, 但是按照逻辑顺序其应该放在这个位置.</p><p>正如名字里所暗示的那样, <code>optimize-known-call</code>是一个优化步骤, 所以应该不改变句法. 不过, 实际上句法有一点微妙的改变.</p><pre><code>&lt;exp> ::= (quote &lt;immediate>)
+       |  &lt;uvar>
+       |  (if &lt;exp> &lt;exp> &lt;exp>)
+       |  (begin &lt;exp>+)
+       |  (let ((&lt;uvar> &lt;exp>)*) &lt;exp>)
+       |  (letrec ((&lt;label> (lambda (&lt;uvar> &lt;uvar>*)
+                              (bind-free (&lt;uvar> &lt;uvar>*) &lt;exp>)))*)
+            (closures ((&lt;uvar> &lt;label> &lt;uvar>*)*) &lt;exp>))
+       |  (&lt;prim> &lt;exp>*)
+       |  (&lt;label> &lt;exp> &lt;exp>*)
+       |  (&lt;exp> &lt;exp> &lt;exp>*)</code></pre><p>非原始应用现在也可能以标签开头, 这其实也正是<q>优化</q>的用意. 接下来的<code>introduce-procedure-primitives</code>实际上并不在乎这里是表达式还是标签, 虽然实际上<code>convert-closures</code>, <code>optimize-known-call</code>和<code>introduce-procedure-primitives</code>应该合并为一个步骤. 这可以免去诸多冗余的计算, 但是这里分开的理由大概只是Kent Dybvig认为现在这种安排对于初学者更容易理解, 可惜我并不这么觉得.</p><p>本次优化的想法在于, 如果非原始应用的开头直接地引用一个闭包, 我们知道 (或者读者还并不知道, 因为这是下一个变换所做的事情) 接下来我们需要寻找其对应的函数指针, 但是直接引用闭包意味着这个函数指针也可以直接引用, 那么就无需间接的调用 (indirect call) 了. 因此, 接下来的步骤里我们也要注意, 如果非原始应用的开头已经是一个标签, 那么就不能再动了.</p><pre><code>(define (optimize-known-call exp)
+  (define (lookup rator env)
+    (cond ((assq rator env) => cdr)
+          (else rator)))
+  (define ((optimize env) exp)
+    (match exp
+      ((quote ,i) exp)
+      (,x (guard (symbol? x)) x)
+      ((if ,q ,a ,e)
+       `(if ,((optimize env) q)
+            ,((optimize env) a)
+            ,((optimize env) e)))
+      ((begin . ,exp*)
+       (cons 'begin (map (optimize env) exp*)))
+      ((let ,bds ,body)
+       (: bds
+          (lambda (x* e*)
+            (let ((e* (map (optimize env) e*))
+                  (body ((optimize env) body)))
+              (Let x* e* body)))))</code></pre><p>开头没什么好说的, 这里的<code>lookup</code>是为了在环境<code>env</code>之中查找<code>rator</code>是否具有已知的对应标签. 因此, 这个环境是由闭包的名字和其对应的标签的序对构成的. 之后的步骤里, 我们要将非原始应用开头的闭包转换为获取这个闭包所对应的函数指针. 而开头已经是标签的, 那就无需转换了.</p><pre><code>      ((letrec ,bds (closures ,closures ,body))
+       (define env^
+         (append
+          (map
+           (lambda (c)
+             (match c
+               ((,name ,label . ,free*)
+                (cons name label))))
+           closures)
+          env))
+       (: bds
+          (lambda (x* e*)
+            (let ((e* (map (lambda (e)
+                             (match e
+                               ((lambda ,x*
+                                  (bind-free ,y* ,body))
+                                `(lambda ,x*
+                                   (bind-free
+                                    ,y* ,((optimize env^) body))))))
+                           e*))
+                  (body ((optimize env^) body)))
+              (Letrec
+               x* e*
+               `(closures ,closures ,body))))))</code></pre><p>处理<code>letrec</code>的部分很长, 但是主要的繁琐是扩展当前的环境<code>env</code>为<code>env^</code>. 这里需要小心的是, <code>letrec</code>所绑定的这些标签的作用域也能覆盖到其右支的诸<code>lambda</code>上.</p><pre><code>      ((,prim . ,rands)
+       (guard (prim? prim))
+       (cons prim (map (optimize env) rands)))
+      ((,rator . ,rands)
+       (let ((rator ((optimize env) rator))
+             (rands (map (optimize env) rands)))
+         (if (symbol? rator)
+             (cons (lookup rator env) rands)
+             (cons rator rands))))))
+  ((optimize '()) exp))</code></pre><p>对于非原始应用的处理是这次优化实质上的逻辑核心, 而其是由之前的<code>lookup</code>所完成的. 我们试图找到作为符号的<code>rator</code>所对应的标签, 但是找不到的话就维持原状.</p><p>让我们来看一些例子.</p><pre><code>> (compil
+   '(letrec ((even? (lambda (n)
+                      (if (= n 0)
+                          #t
+                          (odd? (- n 1)))))
+             (odd? (lambda (n)
+                     (if (= n 0)
+                         #f
+                         (even? (- n 1))))))
+      (even? 88)))
+'(letrec ((odd?.1$4
+           (lambda (cp.6 n.3)
+             (bind-free
+              (cp.6 even?.0)
+              (if (= n.3 '0) '#f (even?.0$5 even?.0 (- n.3 '1))))))
+          (even?.0$5
+           (lambda (cp.7 n.2)
+             (bind-free
+              (cp.7 odd?.1)
+              (if (= n.2 '0) '#t (odd?.1$4 odd?.1 (- n.2 '1)))))))
+   (closures
+    ((odd?.1 odd?.1$4 even?.0) (even?.0 even?.0$5 odd?.1))
+    (even?.0$5 even?.0 '88)))</code></pre><p>这个例子是比较理想的情况, 因为所有的非原始应用的rator位置都被替换为了其所对应的标签.</p><pre><code>> (compil
+   '(((lambda (h)
+        ((lambda (f) (f f))
+         (lambda (g)
+           (h (lambda (x) ((g g) x))))))
+      (lambda (fact)
+        (lambda (n)
+          (if (= n 0)
+              1
+              (* n (fact (- n 1)))))))
+     10))
+'(let ((t.17
+        (letrec ((h.0$8
+                  (lambda (cp.9 fact.4)
+                    (bind-free
+                     (cp.9)
+                     (letrec ((t.6$10
+                               (lambda (cp.11 n.5)
+                                 (bind-free
+                                  (cp.11 fact.4)
+                                  (if (= n.5 '0)
+                                    '1
+                                    (* n.5 (fact.4 fact.4 (- n.5 '1))))))))
+                       (closures ((t.6 t.6$10 fact.4)) t.6))))))
+          (closures
+           ((h.0 h.0$8))
+           (letrec ((f.1$12
+                     (lambda (cp.13 g.2)
+                       (bind-free
+                        (cp.13 h.0)
+                        (h.0$8
+                         h.0
+                         (letrec ((t.7$14
+                                   (lambda (cp.15 x.3)
+                                     (bind-free
+                                      (cp.15 g.2)
+                                      (let ((t.16 (g.2 g.2 g.2)))
+                                        (t.16 t.16 x.3))))))
+                           (closures ((t.7 t.7$14 g.2)) t.7)))))))
+             (closures ((f.1 f.1$12 h.0)) (f.1$12 f.1 f.1)))))))
+   (t.17 t.17 '10))</code></pre><p>而又一个例子则是不怎么理想的情况.</p><h2>作业12: <code>introduce-procedure-primitives</code></h2><p>顾名思义, <code>introduce-procedure-primitives</code>引入了一些和过程 (或者说闭包) 相关的原语. 这些原语包括<code>make-procedure</code>, <code>procedure-set!</code>, <code>procedure-code</code>以及<code>procedure-ref</code>. </p></body></html>

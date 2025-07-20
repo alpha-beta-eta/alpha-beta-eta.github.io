@@ -28,7 +28,7 @@
     (H2 (A "函数式编程的domain论基础" #:attr* '((href "fp_domain.html"))))
     (H2 (A "结构证明论" #:attr* '((href "spt.html"))))
     (H2 (A "OPLSS" #:attr* '((href "oplss.html"))))
-    (H2 (A "归纳定义" #:attr* '((href "induc.html"))))
+    (H2 (A "归纳定义导论" #:attr* '((href "induc.html"))))
     (H2 (A "元对象协议艺术" #:attr* '((href "mop.html"))))
     (H2 (A "Lem编辑器使用笔记" #:attr* '((href "lem_editor.html"))))
     (H2 (A "部分求值" #:attr* '((href "pe_jones.html"))))

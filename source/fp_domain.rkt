@@ -1,7 +1,24 @@
 #lang racket
 (provide fp_domain.html)
 (require SMathML)
+(define (&rule #:space [n 8] . j*)
+  (let-values (((j* j1) (split-at-right j* 1)))
+    (~ #:attr* '((displaystyle "true"))
+       (apply (&split n) j*) (car j1))))
 (define :nat (Ms "nat"))
+(define :Y (Ms "Y"))
+(define :zero (Ms "zero"))
+(define :succ (Ms "succ"))
+(define (Succ M)
+  (app :succ M))
+(define (fix σ M)
+  (app (_ :Y σ) M))
+(define :pred (Ms "pred"))
+(define (Pred M)
+  (app :pred M))
+(define :ifz (Ms "ifz"))
+(define (Ifz M1 M2 M3)
+  (appl :ifz M1 M2 M3))
 (define (Contextualize C)
   (lambda (E)
     (ap C (bra0 E))))
@@ -26,9 +43,31 @@
      (Ms "else") c (Ms "fi")))
 (define $\| (Mo "|"))
 (define $dArr (Mo "&dArr;"))
+(define $cong (Mo "&cong;"))
+(define Γ $Gamma:normal)
+(define Γ^ (&prime $Gamma:normal))
+(define Δ $Delta:normal)
+(define $vdash (Mo "&vdash;"))
+(define (Γ⊢ #:env [env Γ] . x*)
+  (let-values (((b* x*) (split-at-right x* 1)))
+    (&vdash (apply &cm env b*) (car x*))))
+(define $.
+  (Mo "." #:attr* '((lspace "0") (rspace "0"))))
+(define (Lam var type term)
+  (: $lambda (&: var type) $. term))
+(define (subst M x N)
+  (: M (bra0 (&/ N x))))
+(define $::= (Mo "&Colone;"))
 (define-infix*
   (&\| $\|)
-  (&dArr $dArr))
+  (&dArr $dArr)
+  (&cong $cong)
+  (&vdash $vdash)
+  (&::= $::=))
+(define-@lized-op*
+  (@-> &->)
+  (@Lam Lam)
+  (@= &=))
 (define fp_domain.html
   (TnTmPrelude
    #:title "函数式编程的domain论基础"
@@ -145,7 +184,7 @@
       todo.svg
       "特别是, 这些方面时如何交互的.")
    (P "首先, 我们将会引入一个最简单的函数式编程语言, "
-      "即带有自然数作为基本类型但没有一般性的递归类型的"
+      "即带有自然数作为基类型但没有一般性的递归类型的"
       "PCF (Programming Computable Functionals).")
    (P "PCF的" (Em "操作语义") "将由一个" (Em "归纳")
       "定义的" (Em "求值关系")
@@ -177,7 +216,7 @@
       "我们将会引入具有相同类型的封闭PCF表达式的"
       (Em "观察性相等(observational equality)")
       "的概念, 其中" $E_1 "和" $E_2
-      "被认为是观察性相等的当且仅当对于所有具有基本类型"
+      "被认为是观察性相等的当且仅当对于所有具有基类型"
       :nat "的上下文" (ContextC $) ", 都有"
       (MB (&<=> (&dArr (ContextC $E_1)
                        (UnderBar $n))
@@ -187,7 +226,7 @@
       "成立. 从直觉上来说, 表达式" $E_1 "和" $E_2
       "是观察性相等的当且仅当对于" $E_1 "和" $E_2
       "可以作出相同的观察, 其中一个对于" $E "的"
-      (Em "观察") "由观察到对于某个具有基本类型"
+      (Em "观察") "由观察到对于某个具有基类型"
       :nat "的上下文" (ContextC $)
       "和某个自然数" $n "有"
       (&dArr (ContextC $E) (UnderBar $n))
@@ -241,7 +280,7 @@
       (Q "信息序") ", 相对于这个序" $bottom "是最小元素, "
       "而其他的元素 (即自然数) 之间均不可比较. "
       "{译注: 这构成了所谓的扁平格 (flat lattice).} "
-      "PCF的类型从基本类型" :nat
+      "PCF的类型从基类型" :nat
       "开始由二元构成运算符" $-> "构筑而成, 其中"
       (_ $D (&-> $sigma $tau))
       "被认为是从" $D_sigma "到" $D_tau
@@ -256,6 +295,155 @@
       
       )
    (H2. "PCF及其操作语义")
+   (P "本章我们引入原型性质的函数式编程语言PCF及其操作语义.")
+   (P "PCF是一个有类型的语言, 其类型的集合" (Ms "Type")
+      "归纳定义如下"
+      (Ul (Li "基类型" :nat "是一个类型, 而")
+          (Li "每当" $sigma "和" $tau "是类型, 那么"
+              (@-> $sigma $tau) "也是一个类型."))
+      "我们经常将基类型" :nat "记为" $iota
+      ", 而记" (@-> $sigma $tau) "为"
+      (&-> $sigma $tau) ", 其中" $->
+      "被理解为一个" (Ms "Type") "上的右结合二元运算, 例如"
+      (&-> $sigma_1 $sigma_2 $sigma_3) "应该读作"
+      (@-> $sigma_1 (@-> $sigma_2 $sigma_3))
+      ". 根据" (Ms "Type") "的归纳定义, 每个类型" $sigma
+      "都以唯一的方式具有形式"
+      (&-> $sigma_1 $..c $sigma_n $iota) ".")
+   (P "鉴于PCF的项可能包含自由变量, 我们将相对于"
+      (Em "类型上下文(type context)")
+      "来定义项, 在类型上下文之中有限多个变量和其类型一起声明, "
+      "即类型上下文是具有形式"
+      (MB (&equiv Γ
+                  (&cm (&: $x_1 $sigma_1) $..h
+                       (&: $x_n $sigma_n))))
+      "的表达式, 其中" $sigma_i "是类型而" $x_i
+      "是两两互异的变量. 因为变量无法出现于类型表达式之中, 那么"
+      Γ "之中单个变量声明" (&: $x_i $sigma_i)
+      "的顺序就是不重要的. 据此, 如果" Γ^ "是由" Γ
+      "通过置换得到的, 那么我们就将它们视为等同的.")
+   (P "具有形式"
+      (MB (&vdash Γ (&: $M $sigma)))
+      "的合法判断在图2.1中由归纳定义, 其意即"
+      $M "在上下文" Γ "之中是一个具有类型"
+      $sigma "的项.")
+   (Table
+    #:attr* '((align "center")
+              (style "border-spacing: 3em 1em;"))
+    (Tr (Td (&rule (Γ⊢ (&: $x $sigma) Δ (&: $x $sigma))))
+        (Td (&rule (Γ⊢ (&: $x $sigma) (&: $M $tau))
+                   (Γ⊢ (&: (@Lam $x $sigma $M) (&-> $sigma $tau))))))
+    (Tr (Td (&rule (Γ⊢ (&: $M (&-> $sigma $tau)))
+                   (Γ⊢ (&: $N $sigma))
+                   (Γ⊢ (&: (app $M $N) $tau))))
+        (Td (&rule (Γ⊢ (&: $M (&-> $sigma $sigma)))
+                   (Γ⊢ (&: (fix $sigma $M) $sigma)))))
+    (Tr (Td (&rule (Γ⊢ (&: :zero :nat))))
+        (Td (&rule (Γ⊢ (&: $M :nat))
+                   (Γ⊢ (&: (Succ $M) :nat)))))
+    (Tr (Td (&rule (Γ⊢ (&: $M :nat))
+                   (Γ⊢ (&: (Pred $M) :nat))))
+        (Td (&rule (Γ⊢ (: (&: $M_i :nat) (&space 4)
+                          (@= $i (&cm $1 $2 $3))))
+                   (Γ⊢ (&: (Ifz $M_1 $M_2 $M_3) :nat)))))
+    (Tr (Td #:attr* '((colspan "2") (align "center"))
+            "图2.1 PCF的定型规则")))
+   (P "根据推导结构上的归纳, 我们很容易证明每当"
+      (&vdash Γ (&: $M $sigma)) "可以被推导出来, 那么"
+      (&vdash (app $pi Γ) (&: $M $sigma))
+      "也可以被推导出来, 其中" $pi "是任意对于"
+      Γ "的置换.")
+   (P "鉴于每个PCF的语言构造只有一条定型规则与之对应, "
+      "那么我们很容易证明" (&vdash Γ (&: $M $sigma))
+      "中的" $sigma "由" Γ "和" $sigma
+      "唯一确定 (练习!). "
+      "{译注: 唯一确定意即如果" (&vdash Γ (&: $M $sigma_1))
+      "和" (&vdash Γ (&: $M $sigma_2))
+      "都是可推导的, 那么" (&= $sigma_1 $sigma_2)
+      ".} 因此, 反向应用定型规则产生了一个递归的"
+      (Em "类型检查(type checking)")
+      "算法, 其给出" $M "和" Γ "即可计算满足"
+      (&vdash Γ (&: $M $sigma)) "的类型"
+      $sigma ", 只要这个类型的确存在, 否则的话也能够报错. "
+      "{译注: 满足" (&vdash Γ (&: $M $sigma))
+      "的意思是" (&vdash Γ (&: $M $sigma)) "是可推导的. "
+      "也就是说, 如果存在类型" $sigma "使得"
+      (&vdash Γ (&: $M $sigma))
+      "是可推导的, 那么算法就能计算出这个类型, 并且我们还知道这个类型是唯一的, "
+      "不存在这种类型的话算法也能够主动报错.} "
+      "(我们邀请读者对于一些简单的例子测试这个算法!)")
+   (P "接下来我们不拘泥于PCF项的" (Q "官方 (offcial)")
+      "句法. 经常我们记" (ap $M $N) "或" (@ap $M $N)
+      "而非" (app $M $N) ". 为了与" $->
+      "的右结合性保持一致, 我们将由并置给出的应用视为左结合的, "
+      "意即" (: $M_1 $..h $M_n) "应该读作"
+      (@ $..h (@ap $M_1 $M_2) $..h $M_n) "或者"
+      (app (ap (app $M_1 $M_2) $..h) $M_n) ".")
+   (P "对于由" $lambda "所绑定的变量, 我们采取通常的"
+      (Em $alpha "转换") "的约定, 即项被认为是相等的, "
+      "如果它们互相可以通过对于绑定变量进行适当换名得到. "
+      "{译注: 换言之, 更技术性地说, 在某种意义上我们要考虑的是"
+      $lambda "项的" $alpha "等价类.} "
+      "而且, 当替换项" $M "中的变量" $x "为项" $N
+      "时, 我们首先会对于" $M "的绑定变量进行换名以使得"
+      $N "的自由变量不会被" $M "中的" (Em "lambda抽象")
+      "绑定, 也就是说我们所用的是"
+      (Em "无捕获替换(capture-free substitution)") ".")
+   (P "在我们定义PCF的操作语义之前, 我们先引入PCF的"
+      (Q "原项 (raw term)") "的概念, 根据以下的BNF语法:"
+      (MB (&::= $M (&\| $x
+                        (@Lam $x $sigma $M)
+                        (app $M $M)
+                        :zero
+                        (Succ $M)
+                        (Pred $M)
+                        (Ifz $M $M $M))))
+      "当然了, 不是每个原项都可定型, 例如"
+      (Lam $x :nat (app $x $x))
+      ", 其中第一个" $x "的出现显然应该具有函数类型以使得"
+      (app $x $x) "是良类型的.")
+   (P "现在我们呈现PCF的一个" (Q "大步")
+      "语义, 其由一个原项上的二元关系" $dArr
+      "给出, 而这个关系是根据图2.2中的规则归纳定义的. "
+      "这里的" (UnderBar $n) "是自然数" $n
+      "的canonical" (Em "数码")
+      ", 其被递归地定义为" (&equiv (UnderBar $0) :zero) "而"
+      (&equiv (UnderBar (&+ $k $1)) (Succ (UnderBar $k))) ".")
+   (Table
+    #:attr* '((align "center")
+              (style "border-spacing: 3em 1em;"))
+    (Tr (Td (&rule (&dArr $x $x)))
+        (Td (&rule (&dArr (Lam $x $sigma $M) (Lam $x $sigma $M)))))
+    (Tr (Td (&rule (&dArr $M (Lam $x $sigma $E))
+                   (&dArr (subst $E $x $N) $V)
+                   (&dArr (app $M $N) $V)))
+        (Td (&rule (&dArr (app $M (fix $sigma $M)) $V)
+                   (&dArr (fix $sigma $M) $V))))
+    (Tr (Td (&rule (&dArr (UnderBar $0) (UnderBar $0))))
+        (Td (&rule (&dArr $M (UnderBar $n))
+                   (&dArr (Succ $M) (UnderBar (&+ $n $1))))))
+    (Tr (Td (&rule (&dArr $M (UnderBar $0))
+                   (&dArr (Pred $M) (UnderBar $0))))
+        (Td (&rule (&dArr $M (UnderBar (&+ $n $1)))
+                   (&dArr (Pred $M) (UnderBar $n)))))
+    (Tr (Td (&rule (&dArr $M (UnderBar $0))
+                   (&dArr $M_1 $V)
+                   (&dArr (Ifz $M $M_1 $M_2) $V)))
+        (Td (&rule (&dArr $M (UnderBar (&+ $n $1)))
+                   (&dArr $M_2 $V)
+                   (&dArr (Ifz $M $M_1 $M_2) $V))))
+    (Tr (Td #:attr* '((colspan "2") (align "center"))
+            "图2.2 PCF的大步语义")))
+   (P "每当" (&dArr $E $V) ", 那么" $V
+      "是一个变量, 数码, 或者" $lambda "抽象. "
+      "根据推导" (&dArr $E $V) "的结构上的归纳, "
+      $V "的自由变量包含于" $E "的自由变量之中. "
+      "因此, 如果" $E "是一个封闭表达式, 那么"
+      $V "要么是一个数码, 要么是一个没有自由变量的"
+      $lambda "抽象. 这样的项被称为(句法)"
+      (Em "值") ", 并且很容易看出对于每个这样的值"
+      $V "我们都有" (&dArr $V $V) ". "
+      )
    (H2. "PCF的Scott模型")
    (H3. "基本的domain论")
    (H3. "PCF的domain模型")

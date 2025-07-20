@@ -1,6 +1,11 @@
 #lang racket
 (provide misc.html)
 (require SMathML "misc-utils.rkt")
+(define $pr (Mo "&pr;"))
+(define $. (Mo "." #:attr* '((lspace "0"))))
+(define (∀ x P)
+  (: $forall x $. P))
+(define $<=:id (Mi "&le;"))
 (define $det (Mi "det"))
 (define (&det A) (app $det A))
 (define (&det0 A) (@ap $det A))
@@ -12,6 +17,9 @@
   (appl $delta i j))
 (define (∃ x P)
   (: $exists x $cm P))
+(define-infix*
+  (&=> $=>)
+  (&pr $pr))
 (define misc.html
   (TmPrelude
    #:title "misc"
@@ -303,6 +311,28 @@
     "存在以" $a "为中心的开球" $B_X "满足"
     (&sube (app $f $B_X) $B_Y) ". 等价地, 把开球替换成开集或者邻域也可以.")
    
+   (H1 "良基关系")
+   ((definition)
+    "一个偏序集被称为良基 (well-founded) 的, 如果其每个非空子集都有极小元. "
+    "对于良基的偏序集, 我们可以施行良基归纳. 对于良基的偏序集" (tu0 $X $<=:id)
+    "和性质" $P ", 如果对于每个" (∈ $x $X) ", 我们可以根据"
+    (∀ (∈ $y $X) (&=> (&< $y $x) (app $P $y))) "推出"
+    (app $P $x) ", 那么性质" $P "对于每个" (∈ $x $X)
+    "均成立. 一种证明良基归纳正确性的方式是反证法. "
+    "对于满足良基归纳条件的性质" $P ", 假设" $X
+    "中存在不满足" $P "的元素, 那么这些元素构成了" $X
+    "的一个非空子集, 即" (setI (∈ $x $X) (&neg (app $P $x)))
+    ". 根据良基的定义, 这个集合具有一个极小元. "
+    "对于所有小于这个极小元的元素, 我们知道其必然满足性质"
+    $P ", 因为这是极小的定义. 根据良基归纳的条件, "
+    "我们可以推出这个极小元也必然满足性质" $P
+    ", 那么这就导出了一个矛盾.")
+   (P "接下来抄一抄nlab, 这和传统意义上的良基关系还不太一样.")
+   (H2 "1. 想法")
+   (P "一个集合" $S "上的一个二元关系" $pr "是良基的, "
+      "如果在" $S "上我们可以对于" $pr "做归纳.")
+   (H2 "2. 定义")
+   
    (H1 "未归类")
    ((theorem)
     "给定集合" $A "和" $B "以及函数" (func $f $A $B) ", 那么"
@@ -412,5 +442,115 @@
     "这题还挺有趣的, 因为我每次看到都要想一想, "
     "但是只要动笔就会发现很简单."
     )
-   
+   (H1 "读书的地图")
+   (P "大致上记录了我读书的痕迹, 然而不甚完整. 仅是为了备忘.")
+   (Ol (Li "分析学"
+           (Ol (Li "Principles of Mathematical Analysis (Baby Rudin)")
+               (Li "微积分学教程 (菲赫金哥尔茨)")
+               (Li "数学分析习题集 (吉米多维奇)")
+               (Li "Amann &amp; Escher")
+               (Li "Godement")
+               (Li "An Introduction to Manifolds")
+               (Li "Stein")
+               (Li "Exercises in Analysis (Part I)")
+               (Li "Treatise on Analysis (Dieudonné)")
+               (Li "无穷小计算 (Dieudonné)")
+               )
+           )
+       (Li "代数学"
+           (Ol (Li "Hoffman &amp; Kunze")
+               (Li "代数学方法 (李文威)")
+               (Li "Algebra: Chapter 0")
+               (Li "Algebra (Bourbaki)")
+               (Li "Godement")
+               (Li "Introduction to Commutative Algebra")
+               )
+           )
+       (Li "逻辑学"
+           (Ol (Li "集合论导引 (冯琦)")
+               (Li "Set Theory (Kunen)")
+               (Li "Beginning Mathematical Logic (Peter Smith)")
+               (Li "Gödel Without (Too Many) Tears")
+               (Li "Structural Proof Theory")
+               (Li "An Introduction to Formal Logic (Peter Smith)")
+               (Li "An Introduction to Inductive Definitions (Peter Aczel)")
+               )
+           )
+       (Li "范畴论"
+           (Ol (Li "Category Theory (Steve Awodey)")
+               (Li "Category Theory in Context")
+               (Li "Abstract and Concrete Categories")
+               (Li "Topoi: The Categorial Analysis of Logic")
+               )
+           )
+       (Li "编程语言"
+           (Ol (Li "程序设计"
+                   (Ol (Li "SICP")
+                       (Li "HtDP")
+                       (Li "Concepts, Techniques, and Models of Computer Programming "
+                           "(我挺讨厌这本书的)")
+                       (Li "ML for the Working Programmer")
+                       (Li "Programming in Standard ML")
+                       (Li "CMU 15-122 (Principles of Imperative Computation)")
+                       )
+                   )
+               (Li "一般性入门导引"
+                   (Ol (Li "Essentials of Programming Languages")
+                       (Li "Programming Languages: Application and Interpretation")
+                       (Li "Lisp in Small Pieces")
+                       )
+                   )
+               (Li "一般性严肃导引"
+                   (Ol (Li "TaPL")
+                       (Li "PFPL")
+                       (Li "Software Foundations")
+                       (Li "PLFA")
+                       (Li "The Formal Semantics of Programming Languages")
+                       (Li "Semantics Engineering with PLT Redex "
+                           "(讲义形式为Programming Languages and Lambda Calculi)")
+                       (Li "Domain-Theoretic Foundations of Functional Programming")
+                       )
+                   )
+               (Li "证明助手"
+                   (Ol (Li "The Little Typer")
+                       (Li "Proofs and Types")
+                       (Li "Lectures on the Curry-Howard Isomorphism")
+                       (Li "HoTT")
+                       (Li "The Little Prover")
+                       )
+                   )
+               (Li "部分求值"
+                   (Ol (Li "Partial Evaluation and Automatic Program Generation")
+                       )
+                   )
+               (Li "抽象解释"
+                   )
+               (Li "计算理论"
+                   (Ol (Li "Computability and Complexity (Neil Jones)"
+                           )
+                       )
+                   )
+               (Li "(自然)语言学"
+                   (Ol (Li "Continuations and Natural Language"
+                           )
+                       )
+                   )
+               (Li "形式语言学(和句法分析)"
+                   (Ol (Li "Parsing with Derivatives")
+                       (Li "Parsing with Zippers")
+                       )
+                   )
+               )
+           )
+       (Li "计算机硬件"
+           (Ol (Li "Computation Structures")
+               (Li "Foundations of Analog and Digital Electronic Circuits")
+               )
+           )
+       (Li "物理学"
+           (Ol (Li "力学概论 (方励之)")
+               (Li "Structure and Interpretation of Classical Mechanics")
+               )
+           )
+       )
    ))

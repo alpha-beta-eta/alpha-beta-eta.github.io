@@ -1,6 +1,14 @@
 #lang racket
 (provide sewpr.html)
 (require SMathML)
+(define-syntax-rule (@eqn* (x ...) ...)
+  (MB (set-attr*
+       (&Table (x ...) ...)
+       'columnalign "right center left"
+       'displaystyle "true"
+       'frame "solid")))
+(define (subst M X N)
+  (: M (bra0 (&<- X N))))
 (define tuple tupa0)
 (define (make-const str)
   (Mi str #:attr* '((mathvariant "monospace"))))
@@ -34,10 +42,17 @@
 (define $• (Mo "&bull;"))
 (define $≐ (Mo "&doteq;"))
 (define YV (_ $Y:monospace $V:monospace))
+(define $FV
+  (Mi "FV" #:attr* '((mathvariant "script"))))
+(define (&FV M)
+  (app $FV M))
+(define $\\ (Mo "\\"))
 (define-infix*
   (&• $•)
   (&=> $=>)
-  (&≐ $≐))
+  (&≐ $≐)
+  (&\\ $\\)
+  (&<- $<-))
 (define-@lized-op*
   (@• &•))
 (define sewpr.html
@@ -79,7 +94,7 @@
       "另一种解释是" (Q "树") "的集合, 其常被称为抽象句法(树). "
       "本书我们总是指后者.")
    (P "对于本章和下一章而言, 我们使用下面的BNF语法作为一个实际例子:"
-      (eqn*
+      (@eqn*
        ($B $=  boolt)
        ($  $\| boolf)
        ($  $\| (@• $B $B)))
@@ -134,7 +149,7 @@
    (H3. "函数和" $lambda "演算")
    (H3. $lambda "演算: 句法和归约")
    (P $lambda "演算的表达式的一般语法定义如下:"
-      (eqn*
+      (@eqn*
        ((&cm $M $N $L) $=  $X)
        ($              $\| (LAM $X $M))
        ($              $\| (APP $M $M))
@@ -151,7 +166,24 @@
       "与之形成对比的是, 例子" (LAM $x $x) "与恒等函数相对应. "
       "这个例子和前两个例子的不同之处在于" $x
       "在前两个表达式里都是自由出现的, 而在后面的例子里是绑定出现的.")
-   
+   (@eqn*
+    ((&FV $X) $= (setE $X))
+    ((&FV (LAM $X $M)) $= (&\\ (&FV $M) (setE $X)))
+    ((&FV (APP $M_1 $M_2)) $= (&union (&FV $M_1) (&FV $M_2))))
+   (P "最后, 为了定义" $lambda "演算里的一般规约关系"
+      $n:bold ", 让我们首先定义三个简单的规约概念, 即"
+      (&cm $alpha $beta $eta) "."
+      (@eqn*
+       ((LAM $X_1 $M) $alpha (LAM $X_2 (subst $M $X_1 $X_2)))
+       ($ $ (: "如果" (&!in $X_2 (&FV $M))))
+       ((APP (LAM $X $M_1) $M_2) $beta (subst $M_1 $X $M_2))
+       ((LAM $X (APP $M $X)) $eta $M)
+       ($ $ (: "如果" (&!in $X (&FV $M)))))
+      (Ul (Li $alpha "对于一个函数的形式参数进行重命名. "
+              
+              )
+          )
+      )
    (H3. "编码布尔")
    (eqn*
     ($true  $≐ (LAM $x (LAM $y $x)))
