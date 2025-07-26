@@ -2156,6 +2156,96 @@
       (Code "procedure-set!") ", "
       (Code "procedure-code") "以及"
       (Code "procedure-ref")
-      ". "
+      ", 其中"
+      (Ul (Li (Code "make-procedure")
+              ": 接受一个函数指针和一个自然数, "
+              "这个自然数代表了自由变量的数目.")
+          (Li (Code "procedure-set!")
+              ": 接受一个过程 (或者说闭包), 一个索引, 还有一个值, "
+              "然后使得这个过程的索引位置的值是我们所提供的值. "
+              "这个过程在构造闭包的过程中要用到.")
+          (Li (Code "procedure-code")
+              ": 取一个闭包所包含的函数指针, "
+              "此时这个所谓的" (Q "函数") "就没有任何自由变量了.")
+          (Li (Code "procedure-ref")
+              ": 接受一个闭包和一个索引, "
+              "取闭包的索引位置所对应的值. "
+              "这个过程的目的是为了取得自由变量的值, "
+              "而闭包的来源则是之前所引入的"
+              (Code "lambda") "的额外参数."))
+      "目前所有需要的数据都既已就位, 我们做的只是摆弄这些数据, "
+      "将它们塑造成合适的形状罢了.")
+   (P "我们的实现策略是借助于两个互递归的过程"
+      (Code "intro") "和" (Code "Intro")
+      ", 这实际上反映了自然的句法结构, "
+      "因为只有" (Code "lambda")
+      "所辖的表达式才需要将其中的自由变量转换为对于"
+      (Code "procedure-ref") "的调用. "
+      "还有一种更为紧凑的实现策略, "
+      "也就是说, 我们要根据上下文来判断是否可能需要调用"
+      (Code "procedure-ref")
+      ". 这更多的是个人偏好的问题, 而不是本质性的.")
+   (CodeB "(define (introduce-procedure-primitives exp)
+  (define (intro exp)
+    (match exp
+      ((quote ,i) exp)
+      (,x (guard (symbol? x)) x)
+      ((if ,q ,a ,e)
+       (cons 'if (map intro (cdr exp))))
+      ((begin . ,exp*)
+       (cons 'begin (map intro exp*)))
+      ((let ,bds ,body)
+       (: bds
+          (lambda (x* e*)
+            (let ((e* (map intro e*))
+                  (body (intro body)))
+              (Let x* e* body)))))
+      ((letrec ,bds (closures ,closures ,body))
+       (define make-procedure*
+         (map
+          (lambda (c)
+            (match c
+              ((,name ,label . ,free*)
+               `(,name (make-procedure ,label (quote ,(length free*)))))))
+          closures))
+       (define procedure-set!*
+         (append-map
+          (lambda (c)
+            (match c
+              ((,name ,label . ,free*)
+               (mapi (lambda (free index)
+                       `(procedure-set! ,name (quote ,index) ,free))
+                     free*))))
+          closures))
+       (: bds
+          (lambda (x* e*)
+            (let ((e* (map (lambda (e)
+                             (match e
+                               ((lambda ,x*
+                                  (bind-free
+                                   (,cp . ,free*)
+                                   ,body))
+                                `(lambda ,x* ,((Intro cp free*) body)))))
+                           e*))
+                  (body (intro body)))
+              (Letrec
+               x* e*
+               `(let ,make-procedure*
+                  ,(if (null? procedure-set!*)
+                       body
+                       `(begin ,@procedure-set!* ,body))))))))
+      ((,prim . ,rands)
+       (guard (prim? prim))
+       (cons prim (map intro rands)))
+      ((,label . ,rands)
+       (guard (label? label))
+       (cons label (map intro rands)))
+      ((,rator . ,rands)
+       (let ((rator (intro rator))
+             (rands (map intro rands)))
+         `((procedure-code ,rator) . ,rands)))))")
+   (P "鉴于这次的代码很长, 所以每一块我也分割得很长, "
+      "因为絮叨的叙述也无助于实际的理解. "
+      
       )
    ))
