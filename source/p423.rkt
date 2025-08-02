@@ -3111,4 +3111,160 @@
    (P "fixnum的标记是" (Code "000") ". 换言之, 我们有61个位来表示整数值, "
       "然后这个值会被左移3位, 或者说乘上8. 选" (Code "000")
       "作为标记对于fixnum这个类型的运算会比较便利.")
+   
+   (P "为了直接在Scheme里就能看到结果, 我们还需要补充一些过程. "
+      "这里写的方式未必那么符合" (Q "做正确的事情")
+      "之精神, 然而的确可行. 其中的" (Code "get-result")
+      "将作为64位二进制数码的表示转换为可读的Scheme值.")
+   (CodeB "(define *memory* (make-vector 1000))
+(define allocated 0)
+(define (alloc size)
+  (if (and (>= size 0) (= (modulo size 8) 0))
+      (let ((address allocated))
+        (set! allocated (+ allocated (quotient size 8)))
+        (* address 8))
+      (error 'alloc &quot;invalid size&quot;)))
+(define (mset! index offset value)
+  (unless (or (procedure? value)
+              (&lt;= (- (expt 2 63)) value (- (expt 2 63) 1)))
+    (error 'mset! &quot;value must be a 64-bit fixnum&quot;))
+  (let ((x (+ index offset)))
+    (if (and (>= x 0) (= (modulo x 8) 0))
+        (let ((actual (quotient x 8)))
+          (if (&lt; actual allocated)
+              (vector-set! *memory* actual value)
+              (error 'mset! &quot;try to access unallocated memory&quot;)))
+        (error 'mset! &quot;invalid arguments:\\nindex: ~s\\noffset: ~s&quot; index offset))))
+(define (mref index offset)
+  (let ((x (+ index offset)))
+    (if (and (>= x 0) (= (modulo x 8) 0))
+        (let ((actual (quotient x 8)))
+          (if (&lt; actual allocated)
+              (vector-ref *memory* actual)
+              (error 'mref &quot;try to access unallocated memory&quot;)))
+        (error 'mref &quot;invalid arguments&quot;))))
+(define (get-result encoding)
+  (case (logand encoding #b111)
+    ((#b000) (sra encoding 3))
+    ((#b001) (cons (get-result (mref encoding (- offset:car tag:pair)))
+                   (get-result (mref encoding (- offset:cdr tag:pair)))))
+    ((#b010) '&lt;procedure>)
+    ((#b011) (box (get-result (mref encoding (- offset:box tag:box)))))
+    ((#b110) (cond ((= encoding $false) #f)
+                   ((= encoding $true) #t)
+                   ((= encoding $nil) '())
+                   ((= encoding $void) (void))))
+    ((#b111)
+     (let ((len (get-result
+                 (mref encoding (- offset:vector-length tag:vector)))))
+       (let iter ((i len) (result* '()))
+         (if (= i 0)
+             (apply vector result*)
+             (iter (- i 1)
+                   (cons (get-result
+                          (mref encoding (- (* 8 i) tag:vector)))
+                         result*))))))
+    (else (error 'get-result &quot;unknown encoding ~s&quot; encoding))))")
+   (P "以下是一些例子.")
+   (CodeB "> (compil
+   '(letrec ((map (lambda (proc lst)
+                    (if (null? lst)
+                        '()
+                        (cons (proc (car lst))
+                              (map proc (cdr lst)))))))
+      (map (lambda (x) (* x x))
+           '(1 2 3))))
+'(letrec ((map.0$6
+           (lambda (cp.7 proc.1 lst.2)
+             (if (= lst.2 22)
+               22
+               (let ((car.10 ((mref proc.1 -2) proc.1 (mref lst.2 -1)))
+                     (cdr.11 (map.0$6 (mref cp.7 6) proc.1 (mref lst.2 7))))
+                 (let ((pair.12 (+ (alloc 16) 1)))
+                   (begin
+                     (mset! pair.12 -1 car.10)
+                     (mset! pair.12 7 cdr.11)
+                     pair.12))))))
+          (t.5$8 (lambda (cp.9 x.3) (* x.3 (sra x.3 3)))))
+   (let ((t.4
+          (let ((car.19 8)
+                (cdr.20
+                 (let ((car.16 16)
+                       (cdr.17
+                        (let ((car.13 24) (cdr.14 22))
+                          (let ((pair.15 (+ (alloc 16) 1)))
+                            (begin
+                              (mset! pair.15 -1 car.13)
+                              (mset! pair.15 7 cdr.14)
+                              pair.15)))))
+                   (let ((pair.18 (+ (alloc 16) 1)))
+                     (begin
+                       (mset! pair.18 -1 car.16)
+                       (mset! pair.18 7 cdr.17)
+                       pair.18)))))
+            (let ((pair.21 (+ (alloc 16) 1)))
+              (begin
+                (mset! pair.21 -1 car.19)
+                (mset! pair.21 7 cdr.20)
+                pair.21)))))
+     (let ((map.0
+            (let ((proc.22 (+ (alloc 16) 2)))
+              (begin (mset! proc.22 -2 map.0$6) proc.22))))
+       (begin
+         (mset! map.0 6 map.0)
+         (map.0$6
+          map.0
+          (let ((t.5
+                 (let ((proc.23 (+ (alloc 8) 2)))
+                   (begin (mset! proc.23 -2 t.5$8) proc.23))))
+            t.5)
+          t.4)))))")
+   (CodeB "> (get-result
+   (letrec ((map.0$6
+             (lambda (cp.7 proc.1 lst.2)
+               (if (= lst.2 22)
+                   22
+                   (let ((car.10 ((mref proc.1 -2) proc.1 (mref lst.2 -1)))
+                         (cdr.11 (map.0$6 (mref cp.7 6) proc.1 (mref lst.2 7))))
+                     (let ((pair.12 (+ (alloc 16) 1)))
+                       (begin
+                         (mset! pair.12 -1 car.10)
+                         (mset! pair.12 7 cdr.11)
+                         pair.12))))))
+            (t.5$8 (lambda (cp.9 x.3) (* x.3 (sra x.3 3)))))
+     (let ((t.4
+            (let ((car.19 8)
+                  (cdr.20
+                   (let ((car.16 16)
+                         (cdr.17
+                          (let ((car.13 24) (cdr.14 22))
+                            (let ((pair.15 (+ (alloc 16) 1)))
+                              (begin
+                                (mset! pair.15 -1 car.13)
+                                (mset! pair.15 7 cdr.14)
+                                pair.15)))))
+                     (let ((pair.18 (+ (alloc 16) 1)))
+                       (begin
+                         (mset! pair.18 -1 car.16)
+                         (mset! pair.18 7 cdr.17)
+                         pair.18)))))
+              (let ((pair.21 (+ (alloc 16) 1)))
+                (begin
+                  (mset! pair.21 -1 car.19)
+                  (mset! pair.21 7 cdr.20)
+                  pair.21)))))
+       (let ((map.0
+              (let ((proc.22 (+ (alloc 16) 2)))
+                (begin (mset! proc.22 -2 map.0$6) proc.22))))
+         (begin
+           (mset! map.0 6 map.0)
+           (map.0$6
+            map.0
+            (let ((t.5
+                   (let ((proc.23 (+ (alloc 8) 2)))
+                     (begin (mset! proc.23 -2 t.5$8) proc.23))))
+              t.5)
+            t.4))))))
+'(1 4 9)")
+   
    ))
