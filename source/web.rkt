@@ -124,6 +124,9 @@
          "fear-of-macros.rkt"
          "reviews.rkt"
          "exercises_in_lattice_theory.rkt"
+         "tspl4.rkt"
+         "commalg.rkt"
+         "lazy_eager_greedy.rkt"
          
          )
 (define (emit-web)
@@ -265,6 +268,9 @@
   (emitXml reviews.html "../reviews.html")
   (emitXml exercises_in_lattice_theory.html
            "../exercises_in_lattice_theory.html")
+  (emitXml tspl4.html "../tspl4.html")
+  (emitXml commalg.html "../commalg.html")
+  (emitXml lazy_eager_greedy.html "../lazy_eager_greedy.html")
   
   )
 (emit-web)
