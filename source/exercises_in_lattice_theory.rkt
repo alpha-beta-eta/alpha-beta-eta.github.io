@@ -1,6 +1,12 @@
 #lang racket
 (provide exercises_in_lattice_theory.html)
 (require SMathML)
+(define $Im (Mi "Im"))
+(define (&Im f) (app $Im f))
+(define ((answer #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "answer")))
+   (B (format "解答~a." n)) " " x*))
 (define (format-num section index)
   (cond ((and section index)
          (format "~a.~a"
@@ -42,7 +48,9 @@
         (Cite `(a ((href ,href)) "某" ,name))))
   (lambda (#:id [id #f] #:auto? [auto? #t])
     (lambda (#:attr* [attr* '()] . html*)
-      (cons (build-%entry #:id id #:auto? auto? #:present present #:cite cite)
+      (cons (build-%entry #:id id #:auto? auto?
+                          #:present present #:cite cite
+                          #:class class)
             (cons attr* html*)))))
 (define-syntax-rule (define-Entry* (id name class) ...)
   (begin (define id (Entry name class))
@@ -52,7 +60,9 @@
   (Theorem "定理" "theorem")
   (Example "例子" "example")
   (Proposition "命题" "proposition")
-  (Exercise "练习" "exercise"))
+  (Exercise "练习" "exercise")
+  (Remark "评注" "remark")
+  (Corollary "推论" "corollary"))
 (define $<_P (_ $< $P))
 (define $<=_P (_ $<= $P))
 (define $<=_Q (_ $<= $Q))
@@ -73,13 +83,62 @@
    (P "注意, 这本书默认偏序集是非空的.")
    (H2. "偏序集与格")
    (H3. "偏序集")
+   
    (H3. "格与完备格")
+   ((Definition)
+    )
+   ((Remark)
+    )
+   ((Definition)
+    )
+   ((Theorem)
+    )
+   ((Example)
+    )
+   ((Theorem)
+    )
+   ((Theorem)
+    )
+   ((Definition)
+    )
+   ((Example)
+    )
+   ((Definition)
+    )
+   ((Theorem)
+    )
+   ((Corollary)
+    )
+   ((Definition)
+    )
+   ((Theorem)
+    )
+   ((Definition)
+    "设" $P "是一个偏序集, "
+    (func $f $P $P)
+    "是一个自映射. 如果"
+    (Ol (Li "单调性/保序性: "
+            (&<= $x $y) "可以推出"
+            (&<= (app $f $x) (app $f $y))
+            ", 对于任意的"
+            (∈ $x $y $P) ";")
+        (Li "增值性: "
+            (&<= $x (app $f $x))
+            ", 对于任意的"
+            (∈ $x $P) ";")
+        (Li "幂等性: "
+            (&= (&compose $f $f) $f) ","))
+    "那么则称" $f "是" $P
+    "上的一个闭包算子 (closure operator).")
    (H3. "序同构和格同构")
    (H3. "分配格和Boole代数")
    (H3. "理想和滤子")
    (H3. "格中的特殊元素")
    (H3. "习题" #:auto? #f)
    ((Exercise)
+    "找出所有的" $4 "元偏序集和" $5 "元格.")
+   ((answer)
+    
     )
    ((Exercise)
     "设" (tu0 $P $<=:id_P) "和" (tu0 $Q $<=:id_Q)
@@ -105,6 +164,34 @@
     "和" (&<= (tu0 $x_2 $y_2) (tu0 $x_3 $y_3))
     ", 鉴于" $<= "的两个条件是互斥的, "
     "所以说其实就是四种情况. "
+    )
+   ((Exercise)
+    "设" $P "是一个偏序集, "
+    (func (&cm $f $g) $P $P) "是闭包算子, "
+    "证明下列条件等价:"
+    (Ol (Li (&<= $f $g) ";")
+        (Li (&= (&compose $f $g) $g) ";")
+        (Li (&= (&compose $g $f) $g) ";")
+        (Li (&sube (&Im $g) (&Im $f)) ".")))
+   ((proof)
+    (Ol (Li "由1推出2: "
+            "根据" $f "的增值性, "
+            (&<= (app $g $x) (app $f (app $g $x)))
+            ". 根据" (&<= $f $g) ", "
+            (&<= (app $f (app $g $x))
+                 (app $g (app $g $x)))
+            ". 又根据" $g "的幂等性, "
+            (&<= (app $f (app $g $x))
+                 (app $g $x))
+            ". 综上所述, "
+            (&= (app $f (app $g $x))
+                (app $g $x))
+            ". 鉴于" $x "的任意性, 故"
+            (&= (&compose $f $g) $g) ".")
+        (Li "由2推出3: "
+            
+            )
+        )
     )
    (H2. "Galois伴随和Galois连接")
    (H3. "Galois伴随")
