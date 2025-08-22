@@ -6,7 +6,6 @@
    #:title "一些没用的笔记"
    #:css "styles.css"
    (H1 "一些没用的笔记")
-   (P "我又幻想了.")
    (columnize
     (H2 (A "摆弄SICP图形语言" #:attr* '((href "picture.html"))))
     (H2 (A "The Ship of Theseus" #:attr* '((href "Ship-of-Theseus.html"))))
@@ -19,7 +18,9 @@
            #:attr* '((href "linear_algebra_notes.html"))))
     (H2 (A "组合学笔记" #:attr* '((href "combinatorics_notes.html"))))
     (H2 (A "绘制数学图形" #:attr* '((href "illustrations.html"))))
+    #;
     (H2 (A "计算机辅助设计的几何编程" #:attr* '((href "cad.html"))))
+    #;
     (H2 (A "Topos: 逻辑的范畴分析" #:attr* '((href "topos.html"))))
     (H2 (A "Abel定理" #:attr* '((href "abel.html"))))
     (H2 (A "数学家学法语" #:attr* '((href "french.html"))))
@@ -42,18 +43,23 @@
     (H2 (A "高阶范畴逻辑导论" #:attr* '((href "hocl.html"))))
     (H2 (A "代数: 第0章" #:attr* '((href "algebra.html"))))
     (H2 (A "Common Lisp面向对象编程" #:attr* '((href "clos.html"))))
+    #;
     (H2 (A "游戏设计" #:attr* '((href "game_design.html"))))
+    #;
     (H2 (A "并行和顺序算法" #:attr* '((href "cmu15210.html"))))
+    #;
     (H2 (A "命令式编程原理笔记" #:attr* '((href "cmu15122.html"))))
     (H2 (A "同伦类型论" #:attr* '((href "hott.html"))))
     (H2 (A "格论笔记" #:attr* '((href "lattice_theory_notes.html"))))
     (H2 (A "关于宏的笔记" #:attr* '((href "macro_notes.html"))))
+    #;
     (H2 (A "证明论和逻辑复杂度" #:attr* '((href "proof_theory.html"))))
     (H2 (A "Kerodon翻译" #:attr* '((href "kerodon.html"))))
     (H2 (A "范畴逻辑和类型论" #:attr* '((href "cltt.html"))))
     (H2 (A "逻辑学习指南" #:attr* '((href "logic.html"))))
     (H2 (A "句法闭包" #:attr* '((href "synclo.html"))))
     (H2 (A "卫生宏技术" #:attr* '((href "macro.html"))))
+    #;
     (H2 (A "Core War介绍" #:attr* '((href "corewar.html"))))
     (H2 (A "理解Maxima" #:attr* '((href "maxima.html"))))
     (H2 (A "Scheme的三种实现模型" #:attr* '((href "timp.html"))))
@@ -70,6 +76,7 @@
            #:attr* '((href "metaocaml.html"))))
     (H2 (A "Zork论文翻译" #:attr* '((href "zork.html"))))
     (H2 (A "Schemer看monad" #:attr* '((href "monad.html"))))
+    #;
     (H2 (A "高效多项式计算" #:attr*
            '((href "polynomial_computation.html"))))
     (H2 (A "测度论" #:attr* '((href "measure.html"))))
@@ -77,17 +84,20 @@
     (H2 (A "Stone空间笔记" #:attr* '((href "stone.html"))))
     (H2 (A "无点拓扑笔记" #:attr* '((href "pointless.html"))))
     (H2 (A "REFAL" #:attr* '((href "refal.html"))))
+    #;
     (H2 (A "AIM和AITR考古" #:attr* '((href "aimtr.html"))))
     (H2 (A "自动微分的简单本质翻译" #:attr* '((href "simple-ad.html"))))
     (H2 (A "线性逻辑笔记" #:attr* '((href "linear_logic_notes.html"))))
     (H2 (A "定性表示笔记" #:attr* '((href "qualitative_representations.html"))))
     (H2 (A "布尔代数导引" #:attr* '((href "boolean.html"))))
     (H2 (A "游戏语义" #:attr* '((href "game_semantics.html"))))
+    #;
     (H2 (A "PiHKAL翻译" #:attr* '((href "pihkal.html"))))
     (H2 (A "延续和自然语言" #:attr* '((href "continuation.html"))))
     (H2 (A "离散微分几何笔记" #:attr* '((href "cmu15458.html"))))
     (H2 (A "范畴逻辑引论" #:attr* '((href "catlog.html"))))
     (H2 (A "隐函数定理" #:attr* '((href "implicit.html"))))
+    #;
     (H2 (A "集合论" #:attr* '((href "set_theory.html"))))
     (H2 (A "没有(太多)眼泪的Gödel" #:attr* '((href "godel.html"))))
     (H2 (A "对于宏的恐惧" #:attr* '((href "fear-of-macros.html"))))

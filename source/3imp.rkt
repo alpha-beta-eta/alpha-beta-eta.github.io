@@ -1,6 +1,64 @@
 #lang racket
 (provide 3imp.html)
 (require SMathML)
+(define (Mid str) (Mi #:attr* '((mathvariant "italic")) str))
+(define-syntax-rule (define-mid* (id str) ...)
+  (begin
+    (define id (Mid str))
+    ...))
+(define-mid*
+  (:v "v")
+  (:var "var")
+  (:obj "obj")
+  (:vars "vars")
+  (:body "body")
+  (:then "then")
+  (:else "else")
+  (:ret "ret")
+  (:next "next"))
+(define (C exp #:constant* [constant* '(zero nil vecnil Nat Atom)]
+           #:special* [special* '(U l l-1)])
+  (define (T exp)
+    (match exp
+      (,x (guard (symbol? x))
+          (define s (symbol->string x))
+          (list
+           (cond ((memq x constant*) s)
+                 ((memq x special*)
+                  (Mi s #:attr* '((mathvariant "script"))))
+                 (else
+                  (if (= (string-length s) 1)
+                      (Mi s)
+                      (Mid s))))))
+      (,n (guard (number? n)) (list (number->string n)))
+      ((,op . ,arg*)
+       `("("
+         ,@(if (symbol? op)
+               (list (symbol->string op))
+               (T op))
+         ,@(if (null? arg*) '()
+               (apply
+                append
+                (cons
+                 '(" ")
+                 (add-between
+                  (map T arg*) '(" ")))))
+         ")"))))
+  (define (optimize lst)
+    (if (null? lst)
+        '()
+        (let loop ((head (car lst))
+                   (tail (cdr lst)))
+          (cond ((null? tail) (list head))
+                ((string? head)
+                 (cond ((string? (car tail))
+                        (loop (string-append head (car tail))
+                              (cdr tail)))
+                       (else
+                        (cons head (optimize tail)))))
+                (else
+                 (cons head (optimize tail)))))))
+  (apply Code (optimize (T exp))))
 (define 3imp.html
   (TnTmPrelude
    #:title "Scheme的三种实现模型"
@@ -210,9 +268,181 @@
       "在对于" (Code "if") "表达式求值期间, "
       "其存放着测试 (test) 表达式的值; " (Code "if")
       "用这个值来决定要对两个其他子表达式中的哪一个进行求值. "
+      "当一个计算完成时, 累积器里的值应该是这个计算的值.")
+   (P (Em "下一个表达式")
+      "刻画了接下来要求值的表达式, "
+      )
+   (P (Em "当前环境")
+      "存放着活跃的词法绑定. "
+      )
+   (P "在一个应用的求值期间, " (Em "当前值肋骨")
+      "存放着已经被求值了的参数(的值)的列表. "
       
       )
    (H3. "实现基于堆的模型" #:id "heap-model-impl")
+   (H4. "汇编代码")
+   (P "本节所描述的VM汇编代码由12种指令构成, "
+      "每个指令有零或更多个参数 (operand). "
+      "以下是对于这些指令的描述.")
+   (Ol (Li (C '(halt))
+           "终止了虚拟机器. 累积器里的值是计算的(最终)结果.")
+       (Li (C '(refer var x))
+           "找出当前环境里变量" :var
+           "的值, 然后将这个值放到累积器里, "
+           "并将下一个表达式置为" $x ".")
+       (Li (C '(constant obj x))
+           "将" :obj "放到累积器里, "
+           "并将下一个表达式置为" $x ".")
+       (Li (C '(close vars body x))
+           "根据" :body ", " :vars
+           "以及当前环境创建一个闭包, "
+           "然后将这个闭包放到累积器里, "
+           "并将下一个表达式置为" $x ".")
+       (Li (C '(test then else))
+           "对于累积器进行测试, 如果累积器是nonnull的 "
+           "(意即测试(表达式)返回真), 置下一个表达式为"
+           :then ". 否则的话, " (Code "test")
+           "置下一个表达式为" :else
+           ". {译注: 在作者写下论文的时候, Scheme里的"
+           (Code "#f") "和空表实际上是相同的, "
+           "所以不要见怪.}")
+       (Li (C '(assign var x))
+           "将当前环境中对于变量" :var
+           "的绑定改变为累积器里的值, "
+           "并将下一个表达式置为" $x ".")
+       (Li (C '(conti x))
+           "根据当前的栈创建一个延续, "
+           "将这个延续置于累积器之中, "
+           "最后将下一个表达式置为" $x ".")
+       (Li (C '(nuate s var))
+           "将" $s "恢复为当前的栈, "
+           "将累积器置为当前环境中"
+           :var "的值, 然后将下一个表达式置为"
+           (Code "(return)")
+           " (见之后的说明).")
+       (Li (C '(frame ret x))
+           "由当前环境, 当前值肋骨, 以及作为下一个表达式的"
+           :ret "构造出一个新的帧, 然后将这个帧加入到当前的栈里, "
+           "并将当前值肋骨置为空表, 下一个表达式置为" $x
+           ". {译注: 原文存在笔误, 将参数顺序弄反了.}")
+       (Li (C '(argument x))
+           "将累积器里的值加入到当前值肋骨里, "
+           "然后置下一个表达式为" $x ".")
+       (Li (C '(apply))
+           "应用累积器里的闭包于当前值肋骨里的值列表. "
+           "精确地说, 这个指令扩展闭包的环境以"
+           "闭包的变量 (也就是形式参数) 列表和当前值肋骨, "
+           "然后将当前环境设置为这个新的环境, "
+           "当前值肋骨置为空表, 下一个表达式置为闭包的体.")
+       (Li (C '(return))
+           "移除(当前)栈的第一个帧, 重设当前环境, "
+           "当前值肋骨, 下一个表达式, 以及当前栈. "
+           "{译注: 实际上, 对于当前栈的变动就是移除其第一个帧.}"))
+   (H4. "转换")
+   (P "编译器将Scheme表达式转换为上述汇编语言指令. "
+      "一些表达式, 诸如变量和常量, 被转换为一条汇编语言指令. "
+      "另一些表达式, 例如应用, 被转换为多条指令.")
+   (P "编译器依次寻求每种类型的表达式, 然后将其转换为相应的指令. "
+      "编译器的输入是要被编译的表达式和在表达式(求值)完成之后"
+      "接下来要执行的指令. 这接下来的指令可以想成是表达式的延续 "
+      "(不要将其与" (Code "call/cc") "所返回的延续对象相混淆).")
+   (P "出现在下方的编译器的代码. 注意到我们使用" (Code "cond")
+      "和" (Code "record-case") "来parse表达式; "
+      "并且这篇论文里的所有编译器都会用到它们. "
+      "它们在第2章里和其他Scheme句法形式一起被描述了."
+      (CodeB "(define compile
+  (lambda (x next)
+    (cond
+      [(symbol? x)
+       (list 'refer x next)]
+      [(pair? x)
+       (record-case x
+         [quote (obj)
+          (list 'constant obj next)]
+         [lambda (vars body)
+          (list 'close vars (compile body '(return)) next)]
+         [if (test then else)
+          (let ([thenc (compile then next)]
+                [elsec (compile else next)])
+            (compile test (list 'test thenc elsec)))]
+         [set! (var x)
+          (compile x (list 'assign var next))]
+         [call/cc (x)
+          (let ([c (list 'conti
+                         (list 'argument
+                               (compile x '(apply))))])
+            (if (tail? next)
+                c
+                (list 'frame next c)))]
+         [else
+          (recur loop ([args (cdr x)]
+                       [c (compile (car x) '(apply))])
+            (if (null? args)
+                (if (tail? next)
+                    c
+                    (list 'frame next c))
+                (loop (cdr args)
+                      (compile (car args)
+                               (list 'argument c)))))])]
+      [else
+       (list 'constant x next)])))")
+      "这个编译器并没有进行任何错误检查, "
+      "尽管任何意在实用的编译器至少应该验证参数的数目和结构. "
+      "整篇论文里出现的编译器和虚拟机都几乎不进行错误检查, "
+      "这是为了缩短代码和简化呈现.")
+   (P "对于变量 (符号), " (Code "quote")
+      "表达式, 常量表达式 (刻画于" (Code "cond")
+      "的" (Code "else") "子句之中) "
+      "的处理都是直接的. 一个变量" :v
+      "和接下来的指令" :next "会被转换为"
+      (C '(refer v next)) ". 类似地, " (C '(quote obj))
+      "和简单的" :obj "会被转换为"
+      (C '(constant obj next)) ".")
+   (P "对于" (Code "lambda") "表达式的处理也是同样直接的. "
+      )
+   (H4. "求值")
+   (P "虚拟机器, 也就是VM, 解释上述编译器所产生的指令, "
+      "使用之前所描述的数据结构和寄存器. "
+      "它的结构和SECD机器 [Lan64, Lan65] 类似; "
+      "寄存器状态的改变由一个尾递归函数所模拟. "
+      "这个函数的参数即是寄存器本身. "
+      "每次对于VM的递归调用都象征着一次新的机器循环的开始; "
+      "VM寄存器的新值由其参数刻画. "
+      "这种结构避免了赋值的使用, "
+      "使得对于VM及其状态变化的更为清晰紧凑的描述成为可能.")
+   (P "以下是VM的代码:"
+      (CodeB "(define VM
+  (lambda (a x e r s)
+    (record-case x
+      [halt () a]
+      [refer (var x)
+       (VM (car (lookup var e)) x e r s)]
+      [constant (obj x)
+       (VM obj x e r s)]
+      [close (vars body x)
+       (VM (closure body e vars) x e r s)]
+      [test (then else)
+       (VM a (if a then else) e r s)]
+      [assign (var x)
+       (set-car! (lookup var e) a)
+       (VM a x e r s)]
+      [conti (x)
+       (VM (continuation s) x e r s)]
+      [nuate (s var)
+       (VM (car (lookup var e)) '(return) e r s)]
+      [frame (ret x)
+       (VM a x e '() (call-frame ret e r s))]
+      [argument (x)
+       (VM a x e (cons a r) s)]
+      [apply ()
+       (record a (body e vars)
+         (VM a body (extend e vars r) '() s))]
+      [return ()
+       (record s (x e r s)
+         (VM a x e r s))])))"))
+   (P "VM的操作着前述对于指令的描述. "
+      
+      )
    (H3. "改进变量访问" #:id "variable-access")
    (H2. "基于栈的模型")
    (H2. "基于字符串的模型")

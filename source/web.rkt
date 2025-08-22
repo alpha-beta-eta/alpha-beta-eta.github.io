@@ -131,6 +131,9 @@
          "plan.rkt"
          "csug.rkt"
          "3imp.rkt"
+         "plane_algebraic_curves.rkt"
+         "game_programming_notes.rkt"
+         "prafm.rkt"
          
          )
 (define (emit-web)
@@ -279,6 +282,11 @@
   (emitXml plan.html "../plan.html")
   (emitXml csug.html "../csug.html")
   (emitXml 3imp.html "../3imp.html")
+  (emitXml plane_algebraic_curves.html
+           "../plane_algebraic_curves.html")
+  (emitXml game_programming_notes.html
+           "../game_programming_notes.html")
+  (emitXml prafm.html "../prafm.html")
   
   )
 (emit-web)

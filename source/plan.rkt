@@ -12,11 +12,13 @@
            (Ol (Li "IUB P423")
                (Li "Three Implementation Models for Scheme")))
        (Li "Commutative Algebra")
+       (Li "Plane Algebraic Curves")
        (Li "一般性的计算理论"
            (Ol (Li "Computablity and Complexity (Neil Jones)")
                (Li "G&ouml;del Without Tears")
                (Li "Partial Evaluation and Automatic Program Generation")))
        (Li "指称语义, 格论, domain论, 无点拓扑")
+       (Li "游戏编程, 特别是状态机和行为树")
        (Li "运动")
        (Li "按时睡觉")
        (Li "好好吃饭")
