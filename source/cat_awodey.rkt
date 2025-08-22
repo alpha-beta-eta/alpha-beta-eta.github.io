@@ -1,6 +1,16 @@
 #lang racket
 (provide cat_awodey.html)
 (require SMathML)
+(define (λfst #:v [v $z])
+  (Lam v (&fst v)))
+(define (λsnd #:v [v $z])
+  (Lam v (&snd v)))
+(define (λpair a d #:v [v $x])
+  (Lam v (tupa0 (ap a v) (ap d v))))
+(define (λcompose c b #:v [v $y])
+  (Lam v (ap c (@ap b v))))
+(define (λcomp c b #:v [v $y])
+  (Lamb v (@ap c (@ap b v))))
 (define (subst termA termB var)
   (: termA (bra0 (&/ termB var))))
 (define $.:compact
@@ -231,7 +241,15 @@
   (@\|-> &\|->)
   (@cm &cm)
   (@: &:)
-  (@Lam Lam))
+  (@Lam Lam)
+  (@Lamb Lamb)
+  (@λcompose λcompose)
+  (@λcomp λcomp)
+  (@λfst λfst)
+  (@λsnd λsnd)
+  (@fst &fst)
+  (@snd &snd)
+  (@-> &->))
 (define (make-cat str)
   (Mi str #:attr* '((mathvariant "bold"))))
 (define-syntax-rule (define-cat* (id str) ...)
@@ -802,7 +820,7 @@
     "代数, 以复合运算" (Q $compose)
     "为原语. 如果你熟悉群, 那么你或许可以将一个范畴"
     "想成是某种一般化了的群.")
-   (H3. "范畴的例子")
+   (H3. "范畴的例子" #:id "examples-of-categories")
    (Ol (Li "我们已经遇到过了集合和函数的范畴" Sets
            ". 这里也有另一个范畴"
            (MB Sets_fin)
@@ -3103,9 +3121,9 @@
                             "(可能有一些具类型的常量)")
                            ((&: (tupa0 $a $b) (&c* $A $B))
                             (@cm (&: $a $A) (&: $b $B)))
-                           ((&fst $c) (@: $c (&c* $A $B)))
-                           ((&snd $c) (@: $c (&c* $A $B)))
-                           ((ap $c $a)
+                           ((&: (&fst $c) $A) (@: $c (&c* $A $B)))
+                           ((&: (&snd $c) $B) (@: $c (&c* $A $B)))
+                           ((&: (ap $c $a) $B)
                             (@cm (&: $c (&-> $A $B))
                                  (&: $a $A)))
                            ((&: (Lam $x $b) (&-> $A $B))
@@ -3137,13 +3155,134 @@
                      " (其中" (&: $x $A) "),")
                  (Li "复合: "
                      (&= (&compose $c $b)
-                         (Lam $x (app $c (ap $b $x)))) "."))
+                         (Lam $x (ap $c (@ap $b $x)))) "."))
              "让我们验证一下这的确是一个良定义的范畴:" (Br)
              "恒元律:"
-             
-             ))
-       )
+             (MB (&= (&compose $c $1_B)
+                     (Lamb $x (@ap $c (@ap (@Lam $y $y) $x)))
+                     (Lamb $x (@ap $c $x))
+                     $c))
+             (MB (&= (&compose $1_C $c)
+                     (Lamb $x (@ap (@Lam $y $y) (@ap $c $x)))
+                     (Lamb $x (@ap $c $x))
+                     $c))
+             "结合律:"
+             (MB (deriv
+                  (&compose $c (@compose $b $a))
+                  (Lamb $x (@ap $c (@ap (@compose $b $a) $x)))
+                  (Lamb $x (@ap $c (@ap (@Lam $y (ap $b (@ap $a $y))) $x)))
+                  (Lamb $x (@ap $c (@ap $b (@ap $a $x))))
+                  (Lamb $x (@ap (Lamb $y (@ap $c (@ap $b $y)))
+                                (@ap $a $x)))
+                  (Lamb $x (@ap (@compose $c $b) (@ap $a $x)))
+                  (&compose (@compose $c $b) $a)))
+             "这个范畴具有二元积. 的确如此, 对于类型" $A "和" $B ", 令"
+             (MB (&cm (&= $p_1 (Lam $z (&fst $z)))
+                      (&= $p_2 (Lam $z (&snd $z))))
+                 (&space 6)
+                 (@: $z (&c* $A $B)) ".")
+             "然后, 给出" $a "和" $b "如图"
+             todo.svg
+             "令"
+             (MB (&= (tu0 $a $b)
+                     (Lam $x (tupa0 (ap $a $x) (ap $b $x)))))
+             "那么"
+             (MB (deriv
+                  (&compose $p_1 (tu0 $a $b))
+                  (Lam $x (@ap $p_1 (@ap (@Lam $y
+                                               (tupa0 (ap $a $y) (ap $b $y)))
+                                         $x)))
+                  (Lam $x (@ap $p_1 (tupa0 (ap $a $x) (ap $b $x))))
+                  (Lam $x (@ap $a $x))
+                  $a))
+             "类似地, " (&= (&compose $p_2 (tu0 $a $b)) $b) "." (Br)
+             "最后, 如果" (Arrow $c $X (&c* $A $B)) "也具有性质"
+             (MB (&cm (&= (&compose $p_1 $c) $a)
+                      (&= (&compose $p_2 $c) $b)))
+             "那么"
+             (MB (deriv
+                  (tu0 $a $b)
+                  (λpair $a $b)
+                  (λpair (@compose $p_1 $c)
+                         (@compose $p_2 $c))
+                  (λpair (@λcomp $p_1 $c)
+                         (@λcomp $p_2 $c))
+                  (λpair (@λcomp (@λfst) $c)
+                         (@λcomp (@λsnd) $c))
+                  (λpair (Lamb $y (@fst (ap $c $y)))
+                         (Lamb $y (@snd (ap $c $y))))
+                  (Lam $x (tupa0 (&fst (ap $c $x))
+                                 (&snd (ap $c $x))))
+                  (Lam $x (@ap $c $x))
+                  $c))
+             "{译注: 这个条目里所说的" (Q "不在")
+             ", 其实应该理解为不在" (Q "自由变量集")
+             "之中.}")))
+   ((Remark)
+    $lambda "演算有着另一个令人惊讶的解释, "
+    "即作为命题演算中的证明的一个记号系统; "
+    "其被称为" (Q "Curry-Howard对应")
+    ". 简而言之, 想法在于我们将类型解释为命题 "
+    "(其中" (&c* $A $B) "是合取而" (&-> $A $B)
+    "是implication) 而将项" (&: $a $A)
+    "解释为命题" $A "的证明. 那么, 诸如"
+    (MB (&rule (&: $a $A) (&: $b $B)
+               (&: (tupa0 $a $b) (&c* $A $B))))
+    "这样的项形成规则可以读作带注解的推理规则, "
+    "展示了如何归纳地构筑证明的标签. "
+    "{译注: 所谓标签, 指的是这里冒号之前的内容, "
+    "其可以视为证明的具体内容.} "
+    "因此, 举个例子, 诸如"
+    (MB (&rule*
+         (&rule (bra0 $A) (bra0 $B)
+                (&c* $A $B))
+         (&-> $B (@c* $A $B))
+         (&-> $A (@-> $B (@c* $A $B)))))
+    "这样的一个证明, 其中的方括号指明了假设的取消, "
+    "标签化如下:"
+    (MB (&rule*
+         (&rule (bra0 (&: $x $A))
+                (bra0 (&: $y $B))
+                (&: (tupa0 $x $y) (&c* $A $B)))
+         (&: (Lam $y (tupa0 $x $y))
+             (&-> $B (@c* $A $B)))
+         (&: (Lamb $x (Lam $y (tupa0 $x $y)))
+             (&-> $A (@-> $B (@c* $A $B))))))
+    "最终的" (Q "证明项")
+    (Lamb $x (Lam $y (tupa0 $x $y)))
+    "因而记录了对于" (Q "命题")
+    (&-> $A (@-> $B (@c* $A $B)))
+    "的一个特定证明, 而对于相同命题的不同证明"
+    "将会给出一个不同的项." (Br)
+    "尽管人们总是谈论由之而来的逻辑和类型论之间的" (Q "同构")
+    ", 但是实际上我们这里所拥有的仅仅是一个从"
+    "带有合取与implication的命题演算中的证明的范畴 "
+    "(如在" (Ref "examples-of-categories")
+    "的例子10里定义的那样) 到" $lambda
+    "演算的类型的范畴的一个函子. "
+    "这个函子一般并非同构, "
+    "除非我们强加 (impose) 一些更进一步的证明之间的等式.")
    (H3. "带有积的范畴")
+   (P "令" CatC "是一个范畴, 其对于每对对象都有一个积图表. "
+      "设我们有对象和箭头"
+      todo.svg
+      "带有如图所示的积. 然后, 对于"
+      (MB (&= (&c* $f $f^)
+              (tupa0 (&compose $f $p_1)
+                     (&compose $f^ $p_2))))
+      "我们记"
+      (MB (Arrow (&c* $f $f^)
+                 (&c* $A $A^)
+                 (&c* $B $B^)))
+      "{译注: 译者对于这句话的表达感到相当困惑, "
+      "不过或许只是一个定义而已.} "
+      "那么, 以下图表中的两个方块都是交换的:"
+      todo.svg
+      "以这种方式, 如果我们对于每对对象选择一个积, "
+      "那么我们就得到了一个函子"
+      (MB (Functor $c* (&c* CatC CatC) CatC))
+      
+      )
    (H3. "同态集")
    (H3. "练习")
    (H2. "对偶性")

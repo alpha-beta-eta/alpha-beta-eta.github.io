@@ -1,6 +1,62 @@
 #lang racket
 (provide 3imp.html)
 (require SMathML)
+(define (Mid str) (Mi #:attr* '((mathvariant "italic")) str))
+(define-syntax-rule (define-mid* (id str) ...)
+  (begin
+    (define id (Mid str))
+    ...))
+(define-mid*
+  (:var "var")
+  (:obj "obj")
+  (:vars "vars")
+  (:body "body")
+  (:then "then")
+  (:else "else")
+  (:ret "ret"))
+(define (C exp #:constant* [constant* '(zero nil vecnil Nat Atom)]
+           #:special* [special* '(U l l-1)])
+  (define (T exp)
+    (match exp
+      (,x (guard (symbol? x))
+          (define s (symbol->string x))
+          (list
+           (cond ((memq x constant*) s)
+                 ((memq x special*)
+                  (Mi s #:attr* '((mathvariant "script"))))
+                 (else
+                  (if (= (string-length s) 1)
+                      (Mi s)
+                      (Mid s))))))
+      (,n (guard (number? n)) (list (number->string n)))
+      ((,op . ,arg*)
+       `("("
+         ,@(if (symbol? op)
+               (list (symbol->string op))
+               (T op))
+         ,@(if (null? arg*) '()
+               (apply
+                append
+                (cons
+                 '(" ")
+                 (add-between
+                  (map T arg*) '(" ")))))
+         ")"))))
+  (define (optimize lst)
+    (if (null? lst)
+        '()
+        (let loop ((head (car lst))
+                   (tail (cdr lst)))
+          (cond ((null? tail) (list head))
+                ((string? head)
+                 (cond ((string? (car tail))
+                        (loop (string-append head (car tail))
+                              (cdr tail)))
+                       (else
+                        (cons head (optimize tail)))))
+                (else
+                 (cons head (optimize tail)))))))
+  (apply Code (optimize (T exp))))
 (define 3imp.html
   (TnTmPrelude
    #:title "Scheme的三种实现模型"
@@ -210,9 +266,81 @@
       "在对于" (Code "if") "表达式求值期间, "
       "其存放着测试 (test) 表达式的值; " (Code "if")
       "用这个值来决定要对两个其他子表达式中的哪一个进行求值. "
+      "当一个计算完成时, 累积器里的值应该是这个计算的值.")
+   (P (Em "下一个表达式")
+      "刻画了接下来要求值的表达式, "
+      )
+   (P (Em "当前环境")
+      "存放着活跃的词法绑定. "
+      )
+   (P "在一个应用的求值期间, " (Em "当前值肋骨")
+      "存放着已经被求值了的参数(的值)的列表. "
       
       )
    (H3. "实现基于堆的模型" #:id "heap-model-impl")
+   (H4. "汇编代码")
+   (P "本节所描述的VM汇编代码由12种指令构成, "
+      "每个指令有零或更多个参数 (operand). "
+      "以下是对于这些指令的描述.")
+   (Ol (Li (C '(halt))
+           "终止了虚拟机器. 累积器里的值是计算的(最终)结果.")
+       (Li (C '(refer var x))
+           "找出当前环境里变量" :var
+           "的值, 然后将这个值放到累积器里, "
+           "并将下一个表达式置为" $x ".")
+       (Li (C '(constant obj x))
+           "将" :obj "放到累积器里, "
+           "并将下一个表达式置为" $x ".")
+       (Li (C '(close vars body x))
+           "根据" :body ", " :vars
+           "以及当前环境创建一个闭包, "
+           "然后将这个闭包放到累积器里, "
+           "并将下一个表达式置为" $x ".")
+       (Li (C '(test then else))
+           "对于累积器进行测试, 如果累积器是nonnull的 "
+           "(意即测试(表达式)返回真), 置下一个表达式为"
+           :then ". 否则的话, " (Code "test")
+           "置下一个表达式为" :else
+           ". {译注: 在作者写下论文的时候, Scheme里的"
+           (Code "#f") "和空表实际上是相同的, "
+           "所以不要见怪.}")
+       (Li (C '(assign var x))
+           "将当前环境中对于变量" :var
+           "的绑定改变为累积器里的值, "
+           "并将下一个表达式置为" $x ".")
+       (Li (C '(conti x))
+           "根据当前的栈创建一个延续, "
+           "将这个延续置于累积器之中, "
+           "最后将下一个表达式置为" $x ".")
+       (Li (C '(nuate s var))
+           "将" $s "恢复为当前的栈, "
+           "将累积器置为当前环境中"
+           :var "的值, 然后将下一个表达式置为"
+           (Code "(return)")
+           " (见之后的说明).")
+       (Li (C '(frame ret x))
+           "由当前环境, 当前值肋骨, 以及作为下一个表达式的"
+           :ret "构造出一个新的帧, 然后将这个帧加入到当前的栈里, "
+           "并将当前值肋骨置为空表, 下一个表达式置为" $x
+           ". {译注: 原文存在笔误, 将参数顺序弄反了.}")
+       (Li (C '(argument x))
+           "将累积器里的值加入到当前值肋骨里, "
+           "然后置下一个表达式为" $x ".")
+       (Li (C '(apply))
+           "应用累积器里的闭包于当前值肋骨里的值列表. "
+           "精确地说, 这个指令扩展闭包的环境以"
+           "闭包的变量 (也就是形式参数) 列表和当前值肋骨, "
+           "然后将当前环境设置为这个新的环境, "
+           "当前值肋骨置为空表, 下一个表达式置为闭包的体.")
+       (Li (C '(return))
+           "移除(当前)栈的第一个帧, 重设当前环境, "
+           "当前值肋骨, 下一个表达式, 以及当前栈. "
+           "{译注: 实际上, 对于当前栈的变动就是移除其第一个帧.}"))
+   (H4. "转换")
+   (P "编译器将Scheme表达式转换为上述汇编语言指令. "
+      "一些表达式, 诸如变量和常量, 被转换为一条汇编语言指令. "
+      "另一些表达式, 例如应用, 被转换为多条指令.")
+   
    (H3. "改进变量访问" #:id "variable-access")
    (H2. "基于栈的模型")
    (H2. "基于字符串的模型")
