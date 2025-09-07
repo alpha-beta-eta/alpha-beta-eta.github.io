@@ -70,4 +70,6 @@
         (cond
           [(null? vars) (nxtrib (cdr e))]
           [(eq? (car vars) var) vals]
-          [else (nxtelt (cdr vars) (cdr vals))])))))</code></pre></p><h3 id="variable-access">第3.5节 改进变量访问</h3><h2>第4章 基于栈的模型</h2><h2>第5章 基于字符串的模型</h2><h2>第6章 总结</h2></body></html>
+          [else (nxtelt (cdr vars) (cdr vals))])))))</code></pre>两层循环是必要的, 一层施行于环境的肋骨之上, 另一层施行于变量肋骨的变量之上. 第二层循环也携带着值肋骨, 以使得正确的位置被找到时值可以立即取出. 注意到鉴于循环是尾递归的, 所以说搜索是迭代性的.</p><p>函数<code>closure</code>创建一个新的闭包对象, 其不过就是由一个体, 一个环境, 一个变量列表构成的一个列表:<pre><code>(define closure
+  (lambda (body e vars)
+    (list body e vars)))</code></pre></p><p>函数<code>continuation</code>创建一个新的延续对象. 一个延续是一个闭包, </p><h3 id="variable-access">第3.5节 改进变量访问</h3><h2>第4章 基于栈的模型</h2><h2>第5章 基于字符串的模型</h2><h2>第6章 总结</h2></body></html>

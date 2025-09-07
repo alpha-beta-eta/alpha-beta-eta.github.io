@@ -101,6 +101,7 @@
     (H2 (A "集合论" #:attr* '((href "set_theory.html"))))
     (H2 (A "没有(太多)眼泪的Gödel" #:attr* '((href "godel.html"))))
     (H2 (A "对于宏的恐惧" #:attr* '((href "fear-of-macros.html"))))
+    (H2 (A "lambda到SKI" #:attr* '((href "ski.html"))))
     
     )
    ))
