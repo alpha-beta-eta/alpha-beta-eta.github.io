@@ -463,7 +463,18 @@
           [(null? vars) (nxtrib (cdr e))]
           [(eq? (car vars) var) vals]
           [else (nxtelt (cdr vars) (cdr vals))])))))")
-      
+      "两层循环是必要的, 一层施行于环境的肋骨之上, "
+      "另一层施行于变量肋骨的变量之上. "
+      "第二层循环也携带着值肋骨, "
+      "以使得正确的位置被找到时值可以立即取出. "
+      "注意到鉴于循环是尾递归的, 所以说搜索是迭代性的.")
+   (P "函数" (Code "closure") "创建一个新的闭包对象, "
+      "其不过就是由一个体, 一个环境, 一个变量列表构成的一个列表:"
+      (CodeB "(define closure
+  (lambda (body e vars)
+    (list body e vars)))"))
+   (P "函数" (Code "continuation") "创建一个新的延续对象. "
+      "一个延续是一个闭包, "
       )
    (H3. "改进变量访问" #:id "variable-access")
    (H2. "基于栈的模型")

@@ -134,6 +134,7 @@
          "plane_algebraic_curves.rkt"
          "game_programming_notes.rkt"
          "prafm.rkt"
+         "engine.rkt"
          
          )
 (define (emit-web)
@@ -287,6 +288,7 @@
   (emitXml game_programming_notes.html
            "../game_programming_notes.html")
   (emitXml prafm.html "../prafm.html")
+  (emitXml engine.html "../engine.html")
   
   )
 (emit-web)

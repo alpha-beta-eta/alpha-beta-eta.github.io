@@ -58,6 +58,15 @@
   (&conj $conj))
 (define-@lized-op*
   (@conj &conj))
+(define (make-cat str)
+  (Mi str #:attr* '((mathvariant "sans-serif"))))
+(define-syntax-rule (define-cat* (id str) ...)
+  (begin
+    (define id (make-cat str))
+    ...))
+(define-cat*
+  (CatSet "Set")
+  )
 (define catlog.html
   (TnTmPrelude
    #:title "范畴逻辑引论"
@@ -219,6 +228,27 @@
    ((Example)
     "一个显然的非例 (non-example) 是偏序集的理论, "
     )
+   (H4. "代数理论的模型" #:switch? #f)
+   (P "让我们考虑代数理论的" (Em "模型") ", 即" (Em "代数")
+      ". 经典地, 一个群可以由一个集合" $G ", 一个元素"
+      (∈ $e $G) ", 一个函数" (func $m (&c* $G $G) $G)
+      ", 一个函数" (func $i $G $G) "给出, 其满足群公理:"
+      (eqn*
+       ((appl $m $x (appl $m $y $z))
+        $=
+        (appl $m (appl $m $x $y) $z))
+       ((appl $m $x (ap $i $x))
+        $=
+        (&= (appl $m (ap $i $x) $x) $e))
+       ((appl $m $x $e)
+        $=
+        (&= (appl $m $e $x) $x)))
+      "对于任意的" (∈ $x $y $z $G)
+      "成立. 然而, 观察到这种概念可以被轻易地一般化"
+      "以使得我们可以在异于" CatSet
+      "的范畴之中讨论群论的模型. "
+      
+      )
    (H2. "命题逻辑")
    (H2. "一阶逻辑")
    (H2. "类型论")

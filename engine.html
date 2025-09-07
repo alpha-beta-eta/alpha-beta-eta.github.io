@@ -1,0 +1,41 @@
+<html><head><meta charset="utf-8"/><title>游戏引擎架构笔记</title><link href="styles.css" rel="stylesheet"/></head><body><h1>游戏引擎架构笔记</h1><h2>第1章 引论</h2><h2>第2章 工具</h2><h2>第3章 游戏软件工程基础</h2><h2>第4章 并行和并发编程</h2><h2>第5章 游戏3D数学</h2><h2>第6章 引擎支持系统</h2><h2>第7章 资源以及文件系统</h2><h2>第8章 游戏循环和实时模拟</h2><p>游戏是实时的, 动态的, 交互性的计算机模拟. </p><h3>第8.1节 渲染循环</h3><h3>第8.2节 游戏循环</h3><h4>第8.2.1小节 一个简单的例子: Pong</h4><h3>第8.3节 游戏循环架构风格</h3><h4>第8.3.1小节 Windows消息泵</h4><h4>第8.3.2小节 回调驱动的框架</h4><p>大多数游戏引擎子系统和第三方游戏中间件包以库的形式结构化. </p><p>与之相对的是, 一些游戏引擎和游戏中间件包以框架的形式结构化. 一个框架是一个部分完成的应用. 程序员通过提供缺失机能的实现或者覆盖默认的行为以完成应用. </p><p>在基于框架的渲染引擎或者游戏引擎之中, 主游戏循环已经写给我们了, 只是它大致上是空的. 游戏程序员可以编写回调函数来填充缺失的细节. OGRE渲染引擎是库包裹于框架的一个例子. 在最低层次上, OGRE提供了可由游戏引擎程序员直接调用的函数. 然而, OGRE也提供了一个框架, 其包裹了如何有效使用低层次的OGRE库的知识. 如果程序员选择使用OGRE框架, 那么其需要从<code>Ogre:FrameListener</code>导出一个类并覆盖两个虚函数: <code>frameStarted()</code>和<code>frameEnded()</code>. 正如你可能会猜想到的, 这些函数分别在主3D场景由OGRE渲染之前和之后调用. OGRE框架对于其内部游戏循环的实现看起来像是以下的伪代码.<pre><code>while (true)
+{
+    for (each frameListener)
+    {
+        frameListener.frameStarted();
+    }
+
+    renderCurrentScene();
+
+    for (each frameListener)
+    {
+        frameListener.frameEnded();
+    }
+
+    finalizeSceneAndSwapBuffers();
+}</code></pre>一个特定游戏的帧监听器实现看起来可能像以下这样.<pre><code>class GameFrameListener : public Ogre::FrameListener
+{
+public:
+    virtual void frameStarted(const FrameEvent& event)
+    {
+        // Do things that must happen before the 3D scene
+        // is rendered (i.e., service all game engine
+        // subsystems).
+        pollJoypad(event);
+        updatePlayerControls(event);
+        updateDynamicsSimulation(event);
+        resolveCollisions(event);
+        updateCamera(event);
+        
+        // etc.
+    }
+
+    virtual void frameEnded(const FrameEvent& event)
+    {
+        // Do things that must happen after the 3D scene
+        // has been rendered.
+        drawHud(event);
+
+        // etc.
+    }
+};</code></pre></p><h4>第8.3.3小节 基于事件的更新</h4><p>在游戏之中, 事件是游戏或其环境的状态的任何有趣改变. 大多数游戏引擎有着一个事件系统, 其允许诸引擎子系统订阅特定种类的事件, 并在那些事件发生时进行反应. 游戏的事件系统往往也非常类似于作为GUI基础的事件/消息系统.</p><h3>第8.4节 抽象时间线</h3><p>在游戏编程中, 基于抽象时间线进行思考可能是极其有用的. 一个时间线是一个连续的一维的轴, 其原点可以坐落于相对于系统内的其他时间线的任何位置. 时间线可以简单地由时钟变量实现, 其存储着整数或者浮点形式的绝对时间值.</p><h4>第8.4.1小节 真实时间</h4><h4>第8.4.2小节 游戏事件</h4><h4>第8.4.3小节 局部和全局时间线</h4><h3>第8.5节 度量和处理时间</h3><h3>第8.6节 多处理器游戏循环</h3><h2>第9章 人类接口设备</h2><h2>第10章 debug和开发工具</h2><h2>第11章 渲染引擎</h2><h2>第12章 动画系统</h2><h2>第13章 碰撞和刚体动力学</h2><h2>第14章 音频</h2><h2>第15章 gameplay系统引论</h2><h3>第15.1节 游戏世界解剖</h3><h4>第15.1.1小节 世界元素</h4><h4>第15.1.2小节 世界chunk</h4><h4>第15.1.3小节 高层次游戏流</h4><h3>第15.2节 实现动态元素: 游戏对象</h3><h4>第15.2.1小节 游戏对象模型</h4><h3>第15.3节 数据驱动游戏引擎</h3><h3>第15.4节 游戏世界编辑器</h3><h2>第16章 运行时gameplay基础系统</h2><h3>第16.1节 gameplay基础系统的组件</h3><h3>第16.2节 运行时对象模型架构</h3><h3>第16.3节 世界chunk的数据格式</h3><h3>第16.4节 </h3><h3>第16.5节 对象引用和世界查询</h3><h3>第16.6节 实时更新游戏对象</h3><h3>第16.7节 应用并发于游戏对象更新</h3><h3>第16.8节 事件和消息传递</h3></body></html>
