@@ -1,6 +1,8 @@
 #lang racket
 (provide cat_awodey.html)
 (require SMathML)
+(define $thetav (Mi "&thetav;"))
+(define $thetav_X (_ $thetav $X))
 (define $! (Mi "!"))
 (define (Family X i I)
   (_ (@ (_ X i)) (∈ i I)))
@@ -3372,8 +3374,58 @@
              (app (F $g) (app (F $f) $x))
              (app (@compose (F $g) (F $f)) $x)))))
    (P "之后我们将会远为细致地研究这样的可表函子. "
-      
-      )
+      "暂时我们只想看看如何使用同态集给出积的定义的另一种表述.")
+   (P "对于任意的对象" $P ", 一对箭头" (Arrow $p_1 $P $A)
+      "和" (Arrow $p_2 $P $B) "确定了集合"
+      (MB (&c* (Hom $P $A) (Hom $P $B)))
+      "的一个元素" (tu0 $p_1 $p_2)
+      ". 现在对于任意的箭头"
+      (MB (Arrow $x $X $P))
+      "将其与" $p_1 "和" $p_2 "进行复合给出了一对箭头"
+      (&= $x_1 (Arrow (&compose $p_1 $x) $X $A)) "和"
+      (&= $x_2 (Arrow (&compose $p_2 $x) $X $B))
+      ", 如以下图表所示:"
+      todo.svg
+      "以这种方式, 我们有了一个函数"
+      (MB (&= $thetav_X
+              (Arrow (tu0 (Hom $X $p_1) (Hom $X $p_2))
+                     (Hom $X $P)
+                     (&c* (Hom $X $A) (Hom $X $B)))))
+      "其被定义为"
+      (MBL "(2.1)" (&= (app $thetav_X $x) (tu0 $x_1 $x_2)))
+      "这个函数" $thetav_X "可以用来按照如下方式"
+      "精确地表达成为一个积的条件.")
+   ((Proposition)
+    (Em "具有形式"
+        (MB (LeftRightDiagram $A $p_1 $P $p_2 $B))
+        "的一个图表是" $A "和" $B
+        "的一个积当且仅当对于每个对象" $X
+        ",(2.1)中所给出的canonical函数" $thetav_X
+        "是一个同构,即"
+        (MB (&: $thetav_X
+                (&cong (Hom $X $P)
+                       (&c* (Hom $X $A) (Hom $X $B)))) ".")))
+   ((proof)
+    "检视积的UMP: 它恰是在说对于每个元素"
+    (∈ (tu0 $x_1 $x_2) (&c* (Hom $X $A) (Hom $X $B)))
+    ", 存在唯一的" (∈ $x (Hom $X $P)) "使得"
+    (&= (app $thetav_X $x) (tu0 $x_1 $x_2))
+    ", 即" $thetav_X "是双射的.")
+   ((Definition)
+    "令" CatC ", " CatD "是具有二元积的范畴. 一个函子"
+    (Functor $F CatC CatD) "被称为是" (Em "保持二元积")
+    ", 如果其将" CatC "中的每个积图表"
+    (MB (LeftRightDiagram $A $p_1 (&c* $A $B) $p_2 $B))
+    "送至" CatD "中的一个积图表"
+    (MB (apply
+         LeftRightDiagram
+         (map* (curry app $F)
+               $A $p_1 (&c* $A $B) $p_2 $B)))
+    "根据这个定义我们可以知道" $F "保持积恰当"
+    (MB (&cong (app $F (&c* $A $B))
+               (&c* (app $F $A) (app $F $B))))
+    (Q "canonically") ", "
+    )
    (H3. "练习")
    (H2. "对偶性")
    (H3. "对偶原理")
