@@ -1,6 +1,12 @@
 #lang racket
 (provide cat_awodey.html)
 (require SMathML)
+(define $CT (Mi "CT"))
+(define $CT^* (&* $CT))
+(define Σ $Sigma:normal)
+(define Δ $Delta:normal)
+(define Σ* (&* Σ))
+(define Δ* (&* Δ))
 (define $thetav (Mi "&thetav;"))
 (define $thetav_X (_ $thetav $X))
 (define $! (Mi "!"))
@@ -3509,17 +3515,40 @@
       (MB (&=> (&= (&dom $g) (&cod $f))
                (&= (&dom (&compose $g $f))
                    (&dom $f))) "."))
-   (P "现在对于范畴论的初等语言里的任意句子"
-      $Sigma:normal ", 我们可以通过以下替换构造"
-      (Q "对偶陈述") (&* $Sigma:normal) ":"
+   (P "现在对于范畴论的初等语言里的任意句子" Σ
+      ", 我们可以通过以下替换构造"
+      (Q "对偶陈述") Σ* ":"
       (eqn*
        ((&compose $f $g)
         "for"
         (&compose $g $f))
        ($cod "for" $dom)
        ($dom "for" $cod))
-      "很容易看出来" (&* $Sigma:normal)
-      "也会是良形式的句子. "
+      "很容易看出来" Σ* "也会是良形式的句子. "
+      "接下来, 设我们有了一个句子" Σ
+      "蕴涵 (entail) 一个" Δ " (即" (&=> Σ Δ)
+      ") 而没有使用范畴论公理中的任何一条, "
+      "那么我们显然也有" (&=> Σ* Δ*)
+      ", 因为被替换的项仅仅被视为未加定义的常量. "
+      "但是, 现在我们可以观察到范畴论 (" $CT
+      ") 的诸公理本身是" (Q "自对偶 (self-dual)")
+      "的, 其意为我们有"
+      (MB (&= $CT^* $CT) ".")
+      "因此, 我们有如下" (Em "对偶原理") ".")
+   ((Proposition)
+    (B "(形式对偶性). ")
+    (Em "对于范畴论语言之中的任意句子" Σ
+        ",如果" Σ "由范畴论的公理推出,那么其对偶"
+        Σ* "亦可由范畴论的公理推出:"
+        (MB (&=> $CT Σ) "可以推出"
+            (&=> $CT Σ*) ".")))
+   (P "从更加概念化的角度来看, "
+      "注意到如果一个陈述牵涉某个由对象和箭头构成的图表"
+      todo.svg
+      "那么其对偶陈述则牵涉由该图表反转箭头方向和复合顺序所得到的新图表"
+      todo.svg
+      "回忆一下一个范畴" CatC "的相反范畴" (&op CatC)
+      ", 我们看到"
       )
    (H3. "余积")
    (H3. "等化子")

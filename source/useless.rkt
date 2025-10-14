@@ -99,8 +99,7 @@
            #:attr* '((href "metaocaml.html"))))
     #;
     (H2 (A "Zork论文翻译" #:attr* '((href "zork.html"))))
-    #;
-    (H2 (A "Schemer看monad" #:attr* '((href "monad.html"))))
+    (H2 (A "Schemer的monad之见" #:attr* '((href "monad.html"))))
     #;
     (H2 (A "高效多项式计算" #:attr*
            '((href "polynomial_computation.html"))))

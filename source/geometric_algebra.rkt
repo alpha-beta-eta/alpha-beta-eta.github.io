@@ -40,6 +40,34 @@
 (define-Entry*
   (Definition "定义" "definition")
   (Theorem "定理" "theorem"))
+(define (GlobalEntry name class)
+  (define (present %entry attr* . html*)
+    (define id (%entry-id %entry))
+    (define Attr* (attr*-set attr* 'class class 'id id))
+    (define index (%entry-index %entry))
+    (define head
+      (if index
+          (B name (format "~s. " index))
+          (B name ". ")))
+    `(div ,Attr* ,head . ,html*))
+  (define (cite %entry)
+    (define id (%entry-id %entry))
+    (define href (string-append "#" id))
+    (define index (%entry-index %entry))
+    (if index
+        (Cite `(a ((href ,href)) ,name ,(format "~s" index)))
+        (Cite `(a ((href ,href)) "某" ,name))))
+  (lambda (#:id [id #f] #:auto? [auto? #t])
+    (lambda (#:attr* [attr* '()] . html*)
+      (cons (build-%entry #:id id #:auto? auto?
+                          #:present present #:cite cite
+                          #:local? #f #:class class)
+            (cons attr* html*)))))
+(define-syntax-rule (define-GlobalEntry* (id name class) ...)
+  (begin (define id (GlobalEntry name class))
+         ...))
+(define-GlobalEntry*
+  (Axiom "公理" "axiom"))
 (define $parallel (Mo "&parallel;"))
 (define $nparallel (Mo "&nparallel;"))
 (define-infix*
@@ -60,11 +88,34 @@
     ", 要么没有点" $P "同时落于" $l "和" $m
     "之上, 那么我们称" $l "和" $m "平行, 记作"
     (&parallel $l $m) ". 如果" $l "和" $m
-    "不平行, 我们记作" (&nparallel $l $m) "." (Br)
-    "如果" (&nparallel $l $m)
-    ", 那么至少存在一个点" $P
-    "同时落于" $l "和" $m "之上.")
-   
+    "不平行, 我们记作" (&nparallel $l $m) ".")
+   (P "如果" (&nparallel $l $m)
+      ", 那么至少存在一个点" $P
+      "同时落于" $l "和" $m "之上.")
+   ((Axiom #:id "axiom1")
+    "给定两个" (Em "相异") "的点" $P "和" $Q
+    ", 存在一条" (Em "唯一") "的直线" $l "使得"
+    $P "落于" $l "之上且" $Q "落于" $l
+    "之上. 我们将其记作" (&= $l (&+ $P $Q)) ".")
+   (P "如果" (&nparallel $l $m) ", 那么恰存在一个点"
+      $P "同时落于" $l "和" $m "之上. 诚然如此, "
+      "假使存在两个这样的点, 那么根据" (Ref "axiom1")
+      ", " (&= $l $m) ", 因而" (&parallel $l $m) ".")
+   ((Axiom)
+    "给定一个点" $P "和一条直线" $l
+    ", 存在唯一的直线" $m "使得" $P "落于" $m
+    "之上且" (&parallel $m $l) ".")
+   ((Theorem)
+    (Q "平行") "是一个等价关系.")
+   ((proof)
+    
+    )
+   ((Definition)
+    "一个由平行直线构成的等价类被称为一个平行直线的束 (pencil).")
+   ((Theorem)
+    "设存在三个不同的平行直线束" (&cm $pi_1 $pi_2 $pi_3)
+    ", 那么"
+    )
    (H2. "辛几何和正交几何")
    (H2. "一般线性群")
    (H2. "辛群和正交群的结构")
