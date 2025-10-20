@@ -142,6 +142,7 @@
          "papers_plan.rkt"
          "having_an_effect.rkt"
          "haskell_music.rkt"
+         "array.rkt"
          
          )
 (define (emit-web)
@@ -304,6 +305,7 @@
   (emitXml papers_plan.html "../papers_plan.html")
   (emitXml having_an_effect.html "../having_an_effect.html")
   (emitXml haskell_music.html "../haskell_music.html")
+  (emitXml array.html "../array.html")
   
   )
 (emit-web)

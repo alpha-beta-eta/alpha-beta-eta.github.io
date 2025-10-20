@@ -36,6 +36,7 @@
     (H2 (A "范畴论笔记" #:attr* '((href "cat_awodey.html"))))
     #;
     (H2 (A "(瞎写的)游戏编程" #:attr* '((href "game_programming.html"))))
+    (H2 (A "关于数组语言的随想" #:attr* '((href "array.html"))))
     
     )
    ))
