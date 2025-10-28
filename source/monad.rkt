@@ -1101,10 +1101,179 @@ c: #\\d
       "另外, 这个" (Code "k")
       " (未经包装的当前延续) 也会直接传递给"
       (Code "f") "的体, 作为当前延续使用.")
-   
+   (P "在" (Code "callcc")
+      "的定义之中, 我们打包了当前的延续"
+      (Code "k") "以忽略未来的当前延续"
+      "而调用现在存储的这个当前延续. "
+      "这就是绑定到" (Code "k-as-proc")
+      "的对象. {译注: 更准确地说, 给"
+      (Code "k-as-proc")
+      "喂一个纯值之后会产生一个monadic值.} "
+      "我们将包装了的延续传递给" (Code "f")
+      ", 其会返回一个" $MA
+      ", 然后其又会被传递进入时的当前的延续"
+      (Code "k") ". 我们使用一个程序来描述"
+      (Code "callcc")
+      ". 这个程序的参数也接受嵌套的整数列表, "
+      "然后返回其中的数字之积. "
+      "当遇到数字" (Code "0")
+      "的时候, 这个过程应该立即返回" (Code "0")
+      ". 出于乐趣, 我们给退出之后添加了一些代码, "
+      "以确保它并不会发生. "
+      "如果不加这冗余的代码, 或许不会令某些人信服. "
+      "这种证明手法在于使得" (Code "(exit 0)")
+      "位于非尾位置, 让sequel做些什么. "
+      "不过若是我们的" (Code "callcc")
+      "以预想的方式工作, 那么这个sequel就会被直接忽略."
+      (CodeB "(define product
+  (λ (ls exit)
+    (cond
+      ((null? ls) (unit_continuation 1))
+      ((list?? (car ls))
+       ((star_continuation
+         (λ (a)
+           ((star_continuation
+             (λ (d)
+               (unit_continuation (* a d))))
+            (product (cdr ls) exit))))
+        (product (car ls) exit)))
+      ((zero? (car ls))
+       ((star_continuation
+         (λ (_)
+           (unit_continuation (sub1 _))))
+        (exit 0)))
+      (else
+       ((star_continuation
+         (λ (d)
+           (unit_continuation
+            (* (car ls) d))))
+        (product (cdr ls) exit))))))"))
+   (P "以下的第一个测试处理的是基本情况, "
+      (Code "1") "会直接返回, "
+      (Code "out") "不会被调用."
+      (CodeB "> ((callcc
+    (λ (out) (product '() out)))
+   (λ (x) x))
+1"))
+   (P "下一个例子对应于Scheme的"
+      (Code "(add1 (call/cc (λ (out) (product '() out))))")
+      ". {译注: 当然了, 这里的" (Code "product")
+      "是按照通常方式而非monad风格定义的.} 这表明了"
+      (Code "callcc") "具有某种可复合性."
+      (CodeB "> (((star_continuation
+     (λ (a)
+       (unit_continuation
+        (add1 a))))
+    (callcc
+     (λ (out)
+       (product '() out))))
+   (λ (x) x))
+2"))
+   (P "第三个例子和第二个例子, 只是" (Code "out")
+      "会被调用, 我们需要保证这种情况下的可复合性."
+      (CodeB "> (((star_continuation
+     (λ (a)
+       (unit_continuation
+        (add1 a))))
+    (callcc
+     (λ (out)
+       (product '(5 0 5) out))))
+   (λ (x) x))
+1"))
+   (P "以下是一个非常正常的例子. 因为列表里没有"
+      (Code "0") ", 所以" (Code "out")
+      "不会被调用. {译注: 尽管如此, 作为延续的"
+      (Code "(λ (x) x)") "还是会在最后被调用.}"
+      (CodeB "> ((callcc
+    (λ (out)
+      (product '(2 3 (7 4 5 6) 8 (9) 2) out)))
+   (λ (x) x))
+725760"))
+   (P "让我们来看最后一个例子, 其应该等价于以下的Scheme例子. "
+      "{译注: Dan Friedman称其为简单的例子, "
+      "我希望他只是在开玩笑. 尽管我可以理解这个例子, "
+      "但我实在拒绝称这个例子为简单的.}"
+      (CodeB "(call/cc
+ (λ (k0)
+   ((car (call/cc
+          (λ (k1)
+            (k0 (- (call/cc
+                    (λ (k2)
+                      (k1 `(,k2))))
+                   1)))))
+    3)))")
+      "但是, 对于这个表达式进行monad化有点tricky. "
+      "{译注: 如果你能理解上面的表达式, "
+      "那么monad化就不tricky了.} 延续"
+      (Code "k1") "中的" (Code "((car []) 3)")
+      "需要移到第一个sequel的位置, 同理"
+      (Code "(k0 (- [] 1))")
+      "需要移到第二个sequel的位置."
+      (CodeB "> ((callcc
+    (λ (k0)
+      ((star_continuation
+        (λ (a) ((car a) 3)))
+       (callcc
+        (λ (k1)
+          ((star_continuation
+            (λ (n) (k0 (- n 1))))
+           (callcc
+            (λ (k2) (k1 `(,k2))))))))))
+   (λ (x) x))
+2"))
+   (P "下一个monad是" $identity " monad.")
    (H3. "恒等monad")
+   (P "以下是" $identity " monad."
+      (CodeB "(define unit_identity
+  (λ (a)
+    (let ((ma a))
+      ma)))
+(define star_identity
+  (λ (sequel)
+    (λ (ma)
+      (let ((a ma)) ;This is a MB.
+        (sequel a)))))"))
+   (P "考虑第一次讲座里的" (Code "remberevens")
+      ". {译注: 那是已经monad化了的版本.} "
+      "我们取该定义, 然后将" (Code "unit_state")
+      "替换为" (Code "unit_identity")
+      ", " (Code "star_state") "替换为"
+      (Code "star_identity")
+      ", 接着我们就得到了以下定义."
+      (CodeB "(define remberevens
+  (λ (l)
+    (cond
+      ((null? l) (unit_identity '()))
+      ((list?? (car l))
+       ((star_identity
+         (λ (a)
+           ((star_identity (λ (d) (unit_identity (cons a d))))
+            (remberevens (cdr l)))))
+        (remberevens (car l))))
+      ((odd? (car l))
+       ((star_identity (λ (d) (unit_identity (cons (car l) d))))
+        (remberevens (cdr l))))
+      (else
+       (remberevens (cdr l))))))")
+      (CodeB "> (remberevens '(2 3 (7 4 5 6) 8 (9) 2))
+(3 (7 5) (9))"))
+   (P "这是一个纯粹的解法, 因为有着非常干净的" $unit
+      "和" $star ": 相当于恒等函数. "
+      "将恒等monad修改为使用" $car
+      "部分有着纯值的序对是平凡的事情.")
    (H2. "附录")
    (H3. "状态传递风格的推导")
+   
    (H3. "结论")
+   (P "我们使用了Wadler的方法来解释来源于"
+      (Q "The Essence of Functional Programming")
+      "的monad. 但是, 存在着不同之处. "
+      "Wadler使用了bind, 而我则像Moggi一样使用了star. "
+      "Wadler展示了如何扩展解释器, "
+      "而我展示了如何扩展" (Q "The Little Schemer")
+      "中的程序. Wadler假定能够阅读Haskell程序, "
+      "我则假定理解函数作为值以及能够阅读Scheme程序. "
+      "最后, 我相信我的方法对于新人更加清晰, "
+      "而Wadler的方法更适合成熟的读者.")
    (H3. "致谢")
    ))

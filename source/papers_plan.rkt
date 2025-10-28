@@ -24,6 +24,8 @@
               "探究经典逻辑的Curry-Howard对应")
           (Li "Extensible Denotational Language Specifications: "
               )
+          (Li "Notions of Computation and Monads: "
+              "关于monad在编程语言中的应用的原始论文")
           (Li ""
               )
           )

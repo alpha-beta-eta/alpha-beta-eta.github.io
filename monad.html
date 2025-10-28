@@ -494,4 +494,91 @@ c: #\d
                (λ (k_ignored)
                  (k a)))))
         (let ((ma (f k-as-proc)))
-          (ma k))))))</code></pre></p><p>译者: 从某种意义上来说, <code>callcc</code>的参数<code>k</code>具有双重作用. 从概念上来说, 它是所谓的当前延续. 这个当前延续(的包装版本)会传递给<code>f</code>, 使得<code>f</code>的体中在调用它时返回一个恰当的monadic值, 这个monadic值会忽略其所接受的延续, 转而使用之前所保存的当前延续. 另外, 这个<code>k</code> (未经包装的当前延续) 也会直接传递给<code>f</code>的体, 作为当前延续使用.</p><h3>第2.7节 恒等monad</h3><h2>第3章 附录</h2><h3>第3.1节 状态传递风格的推导</h3><h3>第3.2节 结论</h3><h3>第3.3节 致谢</h3></body></html>
+          (ma k))))))</code></pre></p><p>译者: 从某种意义上来说, <code>callcc</code>的参数<code>k</code>具有双重作用. 从概念上来说, 它是所谓的当前延续. 这个当前延续(的包装版本)会传递给<code>f</code>, 使得<code>f</code>的体中在调用它时返回一个恰当的monadic值, 这个monadic值会忽略其所接受的延续, 转而使用之前所保存的当前延续. 另外, 这个<code>k</code> (未经包装的当前延续) 也会直接传递给<code>f</code>的体, 作为当前延续使用.</p><p>在<code>callcc</code>的定义之中, 我们打包了当前的延续<code>k</code>以忽略未来的当前延续而调用现在存储的这个当前延续. 这就是绑定到<code>k-as-proc</code>的对象. {译注: 更准确地说, 给<code>k-as-proc</code>喂一个纯值之后会产生一个monadic值.} 我们将包装了的延续传递给<code>f</code>, 其会返回一个<math><mrow><mi>M</mi><mo>&af;</mo><mi>A</mi></mrow></math>, 然后其又会被传递进入时的当前的延续<code>k</code>. 我们使用一个程序来描述<code>callcc</code>. 这个程序的参数也接受嵌套的整数列表, 然后返回其中的数字之积. 当遇到数字<code>0</code>的时候, 这个过程应该立即返回<code>0</code>. 出于乐趣, 我们给退出之后添加了一些代码, 以确保它并不会发生. 如果不加这冗余的代码, 或许不会令某些人信服. 这种证明手法在于使得<code>(exit 0)</code>位于非尾位置, 让sequel做些什么. 不过若是我们的<code>callcc</code>以预想的方式工作, 那么这个sequel就会被直接忽略.<pre><code>(define product
+  (λ (ls exit)
+    (cond
+      ((null? ls) (unit_continuation 1))
+      ((list?? (car ls))
+       ((star_continuation
+         (λ (a)
+           ((star_continuation
+             (λ (d)
+               (unit_continuation (* a d))))
+            (product (cdr ls) exit))))
+        (product (car ls) exit)))
+      ((zero? (car ls))
+       ((star_continuation
+         (λ (_)
+           (unit_continuation (sub1 _))))
+        (exit 0)))
+      (else
+       ((star_continuation
+         (λ (d)
+           (unit_continuation
+            (* (car ls) d))))
+        (product (cdr ls) exit))))))</code></pre></p><p>以下的第一个测试处理的是基本情况, <code>1</code>会直接返回, <code>out</code>不会被调用.<pre><code>> ((callcc
+    (λ (out) (product '() out)))
+   (λ (x) x))
+1</code></pre></p><p>下一个例子对应于Scheme的<code>(add1 (call/cc (λ (out) (product '() out))))</code>. {译注: 当然了, 这里的<code>product</code>是按照通常方式而非monad风格定义的.} 这表明了<code>callcc</code>具有某种可复合性.<pre><code>> (((star_continuation
+     (λ (a)
+       (unit_continuation
+        (add1 a))))
+    (callcc
+     (λ (out)
+       (product '() out))))
+   (λ (x) x))
+2</code></pre></p><p>第三个例子和第二个例子, 只是<code>out</code>会被调用, 我们需要保证这种情况下的可复合性.<pre><code>> (((star_continuation
+     (λ (a)
+       (unit_continuation
+        (add1 a))))
+    (callcc
+     (λ (out)
+       (product '(5 0 5) out))))
+   (λ (x) x))
+1</code></pre></p><p>以下是一个非常正常的例子. 因为列表里没有<code>0</code>, 所以<code>out</code>不会被调用. {译注: 尽管如此, 作为延续的<code>(λ (x) x)</code>还是会在最后被调用.}<pre><code>> ((callcc
+    (λ (out)
+      (product '(2 3 (7 4 5 6) 8 (9) 2) out)))
+   (λ (x) x))
+725760</code></pre></p><p>让我们来看最后一个例子, 其应该等价于以下的Scheme例子. {译注: Dan Friedman称其为简单的例子, 我希望他只是在开玩笑. 尽管我可以理解这个例子, 但我实在拒绝称这个例子为简单的.}<pre><code>(call/cc
+ (λ (k0)
+   ((car (call/cc
+          (λ (k1)
+            (k0 (- (call/cc
+                    (λ (k2)
+                      (k1 `(,k2))))
+                   1)))))
+    3)))</code></pre>但是, 对于这个表达式进行monad化有点tricky. {译注: 如果你能理解上面的表达式, 那么monad化就不tricky了.} 延续<code>k1</code>中的<code>((car []) 3)</code>需要移到第一个sequel的位置, 同理<code>(k0 (- [] 1))</code>需要移到第二个sequel的位置.<pre><code>> ((callcc
+    (λ (k0)
+      ((star_continuation
+        (λ (a) ((car a) 3)))
+       (callcc
+        (λ (k1)
+          ((star_continuation
+            (λ (n) (k0 (- n 1))))
+           (callcc
+            (λ (k2) (k1 `(,k2))))))))))
+   (λ (x) x))
+2</code></pre></p><p>下一个monad是<math><mi>identity</mi></math> monad.</p><h3>第2.7节 恒等monad</h3><p>以下是<math><mi>identity</mi></math> monad.<pre><code>(define unit_identity
+  (λ (a)
+    (let ((ma a))
+      ma)))
+(define star_identity
+  (λ (sequel)
+    (λ (ma)
+      (let ((a ma)) ;This is a MB.
+        (sequel a)))))</code></pre></p><p>考虑第一次讲座里的<code>remberevens</code>. {译注: 那是已经monad化了的版本.} 我们取该定义, 然后将<code>unit_state</code>替换为<code>unit_identity</code>, <code>star_state</code>替换为<code>star_identity</code>, 接着我们就得到了以下定义.<pre><code>(define remberevens
+  (λ (l)
+    (cond
+      ((null? l) (unit_identity '()))
+      ((list?? (car l))
+       ((star_identity
+         (λ (a)
+           ((star_identity (λ (d) (unit_identity (cons a d))))
+            (remberevens (cdr l)))))
+        (remberevens (car l))))
+      ((odd? (car l))
+       ((star_identity (λ (d) (unit_identity (cons (car l) d))))
+        (remberevens (cdr l))))
+      (else
+       (remberevens (cdr l))))))</code></pre><pre><code>> (remberevens '(2 3 (7 4 5 6) 8 (9) 2))
+(3 (7 5) (9))</code></pre></p><p>这是一个纯粹的解法, 因为有着非常干净的<math><mi>unit</mi></math>和<math><mi>star</mi></math>: 相当于恒等函数. 将恒等monad修改为使用<math><mi>car</mi></math>部分有着纯值的序对是平凡的事情.</p><h2>第3章 附录</h2><h3>第3.1节 状态传递风格的推导</h3><h3>第3.2节 结论</h3><p>我们使用了Wadler的方法来解释来源于<q>The Essence of Functional Programming</q>的monad. 但是, 存在着不同之处. Wadler使用了bind, 而我则像Moggi一样使用了star. Wadler展示了如何扩展解释器, 而我展示了如何扩展<q>The Little Schemer</q>中的程序. Wadler假定能够阅读Haskell程序, 我则假定理解函数作为值以及能够阅读Scheme程序. 最后, 我相信我的方法对于新人更加清晰, 而Wadler的方法更适合成熟的读者.</p><h3>第3.3节 致谢</h3></body></html>

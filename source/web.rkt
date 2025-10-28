@@ -144,6 +144,7 @@
          "haskell_music.rkt"
          "array.rkt"
          "algebraic_topology.rkt"
+         "analysis1_godement.rkt"
          
          )
 (define (emit-web)
@@ -309,6 +310,8 @@
   (emitXml array.html "../array.html")
   (emitXml algebraic_topology.html
            "../algebraic_topology.html")
+  (emitXml analysis1_godement.html
+           "../analysis1_godement.html")
   
   )
 (emit-web)
