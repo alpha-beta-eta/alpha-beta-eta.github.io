@@ -154,6 +154,8 @@
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml analysis1_godement.html
+             "../analysis1_godement.html")
     (emitXml bps.html "../bps.html")
     (emitXml pfpl.html "../pfpl.html")
     (emitXml rewrite.html "../rewrite.html")
@@ -321,8 +323,6 @@
   (emitXml array.html "../array.html")
   (emitXml algebraic_topology.html
            "../algebraic_topology.html")
-  (emitXml analysis1_godement.html
-           "../analysis1_godement.html")
   (emitXml machine_logic.html
            "../machine_logic.html")
   )
