@@ -1,6 +1,8 @@
 #lang racket
 (provide analysis1_godement.html)
 (require SMathML)
+(define (|[^]| a b)
+  (^ a (bra0 b)))
 (define (MBL label . exp*)
   (MB (Mtable
        #:attr*
@@ -154,6 +156,26 @@
       ", 然后检查结果的确就是对应于指数"
       (&+ $n $1) "的公式右侧 (归纳证明).")
    (P "二项式公式可以写作以下形式"
+      (MBL "(1.4)"
+           (&= (&/ (^ (@+ $x $y) $n) (&fact $n))
+               (sum (&= (&+ $p $q) $n)
+                    (&/ (&i* $x^p $y^q)
+                        (&i* (&fact $p) (&fact $q))))))
+      "其中" $sum "遍历满足" (&= (&+ $p $q) $n)
+      "的整数序对" (∈ $p $q $NN) ". 如果我们一般记"
+      (MBL "(1.5)" (&= (|[^]| $x $n) (&/ $x^n (&fact $n))))
+      "即所谓的" (Em "divided powers") ", 那么我们有"
+      (MBL "(1.6)" (&= (|[^]| (@+ $x $y) $n)
+                       (sum (&i* (|[^]| $x $p)
+                                 (|[^]| $y $q)))))
+      "以这种形式, 此关系可以扩展至任意数目的项, 例如"
+      (MBL "(1.7)"
+           (&= (|[^]| (@+ $x $y $z $y) $n)
+               (sum (&= (&+ $p $q $r $s) $n)
+                    (&i* (|[^]| $x $p)
+                         (|[^]| $y $q)
+                         (|[^]| $z $r)
+                         (|[^]| $u $s)))))
       
       )
    (H2. "收敛: 连续变量")
