@@ -338,3 +338,6 @@
            "../machine_logic.html")
   )
 (emit-web)
+#;
+(parameterize ([replace? #t])
+  (emit-web))

@@ -33,22 +33,24 @@
    Div '(#:attr*) '(((class "answer")))
    (B (format "解答~a." n)) " " x*))
 (define (format-num section index)
-  (cond ((and section index)
-         (format "~a.~a"
-                 (apply string-append
-                        (add-between
-                         (map number->string
-                              (cdr (reverse section))) "."))
-                 index))
-        (section
-         (format "~a.~a"
-                 (apply string-append
-                        (add-between
-                         (map number->string
-                              (cdr (reverse section))) "."))
-                 "*"))
-        (index (format "~a" index))
-        (else #f)))
+  (cond ((eq? (car section) '*)
+         (if index
+             (format "~a" index)
+             #f))
+        (else
+         (if index
+             (format "~a.~a"
+                     (apply string-append
+                            (add-between
+                             (map number->string
+                                  (cdr (reverse section))) "."))
+                     index)
+             (format "~a.~a"
+                     (apply string-append
+                            (add-between
+                             (map number->string
+                                  (cdr (reverse section))) "."))
+                     "*")))))
 (define (format-head name section index)
   (let ((num (format-num section index)))
     (if num
