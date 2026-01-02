@@ -700,9 +700,79 @@
                               (ap $mu $F_n)))
                      (sum (&= $n $0) $inf
                           (ap $mu $E_n))) "."))
-        (Li ""
-            )
-        )
+        (Li "置" (&= $F_0 $E_0) ", 而" (&>= $n $1) "时"
+            (&= $F_n (&\\ $E_n (_ $E (&- $n $1))))
+            "; 那么" (Seq $F) "是" Σ "中的不相交序列, 并且"
+            (&= (Union (∈ $n $NN) $F_n)
+                (Union (∈ $n $NN) $E_n))
+            ". 因此, "
+            (&= (app $mu (Union (∈ $n $NN) $E_n))
+                (sum (&= $n $0) $inf
+                     (ap $mu $F_n)))
+            ". 不过, 根据" $n "上的简单归纳, "
+            "其中归纳步骤要使用a, 可以证明"
+            (&= (ap $mu $E_n)
+                (sum (&= $m $0) $n
+                     (ap $mu $F_m)))
+            ", 故"
+            (MB (&= (sum (&= $n $0) $inf
+                         (ap $mu $F_n))
+                    (lim $n $inf
+                         (sum (&= $m $0) $n
+                              (ap $mu $F_m)))
+                    (lim $n $inf
+                         (ap $mu $E_n))) ".")
+            "最后, 根据b可知"
+            (_ (ang0 (ap $mu $E_n)) (∈ $n $NN))
+            "是非降的, 故"
+            (&= (lim $n $inf (ap $mu $E_n))
+                (Sup (∈ $n $NN) (ap $mu $E_n))) ".")
+        (Li "设" (&< (ap $mu $E_k) $inf)
+            ". 对于" (∈ $n $NN) ", 置"
+            (&= $F_n (&\\ $E_k (_ $E (&+ $k $n))))
+            ", 然后令" (&= $F (Union (∈ $n $NN) $F_n))
+            "; 那么" (Seq $F) "是" Σ
+            "中的一个非降序列, 于是根据e有"
+            (&= (ap $mu $F)
+                (lim $n $inf (ap $mu $F_n)))
+            ". 另外, "
+            (&= (&+ (ap $mu $F_n)
+                    (ap $mu (_ $E (&+ $k $n))))
+                (ap $mu $E_k))
+            "; 鉴于" (&< (ap $mu $E_k) $inf)
+            ", 我们可以安全地写下"
+            (&= (ap $mu $F_n)
+                (&- (ap $mu $E_k)
+                    (ap $mu (_ $E (&+ $k $n)))))
+            ", 于是"
+            (MB (&= (ap $mu $F)
+                    (lim $n $inf
+                         (@- (ap $mu $E_k)
+                             (ap $mu (_ $E (&+ $k $n)))))
+                    (&- (ap $mu $E_k)
+                        (lim $n $inf (ap $mu $E_n)))))
+            "接着, 因为" (&sube $F $E_k) ", 故"
+            (&= (&+ (ap $mu $F)
+                    (app $mu (&\\ $E_k $F)))
+                (ap $mu $E_k))
+            ", 于是 (又因为" (ap $mu $E_k) "有限) "
+            (&= (ap $mu $F)
+                (&- (ap $mu $E_k)
+                    (app $mu (&\\ $E_k $F))))
+            ". 因此, 我们必然有"
+            (&= (app $mu (&\\ $E_k $F))
+                (lim $n $inf (ap $mu $E_n)))
+            ". 但是, " (&\\ $E_k $F) "正是"
+            (Cap (∈ $n $NN) $E_n) "." (Br)
+            "最后, 因为"
+            (_ (ang0 (ap $mu $E_n)) (∈ $n $NN))
+            "是非升的, 所以有"
+            (&= (lim $n $inf (ap $mu $E_n))
+                (Inf (∈ $n $NN) (ap $mu $E_n))) ".")))
+   ((Remark #:auto? #f)
+    "观察到上述的f中条件" (Q "存在某个" (ap $mu $E_n) "有限")
+    "是本质性的. {译注: 原文似乎有笔误, 已修正.} "
+    
     )
    (((entry "可忽略集合"))
     "令" (tu0 $X Σ $mu) "是任意的测度空间."
@@ -756,7 +826,13 @@
             $B "是conegligible的. iii. 如果" (Seq $A)
             "是conegligible集合的序列, 那么"
             (Cap (∈ $n $NN) $A_n) "是conegligible的.")
-        (Li ""
+        (Li "使用一些和可忽略集合相关的非形式化语言是方便的, "
+            "而且这也是一种惯例. 如果" (app $P $x)
+            "是某个可以应用于集合" $X "的元素" $x
+            "的断言, 我们称"
+            (MB "对于几乎每个" (∈ $x $X) "都有" (app $P $x))
+            "或者"
+            
             )
         )
     )

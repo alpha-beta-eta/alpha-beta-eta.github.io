@@ -1,6 +1,33 @@
 #lang racket
 (provide denotational_semantics_notes.html)
 (require SMathML)
+(define %0 (Ms "0"))
+(define %succ (Ms "succ"))
+(define (make-succ term)
+  (app %succ term))
+(define %pred (Ms "pred"))
+(define (make-pred term)
+  (app %pred term))
+(define %true (Ms "true"))
+(define %false (Ms "false"))
+(define %zero (Ms "zero"))
+(define (make-zero term)
+  (app %zero term))
+(define %fn (Ms "fn"))
+(define (make-fn var type term)
+  (: %fn "&nbsp;" (&: var type) $. term))
+(define %fix (Ms "fix"))
+(define (make-fix term)
+  (app %fix term))
+(define $nat (Mi "nat"))
+(define $bool (Mi "bool"))
+(define Φ $Phi:normal)
+(define $ev (Mi "ev"))
+(define &ev
+  (case-lambda
+    ((p) (app $ev p))
+    ((f x) (appl $ev f x))))
+(define $cur (Mi "cur"))
 (define @= (@lize &=))
 (define (preserve f g . x*)
   (&= (f (apply g x*))
@@ -218,6 +245,9 @@
 (define (make-while P B)
   (: (Ms "while") "&nbsp;" P "&nbsp;"
      (Ms "do") "&nbsp;" B))
+(define-@lized-op*
+  (@forall forall)
+  (@c* &c*))
 (define denotational_semantics_notes.html
   (TmPrelude
    #:title "指称语义学讲义"
@@ -1669,10 +1699,397 @@
                    $D $E $d (_ $bottom $E)) "."))
     "幻灯片36")
    ((proof)
-    
-    )
+    "我们应该证明函数的链" (LUB (&>= $n $0) $f_n)
+    "的最小上界是连续的. 这个证明使用了幻灯片27的"
+    (Q "互换律 (interchange law)")
+    ". 对于" $D "中的一个链"
+    (&sqsube $d_0 $d_1 $d_2 $..h) ", 我们有"
+    (eqn*
+     ((ap (@LUB (&>= $n $0) $f_n)
+          (@LUB (&>= $m $0) $d_m))
+      $=
+      (LUB (&>= $n $0)
+           (app $f_n (LUB (&>= $m $0) $d_m)))
+      (: (LUB (&>= $n $0) $f_n) "的定义"))
+     ($
+      $=
+      (LUB (&>= $n $0)
+           (@LUB (&>= $m $0)
+                 (app $f_n $d_m)))
+      (: "每个" $f_n "的连续性"))
+     ($
+      $=
+      (LUB (&>= $m $0)
+           (@LUB (&>= $n $0)
+                 (app $f_n $d_m)))
+      "互换律")
+     ($
+      $=
+      (LUB (&>= $m $0)
+           (@ (app (@LUB (&>= $n $0) $f_n)
+                   $d_m)))
+      (: (LUB (&>= $n $0) $f_n) "的定义"))))
+   ((tcomment)
+    "这个证明有点没头没脑, 所以我感到有必要写下注记. "
+    "原文写的是这是对于幻灯片35的证明, "
+    "这实际上就足够令人费解的了. "
+    "毕竟幻灯片35是一个定义, 那么需要证明什么呢? "
+    "这个证明的目的实际上是为了补足定义里的一点gap, "
+    "以使得定义的确是well-defined的. "
+    "(译者很有先见之明的给幻灯片36取了合适的标题, "
+    "而的确要证明的内容和幻灯片36有关.) "
+    "我们知道一个cpo需要能够对于(升)链作最小上界操作, "
+    "而幻灯片36只是指出可以这么计算该操作, "
+    "没有说明这个计算结果的确是最小上界操作. "
+    "这个证明比较令人迷惑的地方主要是在证明之前就使用了"
+    (LUB (&>= $n $0) $f_n)
+    "这种符号, 实际上在证明的过程之中你不应该把它视为最小上界. "
+    "另外, 这个证明只是论证了保持最小上界这一性质, "
+    "其他还需要论证的内容是单调性, "
+    "然后在连续的基础之上说明这个计算结果"
+    "的确是链的上界且是上界之中最小的. "
+    "当然, 额外的内容并不困难, "
+    "只是因为先前证明总是过分细致而显得这里省略"
+    "这么多内容让译者感到有点奇怪.")
+   ((proposition #:n "1. 求值和Curry化")
+    "给定cpo " $D "和" $E ", 函数"
+    (MB (func:def
+         $ev (&c* (@-> $D $E) $D) $E
+         (tu0 $f $d) (app $f $d)))
+    "是连续的. 给定任意的连续函数"
+    (func $f (&c* $D^ $D) $E)
+    " (其中" $D^ "是一个cpo), 对于每个"
+    (∈ $d^ $D^) ", 函数"
+    (&\|-> (∈ $d $D) (appl $f $d^ $d))
+    "都是连续的, 因而确定了函数cpo "
+    (&-> $D $E) "中的一个元素. "
+    "我们将其记为" (app (app $cur $f) $d^)
+    ", 那么"
+    (MB (func:def
+         (app $cur $f)
+         $D^ (@-> $D $E)
+         $d^ (lam (∈ $d $D)
+                  (appl $f $d^ $d))))
+    "是一个连续函数. [原注: "
+    (Q "Curry化")
+    "这个名字是为了纪念逻辑学家H. B. Curry, "
+    "一位组合子逻辑和lambda演算先驱.]")
+   ((proof)
+    "对于" $ev "的连续性, 注意到"
+    (eqn*
+     ((&ev (LUB (&>= $n $0)
+                (tu0 $f_n $d_n)))
+      $=
+      (&ev (LUB (&>= $i $0) $f_i)
+           (LUB (&>= $j $0) $d_j))
+      "积的最小上界是逐分量计算的")
+     ($
+      $=
+      (ap (@LUB (&>= $i $0) $f_i)
+          (@LUB (&>= $j $0) $d_j))
+      (: "根据" $ev "的定义"))
+     ($
+      $=
+      (LUB (&>= $i $0)
+           (app $f_i
+                (LUB (&>= $j $0) $d_j)))
+      "函数cpo中的最小上界是逐参数计算的")
+     ($
+      $=
+      (LUB (&>= $i $0)
+           (LUB (&>= $j $0)
+                (app $f_i $d_j)))
+      (: "根据每个" $f_i "的连续性"))
+     ($
+      $=
+      (LUB (&>= $n $0)
+           (app $f_n $d_n))
+      "根据幻灯片27的引理")
+     ($
+      $=
+      (LUB (&>= $n $0)
+           (&ev $f_n $d_n))
+      (: "根据" $ev "的定义")))
+    "每个" (app (app $cur $f) $d^)
+    "以及然后" (app $cur $f)
+    "的连续性可以由"
+    (&c* $D_1 $D_2)
+    "中的链的最小上界可以逐分量计算这一事实立即推出.")
+   (&label
+    (make-slide
+     "复合的连续性"
+     "对于cpo " (&cm $D $E $F)
+     ", 复合函数"
+     (MB (func $compose
+               (@c* (@-> $E $F)
+                    (@-> $D $E))
+               (@-> $D $F)))
+     "是连续的, 其定义为对于"
+     (∈ $f (@-> $D $E)) "和"
+     (∈ $g (@-> $E $F)) ","
+     (MB (&= (&compose $g $f)
+             (lam (∈ $d $D)
+                  (app $g (app $f $d)))) "."))
+    "幻灯片37")
+   (&label
+    (make-slide
+     "不动点算子的连续性"
+     "令" $D "是一个domain." (Br)
+     "根据Tarski不动点定理, "
+     "我们知道每个连续函数"
+     (∈ $f (@-> $D $D))
+     "都拥有一个最小不动点"
+     (∈ (&fix $f) $D) "."
+     ((proposition)
+      "函数"
+      (MB (func $fix (@-> $D $D) $D))
+      "是连续的."))
+    "幻灯片38")
+   ((proof)
+    "我们必须首先证明"
+    (func $fix (@-> $D $D) $D)
+    "是一个单调函数. 设"
+    (&sqsube $f_1 $f_2)
+    "是函数domain中的两个元素. "
+    "我们需要证明的是"
+    (&sqsube (&fix $f_1) (&fix $f_2))
+    ", 不过"
+    (eqn*
+     ((app $f_1 (&fix $f_2))
+      $sqsube
+      (app $f_2 (&fix $f_2))
+      (: "鉴于" (&sqsube $f_1 $f_2)))
+     ($
+      $sqsube
+      (&fix $f_2)
+      (: "根据" (&fix $f_2) "的(lpf1)")))
+    "于是, " (&fix $f_2) "是" $f_1
+    "的一个前不动点, 因而根据" (&fix $f_1)
+    "的(lpf2)我们有"
+    (&sqsube (&fix $f_1) (&fix $f_2))
+    ", 这也正是我们想要的. "
+    "[译注: 作者这里将lpf均误作lfp, "
+    "而lfp在书中并没有出现过, 证明的剩余部分也都写错了. "
+    "另外, 读者应该回忆一下, "
+    "根据之前的命题, "
+    "此时最小前不动点和最小不动点均存在且相等.]" (Br)
+    "现在我们将注意力转向证明链的最小上界的保持, 设"
+    (&-> $D $D) "中有" (&sqsube $f_0 $f_1 $f_2 $..h)
+    ". 根据第2章第3节的评注7, 我们只需要证明"
+    (MB (&sqsube
+         (&fix (LUB (&>= $n $0) $f_n))
+         (LUB (&>= $n $0) (&fix $f_n))))
+    "而根据最小前不动点的(lpf2), 证明"
+    (LUB (&>= $n $0) (&fix $f_n))
+    "是" (LUB (&>= $n $0) $f_n)
+    "的一个前不动点就足够了. "
+    "[译注: 即最小前不动点小于其他的前不动点.] "
+    "这是因为:"
+    (eqn*
+     ((app (@LUB (&>= $m $0) $f_m)
+           (LUB (&>= $n $0) (&fix $f_n)))
+      $=
+      (LUB (&>= $m $0)
+           (app $f_m (LUB (&>= $n $0) (&fix $f_n))))
+      "函数链的最小上界可以逐参数计算")
+     ($
+      $=
+      (LUB (&>= $m $0)
+           (LUB (&>= $n $0)
+                (app $f_m (&fix $f_n))))
+      (: "鉴于每个" $f_m "都是连续的"))
+     ($
+      $=
+      (LUB (&>= $k $0)
+           (app $f_k (&fix $f_k)))
+      "根据幻灯片27的引理")
+     ($
+      $sqsube
+      (LUB (&>= $k $0) (&fix $f_k))
+      (: "根据每个" $f_k "的(lpf1)")))
+    "[译注: 这里根据幻灯片27的引理需要用到之前证明的单调性, "
+    "另外最后一步这里的" $sqsube "实际上更确切地说是"
+    $= ", 因为" $fix "是不动点算子, "
+    "不过这个证明的所有地方作者都把最小不动点当作最小前不动点使用.]")
+   (H3 "第3.4节 练习")
+   ((exercise #:n "1")
+    "验证本章未经证明的构造, 证明本章未经证明的命题.")
+   ((exercise #:n "2")
+    "令" $X "和" $Y "是集合而" (_ $X $bottom) "和" (_ $Y $bottom)
+    "是对应的扁平domain, 如幻灯片31. 证明一个函数"
+    (func $f (_ $X $bottom) (_ $Y $bottom))
+    "是连续的当且仅当以下条件之一成立:"
+    (Ol #:attr* '((type "a"))
+        (Li $f "是严格的, 即" (&= (app $f $bottom) $bottom) ";")
+        (Li $f "是常函数, 即"
+            (forall (∈ $x $X)
+                    (&= (app $f $x) (app $f $bottom))) ".")))
+   ((exercise #:n "3")
+    "令" (setE $top) "是一个单元素集合, 而"
+    (_ (setE $top) $bottom) "是相对应的扁平domain. 令"
+    $Omega:normal "是图1所描绘的" (Q "垂直自然数")
+    "的domain. 证明函数domain "
+    (@-> $Omega:normal (_ (setE $top) $bottom))
+    "和" $Omega:normal "之间存在一个双射.")
+   ((exercise #:n "4")
+    "证明幻灯片37的内容.")
    (H2 "第4章 Scott归纳")
+   (H3 "第4.1节 链封闭子集和可容许子集")
+   (P "在第2章的时候我们看到一个domain " $D
+      "上的一个连续函数" (func $f $D $D)
+      "的最小不动点可以表达为自" $D
+      "的最小元素" $bottom "起反复应用" $f
+      "所得到的链的最小上界: "
+      (&= (&fix $f)
+          (LUB (&>= $n $0)
+               (app $f^n $bottom)))
+      ". 这种构造允许我们使用特定方式证明"
+      (&fix $f) "的性质, " (Em "只要")
+      "这个性质满足幻灯片39中的条件, "
+      "证明方式为使用数学归纳法表明对于每个"
+      $n "而言" (app $f^n $bottom) "具有该性质. "
+      "或许将这种对于数学归纳法的使用方式打包以隐藏"
+      (&fix $f) "作为某个链的不动点的显式构造也是方便的, "
+      "见幻灯片40. 为了澄清幻灯片40的陈述, 注意到"
+      (∈ (&= (app $f^0 $bottom) $bottom) $S)
+      ", 此为" (B "基本步骤") "; 而"
+      (∈ (app $f^n $bottom) $S) "可以推出"
+      (∈ (&= (app (^ $f (&+ $n $1)) $bottom)
+             (app $f (app $f^n $bottom)))
+         $S)
+      ", 此为" (B "归纳步骤") "; 因此, 根据"
+      $n "上的归纳, 我们有"
+      (forall (&>= $n $0)
+              (∈ (app $f^n $bottom) $S))
+      ". 最后, 根据" $S "的链封闭性, "
+      (∈ (&= (&fix $f)
+             (LUB (&>= $n $0)
+                  (app $f^n $bottom)))
+         $S)
+      ", 这正是我们所要的.")
+   (&label
+    (set-attr*
+     (make-slide
+      "链封闭子集和可容许子集"
+      "令" $D "是一个cpo. 一个子集"
+      (&sube $S $D) "被称为是"
+      (Em "链封闭的")
+      "当且仅当对于" $D
+      "中所有的链"
+      (&sqsube $d_0 $d_1 $d_2 $..h)
+      ", 有"
+      (MB (&=> (@forall (&>= $n $0)
+                        (∈ $d_n $S))
+               (∈ (@LUB (&>= $n $0) $d_n)
+                  $S)))
+      "如果" $D "是一个domain, "
+      (&sube $S $D) "被称为是"
+      (Em "可容许的") "当且仅当其是"
+      $D "的一个链封闭子集且"
+      (∈ $bottom $S) "." (Hr)
+      "元素" (∈ $d $D) "的一个性质"
+      (app Φ $d) "被称为是"
+      (Em "链封闭的") "当且仅当"
+      (setI (∈ $d $D) (app Φ $d))
+      "是" $D "的一个链封闭子集, "
+      "类似地还可以定义可容许性质.")
+     'style "height: 280px")
+    "幻灯片39")
+   ((tcomment)
+    "所谓(" $D "上的)性质指的是一个从"
+    $D "到真假的函数, 这是一种外延性的观念. "
+    "另外, 正如幻灯片39, " $D
+    "上的一个性质" Φ "也可以由子集"
+    (setI (∈ $d $D) (app Φ $d))
+    "表示, 这和函数表示是完全等价的.")
+   ((comment)
+    "术语" (Em "inclusive")
+    "或者" (Em "inductive")
+    "经常用作" (Q "链封闭")
+    "的同义词.")
+   ((example #:n "1")
+    "考虑图1所描绘的" (Q "垂直自然数")
+    "的domain " $Omega:normal ", 那么"
+    (Ul (Li $Omega:normal "的任意" (Em "有限")
+            "子集都是链封闭的;")
+        (Li (setE $0 $2 $4 $6 $..h)
+            "不是" $Omega:normal "的一个链封闭子集;")
+        (Li (&union (setE $0 $2 $4 $6 $..h) (setE $omega))
+            "是" $Omega:normal "的一个链封闭子集, "
+            "当然其也是一个可容许子集.")))
+   (&label
+    (make-slide
+     "Scott的不动点归纳原理"
+     "令" (func $f $D $D) "是domain " $D
+     "上的一个连续函数." (Br)
+     "对于任意的可容许子集" (&sube $S $D)
+     ", 为了证明" $f "的最小不动点在"
+     $S "之中, 即"
+     (MB (∈ (&fix $f) $S))
+     "实际上证明"
+     (MB (forall (∈ $d $D)
+                 (&=> (∈ $d $S)
+                      (∈ (app $f $d) $S))))
+     "就足够了.")
+    "幻灯片40")
+   ((tcomment)
+    "约定俗成地, 点号代表辖域尽可能向右延伸.")
+   (P "在实际情况下应用Scott的不动点归纳原理的难点在于"
+      "识别出一个适切的可容许子集" $S
+      ", 即寻找一个具有合适强度的" (Q "归纳假设") ".")
+   (H3 "第4.2节 例子")
+   ((example #:n "1")
+    "设" $D "是一个domain而"
+    (func $f (@c* $D (@c* $D $D)) $D)
+    "是一个连续函数. "
+    )
+   (H3 "第4.3节 构建链封闭子集")
+   
+   (H3 "第4.4节 练习")
+   
    (H2 "第5章 PCF")
+   (P "语言PCF (Programming Computable Functions, 编程可计算函数) "
+      "是一个简单的函数式编程语言, "
+      "其经常用作指称语义和操作语义的理论建立中的示例语言, "
+      "也包括这两种语义之间的关系的理论. "
+      "其句法是由Dana Scott于大约1969年引入的, 作为"
+      (Q "Logic of Computable Functions (可计算函数逻辑)")
+      "的一部分, 其也在具有高度影响力的论文Plotkin (1977) "
+      "里作为一种编程语言被研究.")
+   (P "本章将给出我们在这个讲义里所使用的PCF的某个特定版本的句法和操作语义. "
+      "而在第6章中我们将看到如何使用domain和连续函数来赋予它一个指称语义.")
+   (H3 "第5.1节 项和类型")
+   (P "PCF语言的" (Em "类型") ", " (Em "表达式") ", "
+      (Em "项") "在幻灯片43中定义.")
+   (&label
+    (set-attr*
+     (make-slide
+      "PCF句法"
+      (Em "类型")
+      (MB (&::= $tau (&\| $nat $bool (&-> $tau $tau))))
+      (Em "表达式")
+      (eqn*
+       ($M $::= (&\| %0 (make-succ $M) (make-pred $M)))
+       ($  $\|  (&\| %true %false (make-zero $M)))
+       ($  $\|  (&\| $x (make-if $M $M $M)))
+       ($  $\|  (&\| (make-fn $x $tau $M)
+                     (ap $M $M) (make-fix $M))))
+      "其中" (∈ $x $VV) ", 一个" (Em "变量")
+      "无限集合." (Br)
+      (B "技术细节: ")
+      "我们在绑定变量的" $alpha
+      "变换的意义下将表达式视为等同的, "
+      "而绑定变量是由" %fn "表达式构造子创建的: "
+      "根据定义一个PCF" (Em "项")
+      "是一个表达式的" $alpha "等价类.")
+     'style "height: 300px;")
+    "幻灯片43")
+   (P "各种句法形式的意义如下."
+      (Ul (Li $nat "是自然数" (&cm $0 $1 $2 $3 $..h)
+              "的类型. "
+              )
+          )
+      )
    (H2 "第6章 PCF的指称语义")
    (H2 "第7章 将指称语义和操作语义联系起来")
    (H2 "第8章 完全抽象")

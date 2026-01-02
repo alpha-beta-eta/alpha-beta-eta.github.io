@@ -7,8 +7,6 @@
    #:css "styles.css"
    (H1 "一些没用的笔记")
    (columnize
-    (H2 (A "摆弄SICP图形语言" #:attr* '((href "picture.html"))))
-    (H2 (A "The Ship of Theseus" #:attr* '((href "Ship-of-Theseus.html"))))
     (H2 (A "语义工程和PLT Redex笔记" #:attr* '((href "sewpr.html"))))
     #;
     (H2 (A "Miscellaneous Notes" #:attr* '((href "misc.html"))))
@@ -99,7 +97,6 @@
            #:attr* '((href "metaocaml.html"))))
     #;
     (H2 (A "Zork论文翻译" #:attr* '((href "zork.html"))))
-    (H2 (A "monad的Schemer之见" #:attr* '((href "monad.html"))))
     #;
     (H2 (A "高效多项式计算" #:attr*
            '((href "polynomial_computation.html"))))

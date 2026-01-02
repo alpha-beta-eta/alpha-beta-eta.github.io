@@ -37,6 +37,9 @@
     #;
     (H2 (A "(瞎写的)游戏编程" #:attr* '((href "game_programming.html"))))
     (H2 (A "关于数组语言的随想" #:attr* '((href "array.html"))))
+    (H2 (A "摆弄SICP图形语言" #:attr* '((href "picture.html"))))
+    (H2 (A "The Ship of Theseus" #:attr* '((href "Ship-of-Theseus.html"))))
+    (H2 (A "monad的Schemer之见" #:attr* '((href "monad.html"))))
     
     )
    ))

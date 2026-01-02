@@ -156,10 +156,16 @@
          "abstract.rkt"
          "domain.rkt"
          "unified.rkt"
+         "topology_via_logic.rkt"
          
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml stone.html "../stone.html")
+    (emitXml topology_via_logic.html
+             "../topology_via_logic.html")
+    (emitXml denotational_semantics_notes.html
+             "../denotational_semantics_notes.html")
     (emitXml unified.html "../unified.html")
     (emitXml measure.html "../measure.html")
     (emitXml ds.html "../ds.html")
@@ -267,8 +273,6 @@
   (emitXml cat_awodey.html "../cat_awodey.html")
   (emitXml hoffman_preface.html "../hoffman_preface.html")
   (emitXml combinatorics_notes.html "../combinatorics_notes.html")
-  (emitXml denotational_semantics_notes.html
-           "../denotational_semantics_notes.html")
   (emitXml hott.html "../hott.html")
   (emitXml exercises_in_analysis.html "../exercises_in_analysis.html")
   (emitXml blind.html "../blind.html")
@@ -293,7 +297,6 @@
   (emitXml polynomial_computation.html "../polynomial_computation.html")
   (emitXml elements_knopp.html "../elements_knopp.html")
   (emitXml classical_ai.html "../classical_ai.html")
-  (emitXml stone.html "../stone.html")
   (emitXml pointless.html "../pointless.html")
   (emitXml refal.html "../refal.html")
   (emitXml zipper.html "../zipper.html")
