@@ -11,6 +11,7 @@
      (font-family "SHSerif")
      (src "url('fonts/SourceHanSerifCN-VF.otf.woff2') format('woff2')"))
     ("body"
+     (text-autospace "normal")
      (font-family "SHSerif, serif")
      (font-weight "400")
      (color "#4a4035")
