@@ -12,6 +12,7 @@
                    (d "M 0 0 h 320 v 160 h -320 z")
                    (fill "none")))
    (Text #:attr* '((x "130") (y "80")) "欠一张图")))
+(define (len I) (ap $lambda I))
 (define $G_n+1 (_ $G (&+ $n $1)))
 (define $E_n+1 (_ $E (&+ $n $1)))
 (define $a.e. (Mi "a.e."))
@@ -1146,7 +1147,88 @@
     
     )
    (H3. $RR "上的Lebesgue测度" #:id "lebesgue_on_RR")
-   
+   ((Definition)
+    (Ol #:attr* '((type "a"))
+        (Li "对于本节的目的而言, " $RR "中的一个"
+            (B "半开区间") "是具有形式"
+            (&= (\[\[ $a $b)
+                (setI $x (: $a $<= $x $< $b)))
+            "的一个集合, 其中" (∈ $a $b $RR)
+            ". 注意到这个公式里我允许"
+            (&<= $b $a) ", 此时"
+            (&= (\[\[ $a $b) $empty) ".")
+        (Li "如果" (&sube $I $RR) "是一个半开区间, 那么要么"
+            (&= $I $empty) ", 要么"
+            (&= $I (\[\[ (infimum $I) (supremum $I)))
+            ", 于是其端点是良定义的. 因此, 我们定义半开区间"
+            $I "的" (B "长度") (len $I) "为"
+            (MB (&cm (&= (len $empty) $0)
+                     (: "若" (&< $a $b) "则"
+                        (&= (len (\[\[ $a $b))
+                            (&- $b $a)))) "."))))
+   ((Lemma)
+    "如果" (&sube $I $RR) "是一个半开区间, " (Seq $I $j $NN)
+    "是一个能够覆盖" $I "的半开区间的序列, 那么"
+    (MB (&<= (len $I)
+             (sum (&= $j $0) $inf
+                  (len $I_j))) "."))
+   ((proof)
+    (Ol #:attr* '((type "a"))
+        (Li "如果" (&= $I $empty) ", 那么当然有"
+            (&<= (&= (len $I) $0)
+                 (sum (&= $j $0) $inf
+                      (len $I_j)))
+            ". 不然的话, 取" (&= $I (\[\[ $a $b))
+            ", 其中" (&< $a $b) ". "
+            )
+        )
+    )
+   ((Definition)
+    "从现在开始, 到本节末为止, 定义"
+    (func $theta (&power $RR) (\[\] $0 $inf))
+    "为"
+    (MB (&= (app $theta $A)
+            (infimum
+             (setI (sum (&= $j $0) $inf (len $I_j))
+                   (: (Seq $I $j $NN)
+                      "是一个半开区间的序列, 其满足"
+                      (&sube $A (Union (∈ $j $NN) $I_j)))))) ".")
+    "注意到每个" $A "都可以由某个半开区间序列所覆盖, 例如"
+    (&sube $A (Union (∈ $n $NN) (\[\[ (&- $n) $n)))
+    "; 因此, 如果"
+    )
+   ((Proposition)
+    (Ol #:attr* '((type "a"))
+        (Li $theta "是" $RR "上的一个外测度.")
+        (Li "对于每个半开区间" (&sube $I $RR)
+            ", " (&= (app $theta $I) (len $I)) ".")))
+   ((proof)
+    (Ol #:attr* '((type "a"))
+        (Li ""
+            )
+        )
+    )
+   ((Remark #:auto? #f)
+    
+    )
+   ((Definition)
+    "鉴于Lebesgue外测度的确是一个外测度, 我们可以使用它来构造一个测度"
+    $mu ", 通过Carathéodory方法. 这个测度即" (B $RR "上的Lebesgue测度")
+    ". " $mu "所能测度的集合" $E "被称为是" (B "Lebesgue可测的")
+    ", 也就是说, 对于每个" (&sube $A $RR) "有"
+    (&= (&+ (app $theta (&cap $A $E))
+            (app $theta (&\\ $A $E)))
+        (app $theta $A))
+    ". 对于" $mu "而言的可忽略集合被称为是" (B "Lebesgue可忽略的")
+    "; "
+    )
+   ((Lemma)
+    "令" (∈ $x $RR) ", 那么"
+    (&= $H_x (\]\[ (&- $inf) $x))
+    "是Lebesgue可测的.")
+   ((proof)
+    
+    )
    (H3. $RR^r "上的Lebesgue测度" #:id "lebesgue_on_RR^r")
    
    (H2. "积分")
@@ -1236,7 +1318,7 @@
     (Ol #:attr* '((type "a"))
         (Li "对于每个" (∈ $a $A:fraktur) ", "
             (&= (&+ $a $a) $0) ", 即"
-            (&= $a (&- $a)) ". {译注: 即特征为二.}")
+            (&= $a (&- $a)) ".")
         (Li "对于所有的" (∈ $a $b $A:fraktur)
             ", " (&= (&i* $a $b) (&i* $b $a))
             ". {译注: 即Boole环一定是交换环.}")))

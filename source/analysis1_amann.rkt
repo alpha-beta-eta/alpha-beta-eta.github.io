@@ -49,6 +49,8 @@
   (RemarkExample "评注和例子" "remark_example")
   
   )
+(define $NN^* (^ $NN $c*))
+(define $RR^+ (^ $RR $+))
 (define $Num (Mi "Num"))
 (define (&Num X)
   (app $Num X))
@@ -81,6 +83,8 @@
             (Mtd label)))))
 (define (Dabs a b)
   (&abs (&- a b)))
+(define (Dd a b)
+  (appl $d a b))
 (define analysis1_amann.html
   (TnTmPrelude
    #:title "分析一 (Amann &amp; Escher)"
@@ -198,10 +202,35 @@
                      (~ $1 (&+ (&i* $2 $n) $1)) $..h))
             "具有无限多个正项, 无限多个负项, "
             "并且对于几乎所有项而言绝对值都小于" $1 ".")
-        (Li ""
+        (Li "对于" (∈ $m $NN^*) ", 一个函数"
+            (func $psi (&+ $m $NN) $X)
+            "也被称为" $X "中的一个序列. 也就是说, "
+            (&= (_ (@ $x_j) (&>= $j $m))
+                (tu0 $x_m (_ $x (&+ $m $1))
+                     (_ $x (&+ $m $2)) $..h))
+            "是" $X "中的一个序列, 即便索引不从"
+            $0 "开始. "
             )
         )
     )
+   (H4. "度量空间")
+   (P "令" $X "是一个集合. 一个函数" (func $d (&c* $X $X) $RR^+)
+      "被称为" $X "上的一个" (B "度量") ", 如果以下条件成立:"
+      (Ol (Li (&<=> (&= (Dd $x $y) $0)
+                    (&= $x $y)) ";")
+          (Li (&= (Dd $x $y) (Dd $y $x)) " (对称性);")
+          (Li (&<= (Dd $x $y)
+                   (&+ (Dd $x $z) (Dd $z $y)))
+              " (三角不等式)."))
+      "如果" $d "是" $X "上的一个度量, 那么" (tu0 $X $d)
+      "被称为一个" (B "度量空间")
+      ". 当度量在上下文中是显然的时候, "
+      "我们将" (tu0 $X $d) "简记为" $X
+      ". 最后, 我们将" (Dd $x $y)
+      "称为度量空间" $X "中"
+      (B "点") $x "和" $y
+      "之间的" (B "距离") ".")
+   
    (H3. "实序列和复序列")
    (H3. "赋范向量空间")
    (H3. "单调序列" #:id "monotone-sequences")

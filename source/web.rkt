@@ -157,10 +157,21 @@
          "domain.rkt"
          "unified.rkt"
          "topology_via_logic.rkt"
+         "practical_implementation.rkt"
+         "object.rkt"
+         "spec.rkt"
+         "substructural.rkt"
          
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml substructural.html
+             "../substructural.html")
+    (emitXml spec.html "../spec.html")
+    (emitXml object.html "../object.html")
+    (emitXml practical_implementation.html
+             "../practical_implementation.html")
+    (emitXml haskell_music.html "../haskell_music.html")
     (emitXml mop.html "../mop.html")
     (emitXml stone.html "../stone.html")
     (emitXml topology_via_logic.html
@@ -191,6 +202,7 @@
     (emitXml control.html "../control.html")
     (emitXml logic.html "../logic.html")
     (emitXml plan.html "../plan.html")
+    (emitXml huyan.html "../huyan.html")
     (emitXml index.html "../index.html")
     (emitXml useless.html "../useless.html")
     (emitCss styles.css "../styles.css")
@@ -245,7 +257,6 @@
   (emitXml calculus.html "../calculus.html")
   (emitXml sml-history.html "../sml-history.html")
   (emitXml macro.html "../macro.html")
-  (emitXml huyan.html "../huyan.html")
   (emitXml french.html "../french.html")
   (emitXml maxima.html "../maxima.html")
   (emitXml scheme_cg.html "../scheme_cg.html")
@@ -337,7 +348,6 @@
   (emitXml language_cognitive.html "../language_cognitive.html")
   (emitXml papers_plan.html "../papers_plan.html")
   (emitXml having_an_effect.html "../having_an_effect.html")
-  (emitXml haskell_music.html "../haskell_music.html")
   (emitXml array.html "../array.html")
   (emitXml algebraic_topology.html
            "../algebraic_topology.html")

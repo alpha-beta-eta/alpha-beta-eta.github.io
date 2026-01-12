@@ -1,6 +1,8 @@
 #lang racket
 (provide mop.html)
 (require SMathML)
+(define (LP x . x*)
+  (apply P (B x ". ") x*))
 (define mop.html
   (TmPrelude
    #:title "元对象协议艺术"
@@ -38,7 +40,69 @@
    (H2 "第I部分 元对象协议的设计和实现")
    (H3 "第1章 CLOS是如何实现的")
    (H4 "第1.1节 CLOS的一个子集")
+   (P "出于教学和(相对)简明的旨趣, 我们选择与CLOS的一个简化子集打交道. "
+      "完整CLOS的所有基本特征都有囊括: "
+      (Em "类(class)") ", 其从一个类或者多个类继承了结构和行为; "
+      "类的" (Em "实例(instance)") ", 其可以被创建, 初始化, 和操纵; "
+      (Em "通用函数(generic function)") ", 其行为依赖于供给它们的参数的类; "
+      (Em "方法(method)") ", 其定义了通用函数特定于类的行为和操作. "
+      "我们简化了的方言的主要限制包括:")
+   (LP "没有类重定义"
+       
+       )
+   (LP "没有方法重定义"
+       
+       )
+   (LP "没有前向引用的超类"
+       
+       )
+   (LP "显式的通用函数定义"
+       
+       )
+   (LP "只有标准的方法组合"
+       
+       )
+   (LP (Span "没有" (Code "eql") "特化子")
+       
+       )
+   (LP (Span "没有带有" (Code ":class") "分配的槽")
+       
+       )
+   (LP "类型和类并未完全继承"
+       
+       )
+   (LP "最小的句法糖"
+       
+       )
    (H4 "第1.2节 基本的台面下数据结构")
+   (P "就其最简单的语言而言, 一个CLOS程序由"
+      (Code "defclass") ", " (Code "defgeneric") ", " (Code "defmethod")
+      "形式以及与其交织的更为传统的Common Lisp形式构成. "
+      "执行这些形式定义了程序的类, 通用函数, 方法.")
+   (P "在台面下, 这些形式的执行创建了对于类, 通用函数, 方法的内部表示, "
+      "记录了其定义中所提供的信息. "
+      "实现使用存储于类的内部表示的信息来创建类的实例以及访问(实例的)槽. "
+      "存储于通用函数及其方法的内部表示中的信息则用以调用通用函数.")
+   (P "为了使事情具体化, 考虑以下的示例CLOS程序:"
+      (CodeB "(defclass rectangle ()
+  ((height :initform 0.0 :initarg :height)
+   (width  :initform 0.0 :initarg :width)))
+
+(defclass color-mixin ()
+  ((cyan    :initform 0.0 :initarg :cyan)
+   (magenta :initform 0.0 :initarg :magenta)
+   (yellow  :initform 0.0 :initarg :yellow)))
+
+(defclass color-rectangle (color-mixin rectangle)
+  ((clearp :initform (y-or-n-p &quot;But is it transparent?&quot;)
+           :initarg :clearp :accessor clearp)))
+
+(defgeneric paint (x))
+
+(defmethod paint ((x rectangle)) ;Method #1
+  (vertical-stroke (slot-value x 'height)
+                   (slot-value x 'width)))")
+      )
    (H4 "第1.3节 表示类")
    (H4 "第1.4节 打印对象")
    (H4 "第1.5节 表示实例的结构")

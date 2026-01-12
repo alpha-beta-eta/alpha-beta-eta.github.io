@@ -1,12 +1,21 @@
 #lang racket
 (provide stone.html)
 (require SMathML)
+(define (symdiff a b)
+  (&join (@meet a (&complement b))
+         (@meet b (&complement a))))
+(define ((tcomment #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "tcomment")))
+   (B (format "译者注记~a." n)) " " x*))
 (define-syntax eqn*
   (syntax-rules ()
     ((_ (x ...) ...)
      (MB (set-attr*
           (&Table (x ...) ...)
           'columnalign "right center left left")))))
+(define (powerset X)
+  (ap $P X))
 (define (∀ domain statement)
   (: $forall domain (@ statement)))
 (define $Join (Mo "&Vee;"))
@@ -236,6 +245,18 @@
     (&= (&meet $a $b) (&meet $a (@join $a $b)) $a)
     ", 反之亦然. 也就是说, 两个" $A "上的偏序是相合的. "
     "相反方向的证明是容易的.")
+   ((tcomment)
+    "这个命题本身的陈述稍有些模糊. 实际上, "
+    (tu0 $A $join $meet $0 $1)
+    "是一个格的更为精确的表述为由"
+    (tu0 $A $join $0) "导出的偏序和"
+    (tu0 $A $meet $1) "导出的偏序是相同的. "
+    "然而, 这里的导出的含义和前面的定理又不完全相同. "
+    "我说的是" (tu0 $A $meet $1)
+    "的情形, 此时应该定义" (&<= $a $b)
+    "为" (&= (&meet $a $b) $a)
+    ". 若是仍然死板地按照之前的定理, "
+    "那么原文也有提到, 这两种导出偏序应该恰好相反.")
    (P "因此, 我们对于格的形式定义为"
       (Q "一个集合带有两个二元运算" $join "和"
          $meet ", 以及两个突出元素" $0 "和" $1
@@ -286,13 +307,122 @@
       "那么可以推得Boole代数之间的任何格同态"
       (func $f $A $B) "实际上都是Boole代数同态, 即"
       $f "与" $complement "可以交换.")
+   ((tcomment)
+    "如果" (func $f $A $B) "是两个Boole代数之间的格同态, 并且"
+    (∈ $a $b $A) "满足" (&= (&join $a $b) $1_A)
+    "和" (&= (&meet $a $b) $0_A) ", 那么"
+    (&= (&join (app $f $a) (app $f $b)) $1_B) "且"
+    (&= (&meet (app $f $a) (app $f $b)) $0_B)
+    ". 换言之, " (&= $a (&complement $b)) "而"
+    (&= (app $f $a) (&complement (app $f $b))) ", 亦即"
+    (&= (app $f (&complement $b))
+        (&complement (app $f $b))) ".")
    ((Example)
     "是时候举一些例子了."
     (Ol #:attr* '((type "a"))
-        (Li "对于任意的集合" $X
+        (Li "对于任意的集合" $X ", 幂集" (powerset $X)
+            "是一个格, 其中" $<= "被解释为包含关系, "
+            $join "和" $meet "分别是子集的并和交, "
+            $0 "和" $1 "分别是空集和整个" $X
+            ". 而且, " (powerset $X)
+            "是分配的, 因为对于" $X "的子集"
+            (&cm $A $B $C) ", 我们有"
+            
             )
         )
     )
+   ((Definition)
+    "接下来, 我们要草绘Boole代数和Boole环之间的等价性. "
+    "在任意的Boole代数" $A "之中, 我们定义"
+    (Em "对称差") "运算" $+ "为"
+    (MB (&= (&+ $a $b)
+            (&join (@meet $a (&complement $b))
+                   (@meet $b (&complement $a)))) "."))
+   ((Lemma #:auto? #f)
+    "分配律"
+    (&= (&meet $a (@+ $b $c))
+        (&+ (@meet $a $b) (@meet $a $c)))
+    "成立.")
+   ((proof)
+    
+    )
+   (P "我们将对于结合律"
+      (MB (&= (&+ $a (@+ $b $c))
+              (&+ (@+ $a $b) $c)))
+      "的验证留给读者作为练习. 现在对于任意的"
+      $a ", 我们有"
+      (MB (&= (&+ $a $a)
+              (&join (@meet $a (&complement $a))
+                     (@meet $a (&complement $a)))
+              (&join $0 $0)
+              $0))
+      "以及"
+      (MB (&= (&+ $a $0)
+              (symdiff $a $0)
+              (&join $a $0)
+              $a))
+      "因此, " (tu0 $A $+ $0) "是一个群 "
+      "(而且, 根据" $+ "的定义, 这个群显然是交换的), "
+      (tu0 $A $+ $meet $0 $1)
+      "是一个含幺交换环. "
+      "{译注: 这当然也是幂等环.}")
+   ((Definition)
+    "反过来, 令" $A "是一个带有幺元" $1
+    "的环, 且满足" (&= $a^2 $a)
+    " (此时我们称" $A "为一个Boole环), 那么")
+   ((Lemma #:auto? #f)
+    (Ol #:attr* '((type "i"))
+        (Li $A "是交换环.")
+        (Li "对于每个" (∈ $a $A) ", "
+            (&= (&+ $a $a) $0) ".")))
+   ((tcomment)
+    "之前受到Halmos误导, 他将满足" (&= (&+ $a $a) $0)
+    "的环称为特征为二的环. 现在我想了一下, "
+    "实际上特征为二这个性质在含幺环上才有意义. "
+    "不过, 的确对于含幺环而言, "
+    (&= (&+ $a $a) $0) "和" (&= (&+ $1 $1) $0)
+    "是等价的. 当然, 鉴于两者涵义的确并不完全相同, "
+    "所以我想还是不要混淆为好.")
+   ((proof)
+    
+    )
+   (P "故乘性结构" (tu0 $A $d* $1)
+      "是一个半格 (换言之, 幂等交换幺半群), "
+      "其偏序被定义为" (&<= $a $b) "当且仅当"
+      (&= (&i* $a $b) $a)
+      ". {译注: 原文要读者参考之前的定理, "
+      "不过实际上是之前定理的对偶版本.} "
+      "并且, 显然" $0 "在此偏序之下是"
+      $A "中的最小元素.")
+   (P "现在考虑" (&+ $a $b (&i* $a $b)) ". 我们有"
+      (MB (&= (&i* $a (@+ $a $b (&i* $a $b)))
+              (&+ $a (&i* $a $b) (&i* $a $b))
+              $a))
+      "以及"
+      (MB (&= (&i* $b (@+ $a $b (&i* $a $b)))
+              (&+ (&i* $b $a) $b (&i* $a $b))
+              $b))
+      "于是" (&+ $a $b (&i* $a $b))
+      "是" $a "和" $b "的一个上界. "
+      "但是, 如果" $c "是" $a "和" $b
+      "的一个上界, 那么"
+      (MB (&= (&i* (@+ $a $b (&i* $a $b)) $c)
+              (&+ (&i* $a $c) (&i* $b $c)
+                  (&i* $a $b $c))
+              (&+ $a $b (&i* $a $b))))
+      "故" (&+ $a $b (&i* $a $b))
+      "实际上是最小上界. 如果我们定义"
+      (&join $a $b) "为" (&+ $a $b (&i* $a $b))
+      ", 那么我们就有了一个格结构"
+      (tu0 $A $join $d* $0 $1)
+      ". 而且, 根据类似于引理1.8的论证, "
+      "我们可以验证" $d* "对于" $join
+      "分配; 并且, 也很容易验证"
+      (&+ $1 $a) "是" $a "的一个补. "
+      "因此, " $A "是一个布尔代数.")
+   (P "这个布尔代数中的对称差运算是什么? 我们有"
+      
+      )
    (H3. "理想和滤子")
    (H3. "一些范畴概念")
    (H3. "自由格")

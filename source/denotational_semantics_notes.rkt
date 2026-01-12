@@ -1,6 +1,10 @@
 #lang racket
 (provide denotational_semantics_notes.html)
 (require SMathML)
+(define $terminate (Mo "&darr;"))
+(define (&terminate X)
+  (: X $terminate))
+(define Δ $Delta:normal)
 (define %0 (Ms "0"))
 (define %succ (Ms "succ"))
 (define (make-succ term)
@@ -251,6 +255,7 @@
   (: (Ms "while") "&nbsp;" P "&nbsp;"
      (Ms "do") "&nbsp;" B))
 (define-@lized-op*
+  (@sqsube &sqsube)
   (@forall forall)
   (@c* &c*))
 (define denotational_semantics_notes.html
@@ -2046,12 +2051,71 @@
    ((example #:n "1")
     "设" $D "是一个domain而"
     (func $f (@c* $D (@c* $D $D)) $D)
-    "是一个连续函数. "
+    "是一个连续函数. 令" (func $g (@c* $D $D) (@c* $D $D))
+    "是由"
+    (MB (&def= (appl $g $d_1 $d_2)
+               (tu0 (ap $f (tu0 $d_1 (tu0 $d_1 $d_2)))
+                    (ap $f (tu0 $d_1 (tu0 $d_2 $d_2)))))
+        ", 其中" (∈ $d_1 $d_2 $D))
+    "定义的连续函数. 那么, " (&= $u_1 $u_2) ", 其中"
+    (&def= (tu0 $u_1 $u_2) (&fix $g))
+    ". (注意到之所以" $g
+    "是连续的, 是因为我们可以将其表达为复合, 投影和配对, "
+    "因而可以应用第3章第2节的命题1和幻灯片37: "
+    (&= $g (tupa0 (&compose $f (tupa0 $pi_1
+                                      (tupa0 $pi_1 $pi_2)))
+                  (&compose $f (tupa0 $pi_1
+                                      (tupa0 $pi_2 $pi_2)))))
+    ".)")
+   ((proof)
+    "我们想要证明的是" (∈ (&fix $g) Δ) ", 其中"
+    (MB (&def= Δ (setI (∈ (tu0 $d_1 $d_2) (&c* $D $D))
+                       (&= $d_1 $d_2))) ".")
+    "不难看出" Δ "是积domain " (&c* $D $D)
+    "的一个可容许子集. 因此, 根据Scott不动点归纳原理, "
+    "我们只需要检验"
+    (MB (forall (∈ (tu0 $d_1 $d_2) (&c* $D $D))
+                (&=> (∈ (tu0 $d_1 $d_2) Δ)
+                     (∈ (ap $g (tu0 $d_1 $d_2)) Δ))))
+    "其等价于"
+    (MB (forall (∈ (tu0 $d_1 $d_2) (&c* $D $D))
+                (&=> (&= $d_1 $d_2)
+                     (&= (appl $f $d_1 $d_1 $d_2)
+                         (appl $f $d_1 $d_2 $d_2)))))
+    "这显然为真.")
+   (P "接下来的例子表明Scott归纳原理对于证明关于程序的"
+      "(指称版本的)" (Em "部分正确性(partial correctness)")
+      "断言来说很有用, 即具有形式"
+      (Q "如果程序终止, 那么对于结果来说这个那个的性质成立")
+      "的断言. 与之形成对比的是, " (Em "完全")
+      "正确性断言指的是"
+      (Q "程序的确会终止且对于结果来说这个那个的性质成立")
+      ". 鉴于Scott归纳只能应用于这样的性质" $Phi:normal
+      ", 其满足" (app $Phi:normal $bottom)
+      "成立, 所以说它对于证明完全正确性不是很有用.")
+   ((example #:n "2")
+    "令" (func $f $D $D) "是幻灯片12上定义的连续函数, "
+    "其最小不动点是命令"
+    (MB (make-while
+         (&> $X $0)
+         (@ (&\; (&:= $Y (&* $X $Y))
+                 (&:= $X (&- $X $1))))))
+    "的指称. 我们将会使用Scott归纳证明"
+    (MB (forall
+         (&>= (&cm $x $y) $0)
+         (&=> (&terminate
+               (ap (&fix $f)
+                   (make-map '((X x) (Y y)))))
+              (&= (ap (&fix $f)
+                      (make-map '((X x) (Y y))))
+                  (make-map
+                   `((X 0) (Y ,(&* (@fact $x) $y))))))))
+    "其中"
     )
    (H3 "第4.3节 构建链封闭子集")
    (P "Scott归纳的威力依赖于我们有许多链封闭子集储备能用. "
       "幸运的是, 我们可以根据构造方式来保证许多子集是链封闭的.")
-   (H4 "第4.3.1节 基本关系")
+   (H4 "第4.3.1小节 基本关系")
    (P "令" $D "是一个cpo. " (&c* $D $D) "的子集"
       (MB (setI (∈ (tu0 $x $y) (&c* $D $D))
                 (&sqsube $x $y)))
@@ -2130,13 +2194,155 @@
               (setI (∈ $x $D)
                     (∈ (app $f $x) $S))))
       "是" $D "的一个链封闭子集 (为什么?).")
+   ((tcomment)
+    "设" $S "是" $E "的一个链封闭子集, 对于"
+    (app (inv $f) $S) "中的链"
+    (&sqsube $x_0 $x_1 $x_2 $..h)
+    ", 考虑其最小上界在" $f "下的像"
+    (MB (app $f (LUB (∈ $n $NN) $x_n)))
+    "我们希望其是" $S "的一个元素, "
+    "而这实际上是显然的. 根据" $f
+    "的连续性, 我们知道"
+    (MB (&= (app $f (LUB (∈ $n $NN) $x_n))
+            (LUB (∈ $n $NN) (app $f $x_n))))
+    "鉴于" $S "是一个链封闭子集, 且对于每个"
+    (∈ $n $NN) ", " (∈ (app $f $x_n) $S)
+    ", 故"
+    (MB (∈ (LUB (∈ $n $NN) (app $f $x_n)) $S))
+    "也就是说, 我们有"
+    (MB (∈ (LUB (∈ $n $NN) $x_n)
+           (app (inv $f) $S)))
+    "那么, 我们可以断言" (app (inv $f) $S)
+    "是一个链封闭子集. 译注完毕.")
    (P "设子集" $S "由" $E "上的性质" $P "所定义, 即"
       (MB (&= $S (setI (∈ $y $E) (app $P $y))))
       "那么"
-      
-      )
+      (MB (&= (app (inv $f) $S)
+              (setI (∈ $x $D) (app $P (app $f $x)))))
+      "也就是说, 若" $E "上的性质" (app $P $y)
+      "确定了" $E "的一个链封闭子集, 而"
+      (func $f $D $E) "是一个连续函数, 那么"
+      $D "上的性质" (app $P (app $f $x))
+      "确定了" $D "的一个链封闭子集.")
+   (&label
+    (set-attr*
+     (let ((Φ (lambda (x)
+                (&sqsube (app $f x)
+                         (app $g x)))))
+       (make-slide
+        "例子II"
+        "令" $D "是一个domain而" (func (&cm $f $g) $D $D)
+        "是连续函数并且满足"
+        (&sqsube (&compose $f $g)
+                 (&compose $g $f))
+        ", 那么"
+        (MB (&==> (&sqsube (app $f $bottom)
+                           (app $g $bottom))
+                  (&sqsube (&fix $f)
+                           (&fix $g))) ".")
+        "以下是使用Scott归纳的证明."
+        ((proof)
+         "考虑" $D "的可容许性质"
+         (MB (&equiv (app $Phi:normal $x)
+                     (@ (Φ $x))))
+         "鉴于"
+         (MB (&=> (Φ $x)
+                  (&sqsube (app $g (app $f $x))
+                           (app $g (app $g $x)))
+                  (Φ (app $g $x))))
+         "我们有"
+         (MB (Φ (&fix $g)) "."))))
+     'style "height: 280px")
+    "幻灯片42")
+   ((tcomment)
+    "我们继续补齐一点gap. 鉴于"
+    (MB (&= (app $g (&fix $g)) (&fix $g)))
+    "故"
+    (MB (&sqsube (app $f (&fix $g))
+                 (&fix $g)))
+    "换言之, " (&fix $g) "是" $f
+    "的一个前不动点. 然而" (&fix $f)
+    "是" $f "的最小前不动点, 所以有"
+    (MB (&sqsube (&fix $f) (&fix $g)) "."))
+   (H4 "第4.3.3小节 逻辑运算")
+   (P "令" $D "是一个cpo. 令" (&sube $S $D) "和" (&sube $T $D)
+      "是" $D "的链封闭子集. 那么, 我们有"
+      (MB (&union $S $T) "和" (&cap $S $T))
+      "都是链封闭子集 (为什么?). 若是基于性质的语言, 若"
+      (app $P $x) "和" (app $Q $x) "都确定了" $D
+      "的链封闭子集, 那么"
+      (MB (&cm (: (app $P $x) "或者" (app $Q $x))
+               (&and (app $P $x) (app $Q $x))))
+      "也是如此.")
+   (P "如果" (&cm $S_i (∈ $i $I)) "是由集合" $I
+      "索引的" $D "的一个链封闭子集的族, 那么"
+      (Cap (∈ $i $I) $S_i) "是" $D
+      "的一个链封闭子集 (为什么?).")
+   ((tcomment)
+    "(不论有限还是无限的)交的情况比较简单, 并的情况比较有趣. 对于"
+    (&union $S $T) "中的链" (&sqsube $x_0 $x_1 $x_2 $..h)
+    ", 我们可以按照是否属于" $S "进行分类. "
+    "至少其中一类是无限的, 设其构成了(子)链"
+    (&sqsube $y_0 $y_1 $y_2 $..h)
+    ". 我们知道" (LUB (∈ $n $NN) $y_n)
+    "肯定是属于" (&union $S $T) "的, 若是能够证明"
+    (MB (&= (LUB (∈ $n $NN) $y_n)
+            (LUB (∈ $n $NN) $x_n)))
+    "那么就结束了. 首先鉴于" (setE $y_0 $y_1 $..h)
+    "是" (setE $x_0 $x_1 $..h) "的一个子集, 所以"
+    (MB (&sqsube (LUB (∈ $n $NN) $y_n)
+                 (LUB (∈ $n $NN) $x_n)))
+    "那么我们需要证明的是"
+    (MB (&sqsube (LUB (∈ $n $NN) $x_n)
+                 (LUB (∈ $n $NN) $y_n)))
+    "实际上对于任意的" (∈ $i $NN)
+    ", 鉴于子链" (&sqsube $y_0 $y_1 $y_2 $..h)
+    "的长度是无限的, 所以必然可以找到某个"
+    (∈ $j $NN) "使得" (&sqsube $x_i $y_j)
+    ", 那么可以看出" (LUB (∈ $n $NN) $y_n)
+    "是" (&sqsube $x_0 $x_1 $x_2 $..h)
+    "的一个上界, 也就是说"
+    (MB (&sqsube (LUB (∈ $n $NN) $x_n)
+                 (LUB (∈ $n $NN) $y_n)) ".")
+    "说明完毕, 以下是正文.")
+   (P "因此, 如果一个性质" (appl $P $x $y) "确定了"
+      (&c* $D $E) "的一个链封闭子集, 那么性质"
+      (forall (∈ $x $D) (appl $P $x $y))
+      "确定了" $E "的一个链封闭子集. 这是因为"
+      (MB (deriv
+           (setI (∈ $y $E)
+                 (forall (∈ $x $D)
+                         (appl $P $x $y)))
+           (Cap (∈ $d $D)
+                (setI (∈ $y $E)
+                      (appl $P $d $y)))
+           (Cap (∈ $d $D)
+                (ap (inv $f_d)
+                    (setI (∈ (tu0 $x $y) (&c* $D $E))
+                          (appl $P $x $y))))))
+      "其中" (func $f_d $E (&c* $D $E))
+      "是连续函数, 定义为对于每个" (∈ $d $D)
+      ", " (&= (app $f_d $y) (tu0 $d $y)) ".")
+   (P "实际上, 若称形式为"
+      (&sqsube (appl $f $x_1 $..c $x_k)
+               (appl $g $x_1 $..c $x_l))
+      "或"
+      (&= (appl $f $x_1 $..c $x_k)
+          (appl $g $x_1 $..c $x_l))
+      "的性质为基本性质 (其中" $f "和" $g
+      "为连续函数), 那么对于由基本性质的合取与析取"
+      "构成的东西进行其中一些变量的全称量化, "
+      "那么就会确定非量化的变量所对应的积cpo的一个链封闭子集.")
+   ((tcomment)
+    
+    )
+   (P "不过, 注意到链封闭子集的无限并不必然是链封闭的; "
+      "有限子集总是链完备的, 但是其任意的并不是. "
+      "因此, 一般情况下我们不能使用存在量化构造链封闭子集.")
    (H3 "第4.4节 练习")
-   
+   ((exercise #:n "1")
+    
+    )
    (H2 "第5章 PCF")
    (P "语言PCF (Programming Computable Functions, 编程可计算函数) "
       "是一个简单的函数式编程语言, "
