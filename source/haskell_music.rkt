@@ -252,6 +252,129 @@ Rest :: Dur ->          Primitive")
       "是作为四分之一音符演奏的concert A, 而"
       (Code "Rest 1") "是一个全音符休止.")
    (P "然而, 这个定义并不全然令人满意, "
+      "因为我们想要给音符附加其他的信息, "
+      "例如其响度, 或者其他的注记和articulation. "
+      "而且, 音高本身可能实际上是一个打击乐声音, "
+      "其压根就没有真正的音高. "
+      "为了解决这个问题, Euterpea使用了Haskell中的一个重要概念, 即"
+      (Em "多态性(polymorphism)") --
+      "这是对于类型进行参数化或者抽象的能力. ("
+      (Em "poly") "表示" (Em "多") ", " (Em "morphism")
+      "指的是对象的结构, 或者说" (Em "形式") ".)")
+   (P (Code "Primitive") "可以按照以下方式被重新定义为一个"
+      (Em "多态数据类型") ". 我们没有固定音符的音高的类型, "
+      "而是将其留待为未作刻画, 通过" (Em "类型变量") "的使用:"
+      (CodeB "data Primitive a = Note Dur a
+                 | Rest Dur"))
+   (P "注意到类型变量" (Code "a") "被用作" (Code "Primitive")
+      "的一个参数, 然后其用在了声明的体里, 就像函数中的变量一样. "
+      "这个版本的" (Code "Primitive")
+      "比之前的版本更为一般" --
+      "诚然如此, 注意到" (Code "Primitive Pitch")
+      "和之前版本的" (Code "Primitive")
+      "是一样的 (或者, 更技术性地说, " (Em "同构于")
+      "). 但是, " (Code "Primitive")
+      "现在比之前的版本更为灵活, "
+      "例如我们可以给音高添加响度信息, 即"
+      (Code "Primitive (Pitch, Loudness)")
+      ". 其他关于这个想法的具体实例将会在之后引入.")
+   (P "另一种解释这个数据声明的方法是言称对于任意的类型"
+      (Code "a") ", 这个声明声明了其构造子的类型为:"
+      (CodeB "Note :: Dur -> a -> Primitive a
+Rest :: Dur ->      Primitive a")
+      "即便" (Code "Note") "和" (Code "Rest")
+      "被称为数据构造子, 它们仍然是函数并且它们具有类型. "
+      "因为它们的类型签名中都具有类型变量, "
+      "所以它们都是" (Em "多态函数") "的例子.")
+   (P "将多态性视为在类型层次应用抽象原则是很有帮助的" --
+      "事实上, 它通常被称为" (Em "类型抽象")
+      ". 第3章将详细探讨更多多态函数和多态数据类型的例子.")
+   (P "到目前为止, 我们已经引入了Euterpea原始的音符和休止, "
+      "但是如何将许多音符和休止组合成为更大的乐曲呢? "
+      "为了实现这一点, Euterpea定义了另一个多态数据类型, "
+      "这可能是本教材中使用的最重要的数据类型, "
+      "它定义了音符层次的音乐实体的基本结构:"
+      (CodeB "data Music a =
+    Prim (Primitive a)       -- primitive value
+  | Music a :+: Music a      -- sequential composition
+  | Music a :=: Music a      -- parallel composition
+  | Modify Control (Music a) -- modifier")
+      "根据之前的推理, 这些构造子的类型为:"
+      (CodeB "Prim   :: Primitive a        -> Music a
+(:+:)  :: Music a -> Music a -> Music a
+(:=:)  :: Music a -> Music a -> Music a
+Modify :: Control -> Music a -> Music a")
+      "这四个构造子自然也是多态函数.")
+   (P (Code "Music") "数据类型声明基本上是说"
+      (Code "Music") "类型的值具有四种可能的形式:"
+      (Ul (Li (Code "Prim p") "是一个终结结点, 其中"
+              (Code "p") "是一个类型为" (Code "Primitive a")
+              "的原始值, 对于某个类型" (Code "a")
+              "而言, 例如:"
+              (CodeB "a440m :: Music Pitch
+a440m = Prim (Note qn a440)")
+              "是与concert A的四分之一音符演绎对应的音乐值.")
+          (Li (Code "m1 :+: m2") "是" (Code "m1") "和"
+              (Code "m2") "的" (Em "顺序复合")
+              "; 即" (Code "m1") "和" (Code "m2")
+              "按次序演奏.")
+          (Li (Code "m1 :=: m2") "是" (Code "m1") "和"
+              (Code "m2") "的" (Em "并行复合")
+              "; 即" (Code "m1") "和" (Code "m2")
+              "同时演奏. 作为结果的时长取决于"
+              (Code "m1") "和" (Code "m2")
+              "中更长的那个." (Br)
+              "(回忆一下, 这两个运算符在上一章有介绍. "
+              "现在你知道了它们实际上是某个代数数据类型的构造子.)")
+          (Li (Code "Modify cntrl m") "是" (Code "m") "的一个"
+              (Q "注解") "版本, 其中控制参数" (Code "cntrl")
+              "刻画了修饰" (Code "m") "的某种方式.")))
+   (P "将这些音乐想法表示为递归数据类型是很方便的, "
+      "因为它不仅允许我们构造音乐值, 还可以拆解它们, "
+      "分析它们的结构, 以保持结构的方式打印它们, "
+      "转换它们, 为演奏目的解释它们, 等等. "
+      "本教材将展示许多这类处理过程的例子.")
+   (P (Code "Control") "数据类型被" (Code "Modify")
+      "构造子用来为" (Code "Music")"值添加注释, "
+      "包括节奏改变, 移调, 乐句属性, 乐器, 调号或自定义标签. "
+      "这个数据类型目前并不重要, "
+      "但为了完整性, 这里给出它的完整定义:"
+      (CodeB "data Control =
+    Tempo      Rational          -- scale the tempo
+  | Transpose  AbsPitch          -- transposition
+  | Instrument InstrumentName    -- instrument label
+  | Phrase     [PhraseAttribute] -- phrase attributes
+  | KeySig     PitchClass Mode   -- key signature and mode
+  | Custom     String            -- custom label
+data Mode = Major | Minor | Ionian | Dorian | Phrygian
+          | Lydian | Mixolydian | Aeolian | Locrian
+          | CustomMode String"))
+   (P (Code "AbsPitch") "只是" (Code "Int")
+      "的类型别名 (" (Q "绝对音高") ", 第2.4节将会定义). "
+      "乐器名是借用自General MIDI标准 [3, 4] 的, "
+      "并被捕获为图2.1中的代数数据类型. " (Code "KeySig")
+      "构造子给一个" (Code "Music")
+      "值附加一个调号, 其与移调是不同的. "
+      "对于乐句属性和自定义标签的完整解释要推迟到第9章.")
+   
+   (H3. "方便的辅助函数")
+   (P "出于方便的考量, Euterpea定义了很大函数用于编写特定种类的音乐值. "
+      "作为开始:"
+      (CodeB "note :: Dur -> a -> Music a
+note d p = Prim (Note d p)
+rest :: Dur -> Music a
+rest d = Prim (Rest d)
+tempo :: Dur -> Music a -> Music a
+tempo r m = Modify (Tempo r) m
+transpose :: AbsPitch -> Music a -> Music a
+transpose i m = Modify (Transpose i) m
+instrument :: InstrumentName -> Music a -> Music a
+instrument i m = Modify (Instrument i) m
+phrase :: [PhraseAttribute] -> Music a -> Music a
+phrase pa m = Modify (Phrase pa) m
+keysig :: PitchClass -> Mode -> Music a -> Music a
+keysig pc mo m = Modify (KeySig pc mo) m")
+      "注意到这些函数每个都是多态的, "
       )
    (H2. "多态函数和高阶函数")
    (P "在前几章中已经介绍了若干多态数据类型的例子. "

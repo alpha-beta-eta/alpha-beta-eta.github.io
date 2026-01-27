@@ -165,6 +165,7 @@
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml spt.html "../spt.html")
     (emitXml substructural.html
              "../substructural.html")
     (emitXml spec.html "../spec.html")
@@ -273,7 +274,6 @@
   (emitXml jones.html "../jones.html")
   (emitXml pe_jones.html "../pe_jones.html")
   (emitXml fp_domain.html "../fp_domain.html")
-  (emitXml spt.html "../spt.html")
   (emitXml analysis_dieudonne.html "../analysis_dieudonne.html")
   (emitXml illustrations.html "../illustrations.html")
   (emitXml analysis3_amann.html "../analysis3_amann.html")
