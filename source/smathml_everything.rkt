@@ -11,6 +11,7 @@
     (H2 (A "SMathML参考" #:attr* '((href "smathml.html"))))
     (H2 (A "SMathML Reference" #:attr* '((href "smathml_ref.html"))))
     (H2 (A "SMathML注记" #:attr* '((href "smathml_comments.html"))))
+    (H2 (A "证明树排版测试" #:attr* '((href "proof_tree_test.html"))))
     
     )
    ))

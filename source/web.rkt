@@ -161,10 +161,16 @@
          "object.rkt"
          "spec.rkt"
          "substructural.rkt"
+         "proof-tree.rkt"
          
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml smathml_everything.html
+             "../smathml_everything.html")
+    (emitXml proof_tree_test.html
+             "../proof_tree_test.html")
+    (emitXml spt.html "../spt.html")
     (emitXml substructural.html
              "../substructural.html")
     (emitXml spec.html "../spec.html")
@@ -227,7 +233,6 @@
   (emitXml links.html "../links.html")
   (emitXml smathml_ref.html "../smathml_ref.html")
   (emitXml ilinks.html "../ilinks.html")
-  (emitXml smathml_everything.html "../smathml_everything.html")
   (emitXml smathml_comments.html "../smathml_comments.html")
   (emitXml hoffman.html "../hoffman.html")
   (emitXml linear_algebra_contents.html "../linear_algebra_contents.html")
@@ -273,7 +278,6 @@
   (emitXml jones.html "../jones.html")
   (emitXml pe_jones.html "../pe_jones.html")
   (emitXml fp_domain.html "../fp_domain.html")
-  (emitXml spt.html "../spt.html")
   (emitXml analysis_dieudonne.html "../analysis_dieudonne.html")
   (emitXml illustrations.html "../illustrations.html")
   (emitXml analysis3_amann.html "../analysis3_amann.html")

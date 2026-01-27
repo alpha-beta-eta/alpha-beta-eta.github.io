@@ -1,0 +1,16 @@
+<html><head><meta charset="utf-8"/><title>证明树排版测试</title><link href="styles.css" rel="stylesheet"/></head><body><h1>证明树排版测试</h1><pre><code>(MB (ProofTreeRender
+     `(&lt;== (cut (,Δ ,Δ^)
+                ,(&amp;⊗ $A $B)
+                (,Δ^^)
+                ,$C)
+           (⊗R (,Δ) ,$A (,Δ^) ,$B)
+           (⊗L (,Δ^^) ,$A ,$B ,$C))
+     env:linear))</code></pre><math display="block"><mrow><mfrac displaystyle="true"><mrow><mrow><mfrac displaystyle="true"><mrow><mrow><mi mathvariant="normal">&Delta;</mi><mo>&vdash;</mo><mi>A</mi></mrow><mspace width="8ex"/><mrow><msup><mi mathvariant="normal">&Delta;</mi><mo>&prime;</mo></msup><mo>&vdash;</mo><mi>B</mi></mrow></mrow><mrow><mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo><msup><mi mathvariant="normal">&Delta;</mi><mo>&prime;</mo></msup></mrow><mo>&vdash;</mo><mrow><mi>A</mi><mo>&otimes;</mo><mi>B</mi></mrow></mrow></mfrac><mrow><mi>&otimes;</mi><mi>R</mi></mrow></mrow><mspace width="8ex"/><mrow><mfrac displaystyle="true"><mrow><mrow><msup><mi mathvariant="normal">&Delta;</mi><mo>&Prime;</mo></msup><mo>,</mo><mi>A</mi><mo>,</mo><mi>B</mi></mrow><mo>&vdash;</mo><mi>C</mi></mrow><mrow><mrow><msup><mi mathvariant="normal">&Delta;</mi><mo>&Prime;</mo></msup><mo>,</mo><mrow><mi>A</mi><mo>&otimes;</mo><mi>B</mi></mrow></mrow><mo>&vdash;</mo><mi>C</mi></mrow></mfrac><mrow><mi>&otimes;</mi><mi>L</mi></mrow></mrow></mrow><mrow><mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo><msup><mi mathvariant="normal">&Delta;</mi><mo>&prime;</mo></msup><mo>,</mo><msup><mi mathvariant="normal">&Delta;</mi><mo>&Prime;</mo></msup></mrow><mo>&vdash;</mo><mi>C</mi></mrow></mfrac><msub><mi>cut</mi><mrow><mi>A</mi><mo>&otimes;</mo><mi>B</mi></mrow></msub></mrow></math><pre><code>(MB (ProofTreeRender
+     `(&lt;== (cut (,Δ^) ,$B
+                (,Δ ,Δ^^) ,$C)
+           (axiom
+            ,(Sequent
+              (list Δ^) (list $B)))
+           (cut (,Δ) ,$A
+                (,Δ^^ ,$B) ,$C))
+     env:linear))</code></pre><math display="block"><mrow><mfrac displaystyle="true"><mrow><mrow><msup><mi mathvariant="normal">&Delta;</mi><mo>&prime;</mo></msup><mo>&vdash;</mo><mi>B</mi></mrow><mspace width="8ex"/><mrow><mfrac displaystyle="true"><mrow><mrow><mi mathvariant="normal">&Delta;</mi><mo>&vdash;</mo><mi>A</mi></mrow><mspace width="8ex"/><mrow><mrow><msup><mi mathvariant="normal">&Delta;</mi><mo>&Prime;</mo></msup><mo>,</mo><mi>B</mi><mo>,</mo><mi>A</mi></mrow><mo>&vdash;</mo><mi>C</mi></mrow></mrow><mrow><mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo><msup><mi mathvariant="normal">&Delta;</mi><mo>&Prime;</mo></msup><mo>,</mo><mi>B</mi></mrow><mo>&vdash;</mo><mi>C</mi></mrow></mfrac><msub><mi>cut</mi><mi>A</mi></msub></mrow></mrow><mrow><mrow><msup><mi mathvariant="normal">&Delta;</mi><mo>&prime;</mo></msup><mo>,</mo><mi mathvariant="normal">&Delta;</mi><mo>,</mo><msup><mi mathvariant="normal">&Delta;</mi><mo>&Prime;</mo></msup></mrow><mo>&vdash;</mo><mi>C</mi></mrow></mfrac><msub><mi>cut</mi><mi>B</mi></msub></mrow></math></body></html>
