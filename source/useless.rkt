@@ -131,6 +131,9 @@
     (H2 (A "lambda到SKI" #:attr* '((href "ski.html"))))
     (H2 (A "有一个作用" #:attr* '((href "having_an_effect.html"))))
     (H2 (A "抽象解释 (翻译)" #:attr* '((href "abstract.html"))))
+    (H2 (A "证明论和逻辑代数"
+           #:attr* '((href "proof_theory_and_algebra_in_logic.html"))))
+    (H2 (A "CMU课程笔记" #:attr* '((href "cmu.html"))))
     
     )
    ))

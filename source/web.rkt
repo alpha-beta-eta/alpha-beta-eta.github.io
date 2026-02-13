@@ -168,9 +168,25 @@
          "aczel1997.rkt"
          "universal_coalgebra.rkt"
          "cmu.rkt"
+         "cml.rkt"
+         "modal_types.rkt"
+         "proof_theory_and_algebra_in_logic.rkt"
+         "atitapl.rkt"
+         "hott_intro.rkt"
+         "lattice_theory.rkt"
+         
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml lattice_theory.html
+             "../lattice_theory.html")
+    (emitXml hott_intro.html "../hott_intro.html")
+    (emitXml atitapl.html "../atitapl.html")
+    (emitXml proof_theory_and_algebra_in_logic.html
+             "../proof_theory_and_algebra_in_logic.html")
+    (emitXml modal_types.html
+             "../modal_types.html")
+    (emitXml cml.html "../cml.html")
     (emitXml cmu.html "../cmu.html")
     (emitXml macro.html "../macro.html")
     (emitXml universal_coalgebra.html

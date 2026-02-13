@@ -644,7 +644,31 @@
     "例子3给出了一个推导, 其不可能藉由假设"
     $A "的单次使用来完成.")
    ((example #:n "3")
-    
+    (MB (&rull
+         (&. $implI '|2.|)
+         (&rull
+          (&. $implI '|1.|)
+          (&rull
+           $implE
+           (&rull
+            $implE
+            (attach (assume
+                     (&impl $A (@impl $A $B)))
+                    '|2.|)
+            (attach (assume $A) '|1.|)
+            (&impl $A $B))
+           (attach (assume $A) '|1.|)
+           $B)
+          (&impl $A $B))
+         (&impl
+          (@impl $A (@impl $A $B))
+          (@impl $A $B))))
+    "假设" $A "需要作两次, 而在" $implI
+    "的第一个实例处存在一个对应的"
+    (B "多重解除 (multiple discharge)")
+    ", 这两次假设" $A "的出现会被一并解除. "
+    "注意到自然演绎的推导的" (Q "非局部性")
+    ": "
     )
    (H3. "从自然演绎到相继式演算")
    
