@@ -168,9 +168,27 @@
          "aczel1997.rkt"
          "universal_coalgebra.rkt"
          "cmu.rkt"
+         "cml.rkt"
+         "modal_types.rkt"
+         "proof_theory_and_algebra_in_logic.rkt"
+         "atitapl.rkt"
+         "hott_intro.rkt"
+         "lattice_theory.rkt"
+         
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml topos.html "../topos.html")
+    (emitXml cmu15122.html "../cmu15122.html")
+    (emitXml lattice_theory.html
+             "../lattice_theory.html")
+    (emitXml hott_intro.html "../hott_intro.html")
+    (emitXml atitapl.html "../atitapl.html")
+    (emitXml proof_theory_and_algebra_in_logic.html
+             "../proof_theory_and_algebra_in_logic.html")
+    (emitXml modal_types.html
+             "../modal_types.html")
+    (emitXml cml.html "../cml.html")
     (emitXml cmu.html "../cmu.html")
     (emitXml macro.html "../macro.html")
     (emitXml universal_coalgebra.html
@@ -274,7 +292,6 @@
   (emitXml tg.html "../tg.html")
   (emitXml sdf.html "../sdf.html")
   (emitXml synclo.html "../synclo.html")
-  (emitXml topos.html "../topos.html")
   (emitXml series.html "../series.html")
   (emitXml calculus.html "../calculus.html")
   (emitXml sml-history.html "../sml-history.html")
@@ -283,7 +300,6 @@
   (emitXml scheme_cg.html "../scheme_cg.html")
   (emitXml cad.html "../cad.html")
   (emitXml synsem.html "../synsem.html")
-  (emitXml cmu15122.html "../cmu15122.html")
   (emitXml corewar.html "../corewar.html")
   (emitXml lapb.html "../lapb.html")
   (emitXml order.html "../order.html")
