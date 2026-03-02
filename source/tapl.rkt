@@ -1,9 +1,59 @@
 #lang racket
 (provide tapl.html)
 (require SMathML)
+(define (format-num section index)
+  (and index
+       (format "~a.~a"
+               (apply string-append
+                      (add-between
+                       (map number->string
+                            (cdr (reverse section))) "."))
+               index)))
+(define (format-head name section index)
+  (let ((num (format-num section index)))
+    (if num
+        (B (format "~a~a. " name num))
+        (B (format "~a. " name)))))
+(define (Entry name class)
+  (define (present %entry attr* . html*)
+    (define id (%entry-id %entry))
+    (define Attr* (attr*-set attr* 'class class 'id id))
+    (define section (%entry-section %entry))
+    (define index (%entry-index %entry))
+    (define head (format-head name section index))
+    `(div ,Attr* ,head . ,html*))
+  (define (cite %entry)
+    (define id (%entry-id %entry))
+    (define href (string-append "#" id))
+    (define section (%entry-section %entry))
+    (define index (%entry-index %entry))
+    (define num (format-num section index))
+    (Cite name `(a ((href ,href)) ,num)))
+  (lambda (#:id [id #f] #:auto? [auto? #t])
+    (lambda (#:attr* [attr* '()] . html*)
+      (cons (build-%entry #:id id #:auto? auto? #:present present #:cite cite)
+            (cons attr* html*)))))
+(define-syntax-rule (define-Entry* (id name class) ...)
+  (begin (define id (Entry name class))
+         ...))
+(define-Entry*
+  (Example "例子" "example")
+  (Theorem "定理" "theorem")
+  (Definition "定义" "definition")
+  (Lemma "引理" "lemma")
+  (Corollary "推论" "corollary")
+  (Proposition "命题" "proposition")
+  (Remark "评注" "remark")
+  (Exercise "练习" "exercise")
+  
+  )
 (define $Nat (Mi "Nat"))
 (define $Top (Mi "Top"))
 (define $Bool (Mi "Bool"))
+(define $List (Mi "List"))
+(define (&List T) (app $List T))
+(define (powerset U)
+  (app $P:script U))
 (define (&rule #:space [n 8] . j*)
   (let-values (((j* j1) (split-at-right j* 1)))
     (~ #:attr* '((displaystyle "true"))
@@ -310,7 +360,7 @@
       (RuleLabel "S-Trans")
       "进行结合以从一个记录类型的任何位置抛弃域, "
       "而不是只能抛弃末端的域.")
-   ((exercise)
+   ((Exercise)
     "绘制一个推导以表明" (RcdType $x $Nat $y $Nat $z $Nat)
     "是" (RcdType $y $Nat) "的一个子类型.")
    (P (RuleLabel "S-RcdWidth") ", "
@@ -327,14 +377,89 @@
    (P "既然我们在高阶语言的上下文中进行讨论, "
       "不仅是数字和记录, 函数也可以作为参数传递给其他函数, "
       "因而我们必须赋予函数类型以子定型规则" --
-      "即我们必须"
+      "即我们必须要刻画在期望某个函数类型的上下文之中, "
+      "何种情况下可以安全地使用不同类型的函数."
+      (MBL (RuleLabel "(S-Arrow)")
+           (&rule
+            (&<: $T_1 $S_1)
+            (&<: $S_2 $T_2)
+            (&<: (&-> $S_1 $S_2)
+                 (&-> $T_1 $T_2))))
+      "注意到子类型关系对于参数类型是逆变的 (contravariant), "
+      "对于结果类型是协变的 (covaraint). "
+      "直觉在于, 如果我们有了一个类型为" (&-> $S_1 $S_2)
+      "的函数" $f ", 那么我们知道" $f "接受类型为" $S_1
+      "的元素; 显然, " $f "也接受" $S_1 "的任何子类型"
+      $T_1 "的元素. " $f "的类型也告诉我们, 其会返回类型为"
+      $S_2 "的元素; 我们也可以将这些结果视为属于" $S_2
+      "的任何超类型" $T_2 ". 也就是说, 任何具有类型"
+      (&-> $S_1 $S_2) "的函数" $f "也可以视为具有类型"
+      (&-> $T_1 $T_2) ".")
+   (P "另一种观念是若要在期望类型" (&-> $T_1 $T_2)
+      "的上下文之中安全使用类型为" (&-> $S_1 $S_2)
+      "的函数, 只需可能传递给该上下文中的函数的参数"
+      "不会对函数本身造成惊吓 (故" (&<: $T_1 $S_1)
+      "), 并且该函数返回的结果也不会对上下文造成惊吓 (故"
+      (&<: $S_2 $T_2) ").")
+   (P "最后, 拥有一个每个类型的超类型是方便的. "
+      "我们引入一个新的类型常量" $Top
+      ", 外加一条规则使得" $Top
+      "成为子类型关系的一个最大元素."
+      (MBL (RuleLabel "(S-Top)")
+           (&<: $S $Top))
+      "第15.4节更深入地讨论了" $Top
+      "类型.")
+   (P "从形式化角度而言, 子类型关系是在我们所给定的规则下封闭的最小关系. "
+      
       )
+   ((Exercise)
+    )
+   
    (H2. "子定型的元理论")
+   (P "前一章的带有子定型的简单类型lambda演算并不直接适用于实现. "
+      "和其他之前我们所见的演算不同的是, 这个系统的规则并非" (Em "句法导向的")
+      -- "其无法" (Q "自底而上阅读") "以产生一个类型检查算法. "
+      "罪魁祸首是定型关系里涵摄规则的" (RuleLabel "T-Sub")
+      "和子定型关系里的传递性" (RuleLabel "S-Trans") ".")
+   (P "之所以" (RuleLabel "T-Sub") "是有问题的, "
+      )
+   (H3. "算法性子定型")
+   (H3. "算法性定型")
+   
    (H2. "子定型的一个ML实现")
    (H2. "案例研究: 命令式对象")
    (H2. "案例研究: Featherweight Java")
    (H2. "递归类型")
+   (P "在第11.12节里我们看到了如何扩展一个简单类型系统以囊括一个类型构造子"
+      (&List $T) ", 其元素是列表项为类型" $T "的元素的列表. "
+      "列表不过是一类常见结构的一个例子而已" --
+      "这类结构也包括队列, 二叉树, 标签树, 抽象句法树, 等等" --
+      
+      )
    (H2. "递归类型的元理论")
+   (H3. "归纳和余归纳")
+   ((Definition)
+    "一个函数" (∈ $F (&-> (powerset $U:script) (powerset $U:script)))
+    "是" (Em "单调的") ", 如果" (&sube $X $Y) "可以推出"
+    (&sube (app $F $X) (app $F $Y))
+    ". (回忆以下, " (powerset $U:script) "是" $U:script
+    "的幂集.)")
+   (P "以下我们默认" $F "是" (powerset $U:script)
+      "上的某个单调函数. 我们经常将" $F "称为一个"
+      (Em "生成函数") ".")
+   ((Definition)
+    "令" $X "是" $U:script "的一个子集."
+    (Ol (Li $X "是" (Em $F "-封闭的")
+            ", 如果" (&sube (app $F $X) $X) ".")
+        (Li $X "是" (Em $F "-一致的")
+            ", 如果" (&sube $X (app $F $X)) ".")
+        (Li $X "是" $F "的一个" (Em "不动点")
+            ", 如果" (&= (app $F $X) $X) ".")))
+   (P "这些定义的一个有用直觉在于将" $U:script
+      "的元素想成是某种陈述或者断言, "
+      )
+   (H3. "有限和无限类型")
+   (H3. "子定型")
    (H2. "类型重构")
    (H2. "全称类型")
    (H2. "存在类型")

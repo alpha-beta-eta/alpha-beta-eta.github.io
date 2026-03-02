@@ -1,6 +1,22 @@
 #lang racket
 (provide topos.html)
 (require SMathML)
+(define (powerset S)
+  (app $P:script S))
+(define app*
+  (case-lambda
+    ((f x) (app f x))
+    ((f g . arg*) (app f (apply app* g arg*)))))
+(define pad
+  (case-lambda
+    ((x) (pad x "2em"))
+    ((x length)
+     (: (Mspace #:attr* `((width ,length)))
+        x
+        (Mspace #:attr* `((width ,length)))))))
+(define (RLDiagram A x B y C)
+  (MB A (^^ $-> (pad x)) B
+      (^^ $<- (pad y)) C))
 (define (_prime x i)
   (_^ x i $prime))
 (define Σ $Sigma:normal)
@@ -15,6 +31,7 @@
     (define (&id x) (app $id x))
     ...))
 (define-simple*
+  (&Im $Im "Im")
   (&dom $dom "dom")
   (&cod $cod "cod"))
 (define (map* proc . x*)
@@ -63,6 +80,8 @@
   (&: F (&-> C D)))
 (define (Comma C a)
   (&darr C a))
+(define (Product f g)
+  (tupa0 f g))
 (define (Coproduct f g)
   (li0 f g))
 (define (Inclusion i A B)
@@ -662,7 +681,28 @@
       "其由下列规则给出"
       (MB (&= (app $p_A (tupa0 $x $y)) $x))
       (MB (&= (app $p_B (tupa0 $x $y)) $y))
-      "现在设"
+      "现在设我们给定了某个其他的集合" $C
+      "连带着一对映射" (func $f $C $A) "和"
+      (func $g $C $B) ", 那么我们根据规则"
+      (&= (app $p $x) (tupa0 (app $f $x) (app $g $x)))
+      "定义" (func $p $C (&c* $A $B)) "."
+      todo.svg
+      "于是, 我们有对于每个" (∈ $x $C) ", "
+      (&= (app* $p_A $p $x) (app $f $x)) "且"
+      (&= (app* $p_B $p $x) (app $g $x))
+      "成立. 也就是说, "
+      (&= (&compose $p_A $p) $f) "且"
+      (&= (&compose $p_B $p) $g)
+      ", 即上述图表交换. 并且, 这样定义的" $p
+      "是能够使得上述图表交换的唯一箭头. "
+      "这是因为如果" (&= (app $p $x) (tupa0 $y $z))
+      ", 那么知道" (&= (app* $p_A $p $x) (app $f $x))
+      "告诉我们" (&= $y (app $f $x)) ". 类似地, 如果"
+      (&= (&compose $p_B $p) $g) ", 那么我们必然有"
+      (&= $z (app $g $x)) ".")
+   (P "与" $f "和" $g "相关联的映射" $p "通常记作"
+      (Product $f $g) ", 即" $f "和" $g "的"
+      (Em "积映射") ". "
       )
    (H3. "余积")
    (P (Q "积") "的对偶概念是对象的" (Em "余积") ", 或者说" (Em "和")
@@ -806,15 +846,86 @@
       ", 其满足对于任意其他的" $D "-锥"
       (setE (Arrow (_prime $f $i) $c^ $d_i))
       ", 恰存在唯一的箭头" (Arrow $f $c^ $c)
-      "使得"
+      "使得对于" $D "中的每个对象" $d_i "有图表"
+      todo.svg
+      "交换.")
+   (P "这个极限锥若存在则被称为具有相对于" $D "-锥的"
+      (Em "泛性质") ". 其在这样的锥中是泛的" -- "任何其他的"
+      $D "-锥都可以如上图所示那样通过它进行唯一分解. 图表"
+      $D "的极限在同构下是唯一的: 如果"
+      
       )
    (H3. "余等化子")
    (H3. "拉回")
+   (P "一对具有共同陪域的" CatC "-箭头"
+      (RLDiagram $a $f $c $g $b)
+      "的一个" (Em "拉回(pullback)")
+      "是" CatC "中图表"
+      todo.svg
+      "的一个极限. "
+      )
    (H3. "推出")
    (H3. "完备性")
    (H3. "指数")
    (H2. "介绍topos")
    (H3. "子对象")
+   (P "如果" $A "是" $B "的一个子集, 那么嵌入函数" (&->hk $A $B)
+      "是单射的, 因而是单态的. 另一方面, 任何单态的函数"
+      (Mono $f $C $B) "都确定了一个" $B "的子集, 也就是"
+      (&= (&Im $f) (setI (app $f $x) (∈ $x $C)))
+      ". 很容易看出来" $f "导出了一个" $C "和" (&Im $f)
+      "之间的双射, 故" (&cong $C (&Im $f)) ".")
+   todo.svg
+   (P "因此, 一个单态函数的定义域同构于其陪域的一个子集. "
+      "在同构意义下, 定义域是陪域的一个子集. "
+      "这将我们引向了子集的范畴版本, 即所谓的"
+      (Em "子对象") ": 一个" CatC "-对象" $d
+      "的一个" (Em "子对象") "是一个以" $d
+      "为陪域的单态" CatC "-箭头" (Mono $f $a $d) ".")
+   (P "现在如果" $D "是一个集合, 那么由" $D
+      "的所有子集构成的集合被称为" $D "的" (Em "幂集")
+      ", 记作" (powerset $D) ", 即"
+      (MB (&= (powerset $D)
+              (setI $A $A "是" $D "的一个子集")) ".")
+      "集合包含关系是幂集" (powerset $D)
+      "上的一个偏序, 即" (tu0 (powerset $D) $sube)
+      "是一个偏序集, 并且其成为了一个范畴, 其中存在一个箭头"
+      (&-> $A $B) "当且仅当" (&sube $A $B)
+      ". 当这样一个箭头的确存在的时候, 以下图表"
+      todo.svg
+      "交换. 这暗示了一种定义" $d "的子对象之间的"
+      (Q "包含") "关系的方法. 对于" (Mono $f $a $d)
+      "和" (Mono $g $b $d) ", 我们置" (&sube $f $g)
+      "当且仅当存在一个" CatC "-箭头"
+      (Arrow $h $a $b) "使得"
+      todo.svg
+      "交换, 即" (&= $f (&compose $g $h))
+      ". (这样一个" $h "总会是单态的, 根据练习3.1.2, 于是"
+      $h "会是" $b "的一个子对象, 这加强了其与" CatSet
+      "情形之间的类比.) 因此, " (&sube $f $g)
+      "恰当" $f "可以经由" $g "进行分解.")
+   (P "子对象上的包含关系是"
+      (Ol #:attr* '((type "i"))
+          (Li (Em "自反的") "; " (&sube $f $f) ", 因为"
+              todo.svg
+              (&= $f (&compose $f (Id $a))) ".")
+          (Li (Em "传递的") "; 如果" (&sube $f $g)
+              "且" (&sube $g $k) ", 那么"
+              (&sube $f $k) ", 因为"
+              todo.svg
+              "如果" (&= $f (&compose $g $h)) "而"
+              (&= $g (&compose $k $i)) ", 那么"
+              (&= $f (&compose $k (@compose $i $h))) ".")))
+   (P "现在, 如果" (&sube $f $g) "且" (&sube $g $f)
+      ", 那么" $f "和" $g "都可以经由对方进行分解, "
+      "如以下交换图表所示:"
+      todo.svg
+      "在这种情况下, " (Arrow $h $a $b) "是一个同构, 其逆为"
+      $i " (留给读者作为练习). 因此, 当" (&sube $f $g) "且"
+      (&sube $g $f) "时, 它们有着同构的定义域, 于是我们称其为"
+      (Em "同构子对象") ", 记作" (&= $f $g)
+      ". "
+      )
    (H3. "对于子对象进行分类")
    (H3. "topos的定义")
    (H3. "最初的一些例子")
