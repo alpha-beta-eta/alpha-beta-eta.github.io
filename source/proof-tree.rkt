@@ -157,13 +157,15 @@
 (define $⊗R (: $⊗:id $R))
 (define-infix*
   (&⊗ $⊗))
+(define (append0 l . x*)
+  (append l x*))
 (define (⊗L Δ A B C)
   (RuleInstance
    (list
-    (Sequent (append Δ (list A B))
+    (Sequent (append0 Δ A B)
              (list C)))
    $⊗L
-   (Sequent (append Δ (list (&⊗ A B)))
+   (Sequent (append0 Δ (&⊗ A B))
             (list C))))
 (define (⊗R Δ A Δ^ B)
   (RuleInstance
@@ -173,20 +175,57 @@
    $⊗R
    (Sequent (append Δ Δ^)
             (list (&⊗ A B)))))
-(define $cut (Mi "cut"))
+(define (Const str)
+  (Mi str #:attr* '((mathvariant "sans-serif"))))
+(define $cut (Const "cut"))
 (define (cut Δ A Δ^ B)
   (RuleInstance
    (list
     (Sequent Δ (list A))
-    (Sequent (append Δ^ (list A))
-             (list B)))
+    (Sequent (append0 Δ^ A) (list B)))
    (_ $cut A)
    (Sequent (append Δ Δ^)
             (list B))))
+(define (&! A) (ap $! A))
+(define $!L (: $! $L))
+(define (!L Δ A C)
+  (RuleInstance
+   (list
+    (Sequent (append0 Δ A) (list C)))
+   $!L
+   (Sequent (append0 Δ (&! A))
+            (list C))))
+(define $!R (: $! $R))
+(define (!R Δ A)
+  (RuleInstance
+   (list
+    (Sequent (map &! Δ) (list A)))
+   $!R
+   (Sequent (map &! Δ) (list (&! A)))))
+(define $contract (Const "contract"))
+(define (contract Δ A C)
+  (RuleInstance
+   (list
+    (Sequent (append0 Δ (&! A) (&! A))
+             (list C)))
+   $contract
+   (Sequent (append0 Δ (&! A))
+            (list C))))
+(define $weaken (Const "weaken"))
+(define (weaken Δ A C)
+  (RuleInstance
+   (list (Sequent Δ (list C)))
+   $weaken
+   (Sequent (append0 Δ (&! A))
+            (list C))))
 (define env:linear
   `((⊗L . ,⊗L)
     (⊗R . ,⊗R)
     (cut . ,cut)
+    (!L . ,!L)
+    (!R . ,!R)
+    (contract . ,contract)
+    (weaken . ,weaken)
     ))
 (define proof_tree_test.html
   (TmPrelude

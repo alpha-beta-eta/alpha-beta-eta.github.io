@@ -32,7 +32,7 @@
      (background-color "black"))
     ("em"
      (font-style "normal")
-     (font-family "Courier, KaiTi"))
+     (font-family "Segoe Script, KaiTi"))
     ("math"
      (font-family "LatinModern, SHSerif"))
     ("mtext"

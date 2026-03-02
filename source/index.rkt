@@ -40,6 +40,8 @@
     (H2 (A "摆弄SICP图形语言" #:attr* '((href "picture.html"))))
     (H2 (A "The Ship of Theseus" #:attr* '((href "Ship-of-Theseus.html"))))
     (H2 (A "monad的Schemer之见" #:attr* '((href "monad.html"))))
+    (H2 (A "证明论和逻辑代数笔记"
+           #:attr* '((href "proof_theory_and_algebra_in_logic.html"))))
     
     )
    ))

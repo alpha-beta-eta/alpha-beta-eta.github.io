@@ -1,9 +1,59 @@
 #lang racket
 (provide tapl.html)
 (require SMathML)
+(define (format-num section index)
+  (and index
+       (format "~a.~a"
+               (apply string-append
+                      (add-between
+                       (map number->string
+                            (cdr (reverse section))) "."))
+               index)))
+(define (format-head name section index)
+  (let ((num (format-num section index)))
+    (if num
+        (B (format "~a~a. " name num))
+        (B (format "~a. " name)))))
+(define (Entry name class)
+  (define (present %entry attr* . html*)
+    (define id (%entry-id %entry))
+    (define Attr* (attr*-set attr* 'class class 'id id))
+    (define section (%entry-section %entry))
+    (define index (%entry-index %entry))
+    (define head (format-head name section index))
+    `(div ,Attr* ,head . ,html*))
+  (define (cite %entry)
+    (define id (%entry-id %entry))
+    (define href (string-append "#" id))
+    (define section (%entry-section %entry))
+    (define index (%entry-index %entry))
+    (define num (format-num section index))
+    (Cite name `(a ((href ,href)) ,num)))
+  (lambda (#:id [id #f] #:auto? [auto? #t])
+    (lambda (#:attr* [attr* '()] . html*)
+      (cons (build-%entry #:id id #:auto? auto? #:present present #:cite cite)
+            (cons attr* html*)))))
+(define-syntax-rule (define-Entry* (id name class) ...)
+  (begin (define id (Entry name class))
+         ...))
+(define-Entry*
+  (Example "例子" "example")
+  (Theorem "定理" "theorem")
+  (Definition "定义" "definition")
+  (Lemma "引理" "lemma")
+  (Corollary "推论" "corollary")
+  (Proposition "命题" "proposition")
+  (Remark "评注" "remark")
+  (Exercise "练习" "exercise")
+  
+  )
 (define $Nat (Mi "Nat"))
 (define $Top (Mi "Top"))
 (define $Bool (Mi "Bool"))
+(define $List (Mi "List"))
+(define (&List T) (app $List T))
+(define (powerset U)
+  (app $P:script U))
 (define (&rule #:space [n 8] . j*)
   (let-values (((j* j1) (split-at-right j* 1)))
     (~ #:attr* '((displaystyle "true"))
@@ -51,6 +101,8 @@
 (define $<: (Mo "&lt;:"))
 (define-infix*
   (&<: $<:))
+(define (μ F) (ap $mu F))
+(define (υ F) (ap $upsilon F))
 (define tapl.html
   (TnTmPrelude
    #:title "类型和编程语言"
@@ -178,7 +230,7 @@
       "这些规则可以直接根据安全替换的直觉推得.")
    (P "对于记录类型, 现在我们已经明白了我们想要考虑的是将类型"
       (Code "S = {k1:S1...km:Sm}") "作为"
-      (Code "T = {l1:T1...ln:Tn")
+      (Code "T = {l1:T1...ln:Tn}")
       "的一个子类型, 如果" (Code "T")
       "相较于" (Code "S") "有着更少的域. "
       "作为一种特别情形, " (Q "忘记")
@@ -310,7 +362,7 @@
       (RuleLabel "S-Trans")
       "进行结合以从一个记录类型的任何位置抛弃域, "
       "而不是只能抛弃末端的域.")
-   ((exercise)
+   ((Exercise)
     "绘制一个推导以表明" (RcdType $x $Nat $y $Nat $z $Nat)
     "是" (RcdType $y $Nat) "的一个子类型.")
    (P (RuleLabel "S-RcdWidth") ", "
@@ -327,14 +379,145 @@
    (P "既然我们在高阶语言的上下文中进行讨论, "
       "不仅是数字和记录, 函数也可以作为参数传递给其他函数, "
       "因而我们必须赋予函数类型以子定型规则" --
-      "即我们必须"
+      "即我们必须要刻画在期望某个函数类型的上下文之中, "
+      "何种情况下可以安全地使用不同类型的函数."
+      (MBL (RuleLabel "(S-Arrow)")
+           (&rule
+            (&<: $T_1 $S_1)
+            (&<: $S_2 $T_2)
+            (&<: (&-> $S_1 $S_2)
+                 (&-> $T_1 $T_2))))
+      "注意到子类型关系对于参数类型是逆变的 (contravariant), "
+      "对于结果类型是协变的 (covaraint). "
+      "直觉在于, 如果我们有了一个类型为" (&-> $S_1 $S_2)
+      "的函数" $f ", 那么我们知道" $f "接受类型为" $S_1
+      "的元素; 显然, " $f "也接受" $S_1 "的任何子类型"
+      $T_1 "的元素. " $f "的类型也告诉我们, 其会返回类型为"
+      $S_2 "的元素; 我们也可以将这些结果视为属于" $S_2
+      "的任何超类型" $T_2 ". 也就是说, 任何具有类型"
+      (&-> $S_1 $S_2) "的函数" $f "也可以视为具有类型"
+      (&-> $T_1 $T_2) ".")
+   (P "另一种观念是若要在期望类型" (&-> $T_1 $T_2)
+      "的上下文之中安全使用类型为" (&-> $S_1 $S_2)
+      "的函数, 只需可能传递给该上下文中的函数的参数"
+      "不会对函数本身造成惊吓 (故" (&<: $T_1 $S_1)
+      "), 并且该函数返回的结果也不会对上下文造成惊吓 (故"
+      (&<: $S_2 $T_2) ").")
+   (P "最后, 拥有一个每个类型的超类型是方便的. "
+      "我们引入一个新的类型常量" $Top
+      ", 外加一条规则使得" $Top
+      "成为子类型关系的一个最大元素."
+      (MBL (RuleLabel "(S-Top)")
+           (&<: $S $Top))
+      "第15.4节更深入地讨论了" $Top
+      "类型.")
+   (P "从形式化角度而言, 子类型关系是在我们所给定的规则下封闭的最小关系. "
+      
       )
+   ((Exercise)
+    )
+   
    (H2. "子定型的元理论")
+   (P "前一章的带有子定型的简单类型lambda演算并不直接适用于实现. "
+      "和其他之前我们所见的演算不同的是, 这个系统的规则并非" (Em "句法导向的")
+      -- "其无法" (Q "自底而上阅读") "以产生一个类型检查算法. "
+      "罪魁祸首是定型关系里涵摄规则的" (RuleLabel "T-Sub")
+      "和子定型关系里的传递性" (RuleLabel "S-Trans") ".")
+   (P "之所以" (RuleLabel "T-Sub") "是有问题的, "
+      )
+   (H3. "算法性子定型")
+   (H3. "算法性定型")
+   
    (H2. "子定型的一个ML实现")
    (H2. "案例研究: 命令式对象")
    (H2. "案例研究: Featherweight Java")
    (H2. "递归类型")
+   (P "在第11.12节里我们看到了如何扩展一个简单类型系统以囊括一个类型构造子"
+      (&List $T) ", 其元素是列表项为类型" $T "的元素的列表. "
+      "列表不过是一类常见结构的一个例子而已" --
+      "这类结构也包括队列, 二叉树, 标签树, 抽象句法树, 等等" --
+      
+      )
    (H2. "递归类型的元理论")
+   (H3. "归纳和余归纳")
+   ((Definition)
+    "一个函数" (∈ $F (&-> (powerset $U:script) (powerset $U:script)))
+    "是" (Em "单调的") ", 如果" (&sube $X $Y) "可以推出"
+    (&sube (app $F $X) (app $F $Y))
+    ". (回忆以下, " (powerset $U:script) "是" $U:script
+    "的幂集.)")
+   (P "以下我们默认" $F "是" (powerset $U:script)
+      "上的某个单调函数. 我们经常将" $F "称为一个"
+      (Em "生成函数") ".")
+   ((Definition)
+    "令" $X "是" $U:script "的一个子集."
+    (Ol (Li $X "是" (Em $F "-封闭的")
+            ", 如果" (&sube (app $F $X) $X) ".")
+        (Li $X "是" (Em $F "-一致的")
+            ", 如果" (&sube $X (app $F $X)) ".")
+        (Li $X "是" $F "的一个" (Em "不动点")
+            ", 如果" (&= (app $F $X) $X) ".")))
+   (P "这些定义的一个有用直觉在于将" $U:script
+      "的元素想成是某种陈述或者断言, 而" $F
+      "代表了某种" (Q "澄清 (justification)")
+      "关系, 其对于某个陈述 (前提) 的集合, "
+      "告诉我们什么新的陈述 (结论) 可由此推出. "
+      "于是, 一个" $F "-封闭集合即不能通过添加由"
+      $F "澄清的元素而加大的集合" --
+      "其既已包含所有可由其成员所澄清的结论. "
+      "另一方面, 一个" $F "-一致集合是" (Em "自澄清的")
+      ": 其中的每个断言都可由作为该集合元素的断言所澄清. "
+      $F "的一个不动点是一个既封闭又一致的集合: "
+      "其包含了所有其成员所需要的澄清, "
+      "以及所有可由其成员所推出的结论, 别无其他.")
+   ((Example)
+    
+    )
+   ((Theorem)
+    "[Knaster-Tarski (Tarski, 1955)]:"
+    (Ol (Li "所有" $F "-封闭集合之交是" $F "的最小不动点.")
+        (Li "所有" $F "-一致集合之并是" $F "的最大不动点.")))
+   ((proof)
+    "我们只考虑对于2的证明, 对于1的证明是对称的. 令"
+    (&= $C (setI $X (&sube $X (app $F $X))))
+    "是由所有" $F "-一致集合构成的集合, 令" $P
+    "是所有这些集合之并. 考虑到" $F "为单调函数的事实, "
+    "并且对于任意的" (∈ $X $C) ", " $X "为" $F
+    "-一致集合且" (&sube $X $P) ", 那么我们就得到"
+    (&sube $X (app $F $X) (app $F $P)) ". 因此, "
+    (&sube (&= $P (Union (∈ $X $C) $X)) (app $F $P))
+    ", 即" $P "是" $F "-一致的. 而且, 根据定义, " $P
+    "是最大的" $F "-一致集合. 再次使用" $F
+    "的单调性, 我们得到了"
+    (&sube (app $F $P) (app $F (app $F $P)))
+    ". 根据" $C "的定义, 这意味着" (∈ (app $F $P) $C)
+    ". 于是, 就和" $C "的任意成员一样, 我们有"
+    (&sube (app $F $P) $P) ", 即" $P "是" $F
+    "-封闭的. 现在我们建立了两个事实: " $P
+    "是最大的" $F "-一致集合, 以及" $P "是" $F
+    "的一个不动点. 因此, " $P "是最大的不动点.")
+   ((Definition)
+    $F "的最小不动点记作" (μ $F) ". " $F
+    "的最大不动点记作" (υ $F) ".")
+   ((Example)
+    
+    )
+   ((Exercise)
+    
+    )
+   ((Corollary)
+    (Ol (Li "归纳原理: 如果" $X "是" $F "-封闭的, 那么"
+            (&sube (μ $F) $X) ".")
+        (Li "余归纳原理: 如果" $X "是" $F "-一致的, 那么"
+            (&sube $X (υ $F)) ".")))
+   (P "这些原理背后的直觉来源于将集合" $X
+      "想成是谓词, "
+      )
+   ((Exercise)
+    
+    )
+   (H3. "有限和无限类型")
+   (H3. "子定型")
    (H2. "类型重构")
    (H2. "全称类型")
    (H2. "存在类型")
