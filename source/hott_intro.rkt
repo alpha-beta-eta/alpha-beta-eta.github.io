@@ -1,6 +1,24 @@
 #lang racket
 (provide hott_intro.html)
 (require SMathML)
+(define (Miv str variant)
+  (Mi str #:attr* `((mathvariant ,variant))))
+(define (make-id str)
+  (Miv str "sans-serif"))
+(define-syntax-rule (define-id* (id str) ...)
+  (begin
+    (define id (make-id str))
+    ...))
+(define-id*
+  ($Id "Id")
+  ($refl "refl"))
+(define Id
+  (case-lambda
+    ((A a b) (appl (_ $Id A) a b))
+    ((a b) (appl $Id a b))))
+(define $=_A (_ $= $A))
+(define-infix*
+  (&=_A $=_A))
 (define hott_intro.html
   (TnTmPrelude
    #:title "同伦类型论引论"
@@ -21,8 +39,26 @@
       "Martin-Löf的依赖类型论 [19]是数学的一种基础性语言, "
       "用在了如今许多计算机证明助手之中.")
    (P "在依赖类型论中存在着称为类型的原始对象和称为元素的原始对象. "
-      
-      )
+      "Martin-Löf的依赖类型论包含了诸多我们所熟悉的"
+      "来源于传统数学的运算的类型形成规则, "
+      "例如积, 和, 以及归纳类型, 比如说自然数的类型. "
+      "其之所以被称为" (Em "依赖") "类型论, "
+      "是因为类型和元素都可以由其他类型的元素参数化. "
+      "{译注: 换言之, 可以依赖于类型的值.}")
+   (P "Martin-Löf的依赖类型论的突出特征之一是"
+      (Em "相等类型(identity type)") ". 相等类型"
+      (MB (Id $A $a $b))
+      "是依赖类型的一个例子, 因为其由两个元素" (&: (&cm $a $b) $A)
+      "参数化了. 相等类型的元素被称为identification, "
+      "而断言" $a "和" $b "是类型" $A "的相等元素的类型论方式是"
+      "断言相等类型" (Id $A $a $b) "中存在一个元素. "
+      "换言之, 为了在类型论中证明两个元素" $a "和" $b
+      "在类型" $A "中相等, 我们不得不定义一个identification "
+      (&: $p (Id $A $a $b)) ". 因此, 通常将相等类型"
+      (Id $A $a $b) "记作" (&= $a $b)
+      ", 或者为了使得作为背景的类型显式化, 可以写成"
+      (&=_A $a $b) ".")
+   
    (H2. "依赖类型论")
    (H2. "依赖函数类型")
    (H2. "自然数")

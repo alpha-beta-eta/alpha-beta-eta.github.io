@@ -174,10 +174,27 @@
          "atitapl.rkt"
          "hott_intro.rkt"
          "lattice_theory.rkt"
+         "inverse.rkt"
+         "twolevel.rkt"
+         "habil.rkt"
+         "hot.rkt"
+         "modal_analysis.rkt"
+         "modal_type_theory.rkt"
          
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml modal_type_theory.html
+             "../modal_type_theory.html")
+    (emitXml modal_analysis.html
+             "../modal_analysis.html")
+    (emitXml zork.html "../zork.html")
+    (emitXml metaocaml.html "../metaocaml.html")
+    (emitXml hot.html "../hot.html")
+    (emitXml habil.html "../habil.html")
+    (emitXml twolevel.html "../twolevel.html")
+    (emitXml inverse.html "../inverse.html")
+    (emitXml jones.html "../jones.html")
     (emitXml cltt.html "../cltt.html")
     (emitXml topos.html "../topos.html")
     (emitXml cmu15122.html "../cmu15122.html")
@@ -308,7 +325,6 @@
   (emitXml lambda.html "../lambda.html")
   (emitXml calculus_dieudonne.html "../calculus_dieudonne.html")
   (emitXml oplss.html "../oplss.html")
-  (emitXml jones.html "../jones.html")
   (emitXml pe_jones.html "../pe_jones.html")
   (emitXml fp_domain.html "../fp_domain.html")
   (emitXml analysis_dieudonne.html "../analysis_dieudonne.html")
@@ -338,8 +354,6 @@
   (emitXml cmu15210.html "../cmu15210.html")
   (emitXml proof_theory.html "../proof_theory.html")
   (emitXml kerodon.html "../kerodon.html")
-  (emitXml metaocaml.html "../metaocaml.html")
-  (emitXml zork.html "../zork.html")
   (emitXml monad.html "../monad.html")
   (emitXml polynomial_computation.html "../polynomial_computation.html")
   (emitXml elements_knopp.html "../elements_knopp.html")

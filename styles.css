@@ -7,7 +7,7 @@ h1, h2, h3, h4, h5, h6, a, b {font-weight: 700;}
 a {text-decoration: none;color: #4a4035;}
 code {font-family: JBMono;color: white;background-color: black;font-variant-ligatures: none;}
 pre:has(> code) {background-color: black;}
-em {font-style: normal;font-family: Courier, KaiTi;}
+em {font-style: normal;font-family: Segoe Script, KaiTi;}
 math {font-family: LatinModern, SHSerif;}
 mtext {font-weight: 400;}
 ms {font-family: JBMono;color: white;background-color: black;}
@@ -23,3 +23,4 @@ table.law div.frame {width: 60%;margin: auto;padding: 10px;border: 5px double bl
 .dialogue td {padding: 5px;text-align: left;vertical-align: top;}
 .dashed {border: 2.5px dashed white;}
 .small-caps {font-variant: small-caps;}
+.emm {font-family: Segoe Script, KaiTi;}

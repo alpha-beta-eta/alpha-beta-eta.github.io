@@ -1,6 +1,81 @@
 #lang racket
 (provide proof_theory_and_algebra_in_logic.html)
 (require SMathML)
+(define (H3. #:attr* [attr* '()] #:id [id #f] #:switch? [switch? #f] . html*)
+  `(,(build-%heading #:present heading-present #:cite heading-cite
+                     #:level 3 #:id id #:switch? switch?)
+    ,attr* . ,html*))
+(define (format-num section index)
+  (and index
+       (format "~a.~a" (cadr (reverse section)) index)))
+(define (format-head name section index)
+  (let ((num (format-num section index)))
+    (if num
+        (B name (format "~a. " num))
+        (B name ". "))))
+(define (Entry name class)
+  (define (present %entry attr* . html*)
+    (define id (%entry-id %entry))
+    (define Attr* (attr*-set attr* 'class class 'id id))
+    (define section (%entry-section %entry))
+    (define index (%entry-index %entry))
+    (define head (format-head name section index))
+    `(div ,Attr* ,head . ,html*))
+  (define (cite %entry)
+    (define id (%entry-id %entry))
+    (define href (string-append "#" id))
+    (define section (%entry-section %entry))
+    (define index (%entry-index %entry))
+    (define num (format-num section index))
+    (Cite `(a ((href ,href)) ,name ,num)))
+  (lambda (#:id [id #f] #:auto? [auto? #t])
+    (lambda (#:attr* [attr* '()] . html*)
+      (cons (build-%entry #:id id #:auto? auto? #:present present
+                          #:cite cite #:class class)
+            (cons attr* html*)))))
+(define-syntax-rule (define-Entry* (id name class) ...)
+  (begin (define id (Entry name class))
+         ...))
+(define-Entry*
+  (Definition "定义" "definition")
+  (Remark "评注" "remark")
+  (Theorem "定理" "theorem")
+  (Warning "警告" "warning")
+  (Example "例子" "example")
+  (Proposition "命题" "proposition")
+  (Corollary "推论" "corollary"))
+(define (powerset S)
+  (app $P:script S))
+(define (&neg2 A) (&neg (&neg A)))
+(define (!0 f) (curry app f))
+(define (!1 f) (curry apply f))
+(define (!commute f g . x*)
+  (&= (f (apply g x*))
+      ((!1 g) (map f x*))))
+(define ((tcomment #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "tcomment")))
+   (B (format "译者注记~a." n)) " " x*))
+(define (Valid A)
+  (app $L:sans-serif A))
+(define (distributeR a * b + c)
+  (&= (* a (@ (+ b c)))
+      (+ (@ (* a b)) (@ (* a c)))))
+(define BA2 (Mi "2" #:attr* '((mathvariant "bold"))))
+(define $->:id (Mi "&rarr;"))
+(define $Join (Mo "&Vee;"))
+(define Join (make-bigop $Join))
+(define $Meet (Mo "&Wedge;"))
+(define Meet (make-bigop $Meet))
+(define (&max S)
+  (ap $max S))
+(define $min (Mi "min"))
+(define (&min S)
+  (ap $min S))
+(define ((answer #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "answer")))
+   (B (format "解答~a." n)) " " x*))
 (define $sharp (Mi "&sharp;"))
 (define &split16 (&split 16))
 (define (&rull label . x*)
@@ -8,7 +83,36 @@
       (: (apply &rule x*) label)
       (apply &rule x*)))
 (define $impl $->)
+(define $join $disj)
+(define $join^ (&prime $join))
+(define $meet $conj)
+(define $meet^ (&prime $meet))
+(define $\\ (Mo "\\"))
+(define $*^A (^ $* $A:bold))
+(define $*^B (^ $* $B:bold))
+(define $*:id (Mi "&#8270;"))
+(define $<=^A (^ $<= $A:bold))
+(define $<=^B (^ $<= $B:bold))
+(define $meet^A (^ $meet $A:bold))
+(define $meet^B (^ $meet $B:bold))
+(define $join_A (_ $join $A))
+(define $meet_A (_ $meet $A))
+(define $->_A (_ $-> $A))
 (define-infix*
+  (&join_A $join_A)
+  (&meet_A $meet_A)
+  (&->_A $->_A)
+  (&meet^A $meet^A)
+  (&meet^B $meet^B)
+  (&<=^A $<=^A)
+  (&<=^B $<=^B)
+  (&*^A $*^A)
+  (&*^B $*^B)
+  (&join^ $join^)
+  (&meet^ $meet^)
+  (&\\ $\\)
+  (&join $join)
+  (&meet $meet)
   (&=> $=>)
   (&conj $conj)
   (&disj $disj)
@@ -18,28 +122,35 @@
     ((x y) (&impl x y))
     ((x y . z*) (&impl x (@ (apply &impl* y z*))))))
 (define-@lized-op*
+  (@<= &<=)
+  (@-> &->)
+  (@join &join)
+  (@meet &meet)
   (@conj &conj)
   (@disj &disj)
   (@impl &impl)
   (@impl* &impl*)
   (@neg &neg))
 (define $=>:id (Mi "&rArr;"))
+(define $disj:id (Mi "&or;"))
 (define @disj=>
-  (@ $disj $=>:id))
+  (@ $disj:id $=>:id))
 (define @=>disj1
-  (@ $=>:id $disj $1))
+  (@ $=>:id $disj:id $1))
 (define @=>disj2
-  (@ $=>:id $disj $2))
+  (@ $=>:id $disj:id $2))
+(define $conj:id (Mi "&and;"))
 (define @conj1=>
-  (@ $conj $1 $=>:id))
+  (@ $conj:id $1 $=>:id))
 (define @conj2=>
-  (@ $conj $2 $=>:id))
+  (@ $conj:id $2 $=>:id))
 (define @=>conj
-  (@ $=>:id $conj))
+  (@ $=>:id $conj:id))
+(define $impl:id (Mi "&rarr;"))
 (define @impl=>
-  (@ $impl $=>:id))
+  (@ $impl:id $=>:id))
 (define @=>impl
-  (@ $=>:id $impl))
+  (@ $=>:id $impl:id))
 (define @neg=>
   (@ $neg $=>:id))
 (define @=>neg
@@ -52,6 +163,10 @@
 (define @=>c (@ $=>:id $c))
 (define @w=> (@ $w $=>:id))
 (define @=>w (@ $=>:id $w))
+(define $join:id $disj:id)
+(define $meet:id $conj:id)
+(define Adefinition
+  (&= $A:bold (tupa0 $A $join:id $meet:id $->:id $0)))
 (define proof_theory_and_algebra_in_logic.html
   (TnTmPrelude
    #:title "证明论和逻辑代数"
@@ -485,8 +600,115 @@
         (Li (&=> (&impl* $alpha $beta $gamma)
                  (&impl (@impl $alpha $beta)
                         (@impl $alpha $gamma))))))
+   ((answer)
+    (Ol (Li (MB (&rull
+                 @=>impl
+                 (&rull
+                  @=>impl
+                  (&rull
+                   @w=>
+                   (&=> $alpha $alpha)
+                   (&=> (&cm $beta $alpha) $alpha))
+                  (&=> $alpha (&impl $beta $alpha)))
+                 (&=> $ (&impl* $alpha $beta $alpha)))))
+        (Li (let* ((deriv0
+                    (&rull
+                     @impl=>
+                     (&=> $beta $beta)
+                     (&=> $gamma $gamma)
+                     (&=> (&cm (&impl $beta $gamma) $beta)
+                          $gamma)))
+                   (deriv1
+                    (&rull
+                     @impl=>
+                     (&=> $alpha $alpha)
+                     deriv0
+                     (&=> (&cm (&impl* $alpha $beta $gamma)
+                               $alpha $beta)
+                          $gamma)))
+                   (deriv2
+                    (&rull
+                     @e=>
+                     deriv1
+                     (&=> (&cm $beta $alpha
+                               (&impl* $alpha $beta $gamma))
+                          $gamma)))
+                   (deriv3
+                    (&rull
+                     @impl=>
+                     (&=> $alpha $alpha)
+                     deriv2
+                     (&=> (&cm (&impl $alpha $beta)
+                               $alpha $alpha
+                               (&impl* $alpha $beta $gamma))
+                          $gamma)))
+                   (deriv4
+                    (&rull
+                     @c=>
+                     deriv3
+                     (&=> (&cm (&impl $alpha $beta)
+                               $alpha
+                               (&impl* $alpha $beta $gamma))
+                          $gamma)))
+                   (deriv5
+                    (&rull
+                     @e=>
+                     deriv4
+                     (&=> (&cm $alpha
+                               (&impl $alpha $beta)
+                               (&impl* $alpha $beta $gamma))
+                          $gamma)))
+                   (deriv6
+                    (&rull
+                     @=>impl
+                     deriv5
+                     (&=> (&cm (&impl $alpha $beta)
+                               (&impl* $alpha $beta $gamma))
+                          (&impl $alpha $gamma))))
+                   (deriv7
+                    (&rull
+                     @=>impl
+                     deriv6
+                     (&=> (&impl* $alpha $beta $gamma)
+                          (&impl (@impl $alpha $beta)
+                                 (@impl $alpha $gamma))))))
+              (MB deriv7)))))
    ((exercise #:n "1.2")
-    
+    "在" (B "LK") "中给出对于以下相继式的证明. "
+    "(检查你的证明中是否存在某个相继式在后件里至少拥有两个公式.)"
+    (Ol (Li (&=> $ (&disj $alpha (&neg $alpha))))
+        (Li (&=> (&neg (@conj $alpha $beta))
+                 (&disj (&neg $alpha) (&neg $beta))))
+        (Li (&=> (&impl (@impl $alpha $beta) $alpha)
+                 $alpha))))
+   ((answer)
+    (Ol (Li (let* ((deriv0
+                    (&rull
+                     @=>neg
+                     (&=> $alpha $alpha)
+                     (&=> $ (&cm $alpha (&neg $alpha)))))
+                   (deriv1
+                    (&rull
+                     @=>disj1
+                     deriv0
+                     (&=> $ (&cm (&disj $alpha (&neg $alpha))
+                                 (&neg $alpha)))))
+                   (deriv2
+                    (&rull
+                     @=>disj2
+                     deriv1
+                     (&=> $ (&cm (&disj $alpha (&neg $alpha))
+                                 (&disj $alpha (&neg $alpha))))))
+                   (deriv3
+                    (&rull
+                     @=>c
+                     deriv2
+                     (&=> $ (&disj $alpha (&neg $alpha))))))
+              (MB deriv3))
+            "是的, 的确存在相继式在后件中拥有两个及以上的公式.")
+        (Li ""
+            )
+        )
     )
    ((remark #:n "1.3")
     
@@ -499,6 +721,929 @@
    (H2. "模态逻辑和亚结构逻辑")
    (H2. "")
    (H2. "从代数到逻辑")
+   (P "逻辑的句法或者说符号方法起源于19世纪中叶. "
+      "G. Boole在他的书 (Boole 1854) 中"
+      "试图将逻辑推理表达为代数计算. "
+      "又过了几十年我们才有了Hilbert风格的系统. "
+      "尽管并非以其完备形式, "
+      "Boole通过引入一些代数等式 (作为逻辑公理) "
+      "和一些用于从代数等式推导其他代数等式的规则 (作为推理规则) "
+      "建立了代数逻辑的公理基础. "
+      "我们应该注意到大约在那个时期, "
+      "诸如群, 环, 域这样的抽象代数结构得到了引入, "
+      "而对于这些结构的研究开始了. "
+      "尽管如此, 那时数学家主要关注具体的代数结构, "
+      "例如整数集, 有理数集, 实数集, 等等. "
+      "本章所介绍的布尔代数是一种抽象代数结构, "
+      "其基本上是由Boole引入的. "
+      "显然, 布尔代数的定义来源于对于古典逻辑的行为的代数描述.")
+   (P "在给出包括格与布尔代数等的一些基本代数结构之后, "
+      "我们将会在第6.2节引入三个代数概念, "
+      "其基本上贯穿了我们整个第二部分的讨论. "
+      "本章的最后两节我们给出了逻辑与代数的联系的一些例子, "
+      "这是第二部分的主题.")
+   (H3. "格与布尔代数")
+   (P "以下我们 先引入一些代数结构的基本概念, 然后呈现其性质.")
+   ((definition #:n "6.1")
+    "(偏序) 一个集合" $A "上的一个" (Em "偏序") $<=
+    "是" $A "上的一个二元关系, 其满足以下性质: 对于所有的"
+    (∈ $x $y $z $A) ", 我们有"
+    (Ol (Li (&<= $x $x) " (自反性);")
+        (Li "如果" (&<= $x $y) "且" (&<= $y $z)
+            ", 那么" (&<= $y $z) " (传递性);")
+        (Li "如果" (&<= $x $y) "且" (&<= $y $x)
+            ", 那么" (&= $x $y) " (反对称性).")))
+   (P "一个" (Em "偏序集") (tupa0 $A $<=)
+      "是由一个集合" $A "和一个其上的偏序" $<=
+      "构成的序对. 一个集合上的一个偏序" $<=
+      "是一个" (Em "全序") " (或者说" (Em "线序")
+      "), 如果对于所有的" (∈ $x $y $A)
+      ", " (&<= $x $y) "或者" (&<= $y $x)
+      "总是成立. 在这种情况下, " (tupa0 $A $<=)
+      "被称为是一个" (Em "全序集") ", 或者说"
+      (Em "链") ". 关系" (&< $x $y) "由条件"
+      (&<= $x $y) "但不" (&<= $y $x)
+      "定义, 其被称为(由偏序" $<= "导出的)"
+      (Em "严格序") ". 显然, " (&<= $x $y)
+      "当且仅当" (&< $x $y) "或" (&= $x $y)
+      "成立. 以下每张图 (Hasse图) 都表示了一个偏序集, "
+      "只有最左边的是一个链.")
+   ((example #:n "6.1")
+    "令" $NN "是自然数集, 即正整数集, 而" $<=
+    "是自然数上的通常序. 显然, "
+    )
+   (H4 "格")
+   ((definition #:n "6.2")
+    "(格) 一个偏序集" (tupa0 $A $<=) "是一个" (Em "格")
+    ", 如果对于所有的" (∈ $x $y $A) ", 存在"
+    (&join $x $y) " (join) 和" (&meet $x $y)
+    " (meet) 满足:"
+    (Ol (Li (&<= $x (&join $x $y)) "且"
+            (&<= $y (&join $x $y)) ";")
+        (Li "对于" (∈ $z $A) ", 如果"
+            (&<= $x $z) "且" (&<= $y $z)
+            ", 那么" (&<= (&join $x $y) $z) ";")
+        (Li (&<= (&meet $x $y) $x) "且"
+            (&<= (&meet $x $y) $y) ";")
+        (Li "对于" (∈ $z $A) ", 如果"
+            (&<= $z $x) "且" (&<= $z $y)
+            ", 那么" (&<= $z (&meet $x $y)) "."))
+    "以上定义中的第一个条件是说" (&join $x $y)
+    "是" $x "和" $y "的一个" (Em "上界")
+    ", 即一个元素其既大于等于" $x "又大于等于" $y
+    ". 第二个条件是说" (&join $x $y) "小于等于"
+    $x "和" $y "的任何上界. 因此, " $x "和" $y
+    "的join " (&join $x $y) "是" $x "和" $y
+    "的" (Em "最小上界") ". 类似地, 第三个条件是说"
+    $x "和" $y "的meet " (&meet $x $y) "是"
+    $x "和" $y "的一个" (Em "下界")
+    ", 而第四个条件和第三个条件连在一起是说"
+    $x "和" $y "的meet " (&meet $x $y) "是"
+    $x "和" $y "的" (Em "最大下界")
+    ". 显然, 以下等价在每个格中都成立: "
+    (&= (&join $x $y) $y) "当且仅当"
+    (&<= $x $y) "当且仅当"
+    (&= (&meet $x $y) $x)
+    ". 由此我们可以推出, 一个给定格的偏序"
+    $<= "可以完全由" $join "或者" $meet
+    "确定. 因此, 我们可以安全地说"
+    (tupa0 $A $join:id $meet:id) "而非"
+    (tupa0 $A $<=) "是一个格. 一个给定的格是"
+    (Em "有界的") ", 如果其存在最大元素和最小元素, "
+    "往往我们分别将其记作" $top "和" $bottom
+    ". 在以下三种偏序集里, 左边的和中间的是格, "
+    "右边的不是.")
+   ((example #:n "6.2")
+    "1. 每个全序集都构成了一个格, 只要定义"
+    (&= (&join $x $y) (&max (setE $x $y))) "而"
+    (&= (&meet $x $y) (&min (setE $x $y)))
+    ". 全序集" (tupa0 $NN $<=) "具有最小元素"
+    $1 ", 但是没有最大元素, 因而其不是有界的." (Br)
+    "2. 例子6.1里的第二个例子, 即偏序集"
+    )
+   ((exercise #:n "6.1")
+    "证明在任意的格中, " (&<= $x $y)
+    "可以推出对于每个" $z "有"
+    (&<= (&join $x $z) (&join $y $z)) "且"
+    (&<= (&meet $x $z) (&meet $y $z)) ".")
+   ((answer)
+    "根据" (&join $y $z) "的定义, 我们知道"
+    (&<= $y (&join $y $z)) "且"
+    (&<= $z (&join $y $z)) ". 另外, 我们还知道"
+    (&<= $x $y) ", 于是根据传递性可知"
+    (&<= $x (&join $y $z)) ". 那么, "
+    (&join $y $z) "是" $x "和" $z
+    "的一个上界, 所以"
+    (&<= (&join $x $z) (&join $y $z))
+    ". 根据" (&meet $x $z) "的定义, "
+    (&<= (&meet $x $z) $x) "且"
+    (&<= (&meet $x $z) $z) ". 另外根据"
+    (&<= $x $y) "和传递性可知"
+    (&<= (&meet $x $z) $y)
+    ". 于是, " (&meet $x $z)
+    "是" $y "和" $z "的一个下界. 那么, 我们有"
+    (&<= (&meet $x $z) (&meet $y $z)) ".")
+   (P "我们将给出格的基本等式.")
+   ((lemma #:n "6.1")
+    "以下等式在任意的格中成立. 对于所有的"
+    (&cm $x $y $z) ", 我们有"
+    (Ul (Li "(1a) " (&= (&join $x $x) $x))
+        (Li "(1b) " (&= (&meet $x $x) $x))
+        (Li "(2a) " (commute &join $x $y))
+        (Li "(2b) " (commute &meet $x $y))
+        (Li "(3a) " (associate &join $x $y $z))
+        (Li "(3b) " (associate &meet $x $y $z))
+        (Li "(4a) " (&= (&join $x (@meet $x $y)) $x))
+        (Li "(4b) " (&= (&meet $x (@join $x $y)) $x))))
+   ((exercise #:n "6.2")
+    "给出引理6.1的(3a)和(4a)的证明.")
+   ((answer)
+    
+    )
+   ((remark #:n "6.3")
+    "(格的另一种定义) 根据定义6.2, "
+    "一个格是一个偏序集且对于由其成员构成的序对, "
+    "join和meet总是存在. 然后, 引理6.1说的是对于每个格而言, "
+    "这八个等式总是成立. 实际上, 定义格的另一种方式是取一个具有形式"
+    (tupa0 $A $join:id $meet:id) "的代数, 其两个运算"
+    $join "和" $meet "总是满足这八个等式." (Br)
+    "为了表明这种等价性, 有必要引入一个偏序使得在这样的代数之中运算"
+    $join "和" $meet "分别表达了(相对于这个偏序而言的)join和meet. "
+    "事实上, 对于八个等式成立的代数" (tupa0 $A $join:id $meet:id)
+    "我们可以证明以下三条陈述总是成立:"
+    (Ol (Li "对于所有的" $x "和" $y ", "
+            (&= (&join $x $y) $y) "当且仅当"
+            (&= (&meet $x $y) $x) ".")
+        (Li "根据" (&= (&meet $x $y) $x)
+            "定义" $A "上的一个二元关系"
+            (&<= $x $y) ", 那么" $<=
+            "是一个偏序. (我们将其称为由格运算"
+            $join "和" $meet (Em "导出") "的偏序.)")
+        (Li (&join $x $y) "和" (&meet $x $y)
+            "分别是" $x "和" $y "相对于这个偏序"
+            $<= "的join和meet. {译注: 当然了, join和meet"
+            "的另外说法分别是最小上界和最大下界.}")))
+   ((exercise #:n "6.3")
+    "证明以上三条陈述成立.")
+   ((answer)
+    (Ol (Li "由" (&= (&join $x $y) $y) "推出"
+            (&= (&meet $x $y) $x) ": 将"
+            (&= (&join $x $y) $y) "带入(4b)可得"
+            (&= (&meet $x $y) $x) ";" (Br)
+            "由" (&= (&meet $x $y) $x) "推出"
+            (&= (&join $x $y) $y)
+            ": 根据(4a)和替换可得"
+            (&= (&join $y (@meet $y $x)) $y)
+            ", 根据(2b)可知"
+            (&= (&join $y (@meet $x $y)) $y)
+            ", 带入" (&= (&meet $x $y) $x)
+            "得到" (&= (&join $y $x) $y)
+            ", 然后再应用(2a)就有"
+            (&= (&join $x $y) $y) ".")
+        (Li ""
+            )
+        )
+    )
+   ((definition #:n "6.3")
+    "(分配格) 一个格" (tupa0 $A $join:id $meet:id) "是"
+    (Em "分配的") ", 如果等式"
+    (distributeR $x &meet $y &join $z)
+    " (即分配律) 对于每个" (∈ $x $y $z $A) "成立.")
+   ((remark #:n "6.4")
+    "以下三条陈述成立."
+    (Ol (Li "每个全序集都是分配格.")
+        (Li "在每个格中对于任意的" (&cm $x $y $z) "不等式"
+            (&>= (&meet $x (@join $y $z))
+                 (&join (@meet $x $y) (@meet $x $z)))
+            "都成立.")
+        (Li "定义6.3中的分配律可以替换为其" (Em "对偶")
+            "形式: "
+            )
+        )
+    )
+   ((definition #:n "6.4")
+    "(完备格) 一个格" (tupa0 $A $join:id $meet:id)
+    "是" (Em "完备的") ", 如果对于" $A "的任意(可能为空的)子集"
+    $S ", 其最小上界 (记作" (Join $S) ") 和最大下界 (记作"
+    (Meet $S) ") 均存在. 这里的" $A "的一个元素" $a
+    "是一个集合" $S "的" (Em "最小上界") ", 如果"
+    (Ul (Li "对于每个" (∈ $x $S) ", " (&<= $x $a)
+            ", 即" $a "是" $S "的一个上界;")
+        (Li "对于每个" (∈ $c $A) ", 如果对于每个" (∈ $x $S)
+            "有" (&<= $x $c) ", 那么" (&<= $a $c)
+            ", 即" (&<= $a $c) "对于" $S "的任意上界"
+            $c "都成立."))
+    (Em "最大下界") "可以对偶地定义. 因此, " $S
+    "的最大下界是一个大于等于" $S "的任意下界的"
+    $S "的下界.")
+   (P "根据定义, " (Join $empty) "和" (Meet $empty)
+      "分别是" $A "的最小元素" $bottom "和最大元素"
+      $top ". 因此, 完备格必然是有界的.")
+   ((example #:n "6.5")
+    
+    )
+   ((exercise #:n "6.6")
+    
+    )
+   ((example #:n "6.6")
+    
+    )
+   (H4 "布尔代数")
+   (P "让我们回忆一下古典逻辑的逻辑联结词" $disj
+      ", " $conj ", " $impl "的真值表, 其中"
+      $0 "和" $1 "分别代表" (Em "falsehood")
+      "和" (Em "truth") "."
+      (MB (&split16
+           (set-attr*
+            (&Table
+             ((&\\ $a $b) $1 $0)
+             ($1          $1 $1)
+             ($0          $1 $0))
+            'rowlines "solid" 'columnlines "solid")
+           (set-attr*
+            (&Table
+             ((&\\ $a $b) $1 $0)
+             ($1          $1 $0)
+             ($0          $0 $0))
+            'rowlines "solid" 'columnlines "solid")
+           (set-attr*
+            (&Table
+             ((&\\ $a $b) $1 $0)
+             ($1          $1 $0)
+             ($0          $1 $1))
+            'rowlines "solid" 'columnlines "solid")))
+      "现在我们在集合" (setE $0 $1) "上定义一个自然的偏序, 即"
+      (&< $0 $1) ". 那么, 左边和中间的真值表是说析取"
+      (&disj $a $b) "与合取" (&conj $a $b)
+      "分别是相对于该偏序的join和meet. "
+      "当然, 我们注意到这种情况下join和meet也可以表达为"
+      (&= (&join $a $b) (&max (setE $a $b))) "和"
+      (&= (&meet $a $b) (&min (setE $a $b))) ".")
+   (P "运用代数的术语, 我们可以说"
+      (tupa0 (setE $0 $1) $join:id $meet:id $->:id $0)
+      "是一个代数, 其中" (tupa0 (setE $0 $1) $join:id $meet:id $0)
+      "是一个带有最小元素" $0 "的格, 并且这个代数还有一个额外的运算"
+      $-> ", 其满足如果" (&<= $a $b) "则" (&= (&-> $a $b) $1)
+      ", 不然的话" (&= (&-> $a $b) $0) ". 藉由最小元素" $0
+      ", 我们定义" (&= (&neg $a) (&-> $a $0))
+      ". 显然, " (&= (&neg $a) $1) "当且仅当" (&= $a $0)
+      ". 并且, 很容易看出来对于" (∈ $a (setE $0 $1))
+      "我们有" (&= (&neg (&neg $a)) $a)
+      ". 通过泛化, 我们按照以下方式引入了古典逻辑的代数.")
+   ((definition #:n "6.5")
+    "(布尔代数) 一个代数" Adefinition
+    "是一个" (Em "布尔代数") "当且仅当"
+    (Ol (Li (tupa0 $A $join:id $meet:id)
+            "是一个格且其最小元素是" $0 ";")
+        (Li "剩余律成立, 即对于所有的" (∈ $a $b $c $A)
+            ", " (&<= (&meet $a $b) $c) "当且仅当"
+            (&<= $a (&-> $b $c)) ";")
+        (Li "双重否定律成立, 即对于每个" (∈ $a $A)
+            ", " (&= (&neg (&neg $a)) $a)
+            ", 其中" (&neg $a) "被定义为" (&-> $a $0) ".")))
+   (P "由以上真值表所确定的代数"
+      (tupa0 (setE $0 $1) $join:id $meet:id $->:id $0)
+      "是一个布尔代数. 为了确认这点, 只需表明剩余律成立. "
+      "实际上, 我们可以看到" (&<= $1 (&-> $b $c))
+      "当且仅当" (&<= $b $c) "当且仅当" (&<= (&meet $1 $b) $c)
+      ", 也就是当" (&= $a $1) "时的剩余律成立, 另外"
+      (&= $a $0) "时" (&<= $0 (&-> $b $c)) "和"
+      (&<= (&meet $0 $b) $c) "总是都成立的. 这个由"
+      $0 "和" $1 "构成的布尔代数被称为" (Em "二值的")
+      ", 记作" BA2 ".")
+   (P "剩余律是说对于每个" (&cm $b $c) "而言集合"
+      (&= $U (setI $x (&<= (&meet $x $b) $c)))
+      "中的最大元素总是存在且就等于" (&-> $b $c)
+      ". 实际上, 根据剩余律, 对于每个" $x "而言, 如果"
+      (&<= (&meet $x $b) $c) ", 那么"
+      (&<= $x (&-> $b $c)) ". 这意味着" (&-> $b $c)
+      "是" $U "的一个上界. 另一方面, 鉴于"
+      (&<= (&-> $b $c) (&-> $b $c))
+      ", 我们有" (&<= (&meet (@-> $b $c) $b) $c)
+      ", 通过使用剩余律的另一方向. 这意味着"
+      (∈ (&-> $b $c) $U) ", 故"
+      (&= (&-> $b $c)
+          (&max (setI (∈ $x $A)
+                      (&<= (&meet $x $b) $c))))
+      ". 现在考虑" (&= $b $c) "这一特定情形. 鉴于"
+      (&<= (&meet $x $b) $b) "总是成立, 具有形式"
+      (&-> $b $b) "必然都是" $A "的最大元素, 记作"
+      $1 ". 这就推出了每个布尔代数既有最小元素" $0
+      "也有最大元素" $1 ". 布尔代数的一个病态例子是满足"
+      (&= $0 $1) "的布尔代数. 这种布尔代数由单独一个元素"
+      $0 "构成, 其被称为" (Em "退化") "布尔代数. "
+      "之后的文本里我们提及布尔代数时, 除非另有说明, "
+      "不然我们总指的是一个" (Em "非退化")
+      "布尔代数. 以下的图片展示一个" $8 "-值布尔代数.")
+   (P "我们可以证明以下的引理6.2对于布尔代数成立, "
+      "但不需要使用双重否定律. 因此, 实际上这些结果对于"
+      (Em "Heyting代数") "也成立, 而Heyting代数的定义"
+      "不过就是从布尔代数的定义里去掉双重否定律. "
+      "Heyting代数将会在第7章详细讨论.")
+   ((lemma #:n "6.2")
+    "下列陈述对于任何布尔代数之中的所有" (&cm $x $y $z) "成立."
+    (Ol (Li (&<= (&meet $x (@-> $x $y)) $y)
+            "总是成立, 因而" (&= (&meet $x (&neg $x)) $0)
+            "作为其一特殊情形而成立.")
+        (Li (&<= $x $y) "可以推出" (&<= (&-> $z $x) (&-> $z $y))
+            "和" (&<= (&-> $y $z) (&-> $x $z)) ". 因此, "
+            (&<= $x $y) "可以推出" (&<= (&neg $y) (&neg $x)) ".")
+        (Li "分配律" (distributeR $x &meet $y &join $z) "成立.")))
+   ((proof)
+    "这里我们只会给出对于第三条陈述的证明. 根据评注6.4, 在任意的格中"
+    (&meet $x (@join $y $z)) "都是" (&meet $x $y) "和" (&meet $x $z)
+    "的一个上界. 因此, 只需说明" (&meet $x (@join $y $z))
+    "是这些上界之中最小的那个. 设" $u "是" (&meet $x $y) "和"
+    (&meet $x $z) "的任意一个上界, 那么" (&<= (&meet $x $y) $u) "且"
+    (&<= (&meet $x $z) $u) ". 根据剩余律, " (&<= $y (&-> $x $u))
+    "和" (&<= $z (&-> $x $u)) "成立. 因此, "
+    (&<= (&join $y $z) (&-> $x $u))
+    ". 再次以相反方向使用剩余律, 我们有"
+    (&<= (&meet $x (@join $y $z)) $u)
+    ". 于是, 我们就得到了想要的结果.")
+   ((tcomment)
+    "补充一下对于前两条陈述的证明."
+    (Ol (Li (&<= (&meet $x (@-> $x $y)) $y)
+            "根据剩余律等价于"
+            (&<= (&-> $x $y) (&-> $x $y))
+            ", 而这不过就是自反性.")
+        (Li "根据1, "
+            (&<= (&meet $z (@-> $z $x)) $x)
+            ". 又因为" (&<= $x $y) "和传递性, "
+            (&<= (&meet $z (@-> $z $x)) $y)
+            ", 于是根据剩余律可知"
+            (&<= (&-> $z $x) (&-> $z $y))
+            ". 根据1, "
+            (&<= (&meet $y (@-> $y $z)) $z)
+            ", 又因为" (&<= $x $y) "和练习6.1, "
+            (&<= (&meet $x (@-> $y $z))
+                 (&meet $y (@-> $y $z)))
+            ", 于是"
+            (&<= (&meet $x (@-> $y $z)) $z)
+            ". 应用剩余律, 就得到"
+            (&<= (&-> $y $z) (&-> $x $z)) ".")))
+   ((lemma #:n "6.3")
+    "下列陈述在每个布尔代数之中都成立."
+    (Ol (Li "对于所有的" (&cm $x $y) ", "
+            (&= (&join $x $y)
+                (&neg (@meet (&neg $x) (&neg $y))))
+            "成立.")
+        (Li "对于所有的" (&cm $x $y) ", "
+            (&= (&-> $x $y) (&join (&neg $x) $y))
+            "成立. 特别地, 对于每个" $x ", "
+            (&= (&join $x (&neg $x)) $1) ".")))
+   ((proof)
+    "我们来证明第二条陈述. 很容易看出来" (&-> $x $y)
+    "是" (&neg $x) "和" $y "的一个上界. 设" $w
+    "是" (&neg $x) "和" $y "的任何一个上界. 根据"
+    (&<= (&neg $x) $w) ", 可以推出"
+    (&<= (&neg $w) (&= (&neg (&neg $x)) $x))
+    ", 因而不等式"
+    (&<= (&-> $x $y)
+         (&-> (&neg $w) $y)
+         (&-> (&neg $w) $w))
+    "成立, 这些是根据引理6.2的第二条得到的. "
+    "另一方面, 鉴于"
+    (&<= (&meet (&neg $w) (@-> (&neg $w) $w))
+         (&= (&meet (&neg $w) $w) $0))
+    ", 我们有"
+    (&<= (&-> (&neg $w) $w)
+         (&= (&-> (&neg $w) $0)
+             (&neg (&neg $w))
+             $w))
+    ". 将两个不等式结合在一起, 我们就得到了"
+    (&<= (&-> $x $y) $w)
+    ". 换言之, " (&-> $x $y)
+    "是" (&neg $x) "和" $y
+    "的最小上界, 故"
+    (&= (&-> $x $y) (&join (&neg $x) $y)) ".")
+   ((tcomment)
+    "这个证明中的"
+    (&<= (&meet (&neg $w) (@-> (&neg $w) $w))
+         (&= (&meet (&neg $w) $w) $0))
+    "卡住了译者好一会儿. 不过, 实际上没那么困难. "
+    "根据引理6.1的第一条, "
+    (&<= (&meet (&neg $w) (@-> (&neg $w) $w)) $w)
+    ". 另外, " (&meet (&neg $w) (@-> (&neg $w) $w))
+    "根据" $meet "的定义本来就有"
+    (&<= (&meet (&neg $w) (@-> (&neg $w) $w)) (&neg $w))
+    ". 于是, " (&meet (&neg $w) (@-> (&neg $w) $w))
+    "是" (&neg $w) "和" $w "的一个下界, 那么"
+    (&<= (&meet (&neg $w) (@-> (&neg $w) $w))
+         (&meet (&neg $w) $w)) ".")
+   ((tcomment)
+    "让我们来证明引理6.3的第一条陈述. "
+    "首先我们想要证明" (&neg (@meet (&neg $x) (&neg $y)))
+    "是" $x "和" $y "的一个上界. 如何证明"
+    (&<= $x (&neg (@meet (&neg $x) (&neg $y))))
+    "呢? 根据" $neg "的定义我们将其改写为等价的"
+    (&<= $x (&-> (@meet (&neg $x) (&neg $y)) $0))
+    ". 根据剩余律, 其等价于"
+    (&<= (&meet $x (@meet (&neg $x) (&neg $y))) $0)
+    ". 根据引理6.2的第一条陈述里的" (&= (&meet $x (&neg $x)) $0)
+    ", 这个不等式的左边就等于" $0 ", 因而总是成立. "
+    (&<= $y (&neg (@meet (&neg $x) (&neg $y))))
+    "可以按照类似的方式进行证明." (Br)
+    "现在设" $u "是" $x "和" $y "的任意一个上界, 我们想要证明"
+    (&<= (&neg (@meet (&neg $x) (&neg $y))) $u)
+    ". 根据引理6.2的第二条陈述和双重否定律, 这等价于证明"
+    (&<= (&neg $u) (&meet (&neg $x) (&neg $y)))
+    ". 这个实际上可由" $u "为" $x "和" $y
+    "的上界这一事实推得. 因为" (&<= $x $u)
+    ", 所以" (&<= (&neg $u) (&neg $x))
+    ", 同理" (&<= (&neg $u) (&neg $y))
+    ". 换言之, " (&neg $u) "是" (&neg $x)
+    "和" (&neg $y) "的一个下界, 故"
+    (&<= (&neg $u) (&meet (&neg $x) (&neg $y)))
+    ". Q.E.D.")
+   (P "我们注意到引理6.3中出现的等式"
+      (&= (&join $x (&neg $x)) $1)
+      "表达了" (Em "排中律")
+      " (见第1.1节) 的某种代数类比. "
+      "另外, 以上的引理6.3是说" $join "和" $->
+      "可以基于" $meet "和" $neg
+      "定义, 也就是说" $join "和" $->
+      "在任何布尔代数之中都是冗余的. "
+      "另一方面, 为了使得布尔代数和"
+      "之后章节将要引入的其他代数之间的比较更加清晰, "
+      "我们保留了将布尔代数定义为具有形式"
+      (tupa0 $A $join:id $meet:id $->:id $0)
+      "的五元组.")
+   ((exercise #:n "6.7")
+    "表明以下陈述在每个布尔代数之中都成立."
+    (Ol (Li "对于任意的" (&cm $x $y) ", "
+            (&= (&join (@-> $x $y) (@-> $y $x)) $1) ".")
+        (Li "对于任意的" (&cm $x $y) ", "
+            (&<= (&-> (@-> $x $y) $x) $x) ".")))
+   ((answer)
+    (Ol (Li (MB (deriv
+                 (&join (@-> $x $y) (@-> $y $x))
+                 (&join (@join (&neg $x) $y)
+                        (@join (&neg $y) $x))
+                 (&join (@join $x (&neg $x))
+                        (@join $y (&neg $y)))
+                 (&join $1 $1)
+                 $1)))
+        (Li (MB (deriv
+                 (&-> (@-> $x $y) $x)
+                 (&-> (@join (&neg $x) $y) $x)
+                 (&join (&neg (@join (&neg $x) $y)) $x)
+                 (&join (@meet $x (&neg $y)) $x)
+                 $x))
+            "换言之, 在布尔代数之中实际上可以将" $<=
+            "加强为" $= ".")))
+   (H3. "子代数, 同态和直积")
+   (P "为了进一步发展我们的代数研究, "
+      "我们要引入三个基本的代数概念. "
+      "鉴于这些概念可以对于多种代数进行定义, "
+      "我们要在一般的上下文中进行定义. "
+      "代数的一个" (Em "语言") $L:script
+      "是一个" (Em "运算符号") "的集合, "
+      "每个运算符号都有一个固定的" (Em "元数")
+      ", 元数是一个非负整数. 具有元数" $0
+      "的运算符号被称为" (Em "常量符号")
+      ". 以下我们假定" $L:script "是一个有限有序集"
+      (tupa0 $f_1 $f_2 $..h $f_m) ", 遵循约定"
+      (&>= $n_1 $n_2 $..c $n_m) ", 其中" $n_i
+      "是" $f_i "的元数. 一个类型为" $L:script
+      "的代数" $A:bold "是一个具有形式"
+      (tu0 $A (^ $f_1 $A:bold)
+           (^ $f_2 $A:bold) $..h
+           (^ $f_m $A:bold))
+      "的结构, 其中" $A "是一个非空集合, 被称为"
+      $A:bold "的" (Em "宇宙") "或者" (Em "潜在集合")
+      ", 而" (^ $f_i $A:bold) "是" $A
+      "上的一个" $n_i "元运算, 其中" (&<= $1 $i $m)
+      ". 每个" (^ $f_i $A:bold) "都应该理解为"
+      $L:script "的运算符号" $f_i "在" $A:bold
+      "中的解释. 出于简洁性的考量, 有时我们会省略"
+      (^ $f_i $A:bold) "的角标" (^ $ $A:bold)
+      ", 如果不至于引起误解.")
+   (P "举个例子, 前一节我们取了一个语言"
+      (tupa0 $join:id $meet:id $->:id $0)
+      "来描述所有布尔代数的类, 其元数分别为"
+      (&cm $2 $2 $2 $0) ". 以下的三个定义里, "
+      "我们将假定代数" $A:bold "和" $B:bold
+      "具有相同的类型.")
+   ((definition #:n "6.6")
+    "(子代数) 一个代数" $B:bold "是" $A:bold
+    "的一个" (Em "子代数") ", 如果" $B
+    "是" $A "的一个子集, 而对于每个" $i
+    "而言" (^ $f_i $B:bold) "是"
+    (^ $f_i $A:bold) "在" $B
+    "上的限制. 也就是说, 对于所有的" $i "和"
+    (∈ $b_1 $..h (_ $b $n_i) $B) "而言, "
+    (let ((f (λ (sig)
+               (appl (^ $f_i sig)
+                     $b_1 $..h (_ $b $n_i)))))
+      (&= (f $B:bold) (f $A:bold))) ".")
+   ((example #:n "6.7")
+    "设" (&= $A:bold (tupa0 $A $join:id $meet:id))
+    "为一个格, 而" $B "是" $A "的一个非空子集. 那么, "
+    (&= $B:bold (tupa0 $B (&prime $join:id) (&prime $meet:id)))
+    "是" $A:bold "的一个子代数 (一般称为格" $A:bold
+    "的一个" (Em "子格") ") 当且仅当对于任意的"
+    (∈ $b_1 $b_2 $B) ", " (&= (&join^ $b_1 $b_2) (&join $b_1 $b_2))
+    "且" (&= (&meet^ $b_1 $b_2) (&meet $b_1 $b_2))
+    ", 其等价于对于任意的" (∈ $b_1 $b_2 $B) ", "
+    (&join $b_1 $b_2) "和" (&meet $b_1 $b_2)
+    "都属于" $B ". 让我们考虑练习6.4"
+    )
+   ((definition #:n "6.7")
+    "(同态和同态像) 一个映射" (func $h $A $B) "是一个从"
+    $A:bold "到" $B:bold "的" (Em "同态") ", 如果"
+    (MB (&= (app $h (appl (^ $f_i $A:bold)
+                          $a_1 $..h (_ $a $n_i)))
+            (appl (^ $f_i $B:bold)
+                  (app $h $a_1) $..h (app $h (_ $a $n_i)))))
+    "对于所有的" $i "和" (∈ $a_1 $..h (_ $a $n_i) $A)
+    "成立. 当" $h "是一个单射时, " $h "被称为是一个(从"
+    $A:bold "到" $B:bold "的)" (Em "嵌入(embedding)")
+    ". 在这种情形下, " $A:bold "被称为是由" $h
+    (Em "嵌入") "到" $B:bold "之中. 如果" $h
+    "是满射的, 即每个元素" (∈ $b $B) "都可以表达为对于某个"
+    (∈ $a $A) "的" (app $h $a) ", 那么" $B:bold
+    "被称为是" $A:bold "的一个" (Em "同态像")
+    " (由同态" $h "). 当" $h "是双射的, " $h
+    "被称为是一个" (Em "同构") "而" $A:bold
+    "被称为是" (Em "同构") "于" $B:bold
+    " (由同构" $h ").")
+   ((remark #:n "6.8")
+    "设" $h "是从一个格" $A:bold "到一个格" $B:bold
+    "的一个同态, 那么" $h "是" (Em "保序的") ", 即对于所有的"
+    (∈ $a $a^ $A) ", " (&<=^A $a $a^) "可以推出"
+    (&<=^B (app $h $a) (app $h $a^)) ", 其中" $<=^A "和"
+    $<=^B "分别是" $A:bold "和" $B:bold
+    "由其格运算导出的序关系. 这是因为如果" (&<=^A $a $a^)
+    "成立, 那么" (&= (&meet^A $a $a^) $a) ", 因而有"
+    (&= (&meet^B (app $h $a) (app $h $a^))
+        (app $h (&meet^A $a $a^))
+        (app $h $a))
+    ". 这意味着"
+    (&<=^B (app $h $a) (app $h $a^)) ".")
+   ((exercise #:n "6.8")
+    
+    )
+   ((definition #:n "6.8")
+    "(直积) 对于给定的代数" $A:bold "和" $B:bold ", 定义" (Em "直积")
+    (&c* $A:bold $B:bold) "为一个代数"
+    (tupa0 (&c* $A $B) (^ $f_1 (&c* $A:bold $B:bold))
+           $..h (^ $f_m (&c* $A:bold $B:bold)))
+    ", 其中"
+    (&= (&c* $A $B)
+        (setI (tu0 $a $b)
+              (: (∈ $a $A) "且" (∈ $b $B))))
+    ", 并且对于每个" $i ", 令"
+    (MB (&= (appl (^ $f_i (&c* $A:bold $B:bold))
+                  (tu0 $a_1 $b_1) $..h
+                  (tu0 (_ $a $n_i) (_ $b $n_i)))
+            (tu0 (appl (^ $f_i $A:bold)
+                       $a_1 $..h (_ $a $n_i))
+                 (appl (^ $f_i $B:bold)
+                       $b_1 $..h (_ $b $n_i)))))
+    "也就是说, " (^ $f_i (&c* $A:bold $B:bold))
+    "是逐分量定义的. 更一般地, 代数" (_ $A:bold $j)
+    " (" (∈ $j $J) ") (" $J
+    "可能无限) 的直积被定义为这样一个代数" $A:bold
+    " (记作" (prod (∈ $j $J) (_ $A:bold $j))
+    "), 其宇宙" $A "是集合" $A_j " (" (∈ $j $J)
+    ") 的直积" (prod (∈ $j $J) $A_j) ", 而"
+    (appl (^ $f_i $A:bold) $a_1 $..h (_ $a $n_i))
+    "的第" $j "分量"
+    (app (appl (^ $f_i $A:bold) $a_1 $..h (_ $a $n_i)) $j)
+    "是由"
+    (appl (^ $f_i (_ $A:bold $j))
+          (app $a_1 $j) $..h
+          (app (_ $a $n_i) $j))
+    "给出的, 其中" (∈ $j $J) "而" (∈ $a_k $A)
+    ". 这里的" (app $a_k $j) "是" $A_j
+    "的一个元素, 其为" $a_k "的第" $j "分量.")
+   ((example #:n "6.9")
+    
+    )
+   ((exercise #:n "6.9")
+    "令" $f "是从" $A:bold "到" $C:bold "的格同态, "
+    $g "是从" $B:bold "到" $D:bold "的格同态. 定义从"
+    (&c* $A:bold $B:bold) "到" (&c* $C:bold $D:bold)
+    "的映射" $h "为"
+    (&= (appl $h $a $b)
+        (tu0 (app $f $a) (app $g $b)))
+    ". 证明" $h "是一个格同态.")
+   ((answer)
+    
+    )
+   (P "在由所有布尔代数构成的类这一情形下, " $B:bold
+      "是一个布尔代数" $A:bold "的一个子代数当且仅当"
+      $B "是" $A "的一个子集, 其包含" (^ $0 $A:bold)
+      "且在" (&cm $join:id $meet:id $->:id)
+      "下封闭. 显然每个非退化的布尔代数都有一个"
+      "同构于二值布尔代数" BA2 "的子代数. 当"
+      $A:bold "和" $B:bold "都是布尔代数时, 一个映射"
+      (func $h $A $B) "是一个从" $A:bold "到" $B:bold
+      "的同态当且仅当对于每个"
+      (∈ $*:id (setE $join:id $meet:id $->:id))
+      "有"
+      (&= (app $h (&*^A $a $a^))
+          (&*^B (app $h $a) (app $h $a^)))
+      ", 而且"
+      (&= (app $h (^ $0 $A:bold)) (^ $0 $B:bold)) ".")
+   (P "对于任意的布尔代数" $A:bold ", " $A:bold
+      "的每个子代数也是一个布尔代数. 另外, 如果"
+      $B:bold "是" $A:bold "藉由某个同态" $h
+      "的一个同态像, 那么" $B:bold
+      "也是一个布尔代数. 为了证明后者, 我们验证"
+      $B:bold "满足布尔代数的三个条件. "
+      "对于第三个条件, 取任意元素" (∈ $a^ $B)
+      ". 然后, 对于某个元素" (∈ $a $A) "而言"
+      $a^ "具有形式" (app $h $a) ". 那么, "
+      (&= (&neg2 $a^) (&neg2 (app $h $a))
+          (app $h (&neg2 $a))
+          (app $h $a) $a^)
+      ", 鉴于" $A:bold "是一个布尔代数. "
+      "至于剩余律, 对于给定的" (∈ $a^ $b^ $c^ $B)
+      ", 取" (∈ $a $b $c $A) "使得"
+      (&= $a^ (app $h $a)) ", "
+      (&= $b^ (app $h $b)) ", "
+      (&= $c^ (app $h $c)) ", 因为"
+      $B:bold "是" $A:bold "的一个同态像. 首先设"
+      (&<= (&meet $a^ $b^) $c^) ", 这等价于条件"
+      (&<= (app $h (&meet $a $b)) (app $h $c))
+      ". 既然" (&<= $b (&-> $a (@meet $a $b)))
+      "在" $A:bold "之中成立, 不等式"
+      (&<= (app $h $b)
+           (&-> (app $h $a) (app $h (&meet $a $b)))
+           (&-> (app $h $a) (app $h $c)))
+      "成立, 鉴于" $h "是保序的. 因此, "
+      (&<= $b^ (&-> $a^ $c^))
+      ". 反过来, 设" (&<= $b^ (&-> $a^ $c^))
+      ". 然后, " (&<= (app $h $b) (app $h (&-> $a $c)))
+      ". 那么, 我们有"
+      (&<= (&meet (app $h $a) (app $h $b))
+           (&meet (app $h $a) (app $h (&-> $a $c)))
+           (app $h $c))
+      ", 鉴于" (&<= (&meet $a (@-> $a $c)) $c)
+      "在" $A:bold "中成立. 因此, "
+      (&<= (&meet $a^ $b^) $c^) "成立.")
+   ((tcomment)
+    "这个证明里有一个gap, 也就是没有说明布尔代数的第一个条件成立. "
+    "换言之, 我们要证明带最小元" $0 "的格结构"
+    (tupa0 $A $join:id $meet:id $0)
+    "保持同态像. 之所以这个是重要的, "
+    "是因为证明中的序关系及其性质依赖于这个事实. "
+    "然而, 从泛代数的角度来看, 这是平凡的, "
+    "因为带最小元的格结构只需要通过等式进行定义, "
+    "而不是像布尔代数的第二个条件那样还依赖于等式之间的关系. "
+    "(所以说, 对于布尔代数的第三个条件的验证也是平凡的.) "
+    "其中比较有趣的是最小元" $0 "也有一个等式刻画, 即其为运算"
+    $join "的单位元. 另外说一句, 之所以格同态" $h
+    "保持序关系, 是因为这个序关系也是用等式定义的, "
+    "而泛代数的同态皆保持等式.")
+   (P "如果" $B:bold "是布尔代数" (_ $A:bold $j) " ("
+      (∈ $j $J) ") 的一个直积" (prod (∈ $j $J) (_ $A:bold $j))
+      ", 那么" $B:bold "也是一个布尔代数, 这是因为"
+      $B:bold "的每个运算都是逐分量定义的. "
+      "{译注: 并且, 布尔代数的定义也只是用到等式和等式之间的关系.} "
+      "为了总结, 我们按照以下方式陈述这些结果. "
+      "这个主题将会在第8.2节里以更泛化的方式进行讨论.")
+   ((theorem #:n "6.4")
+    "由所有布尔代数构成的类在子代数, 同态像, 直积下封闭.")
+   (H3. "布尔代数的表示")
+   (P "在例子6.5和练习6.6中, 我们表明了任意一个集合" $C
+      "的幂集" (powerset $C) "相对于并" $union "和交"
+      $cap "构成了一个分配格"
+      (tupa0 (powerset $C) $union $cap)
+      ", 其中" $empty "是最小元. 对于" $C
+      "的每个子集" $X ", 令" (&- $X) "是" $X
+      "的补. 对于" (&sube (&cm $X $Y) $C) ", 定义"
+      (&= (&-> $X $Y) (&union (&- $X) $Y)) ". 那么, "
+      (&= (powerset $C:bold)
+          (tupa0 (powerset $C) $union $cap $->:id $empty))
+      "形成了一个布尔代数. 具有这种形式的布尔代数被称为"
+      (Em "幂集布尔代数") ".")
+   ((exercise #:n "6.10")
+    )
+   ((exercise #:n "6.11")
+    )
+   (H4 "有限布尔代数")
+   (P "令" $C "是任意一个具有" $m "个元素的有限集合, 例如"
+      (setI $a_k (&<= $1 $k $m))
+      ". {译注: 这默认了当" (&!= $i $j) "时, "
+      (&!= $a_i $a_j) ".} 那么, 幂集布尔代数"
+      (powerset $C:bold) "是一个" $2^m
+      "-值布尔代数. 如果" $D "是另一个具有" $m
+      "个元素的集合, 那么显然" (powerset $D:script)
+      "同构于" (powerset $C:bold)
+      ". 我们注意到"
+      )
+   (H4 "无限布尔代数")
+   (H3. "古典逻辑的代数完备性")
+   (P "第1.1节所讨论的二值语义的每个赋值都确定了一种对于公式的解释. "
+      "赋值和有效性的概念可以自然地扩展至任意的布尔代数. 令"
+      $A:bold "是一个布尔代数. 一个" $A:bold "上的"
+      (Em "赋值") $h "是从所有命题变量的集合到" $A "的任意映射. 赋值"
+      $h "可以自然地延拓成一个从所有公式的集合到集合"
+      $A "的映射, 通过定义"
+      (&= (app $h (&disj $alpha $beta))
+          (&join_A (app $h $alpha) (app $h $beta)))
+      ", "
+      (&= (app $h (&conj $alpha $beta))
+          (&meet_A (app $h $alpha) (app $h $beta)))
+      ", "
+      (&= (app $h (&impl $alpha $beta))
+          (&->_A (app $h $alpha) (app $h $beta)))
+      ", 以及" (&= (app $h $0) $0_A)
+      ". (藉由符号滥用, 对于这个延拓的映射我们也使用符号"
+      $h ". 以上的符号" $disj ", " $conj ", " $impl
+      ", " $0 "代表逻辑联结词和常量, 而" $join_A ", "
+      $meet_A ", " $->_A ", " $0_A "则代表相应的"
+      $A:bold "的代数运算以及" $A "的最小元素, 以避免歧义.) "
+      "一个公式" $phi "在某个布尔代数" $A:bold "中是"
+      (Em "有效的") ", 如果其总是取值" $1_A ", 即对于每个"
+      $A:bold "上的赋值" $h "总有" (&= (app $h $phi) $1_A)
+      ". 公式有效性的概念也可以自然地扩展至相继式的有效性. "
+      "显然, 第1章所讨论的重言式不过就是在二值布尔代数"
+      BA2 "中有效的公式和相继式.")
+   ((theorem #:n "6.6")
+    "(代数完备性) 对于任意给定的非退化布尔代数" $B:bold
+    ", 以下三个条件互相等价. 对于每个公式" $phi ","
+    (Ol (Li $phi "在古典逻辑中是可证明的;")
+        (Li $phi "在所有布尔代数之中都是有效的;")
+        (Li $phi "在布尔代数" $B:bold "中是有效的.")))
+   ((proof)
+    
+    )
+   (H3. "多值链和剩余律")
+   (P "从代数角度而言, 询问如何将我们的二值语义 "
+      "(即基于二值布尔代数的代数语义) 推广为多值语义是自然的. "
+      "本节我们将会考虑将二值语义扩展至多值语义的两种可能方式, "
+      "其将会取决于我们维持何种形式的剩余律. "
+      "我们将会引入两种类型的" (Em "多值链")
+      ", 即定义在全序集上的带有剩余律的代数. "
+      "它们分别是Gödel链和Łukasiewicz链. "
+      "之前章节引入的代数方法也可应用于这两种代数, "
+      "而两类不同的多值逻辑的基本结果也将呈现. "
+      "之后的章节我们将会进一步将这种想法推广至定义在格上的剩余代数, "
+      "并最终将我们引向Heyting代数和剩余格的概念.")
+   (P "作为对于二值语义的一种推广, "
+      "我们考虑如何为和古典逻辑相同的语言引入多值语义. "
+      "我们将我们这里的注意力限制于真值集合" $A
+      "为全序集的情况 (但可能无限), 即一个链, "
+      "并且带有最小元素" $0 "和最大元素" $1
+      ". 例如, 如果是三值语义, 我们可以取" $A "为"
+      (setE $0 (&/ $1 $2) $1)
+      ". 在这种情形下, " (&/ $1 $2)
+      "会被视为" (Em "halfway truth")
+      ", 如果我们将真值理解为"
+      (Em "degree of truth")
+      ". 因为我们假定了" $A "为全序集, 那么"
+      (&join $a $b) "和" (&meet $a $b) "分别可以表达为"
+      (&max (setE $a $b)) "和" (&min (setE $a $b))
+      ". 因此, 主要的问题在于如何在这个集合上定义implication "
+      $-> ". 一种想法不过就是"
+      (Em "保持合取与implication之间的剩余律")
+      ". {译注: 虽然这里的用辞是conjunction和implication, "
+      "但是实际上它们指的是代数运算而不是逻辑联结词, "
+      "只不过一般其会使用相同的符号罢了.}")
+   (P "首先设" $-> "满足剩余律, 那么" $->
+      "的定义必然要满足对于给定的" (∈ $a $b $A)
+      ", 对于所有的" (∈ $d $A) "都有"
+      (&<= (&meet $d $a) $b) "当且仅当"
+      (&<= $d (&-> $a $b)) ". 这等价于说对于所有的"
+      (∈ $d $A) "都有" (&<= (&min (setE $d $a)) $b)
+      "当且仅当" (&<= $d (&-> $a $b))
+      ". 若是的确如此 {译注: 指剩余律成立}, "
+      "我们可以表明如果" (&<= $a $b) "就有"
+      (&= (&-> $a $b) $1) ", 否则的话" (&= (&-> $a $b) $b)
+      ". 这里我们注意到如果" (&<= $a $b) "不成立, 那么"
+      (&> $a $b) "成立, 因为" $<= "是全序的. 现在, 如果"
+      (&<= $a $b) ", 那么" (&<= (&min (setE $d $a)) $b)
+      "对于任意的" $d "总是成立, 因而" (&<= $d (&-> $a $b))
+      "必然对于任意的" $d "成立. 这意味着" (&= (&-> $a $b) $1)
+      ". 接着, 如果" (&> $a $b) ", 那么" (&= (&min (setE $b $a)) $b)
+      ", 而对于所有满足" (&> $d $b) "的" $d "都有"
+      (&> (&min (setE $d $a)) $b) ". 因此, " (&-> $a $b)
+      "必然等于" $b ". {译注: 这里的讨论和布尔代数定义下面的讨论是如出一辙的.} "
+      "反过来, 设运算" $-> "满足 (1) 当" (&<= $a $b) "时有"
+      (&= (&-> $a $b) $1) " (2) 否则的话, " (&= (&-> $a $b) $b)
+      ". 那么, 我们可以表明剩余律成立. 这是因为, 如果"
+      (&<= $a $b) ", 那么一边不等式"
+      (&<= (&min (setE $d $a)) $a $b) "对于任意的" $d
+      "总是成立, 另一边不等式"
+      (&<= $d (&= $1 (&-> $a $b))) "也对于任意的" $d
+      "总是成立. 当" (&> $a $b) "时, 根据我们的假设有"
+      (&<= (&min (setE $d $a)) $b) "当且仅当" (&<= $d $b)
+      "当且仅当" (&<= $d (&-> $a $b))
+      ". 最终, 我们也就是证明了以下结论.")
+   ((tcomment)
+    "这是有点离题的译注. 根据原文, " (&< $a $b) "被定义为"
+    (&meet (@<= $a $b) (&neg (@<= $b $a)))
+    ". 根据这个定义, 可以在直觉主义逻辑下证明"
+    (&neg (@<= $a $b)) "和" (&< $b $a) "是等价的, "
+    "无需诉诸排中律.")
+   ((lemma #:n "6.7")
+    "设" (tupa0 $A $join:id $meet:id) "是一个链并且其具有最大元素" $1
+    ", 那么" $meet "和" $-> "之间的剩余律成立当且仅当对于所有的"
+    (∈ $a $b $A) ", 我们有" (&<= $a $b) "时" (&= (&-> $a $b) $1)
+    "而其他情况下" (&= (&-> $a $b) $b) ".")
+   ((tcomment)
+    "当且仅当的后半部分条件唯一地确定了一个运算" $-> ".")
+   (H4 "Gödel链和Gödel逻辑")
+   (P "引理6.7暗示了以下定义. 现在设" $A "是任意的链且具有最小元素"
+      $0 "和最大元素" $1 ". 按照以下方式定义" $A "上的三个运算"
+      $join ", " $meet ", " $-> ":"
+      (Ul (Li (&= (&join $a $b) (&max (setE $a $b))) ";")
+          (Li (&= (&meet $a $b) (&min (setE $a $b))) ";")
+          (Li (&= (&-> $a $b)
+                  (Choice0
+                   ($1 (@<= $a $b))
+                   ($b (@ "否则的话")))) "."))
+      "那么, 代数" Adefinition "被称为一个" (Em "Gödel链")
+      ". {原注: 这些链在Gödel (1932) 中进行了讨论.} 对于" (&> $n $0)
+      ", 当" $A "恰有" (&+ $n $1) "个元素时, " $A:bold
+      "被称为一个" (@+ $n $1) "-值Gödel链. "
+      "很容易看出来, 每个" (@+ $n $1) "-值Gödel链是同构的. 对于"
+      (@+ $n $1) "-值Gödel链的标准呈现是对于" $A "取集合"
+      (&= (_ $G (&+ $n $1))
+          (setE $0 (&/ $1 $n) (&/ $2 $n) $..h
+                (&/ (@- $n $1) $n) $1))
+      ". 另一方面, 无限的Gödel链不总是同构的, "
+      "因为可以存在具有任意基数的Gödel链.")
+   (P "令" $A:bold "是任意的Gödel链. "
+      "我们可以按照和布尔代数相同的方式定义" $A:bold
+      "上的" (Em "赋值") ". 我们称一个公式" $alpha
+      "在" $A:bold "中是有效的当且仅当对于" $A:bold
+      "上的每个赋值" $f "都有" (&= (app $f $alpha) $1)
+      ". " $A:bold "中所有有效公式的集合记作"
+      (Valid $A:bold) ". 如果对于某个数字" $m
+      ", " $A:bold "同构于" (_ $G:bold $m)
+      ", 那么集合" (Valid $A:bold) "被称为"
+      (Em $m "-值Gödel逻辑")
+      ", 当" $A:bold "无限时则称其为一个"
+      (Em "无限Gödel逻辑") " (其由链" $A "确定). 显然"
+      (Valid (_ $G:bold $2)) "等于经典逻辑" (B "Cl")
+      ". 这些Gödel逻辑实际上在第5.4节的意义下是超直觉主义逻辑.")
+   ((exercise #:n "6.13")
+    )
+   ((lemma #:n "6.8")
+    "如果" $B:bold "是" $A:bold "的一个子代数, 那么"
+    (&sube (Valid $A:bold) (Valid $B:bold)) ".")
+   ((proof)
+    "设一个公式" $phi "在" $A:bold "中是有效的. 令"
+    $f "是" $B:bold "上的任意赋值. "
+    )
+   (H4 "Łukasiewicz链")
+   (P "J. Łukasiewicz在他的论文 (Łukasiewicz, 1920) "
+      "中引入了一种链上的多值语义, 其和前一小节的并不相同. "
+      "他先引入了三值语义, 之后这被扩展为多值语义. "
+      "这一次, 三值情形里" $0 "和" $1 "之间的第三个值"
+      (&/ $1 $2) "被理解为了" (Em "undeterminded") "或者说"
+      (Em "indeterminate") ". "
+      )
    (H2. "代数逻辑的基本")
-   
+   (H3. "Heyting代数")
+   ((Definition)
+    "(Heyting代数) 一个代数" Adefinition
+    "是一个" (Em "Heyting代数") "当且仅当"
+    (Ol (Li (tupa0 $A $join:id $meet:id)
+            "是一个具有最小元" $0 "的格.")
+        (Li "剩余律成立, 即对于所有的" (∈ $a $b $c $A)
+            ", " (&<= (&meet $a $b) $c) "当且仅当"
+            (&<= $a (&-> $b $c)) ".")))
+   (P "每个Heyting代数也(一定)有最大元素" $1
+      ", 并且对于每个元素" $a "都有" $1 "等于"
+      (&-> $a $a) ". 另外, " (&neg $a)
+      "被定义为" (&-> $a $0)
+      ". 显然, 每个布尔代数都是一个Heyting代数. "
+      
+      )
+   (H3. "Lindenbaum-Tarski代数")
+   (H3. "局部有限代数")
+   (H3. "有限可嵌入性质和有限模型性质")
+   (H3. "Heyting代数的canonical扩张")
+   (H2. "Logics and Varieties")
+   (H3. "超直觉主义逻辑的格结构")
+   (H3. "由所有Heyting代数构成的variety HA")
+   (H2. "剩余结构 (Residuated Structures)")
+   (P "本章我们将会给出对于" (Em "剩余结构")
+      "的简短引论, 其是亚结构逻辑的代数结构. "
+      "布尔代数和Heyting代数被定义为是带有二元运算"
+      $-> "的格结构, 其满足" $meet "和" $->
+      "之间的剩余律, 即" (&<= (&meet $a $b) $c)
+      "当且仅当" (&<= $a (&-> $b $c))
+      "对于任意的" (&cm $a $b $c)
+      "成立. 从另一方面来说, "
+      "第6章引入的Łukasiewicz推出并不总是满足此律. "
+      "但是, 其仍然满足融合运算" $d* "和" $->
+      "之间的剩余律.")
+   (P "本章我们将会讨论一般形式的剩余律成立的代数结构, "
+      "并且将注意力主要集中于" (Em "剩余格")
+      ". 这个概念是从代数角度理解亚结构逻辑的关键所在. "
+      
+      )
+   (H3. "剩余格和FL-代数")
+   (H2. "模态代数")
+   (P "对于模态逻辑的语义研究已经藉由使用Kripke语义而发展得相当成功. "
+      
+      )
+   (H3. "模态代数")
    ))

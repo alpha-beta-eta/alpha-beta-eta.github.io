@@ -5,6 +5,8 @@
 ;;   (keyword-apply
 ;;    Div '(#:attr*) '(((class "tcomment")))
 ;;    (B (format "译者注记~a." n)) " " x*))
+(define $UnderBar (Mo "&UnderBar;"))
+(define (UnderBar x) (__ x $UnderBar))
 (define &card &abs)
 (define (H4. #:attr* [attr* '()] #:id [id #f]
              #:switch? [switch? #f] #:auto? [auto? #t] . html*)
@@ -75,6 +77,8 @@
   (:d "d")
   (:e "e")
   (:f "f")
+  (:i "i")
+  (:j "j")
   (:p "p")
   (:q "q")
   (:C "C")
@@ -83,11 +87,16 @@
   (:F "F")
   (:L "L")
   (:M "M")
+  (:S "S")
+  (:T "T")
   (:P "P")
   (:V "V")
   (:X "X")
   (:Y "Y")
   (:Z "Z")
+  (:comp "comp")
+  (:source "source")
+  (:target "target")
   (:WHILE "WHILE")
   (:I "I")
   (::= ":=")
@@ -107,34 +116,29 @@
   (:do "do")
   (:read "read")
   (:write "write"))
-(define :WHILE-programs
-  (: :WHILE
-     (Mtext "-程序"
-            #:attr*
-            '((style "font-family: KaiTi;")))))
-(define :WHILE-data
-  (: :WHILE
-     (Mtext "-数据"
-            #:attr*
-            '((style "font-family: KaiTi")))))
-(define :L-programs
-  (: :L (Mtext "-程序"
-               #:attr*
-               '((style "font-family: KaiTi;")))))
-(define :L-data
-  (: :L (Mtext "-数据"
-               #:attr*
-               '((style "font-family: KaiTi")))))
+(define (&-programs L)
+  (: L (Mtext "-程序"
+              #:attr*
+              '((style "font-family: KaiTi;")))))
+(define (&-data L)
+  (: L (Mtext "-数据"
+              #:attr*
+              '((style "font-family: KaiTi")))))
+(define-syntax-rule (define-pd-id*
+                      (p d L) ...)
+  (begin
+    (define p (&-programs L))
+    ...
+    (define d (&-data L))
+    ...))
+(define-pd-id*
+  (:WHILE-programs :WHILE-data :WHILE)
+  (:L-programs :L-data :L)
+  (:M-programs :M-data :M)
+  (:S-programs :S-data :S)
+  (:T-programs :T-data :T))
 (define :L-data_⊥
   (_ :L-data $bottom))
-(define :M-programs
-  (: :M (Mtext "-程序"
-               #:attr*
-               '((style "font-family: KaiTi;")))))
-(define :M-data
-  (: :M (Mtext "-数据"
-               #:attr*
-               '((style "font-family: KaiTi")))))
 (define deno
   (case-lambda
     ((x) (&db0 x))
@@ -458,6 +462,9 @@
    #:title "可计算性和计算复杂度"
    #:css "styles.css"
    (H1. "可计算性和计算复杂度")
+   (P "虽然很多人都知道, 但是第一个将这样的想法写成书籍的恐怕是Neil Jones. "
+      "也就是说, Turing机器和G&ouml;del配数其实可以看成是很难用的编程语言, "
+      "没有必要局限于此, 我们可以使用真正的编程语言刻画想法, 进行证明.")
    (H2. "引论")
    (H2. "WHILE语言")
    (H3. "WHILE数据和程序的句法")
@@ -591,8 +598,119 @@ D")
    ((Definition)
     "令" (setE ::= :\; :while :var :quote :cons :hd :tl :=? :nil)
     "代表" $DD "的" 10 "个相异元素. WHILE程序" :p
-    "的表示"
-    )
+    "的表示" (UnderBar :p) "由图3.1中所示的映射定义:"
+    (MB (func (UnderBar $dummy) :WHILE-programs :WHILE-data))
+    "其中我们使用了第2.1.5小节和第2.1.6小节里的列表和数字记号.")
+   (MB (set-attr*
+        (&Table
+         ((UnderBar (enum :read (_ :V $i) :\;
+                          :C :\;
+                          :write (_ :V $j)))
+          $=
+          (@ (@ :var :i) (UnderBar :C) (@ :var :j)))
+         ((UnderBar (enum :C :\; :D))
+          $=
+          (@ :\; (UnderBar :C) (UnderBar :D)))
+         ((UnderBar (enum :while :E :do :C))
+          $=
+          (@ :while (UnderBar :E) (UnderBar :C)))
+         ((UnderBar (enum (_ :V $i) ::= :E))
+          $=
+          (@ ::= (@ :var :i) (UnderBar :E)))
+         ((UnderBar (_ :V $i))
+          $=
+          (@ :var :i))
+         ((UnderBar :d) $= (@ :quote :d))
+         ((UnderBar (enum :cons :E :F))
+          $=
+          (@ :cons (UnderBar :E) (UnderBar :F)))
+         ((UnderBar (enum :hd :E))
+          $= (@ :hd (UnderBar :E)))
+         ((UnderBar (enum :tl :E))
+          $= (@ :tl (UnderBar :E)))
+         ((UnderBar (enum :=? :E :F))
+          $=
+          (@ :=? (UnderBar :E) (UnderBar :F))))
+        'columnalign "left"))
+   (P "例如, 如果" :X "和" :Y "分别为" (_ :V $1)
+      "和" (_ :V $2) ", 那么写作"
+      (CodeB "read X;
+  Y := nil;
+  while X do
+    Y := cons (hd X) Y;
+    X := tl X;
+write Y")
+      "的程序将会被翻译为" $DD "中的值:"
+      (CodeB "((var 1)
+ (; (:= (var 2) (quote nil))
+    (while (var 1)
+      (; (:= (var 2) (cons (hd (var 1)) (var 2)))
+         (:= (var 1) (tl (var 1))))))
+ (var 2))")
+      "为了可读性, 写程序时我们会沿用原本的句法, "
+      "但是每当某个程序" :p "为另一个程序的输入时, "
+      "其在我们心中应该理解成其所对应的表示"
+      (UnderBar :p) ".")
+   (P "相同的想法也可类比用于其他语言" :L
+      ", 尽管如果" :L-data "和传统可计算理论文献一样是自然数集的话, "
+      "将程序编码为数据会比较困难.")
+   (H3. "编译")
+   (P "设我们给定了三个编程语言:"
+      (Ul (Li "一个源语言" :S ",")
+          (Li "一个目标语言" :T ", 以及")
+          (Li "一个实现语言" :L "."))
+      "一个从" :S "到" :T "的编译器" (∈ :comp :L-programs)
+      "具有一个输入: 要被编译的一个源程序" (∈ :p :S-programs)
+      ". (在一个" :L "-机器上) 以输入" :p
+      "运行该编译器必然会产生另外一个程序" :target
+      ", 其满足在一个" :T "-机器上运行" :target
+      "和在一个" :S "-机器上运行" :p "具有相同的效果.")
+   (P "如果源语言和目标语言具有相同的数据表示, 即"
+      (&= :S-data :T-data) ", 那么对于所有的输入" :d "有"
+      (&simeq (app (deno :source :S) :d)
+              (app (deno :target :T) :d))
+      ". {译注: 为啥前文用" :p "这里用" :source
+      "? 不过, 我们应该知道"
+      (&= :target (app (deno :comp :L) :source)) ", 若假定"
+      (&sube (&union :S-programs :T-programs) :L-data) ".}")
+   (H4. "不改变数据表示情况下的编译")
+   ((Definition)
+    "设"
+    (Ol (Li (&= :S-data :T-data))
+        (Li (&sube (&union :S-programs :T-programs)
+                   :L-data)))
+    "{原注: 换言之, 语言" :S "和" :T "的程序表示都是"
+    :L-data "的元素.}" (Br)
+    "那么"
+    (Ol (Li "一个完全函数" (func $f :L-data :L-data)
+            "是一个从" :S "到" :T "的" (Em "编译函数")
+            "当且仅当对于每个" (∈ :p :S-programs)
+            ", " (∈ (app $f :p) :T-programs) "且"
+            (&= (deno :p :S) (deno (app $f :p) :T)) ".")
+        (Li "一个" (∈ :comp :L-programs) "是一个从"
+            :S "到" :T "的" (Em "编译器") ", 如果"
+            (deno :comp :L) "是一个编译函数."))
+    "注意到我们谨慎地区分了编译函数和编译器, 编译器即一个编译程序. "
+    "更细致地说, 一个编译函数" $f "满足对于所有的"
+    (∈ :p :S-programs) "和" (∈ :d :S-data) ":"
+    (MB (&simeq (app (deno :p :S) :d)
+                (app (deno (app $f :p) :T) :d)) ".")
+    "(两边都可能会出现未定义的情况, 见第A.3.3小节.)")
+   (P "如果语言" :T (Em "可以模拟") "语言" :S
+      ", 那么根据定义"
+      )
+   (H4. "TI-图")
+   (H4. "改变数据表示情况下的编译")
+   (H3. "解释")
+   (P "设我们给定了两个编程语言:"
+      (Ol (Li "一个实现语言" :L ", 以及")
+          (Li "一个源语言" :S "."))
+      
+      )
+   (H4. "不改变数据表示情况下的解释")
+   (H4. "一个解释的例子: 直线布尔程序")
+   (H3. "组合编译器和解释器图的方式")
+   (H3. "特化")
    (H2. "自解释: " :WHILE "和" :I "的通用程序")
    (H2. "可计算理论的基本")
    (H2. "元编程, 自应用, 和编译器生成")
