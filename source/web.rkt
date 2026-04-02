@@ -180,10 +180,21 @@
          "hot.rkt"
          "modal_analysis.rkt"
          "modal_type_theory.rkt"
+         "unification.rkt"
+         "galgame.rkt"
+         "lcf.rkt"
+         "continuous_lattices.rkt"
          
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml continuous_lattices.html
+             "../continuous_lattices.html")
+    (emitXml lcf.html "../lcf.html")
+    (emitXml manifolds.html "../manifolds.html")
+    (emitXml galgame.html "../galgame.html")
+    (emitXml unification.html
+             "../unification.html")
     (emitXml modal_type_theory.html
              "../modal_type_theory.html")
     (emitXml modal_analysis.html
@@ -372,7 +383,6 @@
   (emitXml catlog.html "../catlog.html")
   (emitXml game_programming.html "../game_programming.html")
   (emitXml implicit.html "../implicit.html")
-  (emitXml manifolds.html "../manifolds.html")
   (emitXml set_theory.html "../set_theory.html")
   (emitXml godel.html "../godel.html")
   (emitXml fear-of-macros.html "../fear-of-macros.html")

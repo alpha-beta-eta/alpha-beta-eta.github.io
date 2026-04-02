@@ -14,6 +14,11 @@
   (Mo "d" #:attr* '((lspace "0") (rspace "0"))))
 (define (&d x)
   (ap $d:form x))
+(define $\| (Mo "|"))
+(define (derivativeAt f t v)
+  (ap (_ (: (~ $d:form (&d t)) $\|)
+         (&= t v))
+      f))
 (define $integral (Mo "&int;"))
 (define (integral a b f x)
   (: (_^ $integral a b) f (&d x)))
@@ -336,7 +341,66 @@
       "一个Euclid空间之中的, "
       )
    (H4. "方向导数")
-   
+   (P "在微积分中, 我们将" $RR^n "中" $p
+      "点处的切空间" (app $T_p $RR^n) "可视化为由从"
+      $p "出发的所有箭头构成的向量空间. "
+      "根据箭头和列向量之间的对应, 向量空间" $RR^n
+      "可以与这列空间等同起来. "
+      "为了区分点和向量, 我们将" $RR^n
+      "中的点记为" (&= $p (tu0 $p^1 $..h $p^n))
+      "而将切空间" (app $T_p $RR^n) "中的向量记为"
+      (MB (&= $v (Mat ($v^1) ($..v) ($v^n)))
+          "或者"
+          (&= $v (tupa0 $v^1 $..h $v^n)) ".")
+      "我们通常记" $RR^n "或者" (app $T_p $RR^n)
+      "的标准基为" (&cm $e_1 $..h $e_n)
+      ". 那么, " (&= $v (sum (&i* $v^i $e_i)))
+      ", 之于某些" (∈ $v^i $RR) ". "
+      (app $T_p $RR^n) "的元素被称为"
+      $RR^n "中的" $p "处的" (Em "切向量")
+      "或者简称" (Em "向量")
+      ". 有时我们抛弃括号, 将"
+      (app $T_p $RR^n) "记为"
+      (ap $T_p $RR^n) ".")
+   (P $RR^n "中过点" (&= $p (tu0 $p^1 $..h $p^n))
+      "以" (&= $v (tupa0 $v^1 $..h $v^n))
+      "为方向的直线的参数化为"
+      (MB (&= (app $c $t)
+              (tu0 (&+ $p^1 (&i* $t $v^1))
+                   $..h
+                   (&+ $p^n (&i* $t $v^n)))) ".")
+      "其第" $i "分量" (app $c^i $t) "为"
+      (&+ $p^i (&i* $t $v^i)) ". 如果" $f
+      "在" $RR^n "中的" $p
+      "的某个邻域里是" C^inf "的, 并且"
+      $v "是点" $p "处的一个切向量, " $p
+      "处" $f "在方向" $v "的" (Em "方向导数")
+      "被定义为"
+      (MB (&= (ap $D_v $f)
+              (lim $t $0
+                   (~ (&- (app $f (app $c $t))
+                          (app $f $p))
+                      $t))
+              (derivativeAt
+               (app $f (app $c $t))
+               $t $0)) ".")
+      "根据链式法则, 我们有"
+      (MB (&= (ap $D_v $f)
+              (sum (&= $i $1) $n
+                   (&i* (app (~ (&d $c^i) (&d $t)) $0)
+                        (app (~ (&partial $f)
+                                (&partial $x^i))
+                             $p)))
+              (sum (&= $i $1) $n
+                   (&i* $v^i
+                        (app (~ (&partial $f)
+                                (&partial $x^i))
+                             $p)))) "."))
+   (P "记号" (ap $D_v $f) "应该理解为在" $p
+      "处求的某种偏导数, 因为" $v "是一个" $p
+      "处的向量. 因此, " (ap $D_v $f)
+      "是一个数字, 而不是一个函数. "
+      )
    (H4. "Germs of Functions")
    (P "一个集合" $S "上的一个" (Em "关系")
       "是" (&c* $S $S) "的一个子集" $R

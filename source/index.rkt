@@ -7,8 +7,6 @@
    #:css "styles.css"
    (H1 "愚者 " (A "RSS" #:attr* '((href "rss.xml"))) " "
        (A "网站介绍" #:attr* '((href "intro.html"))))
-   (P "为学日益, 为道日损.")
-   (P "编程语言和证明论是一体两面.")
    (columnize
     (H2 (A "编程语言的邀请" #:attr* '((href "notes/pl.pdf"))) ": "
         (A "程序集" #:attr* '((href "notes/pl.zip"))))

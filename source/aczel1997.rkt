@@ -1,6 +1,20 @@
 #lang racket
 (provide aczel1997.html)
 (require SMathML)
+(define $aleph (Mi "&aleph;"))
+(define $aleph_0 (_ $aleph $0))
+(define (!0 f) (curry app f))
+(define (!1 f) (curry apply f))
+(define (!commute f g . x*)
+  (&= (f (apply g x*))
+      ((!1 g) (map f x*))))
+(define (ι A B)
+  (_ $iota (&cm A B)))
+(define -- "&mdash;&mdash;")
+(define (Arrow f A B)
+  (&: f (&-> A B)))
+(define CatC $CC)
+(define CatC^ (&prime CatC))
 (define (Cat str)
   (Mi str #:attr* '((mathvariant "bold"))))
 (define-syntax-rule (define-Cat* (id str) ...)
@@ -8,6 +22,8 @@
     (define id (Cat str))
     ...))
 (define-Cat*
+  (CatSet "Set")
+  (alg "alg")
   (Str "Str")
   (Lisp "Lisp")
   (List "List")
@@ -18,6 +34,8 @@
   (app Lisp K))
 (define (CatStr Σ)
   (app Str Σ))
+(define (Catalg F)
+  (app alg F))
 (define $Ɛ (Mi "Ɛ"))
 (define $id (Mi "id" #:attr* '((mathvariant "italic"))))
 (define (&id A) (_ $id A))
@@ -65,11 +83,14 @@
 (define $dummy
   (Mphantom $d*))
 (define Σ $Sigma:normal)
+(define $cong (Mo "&cong;"))
 (define-infix*
+  (&cong $cong)
   (&=> $=>)
   (&::= $::=)
   (&\| $\|))
 (define-@lized-op*
+  (@c* &c*)
   (@compose &compose)
   (@cm &cm)
   (@∈ ∈))
@@ -584,11 +605,226 @@
       ", 存在唯一的函数" (&-> $empty $Y)
       ", 即空函数, 其由序对构成的图就是空集. "
       "注意到范畴不必拥有始对象. "
+      "例如, 非空集合的范畴就是这样的. "
+      "范畴也不必只有一个始对象. "
+      "例如, 在Peano结构的范畴里, "
+      "自然数的Peano结构和句法结构不同, "
+      "但也很容易看出来是始对象. "
+      "尽管这两个结构是不同的, "
+      "但是从抽象层面来说它们是相同的, "
+      "在于一个结构是另一个结构的复制, "
+      "意即存在一个给出了来回两个结构的同态的一一对应, "
+      "也就是说两个结构是同构的. "
+      "这是关于始对象的一般事实" --
+      "当存在始对象时, 任意一对始对象之间都存在唯一的同构, "
+      "因而是同构的. 我们现在转向范畴中的同构的一般概念.")
+   (H3. "同构")
+   (P "在抽象数学里, 同构的数学结构被视为在抽象层面上相同. "
+      "同构的意思是结构之间存在一对同态, 互为对方的逆. "
+      "这种同构的概念可以在任何范畴之中定义.")
+   
+   (H3. "始对象")
+   (P "抽象数学刻画数学结构只关心同构意义上的, "
+      "即所描述的结构上的条件满足"
+      (Ol (Li "存在满足条件的结构.")
+          (Li "任何同构于满足条件的结构的结构都满足条件.")
+          (Li "对于任何一对满足条件的结构, 它们都是同构的."))
+      "而且, 如果第3个要求里的同构是唯一的就更好了.")
+   (P "范畴论的一个基本主题是使用所谓的" (Q "泛映射性质")
+      "来描述范畴中" (Q "唯一同构意义上 (up to unique isomorphism)")
+      "的对象. 这种想法最简单的例子由我们已经定义了的始对象给出.")
+   ((exercise #:n "2.4")
+    "证明如果" $A "同构于一个始对象, 那么" $A "本身就是一个始对象.")
+   ((proposition #:n "2.5")
+    "如果" (&cm $A_1 $A_2) "是始对象, 那么存在唯一的同构"
+    (&cong $A_1 $A_2) ".")
+   ((proof)
+    
+    )
+   (P "总结一下, 以下定理刻画了这次讲座的要义. "
+      "形式语言的句法和语义的" (Q "始代数")
+      "方式在于选择一个范畴使得形式语言的句法可以视为这个范畴的始对象. "
+      "然后, 任何语义都应该刻画为范畴里的对象. "
+      "这么做了以后, 意义函数就由从(作为始对象的)句法宇宙"
+      "到表示语义的对象的唯一映射所唯一确定了. "
+      "{译注: 这里的唯一映射指的是范畴里存在唯一的箭头, "
+      "当然指的不是随意的映射.}")
+   ((theorem #:n "2.6")
+    "在我们四个范畴的例子里, 句法结构可以刻画为同构意义下的始结构, "
+    "即结构范畴里的一个始对象.")
+   (H2. "始代数和终余代数")
+   (P "让我们设我们有了一个形式语言, 我们想要选择一个范畴"
+      CatC "以使得句法可以表示为始对象" $I
+      ", 而每个解释可以表示为一个对象" $A
+      ", 并且意义函数可以表示为唯一的箭头" (&-> $I $A)
+      ". 在许多情况下, 例如对于我们的四个例子而言, "
+      "范畴" CatC "可以自然地选取为某个自函子的代数的范畴, "
+      "这使用了我们将要引入的术语. 从范畴" CatC "到范畴"
+      CatC^ "的函子的概念是自然的同态概念, "
+      "即范畴之间保持结构的映射.")
+   (H3. "函子")
+   (H3. "结构作为代数")
+   (H4 "自函子的代数")
+   (P "给定某个范畴上的一个自函子" $F ", 那么一个"
+      (B $F "的代数") "是一个序对" (tu0 $A $alpha)
+      ", 其中" $A "是范畴的一个对象, 而"
+      (Arrow $alpha (app $F $A) $A)
+      ". 我们可以构造范畴" (Catalg $F) ", 其对象是"
+      $F "的代数而箭头是这样的代数之间的同态给出的. 如果"
+      (tu0 $A $alpha) "和" (tu0 $A^ $alpha^)
+      "是" $F "的代数, 那么从" (tu0 $A $alpha)
+      "到" (tu0 $A^ $alpha^) "的一个" (B "同态")
+      (&-> (tu0 $A $alpha) (tu0 $A^ $alpha^))
+      "是一个函数" (Arrow $pi $A $A^) "满足"
+      (MB (&= (&compose $pi $alpha)
+              (&compose $alpha^ (app $F $pi))) ".")
+      "{译注: 原文这里是函数, 但是我感觉用箭头一词更为合理.} "
+      "于是, 这个范畴的箭头可以取为三元组"
+      (tu0 (tu0 $A $alpha) $pi (tu0 $A^ $alpha^))
+      ", 或者我们也可以使用三元组"
+      (tu0 $alpha $pi $alpha^) ".")
+   (P "我们可以表明, 对于我们的四个结构概念的例子, "
+      "我们都可以在集合范畴" CatSet
+      "上定义一个自函子" $F "以使得每个结构"
+      (&= $A:script (tu0 $A $..h))
+      "都可以视为一个" $F "的代数" (tu0 $A $alpha)
+      ". 在以下每种情形里, 我们首先对于每个集合" $X
+      "定义" (app $F $X) ", 并且对于集合" (&cm $X $Y)
+      "和每个函数" (func $pi $X $Y) "定义"
+      (func (app $F $pi) (app $F $X) (app $F $Y))
+      ". 我们将验证" $F "的确是一个函子的工作留作练习. "
+      "最终, 在每种情形里我们都会对于结构"
+      (&= $A:script (tu0 $A $..h))
+      "定义" (func $alpha (app $F $A) $A)
+      ". 不过, 首先我们需要二元无交并和索引无交并的记号.")
+   (P (B "一些记号: ")
+      "对于集合" (&cm $X $Y) "我们令" (&+ $X $Y)
+      "为其" (B "二元无交并") ", 使用" (&cm $0 $1)
+      "作为标签, 即"
+      (MB (&= (&+ $X $Y)
+              (&union (@c* (setE $0) $X)
+                      (@c* (setE $1) $Y))) ".")
+      "更一般地, 如果" (_ (@ $X_i) (∈ $i $I))
+      "是由集合" $I "索引的一个集合族, 那么"
+      (sum (∈ $i $I) $X_i) "是这个族的"
+      (B "索引无交并") ", 即"
+      (MB (&= (sum (∈ $i $I) $X_i)
+              (setI (tu0 $i $x)
+                    (: (∈ $i $I) "且"
+                       (∈ $x $X_i)))) ".")
+      "在以下的前两个例子中对于函子" $F
+      "的定义里, 我们使用" $1 "代表单元素集"
+      (setE $0) ".")
+   ((example #:n "1")
+    (&= (app $F $X) (&+ $1 $X)) (Br)
+    (func (app $F $pi) (&+ $1 $X) (&+ $1 $Y))
+    (MB (Choice
+         ((ap (app $F $pi) (tu0 $0 $0))
+          $= (tu0 $0 $0))
+         ((ap (app $F $pi) (tu0 $1 $x))
+          $= (tu0 $1 (app $pi $x))
+          (@∈ $x $X))))
+    (func $alpha (&+ $1 $A) $A)
+    (MB (Choice
+         ((ap $alpha (tu0 $0 $0)) $= $alpha)
+         ((ap $alpha (tu0 $1 $x))
+          $= (app $f $x)
+          (@∈ $x $A)))))
+   ((example #:n "2")
+    (&= (app $F $X) (&+ $1 (@c* $K $X))) (Br)
+    (func (app $F $pi)
+          (&+ $1 (@c* $K $X))
+          (&+ $1 (@c* $K $Y)))
+    (MB (Choice
+         ((ap (app $F $pi) (tu0 $0 $0)) $= (tu0 $0 $0))
+         ((ap (app $F $pi) (tu0 $1 (tu0 $k $x)))
+          $= (tu0 $1 (tu0 $k (app $pi $x)))
+          (@cm (∈ $k $K) (∈ $x $X)))))
+    (func $alpha (&+ $1 (@c* $K $A)) $A)
+    (MB (Choice
+         ((ap $alpha (tu0 $0 $0)) $= $a)
+         ((ap $alpha (tu0 $1 (tu0 $k $x)))
+          $= (appl $f $k $x)
+          (@cm (∈ $k $K) (∈ $x $A))))))
+   (let ((F (λ (X) (&+ $K (@c* X X)))))
+     ((example #:n "3")
+      (&= (app $F $X) (F $X)) (Br)
+      (func (app $F $pi) (F $X) (F $Y))
+      (MB (Choice
+           ((ap (app $F $pi) (tu0 $0 $k))
+            $= (tu0 $0 $k)
+            (@∈ $k $K))
+           ((ap (app $F $pi) (tu0 $1 (tu0 $x_1 $x_2)))
+            $= (tu0 $1 (tu0 (app $pi $x_1) (app $pi $x_2)))
+            (@∈ $x_1 $x_2 $X))))
+      (func $alpha (F $A) $A)
+      (MB (Choice
+           ((ap $alpha (tu0 $0 $k))
+            $= (app $a $k)
+            (@∈ $k $K))
+           ((ap $alpha (tu0 $1 (tu0 $x_1 $x_2)))
+            $= (appl $f $x_1 $x_2)
+            (@∈ $x_1 $x_2 $A))))))
+   (let ((F (λ (X) (sum (∈ $sigma Σ)
+                        (^ X $n_sigma)))))
+     ((example #:n "4")
+      (&= (app $F $X) (F $X)) (Br)
+      (func (app $F $pi) (F $X) (F $Y))
+      (MB (&= (ap (app $F $pi)
+                  (tu0 $sigma
+                       (tu0 $x_1 $..h (_ $x $n_sigma))))
+              (tu0 $sigma
+                   (tu0 (app $pi $x_1) $..h
+                        (app $pi (_ $x $n_sigma))))))
+      (MB (@∈ $x_1 $..h (_ $x $n_sigma) $X))
+      (func $alpha (F $A) $A)
+      (MB (&= (ap $alpha (tu0 $sigma
+                              (tu0 $x_1 $..h (_ $x $n_sigma))))
+              (ap (^ $sigma $A:script)
+                  (tu0 $x_1 $..h (_ $x $n_sigma)))))
+      (MB (@∈ $x_1 $..h (_ $x $n_sigma) $A))))
+   ((exercise #:n "3.1")
+    
+    )
+   (H3. "始代数")
+   (P "在什么条件下自函子代数的范畴拥有始代数呢? "
+      "我们给出了这个问题相对于集合范畴上的自函子的答案.")
+   (H4 "有界标准自函子")
+   (P "范畴" CatSet "上的一个自函子" $F "是" (B "标准的")
+      ", 如果对于所有的集合" (&cm $A $B) "满足"
+      $A "是" $B "的一个子集, 都有" (app $F $A)
+      "是" (app $F $B) "的一个子集, 且"
+      (MB (!commute (!0 $F) ι $A $B))
+      "其中" (func (ι $A $B) $A $B)
+      "是从" $A "到" $B "的" (B "嵌入 (inclusion)")
+      "函数, 即满足对于每个" (∈ $x $A) "都有"
+      (&= (app (ι $A $B) $x) $x)
+      "的从" $A "到" $B "的唯一函数.")
+   (P "一个标准函子" $F "是" (B "有界标准的")
+      ", 以" $kappa "为界, 如果" $kappa
+      "是一个正则基数使得对于任意的集合" $A
+      ", 若" (∈ $x (app $F $A)) "则存在"
+      $A "的一个子集" $A^ "具有小于" $kappa
+      "的基数且" (∈ $x (app $F $A^))
+      ". 若" $kappa "是" $aleph_0
+      ", 那么我们称" $F "是" (B "有限标准的") ".")
+   ((exercise #:n "3.2")
+    
+    )
+   (H4 "始代数定理")
+   (P "我们将会藉由以下不动点定理得到始代数.")
+   ((theorem #:n "3.3")
+    "令" $F "是有界标准的. 那么, 作为集合上的算子, "
+    $F "具有唯一的最小不动点" $I ", 即" $I
+    "是一个集合满足" (&= (app $F $I) $I)
+    "且若" (&= (app $F $X) $X) "则有"
+    (&sube $I $X) ".")
+   (P (B "有限情形的证明大纲: ")
       
       )
-   (H3. "同构")
-   (H3. "始对象")
-   (H2. "始代数和终余代数")
-   (H3. "函子")
+   (H3. "终余代数")
+   (H3. "终余代数的例子")
+   (H2. "进程的终宇宙")
+   (H3. "非交互确定性范式")
    
    ))

@@ -131,6 +131,13 @@
     (H2 (A "有一个作用" #:attr* '((href "having_an_effect.html"))))
     (H2 (A "抽象解释 (翻译)" #:attr* '((href "abstract.html"))))
     (H2 (A "CMU课程笔记" #:attr* '((href "cmu.html"))))
+    (H2 (A "实用逻辑和自动推理手册"
+           #:attr* '((href "automated.html"))))
+    (H2 (A "音乐的Haskell学派"
+           #:attr* '((href "haskell_music.html"))))
+    (H2 (A "编程语言中的控制结构"
+           #:attr* '((href "control.html"))))
+    (H2 (A "Edinburgh LCF" #:attr* '((href "lcf.html"))))
     
     )
    ))
