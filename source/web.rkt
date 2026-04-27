@@ -187,10 +187,15 @@
          "real.rkt"
          "agca.rkt"
          "modal_logic.rkt"
+         "nuprl.rkt"
+         "realizability.rkt"
          
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml realizability.html
+             "../realizability.html")
+    (emitXml nuprl.html "../nuprl.html")
     (emitXml modal_logic.html
              "../modal_logic.html")
     (emitXml agca.html "../agca.html")
