@@ -1,12 +1,45 @@
 #lang racket
 (provide automated.html)
 (require SMathML)
+(define $Even (Mi "Even"))
+(define (&Even n)
+  (app $Even n))
+(define $Odd (Mi "Odd"))
+(define (&Odd n)
+  (app $Odd n))
+(define $aleph (Mi "&aleph;"))
+(define $aleph_0 (_ $aleph $0))
+(define (对于所有的 x p)
+  (: "对于所有的" x ",&nbsp;" p))
+(define (存在某个 x p)
+  (: "存在某个" x ",&nbsp;" p))
+(define equivc
+  (case-lambda
+    ((a) (bra0 a))
+    ((a ~) (_ (bra0 a) ~))))
+(define &split:2 (&split 2))
+(define $mod (Mi "mod"))
+(define (@mod n)
+  (@ap $mod n))
+(define (mod= x y n)
+  (&split:2 (&equiv x y) (@mod n)))
+(define $var (Ms "var"))
+(define (&var p)
+  (app $var p))
+(define $FVT (Mi "FVT"))
+(define (&FVT t)
+  (app $FVT t))
+(define $FV (Mi "FV"))
+(define (&FV p)
+  (app $FV p))
 (define $epsilonv (Mi "&varepsilon;"))
 (define $loves (Mi "loves"))
 (define (&loves x y)
   (appl $loves x y))
 (define (App f x)
   (ap f (bra0 x)))
+(define (Appl f . x*)
+  (ap f (bra0 (apply &cm x*))))
 (define $cos (Mi "cos"))
 (define (Ramsey s t)
   (appl $R s t))
@@ -28,15 +61,15 @@
   (Mo "." #:attr* '((lspace "0"))))
 (define (∃ . x*)
   (let-values (((x* P*) (split-at-right x* 1)))
-    (: $exists (apply : x*) $. (car P*))))
+    (: $exists (apply &cm x*) $. (car P*))))
 (define (∀ . x*)
   (let-values (((x* P*) (split-at-right x* 1)))
-    (: $forall (apply : x*) $. (car P*))))
+    (: $forall (apply &cm x*) $. (car P*))))
 (define $exists!
   (Mo "&exist;!" #:attr* '((lspace "0") (rspace "0"))))
 (define (∃! . x*)
   (let-values (((x* P*) (split-at-right x* 1)))
-    (: $exists! (apply : x*) $. (car P*))))
+    (: $exists! (apply &cm x*) $. (car P*))))
 (define $phiv (Mi "&phiv;"))
 (define (qstroke x A B)
   (: A (_ $\| x) B))
@@ -53,6 +86,17 @@
     (map (lambda (y)
            (Mtr (Mtd $=) (Mtd y)))
          y*))
+   'displaystyle "true"
+   'columnalign "center left"))
+(define (deriv^0 x . y*)
+  (set-attr*
+   (apply
+    Mtable
+    (Mtr (Mtd $) (Mtd x))
+    (map2 (lambda (= y)
+            (Mtr (Mtd =) (Mtd y)))
+          y*))
+   'displaystyle "true"
    'columnalign "center left"))
 (define todo.svg
   (Svg
@@ -107,6 +151,7 @@
   (begin (define id (Entry name class))
          ...))
 (define-Entry*
+  (Lemma "引理" "lemma")
   (Corollary "推论" "corollary")
   (Definition "定义" "definition")
   (Remark "评注" "remark")
@@ -152,6 +197,10 @@
 (define (!= . x*)
   (let-values (((a* b*) (split-at-right x* 1)))
     (: (apply &cm a*) $!= (car b*))))
+(define $!=_M (_ $!= $M))
+(define (!=_M . x*)
+  (let-values (((a* b*) (split-at-right x* 1)))
+    (: (apply &cm a*) $!=_M (car b*))))
 (define (G!= . x*)
   (apply != Γ x*))
 (define $!- (Mo "&vdash;"))
@@ -164,7 +213,13 @@
 (define $o* (Mo "&otimes;"))
 (define $NAND (Mo "NAND"))
 (define $NOR (Mo "NOR"))
+(define $=_M (_ $= $M))
+(define $=_M^ (_ $= $M^))
+(define $<=/=> (Mo "&nhArr;"))
 (define-infix*
+  (&<=/=> $<=/=>)
+  (&=_M^ $=_M^)
+  (&=_M $=_M)
   (&NAND $NAND)
   (&NOR $NOR)
   (&o* $o*)
@@ -191,7 +246,45 @@
 (define $not (Mi "not"))
 (define (&not x)
   (app $not x))
+(define $and (Mi "and"))
+(define (&and p q)
+  (appl $and p q))
+(define $or (Mi "or"))
+(define (&or p q)
+  (appl $or p q))
+(define $termval (Ms "termval"))
+(define &termval
+  (case-lambda
+    ((M v t) (APP $termval M v t))
+    ((M v) (APP $termval M v))))
+(define $holds (Ms "holds"))
+(define (&holds M v e)
+  (APP $holds M v e))
+(define $tsubst (Ms "tsubst"))
+(define (&tsubst i t)
+  (APP $tsubst i t))
+(define $subst (Ms "subst"))
+(define &subst
+  (case-lambda
+    ((i p) (APP $subst i p))
+    ((i) (APP $subst i))))
+(define $eqaxioms (Ms "eqaxioms"))
+(define (&eqaxioms Δ)
+  (app $eqaxioms Δ))
+(define $eqaxiom (Ms "eqaxiom"))
+(define (&eqaxiom p)
+  (app $eqaxiom p))
+(define $functions (Ms "functions"))
+(define (&functions p)
+  (APP $functions p))
+(define $equalitize (Ms "equalitize"))
+(define (&equalitize p)
+  (app $equalitize p))
 (define-@lized-op*
+  (@subst &subst)
+  (@tsubst &tsubst)
+  (@= &=)
+  (@termval &termval)
   (@∃ ∃)
   (@∀ ∀)
   (@dual &dual)
@@ -689,7 +782,7 @@ Socrates是一个雅典人
       (MB (&= 179 (&+ (&c* $1 (^ 10 $2))
                       (&c* $7 (^ 10 $1))
                       (&c* $9 (^ 10 $0)))) "."))
-   
+
    (H3. "Boole的逻辑代数" #:id "algebra-of-logic")
    (P "词汇" (Em "algebra") "来源于阿拉伯语的" (Q "al-jabr")
       ", 最早在九世纪由Mohammed al-Khwarizmi (约780-850) 使用, "
@@ -1094,7 +1187,7 @@ val e : expression =
       "并丢弃这些记号之间任意数量的空格 (甚至可能包括换行符). "
       "这样, 句法分析只需处理词元序列, 而可以忽略更底层的细节.")
    (H4. "词法分析")
-   
+
    (H4. "句法分析")
    (H3. "美观打印 (prettyprinting)")
    (H3. "深入阅读")
@@ -1142,7 +1235,7 @@ val e : expression =
       "Chang和Lee (1973), Duffy (1991) 和Fitting (1990), "
       "此外还有一些更专门的著作将在后文中提及.")
    (H3. "练习")
-   
+
    (H2. "命题逻辑")
    (P "我们将会仔细研究命题逻辑, 在OCaml之中定义其形式句法, "
       "连带着句法分析和打印支持. "
@@ -1307,7 +1400,7 @@ val e : expression =
     (string list -> string list -> 'a formula * string list) ->
     string list -> string list -> 'a formula * string list
 = &lt;fun>"))
-   
+
    (H4. "原始命题")
    (P "尽管许多函数将会是通用的 (generic), "
       "但是如果我们固定在一个确定的原始命题类型上, "
@@ -1326,9 +1419,9 @@ val e : expression =
       "现在我们将其提供给通用的公式解析器, "
       "其中对于目前未使用的中缀原子解析器传入一个总是失败的函数, "
       "对于非命题变量的上下文则传入一个空列表:"
-      
+
       )
-   
+
    (H4. "句法操作")
    (P "如果我们能有对应于公式构造子的句法操作"
       "作为正常的OCaml函数可用是很方便的:"
@@ -1478,9 +1571,9 @@ let consequent fm = snd(dest_imp fm);;"))
       "让我们通过定义一个提取公式之中所出现的原子命题的集合的函数来使得我们的表述精确化. "
       "以抽象的数学术语来说, 我们将通过公式上的递归定义" $atoms "如下:"
       (eqn*
-       ((&atoms $bottom)   $= $empty)
-       ((&atoms $top)      $= $empty)
-       ((&atoms $x)        $= (setE $x))
+       ((&atoms $bottom) $= $empty)
+       ((&atoms $top) $= $empty)
+       ((&atoms $x) $= (setE $x))
        ((&atoms (&neg $p)) $= (&atoms $p))
        ((&atoms (&conj $p $q))
         $=
@@ -1669,7 +1762,7 @@ true  true  true  | true
       "总是为真这一点也是合理的, "
       "而只有我们所选择的语义才能在"
       $p "和" $q "取任意真值的情况下使之为真.")
-   
+
    (H3. "有效性, 可满足性, 重言")
    (P "我们称一个赋值" $v (Em "满足")
       "一个公式" $p ", 如果" (&eval $p $v)
@@ -2128,7 +2221,7 @@ let satisfiable fm = not(unsatisfiable fm);;"))
            (&Table
             ($p $q (&NAND $p $q) (&NOR $p $q))
             ("false" "false" "true" "true")
-            ("false" "true" "true""false")
+            ("false" "true" "true" "false")
             ("true" "false" "true" "false")
             ("true" "true" "false" "false"))
            'frame "solid" 'rowlines "solid" 'columnlines "solid")))
@@ -2689,7 +2782,7 @@ true  true  true  | false
       "并且强调了DNF和真值表之间的关系. "
       "我们现在可以确认第2.4节中提出的论断: 给定任意一个"
       $n "元真值函数, 我们可以将其视为一个包含"
-      $n "个原子命题和" $2^n"行的真值表, 并直接构造一个公式 "
+      $n "个原子命题和" $2^n "行的真值表, 并直接构造一个公式 "
       "(以析取范式的形式), 使得该真值函数就是它的解释. "
       "另一方面, 当" $n " (即原公式中原子命题的数量) 较大时, "
       "需要考虑所有" $2^n "个赋值这一点是相当不理想的. "
@@ -3027,6 +3120,11 @@ val fm : prop formula = &lt;&lt;(p \\/ q /\\ r) /\\ (~p \\/ ~r)>>
       "而边是从一个集合" $E "中取出的. "
       "一种对于" (Q "六人聚会") "结果的泛化 "
       "(尽管仍然远没有Ramsey定理一般) 是:")
+   (P "{原注: 请参见第5.5节, "
+      "了解Ramsey在引入其定理时正在解决的逻辑问题. "
+      "另一个其与逻辑的联系是, 第一个" (Q "自然的")
+      "独立于一阶Peano算术的命题 (Paris和Harrington 1991) "
+      "本质上是一个Ramsey型结果的数值编码.}")
    ((Theorem)
     "对于每个" (∈ $s $t $NN) ", 存在某个" (∈ $n $NN)
     "使得任意具有" $n "个顶点的图要么有一个大小为" $s
@@ -3040,7 +3138,141 @@ val fm : prop formula = &lt;&lt;(p \\/ q /\\ r) /\\ (~p \\/ ~r)>>
                  (Ramsey $s (&- $t $1)))) "."))
    ((proof)
     "对于" (&+ $s $t) "施行完全归纳. "
-    )
+    "我们可以根据归纳假设假定结果对于任意的"
+    $s^ "和" $t^ "满足" (&< (&+ $s^ $t^) (&+ $s $t))
+    "成立, 然后我们需要证明" $s "和" $t "的情形." (Br)
+    "考虑具有大小"
+    (&= $n (&+ (Ramsey (&- $s $1) $t)
+               (Ramsey $s (&- $t $1))))
+    "的任意图. 取一个任意的顶点" $v
+    ". 要么存在至少" (Ramsey (&- $s $1) $t)
+    "个顶点与" $v "相连, 要么存在至少"
+    (Ramsey $s (&- $t $1)) "个顶点不与"
+    $v "相连, 否则的话图的总大小至多只有"
+    (&= (&+ (@- (Ramsey (&- $s $1) $t) $1)
+            (@- (Ramsey $s (&- $t $1)) $1)
+            $1)
+        (&- $n $1))
+    ", 这违背了假设. 我们假设前一种情形成立, "
+    "后一种情形的论证是对称的." (Br)
+    "考虑基于与" $v "相连的顶点集的子图, "
+    "其大小至少为" (Ramsey (&- $s $1) $t)
+    ". 根据归纳假设, 要么其有一个大小为"
+    (&- $s $1) "的完全连通子图, 要么其有一个大小为"
+    $t "的完全不连通子图. 如果是前者, 包括"
+    $v "的话就能给出主图的一个大小为" $s
+    "的完全连通子图, 那么我们就结束了. "
+    "如果是后者, 那么我们已经有了一个大小为"
+    $t "的完全不连通子图, 这正是我们所要的. "
+    "于是, 任何大小为" $n
+    "的图要么有一个大小为" $s
+    "的完全连通子图, 要么有一个大小为"
+    $t "的完全不连通子图. 换言之, "
+    (&<= (Ramsey $s $t) $n) ".")
+   (P "{译注: 这个定理的陈述及其论证比看上去要复杂. "
+      "并且, 它的陈述还有一个小错, 即"
+      (&= $s $1) "且" (&= $t $1)
+      "时这个不等式并不成立. "
+      "不过除了这个特殊情形之外, 它的确对于任意的"
+      (&>= $s $1) "和" (&>= $t $1)
+      "成立. 所以说, 论证里其实也存在一个小错, "
+      "就是在这个特殊情形下我们没法从那个图里取出一个顶点, "
+      "因为此时压根就没有顶点. 不过, 在"
+      (&= $s $1) "且" (&>= $t $2) ", 或者"
+      (&>= $s $2) "且" (&= $t $1)
+      "的边缘情形, 原文对于相连不相连的中间结果虽然正确, "
+      "但是论证相当于牵涉了负数目, 所以不太具有意义. "
+      "原文这个对于不等式的论证的适用范围是"
+      (&>= $s $2) "且" (&>= $t $2) "的情形. "
+      "为了清晰起见, 实际上最好把它拆成两个定理. "
+      "一个说明Ramsey数是良定的, 另一个说明不等式成立. "
+      "不过, 不等式的证明本质上不需要归纳法, "
+      "所以说原文证明里的" (Q "根据归纳假设")
+      "的确令人困惑.}")
+   (P "对于任意特定的正整数" (&cm $s $t $n)
+      ", 我们可以表述一个命题公式, 其为重言恰当"
+      (&<= (Ramsey $s $t) $n)
+      ". 我们用整数" $1 "到" $n
+      "为顶点编号, 计算所有的" $s "个元素和"
+      $t "个元素的子集, 然后对于这些集合, "
+      "计算所有的" $2 "元素子集. "
+      "{译注: " $2 "元素子集代表的是边.} "
+      "我们想要表达这样的事实, "
+      "即对于所有的" $s "个元素子集, 有一个的每对元素都是连通的, "
+      "或者对于所有的" $t "个元素子集, 有一个的每对元素都是不连通的. "
+      "以下的局部定义" (Code "e[m;n]") "产生一个原子公式"
+      (Code "p_m_n") ", 我们将其想成是"
+      (Q $m "和" $n "是连通的") ", 或者说"
+      (Q $m "和" $n "互相认识") ", 诸如此类:"
+      (CodeB "let ramsey s t n =
+  let vertices = 1 -- n in
+  let yesgrps = map (allsets 2) (allsets s vertices)
+  and nogrps = map (allsets 2) (allsets t vertices) in
+  let e[m;n] = Atom(P(&quot;p_&quot;^(string_of_int m)^&quot;_&quot;^(string_of_int n))) in
+  Or(list_disj (map (list_conj ** map e) yesgrps),
+     list_disj (map (list_conj ** map (fun p -> Not(e p))) nogrps));;")
+      "{译注: 实际上这个函数的参数"
+      (Code "s") ", " (Code "t") ", " (Code "n")
+      "都可以是自然数, 此时生成的命题公式仍然具有意义.}" (Br)
+      "例如:"
+      (CodeB "# ramsey 3 3 4;;
+- : prop formula =
+&lt;&lt;(p_1_2 /\\ p_1_3 /\\ p_2_3 \\/
+   p_1_2 /\\ p_1_4 /\\ p_2_4 \\/
+   p_1_3 /\\ p_1_4 /\\ p_3_4 \\/ p_2_3 /\\ p_2_4 /\\ p_3_4) \\/
+  ~p_1_2 /\\ ~p_1_3 /\\ ~p_2_3 \\/
+  ~p_1_2 /\\ ~p_1_4 /\\ ~p_2_4 \\/
+  ~p_1_3 /\\ ~p_1_4 /\\ ~p_3_4 \\/ ~p_2_3 /\\ ~p_2_4 /\\ ~p_3_4>>"))
+   (P "我们可以确认数字" $6 "是开始的聚会例子里最好的结果, 即"
+      (&= (Ramsey $3 $3) $6) ":"
+      (CodeB "# tautology(ramsey 3 3 5);;
+- : bool = false
+# tautology(ramsey 3 3 6);;
+- : bool = true"))
+   (P "然而, 后一个例子已经需要相当长的时间, 而即使稍大一些的输入参数, "
+      "也会产生远超我们目前所述方法在合理时间内所能解决的命题问题. "
+      "事实上, 已知的精确Ramsey数非常少, 截至撰写本书时, 即便是"
+      (Ramsey $5 $5) "也只知道其值介于" 43 "到" 49 "之间.")
+   (P "{译注: 以下是Scheme版本的实现:"
+      (CodeB "(define ((allsets n) s)
+  (define (a n s l)
+    (cond ((= n 0) '(()))
+          ((&lt; l n) '())
+          ((= l n) (list s))
+          (else
+           (append (map (curry cons (car s))
+                        (a (- n 1) (cdr s) (- l 1)))
+                   (a n (cdr s) (- l 1))))))
+  (a n s (length s)))
+(define (ramsey s t n)
+  (define v* (range n))
+  (define (sub x)
+    (map (allsets 2)
+         ((allsets x) v*)))
+  (define yes* (sub s))
+  (define no* (sub t))
+  (define (e p)
+    (string->symbol
+     (apply format &quot;p_~s_~s&quot; p)))
+  (make-disj
+   (append (map (lambda (p*)
+                  (make-conj (map e p*)))
+                yes*)
+           (map (lambda (p*)
+                  (make-conj (map (lambda (p)
+                                    `(not ,(e p)))
+                                  p*)))
+                no*))))")
+      "一个例子:"
+      (CodeB "> (simpdnf (ramsey 3 3 4))
+'((p_0_1 p_0_2 p_1_2)
+  (p_0_1 p_0_3 p_1_3)
+  (p_0_2 p_0_3 p_2_3)
+  (p_1_2 p_1_3 p_2_3)
+  ((not p_0_1) (not p_0_2) (not p_1_2))
+  ((not p_0_1) (not p_0_3) (not p_1_3))
+  ((not p_0_2) (not p_0_3) (not p_2_3))
+  ((not p_1_2) (not p_1_3) (not p_2_3)))"))
    (H4. "数字电路")
    (P "数字计算机使用只能占据有限数量电压等级之一的电信号来运行. "
       "(相比之下, 在模拟计算机中, 电压等级可以连续变化.) "
@@ -3075,9 +3307,249 @@ val fm : prop formula = &lt;&lt;(p \\/ q /\\ r) /\\ (~p \\/ ~r)>>
             ("电平" "真值"))
            'columnalign "left"
            'frame "solid" 'rowlines "solid" 'columnlines "solid")))
-   
+   (P "例如, 以下逻辑电路对应于命题公式"
+      (&disj (&conj (&neg $s) $x)
+             (&conj $s $y))
+      ". 一个具有此行为的复合电路元件被称为一个"
+      (Em "选择器(multiplexer)")
+      ", 因为其输出要么是输入" $x ", 要么是输入" $y
+      ", 取决于" $s "是低电平还是高电平."
+      todo.svg)
+   (P "一个显著的区别是, 在电路中我们只需将导线一分为二就能复制输入"
+      $s ", 而在表达式中则需要将" $s "书写两次. "
+      "对于较大的子表达式, 这一差异会更加明显: "
+      "在公式中我们可能需要将其书写多次, "
+      "而在电路中只需从相应的电路元件引出多条导线即可. "
+      "在第2.8节中, 我们将为公式发展出一种类似的技术.")
    (H4. "加法")
+   (P "鉴于计算机采用两电平电路结构, "
+      "数字在计算机中的主要表示方式自然是二进制位置表示法, "
+      "而非十进制或其他方案. "
+      "一个二进制数位, 即一个比特, "
+      "可以用单根导线上的值来表示. 具有"
+      $n "个二进制数位的较大数字可以用" $n
+      "个比特的有序序列来表示, 并以" $n
+      "根导线组成的阵列 (array) 来实现. "
+      "(对于特定大小的阵列有专门的名称, "
+      "例如字节或octet表示八个比特的序列.) "
+      "我们在学校学到的多位算术的常规算法可以直接改写为二进制形式; "
+      "事实上, 它们往往会变得更加简单.")
+   (P "假设我们想要将两个二进制数相加, 每个数由一组" $n
+      "个比特表示. 这意味着每个数的范围是从" $0 "到"
+      (&- $2^n $1) ", 于是和的范围是从" $0 "到"
+      (&- (^ $2 (&+ $n $1)) $2) ", 可能需要" (&+ $n $1)
+      "个比特来存储. 我们只需像十进制一样从右到左逐位相加. "
+      "当某一位的和" (&>= $ $2) "时, 我们将其减去" $2
+      ", 并向下一个比特位产生一个值为" $1 "的" (Q "进位")
+      ". 下面是一个例子, 对应于十进制的"
+      (&= (&+ 179 101) 280) ":"
+      (CodeB "       1  0  1  1  0  0  1  1
+ +     0  1  1  0  0  1  0  1
+------------------------------
+ =  1  0  0  0  1  1  0  0  0"))
+   (P "为了将" $n "位数的加法实现为电路或命题公式, "
+      "最简单的方法是利用算法的规律性, 通过将一个"
+      $1 "位加法器复制" $n "次来构建加法器, "
+      "并在每对相邻元件之间传播进位. "
+      "第一个任务是构建一个" $1 "位加法器, 这并不太难. "
+      "我们可以将两个数字相加所产生的" (Q "和位")
+      " (" $s ") 与" (Q "进位") " (" $c
+      ") 视为两个独立的布尔函数, 其真值表如下所示, "
+      "其中我们使用" $0 "和" $1 "而非" (Q $false)
+      "和" (Q $true) "来强调其与算术的联系:"
+      (MB (set-attr*
+           (&Table
+            ($x $y $c $s)
+            ($0 $0 $0 $0)
+            ($0 $1 $0 $1)
+            ($1 $0 $0 $1)
+            ($1 $1 $1 $0))
+           'frame "solid" 'rowlines "solid" 'columnlines "solid")))
+   (P "进位的真值表可能看起来很熟悉: 它就是" (Q "and")
+      "运算" (&conj $x $y) ". 至于和位, 它是" (Q "or")
+      "运算的不可兼版本, 可以表示为" (&neg (@<=> $x $y))
+      "或者" (&<=> $x (&neg $y)) ", 缩写为XOR. "
+      "我们可以在OCaml中实现与这些运算对应的函数, 如下所示:"
+      (CodeB "let halfsum x y = Iff(x,Not y);;
+
+let halfcarry x y = And(x,y);;")
+      "现在我们可以将" (Em "半加器")
+      "的输入导线和输出导线之间的关系断言如下:"
+      (CodeB "let ha x y s c = And(Iff(s,halfsum x y),Iff(c,halfcarry x y));;"))
+   (P "之所以使用" (Q "半") ", 是因为强调这只是我们所需要的一部分. "
+      "除了最右的数位, 其他情况我们需要将三个比特加起来, "
+      "而不只是两个, 因为还有传入的进位. 一个" (Em "全加器")
+      "将三个比特相加, 因为答案" (&<= $ $3)
+      ", 所以仍然可以只是将结果返回为一个和位和一个进位. "
+      "其真值表如下:"
+      (MB (set-attr*
+           (&Table
+            ($x $y $z $c $s)
+            ($0 $0 $0 $0 $0)
+            ($0 $0 $1 $0 $1)
+            ($0 $1 $0 $0 $1)
+            ($0 $1 $1 $1 $0)
+            ($1 $0 $0 $0 $1)
+            ($1 $0 $1 $1 $0)
+            ($1 $1 $0 $1 $0)
+            ($1 $1 $1 $1 $1))
+           'frame "solid" 'rowlines "solid" 'columnlines "solid"))
+      "并且一种作为门的可能实现如下:"
+      (CodeB "let carry x y z = Or(And(x,y),And(Or(x,y),z));;
+
+let sum x y z = halfsum (halfsum x y) z;;
+
+let fa x y z s c = And(Iff(s,sum x y z),Iff(c,carry x y z));;"))
+   (P "现在将多个全加器组合成一个" $n
+      "位加法器是很容易的事情了, "
+      "并且其在最低端允许一个进位传入, "
+      "而在最高端传出第" (&+ $n $1)
+      "位. {译注: 最后半句有点令我迷惑, "
+      "不过有无这个进位输入都需要"
+      (&+ $n $1) "个位来输出.} "
+      "相应的OCaml函数期望用户提供函数"
+      (Code "x") ", " (Code "y") ", " (Code "out")
+      ", " (Code "c") ", 这些函数接受一个索引, "
+      "生成一个合适的新(原子)变量. "
+      (Code "x") "和" (Code "y")
+      "所返回的变量用于诸输入位, "
+      (Code "out") "返回的则用于输出位, 而"
+      (Code "c") "返回的诸变量是在内部用作进位的, 其中"
+      (Code "c(0)") "是进位入, 而" (Code "c(n)")
+      "是进位出. {译注: 从概念上来说, 除了两端之外, "
+      "这些用于进位的变量既是输入又是输出.}"
+      (CodeB "let conjoin f l = list_conj (map f l);;
+
+let ripplecarry x y c out n =
+  conjoin (fun i -> fa (x i) (y i) (c i) (out i) (c(i + 1)))
+          (0 -- (n - 1));;"))
+   (P "例如, 以下是使用带索引的风格化名称作为输入, "
+      "生成一个" $3 "位加法器:"
+      (CodeB "let mk_index x i = Atom(P(x^&quot;_&quot;^(string_of_int i)))
+and mk_index2 x i j =
+  Atom(P(x^&quot;_&quot;^(string_of_int i)^&quot;_&quot;^(string_of_int j)));;
+val mk_index : string -> int -> prop formula = &lt;fun>
+val mk_index2 : string -> int -> int -> prop formula = &lt;fun>
+# let [x; y; out; c] = map mk_index [&quot;X&quot;; &quot;Y&quot;; &quot;OUT&quot;; &quot;C&quot;];;
+...")
+      "我们得到:"
+      (CodeB "# ripplecarry x y c out 2;;
+- : prop formula =
+&lt;&lt;((OUT_0 &lt;=> (X_0 &lt;=> ~Y_0) &lt;=> ~C_0) /\\
+   (C_1 &lt;=> X_0 /\\ Y_0 \\/ (X_0 \\/ Y_0) /\\ C_0)) /\\
+  (OUT_1 &lt;=> (X_1 &lt;=> ~Y_1) &lt;=> ~C_1) /\\
+  (C_2 &lt;=> X_1 /\\ Y_1 \\/ (X_1 \\/ Y_1) /\\ C_1)>>"))
+   (P "如果我们对最低端的进位输入不感兴趣, "
+      "可以修改结构, 在该位的位置仅使用半加器. "
+      "一个更简单但粗糙的替代方案是, 直接输入"
+      (Code "False") " (即" $0 ") 并化简所得公式:"
+      (CodeB "let ripplecarry0 x y c out n =
+  psimplify
+   (ripplecarry x y (fun i -> if i = 0 then False else c i) out n);;"))
+   (P "之所以使用术语" (Q "波纹进位 (ripple-carry)")
+      "加法器, 是因为进位从右向左依次流过各个全加器. "
+      "在实际电路中, 门的输入发生变化到输出相应变化之间存在传播延迟. "
+      "在极端情况下 (例如" (&+ (Mn "11111...11") $1)
+      "), 最终输出位只有在进位经过" $n
+      "个阶段传播之后才能得到, 大约需要" (&i* $2 $n)
+      "个门延迟. 当" $n "相当大时, 比如" 64
+      ", 这种延迟可能是无法接受的, 因此需要采用不同的设计. "
+      "例如, 在进位选择加法器中, " $n "位输入被分成若干个" $k
+      "位的块, 对应的" $k "位块被加法运算两次, "
+      "一次假设进位输入为" $0 ", 一次假设进位输入为" $1
+      ". 然后可以通过多路复用 (multiplexing) 来决定正确答案, "
+      "以来自前一阶段的实际进位输入作为选择信号. "
+      "这样, 进位只需在" (&/ $n $k)
+      "个块中传播, 每个块仅有少量门延迟. "
+      "为了实现这样的加法器, 我们需要另一个元件来补充"
+      (Code "ripplecarry0") ", 这次强制进位输入为" $1 ":"
+      (CodeB "let ripplecarry1 x y c out n =
+  psimplify
+   (ripplecarry x y (fun i -> if i = 0 then True else c i) out n);;")
+      "当我们使用多路复用器 (选择器) 进行进位传播时, "
+      "将在两种方案之间进行选择:"
+      (CodeB "let mux sel in0 in1 = Or(And(Not sel,in0),And(sel,in1));;"))
+   (P "现在可以递归地实现整体函数, "
+      "使用一个辅助函数对于位阵列中的索引进行偏移:"
+      (CodeB "let offset n x i = x(n + i);;"))
+   (P "假设我们处理的是整体" $n "位中的第"
+      (&cm $0 $..h (&- $k $1))
+      "位. 我们分别在假定进位是" $0 "和" $1
+      "的情况下将" $k "位相加, 这分别给出了输出"
+      (Code "c0") ", " (Code "s0") "和"
+      (Code "c1") ", " (Code "s1")
+      ". 最终的和位与进位出位是由一个多路复用器选择的, "
+      "而选择子为" (Code "c(0)")
+      ". 剩余的" (&- $n $k) "个比特位可以通过递归处理, "
+      "但是所有的比特向量需要都需要偏移" $k
+      "位, 因为我们每次都是从" $0
+      "开始. 额外需要注意的点在于" $n
+      "可能不是" $k "的精确倍数, "
+      "所以说实际上我们每次使用的都是" $k^
+      ", 它要么是" $k ", 要么是比特位总数"
+      $n ", 不论如何选择较小的那个:"
+      (CodeB "let rec carryselect x y c0 c1 s0 s1 c s n k =
+  let k' = min n k in
+  let fm =
+    And(And(ripplecarry0 x y c0 s0 k',ripplecarry1 x y c1 s1 k'),
+        And(Iff(c k',mux (c 0) (c0 k') (c1 k')),
+            conjoin (fun i -> Iff(s i,mux (c 0) (s0 i) (s1 i)))
+                    (0 -- (k' - 1)))) in
+  if k' &lt; k then fm else
+  And(fm,carryselect
+            (offset k x) (offset k y) (offset k c0) (offset k c1)
+            (offset k s0) (offset k s1) (offset k c) (offset k s)
+            (n - k) k);;")
+      "{译注: 个人感觉这里的条件测试应该改成"
+      (Code "(= (- n k^) 0)")
+      ", 当然这是Scheme写法, 不过读者应该可以理解.}")
+   (P "{译注: 关于为什么原文稍有冗余的版本也正确, "
+      "我实际上思考了一段时间, 但是没有抓住头绪. "
+      "后来我发现我忽略了一个关键的事实, "
+      "也就是每个块里面进位输入为假所对应的进位输出, "
+      "一定是小于等于进位输入为真所对应的进位输出的. "
+      "这是一种单调性.}")
+   (P "电路设计中的一个问题是验证某些效率优化没有对所计算的函数造成任何逻辑改变. "
+      "因此, 如果从波纹进位加法器转变为进位选择加法器的优化是正确的, "
+      "那么以下内容应当始终生成重言式. 它表明, 如果相同的输入向量"
+      (Code "x") "和" (Code "y") "由两种不同的方法相加 (使用不同的内部变量), "
+      "则每种方法中所有的和位输出与进位输出应当相同."
+      (CodeB "let mk_adder_test n k =
+  let [x; y; c; s; c0; s0; c1; s1; c2; s2] = map mk_index
+      [&quot;x&quot;; &quot;y&quot;; &quot;c&quot;; &quot;s&quot;; "
+             "&quot;c0&quot;; &quot;s0&quot;; &quot;c1&quot;; &quot;s1&quot;; &quot;c2&quot;; &quot;s2&quot;] in
+  Imp(And(And(carryselect x y c0 c1 s0 s1 c s n k,Not(c 0)),
+          ripplecarry0 x y c2 s2 n),
+      And(Iff(c n,c2 n),
+          conjoin (fun i -> Iff(s i,s2 i)) (0 -- (n - 1))));;"))
+   (P "{译注: 我并没有完全理解这个程序, 不过从直觉上来说, "
+      "它的确应该有一个可以改进的地方. " (Code "ripplecarry0")
+      "只是默认了进位输入是" $0 ", 而对于进位选择加法器, "
+      "生成的命题公式则是断言了进位输入是" $0
+      ". 所以说, 原本的程序在" (Code "n") "为零时不是重言. "
+      "一种改进方式是为波纹进位加法器添加关于进位输入的约束, "
+      "当然此时我们只需要使用" (Code "ripplecarry") ".}")
+   (P "这是一个实用的重言生成器. "
+      "它也展示了计算机设计里的实际问题是如何由命题方法所解决的.")
    (H4. "乘法")
+   (P "既然我们可以将" $n "位数字相加, "
+      "那么我们就可以使用反复加法将数字相乘. "
+      "又一次, 这里可以应用传统算法. "
+      "考虑将两个" $4 "位数字" $A "和" $B
+      "相乘. 我们将会使用记号" $A_i "和" $B_i
+      "代表" $A "和" $B "的第" $i
+      "位, 其中最低重要位 (LSB) 自零开始数, "
+      "于是第" $i "位相当于隐式乘以了" $2^i
+      ". 正和我们手工进行十进制算术时一样, "
+      "我们可以将数字布局如下, 其中乘积项"
+      (&i* $A_i $B_j) "若具有相等的"
+      (&+ $i $j) "则被安排在同一列, "
+      "然后将它们全都加起来:"
+      todo.svg)
+   (P "之后对于" (&i* $A_i $B_j) "我们将会记" (_cm $X $i $j)
+      "; 每个这样的乘积项都可以通过单个AND门由输入位得到. "
+      
+      )
    (H4. "素性和因数分解")
    (H4. "命题逻辑的力量")
    (P "本节仅仅初步展示了某些问题如何可以归约为" (Q "SAT")
@@ -3229,7 +3701,15 @@ val fm : prop formula = &lt;&lt;(p \\/ q /\\ r) /\\ (~p \\/ ~r)>>
       "同时返回递增后的索引以备下次使用. "
       "{译注: 对于Scheme和许多其他Lisp方言而言, "
       "我们有" (Code "gensym") "这种便利设施可用, "
-      "无需费心于freshness问题.}"
+      "无需费心于freshness问题. 不过, " (Code "gensym")
+      "的语义可能相当微妙, 使用起来需要小心谨慎, "
+      "并且可能不具备可移植性. 就译者使用的Racket而言, "
+      "它会产生所谓的uninterned符号, 所以冲突的确是得以避免的, "
+      "但是它并不能保证这些产生的符号在字面上就能和其他符号区别开来, "
+      "所以说简单复制REPL输出再喂给其他过程作为输入在特定情况下可能造成问题, "
+      "不过这种有问题的现象在实际使用时应该罕有发生. "
+      "当然了, 若考虑到实际阅读和演示的需求, "
+      "原文的做法比起使用" (Code "gensym") "是更正确的更好的.}"
       (CodeB "let mkprop n = Atom(P(&quot;p_&quot;^(string_of_num n))),n +/ Int 1;;")
       "为简单起见, 假设初始公式已经通过" (Code "nenf")
       "进行了预简化, 使得否定仅作用于原子, 并且推出式已被消除. "
@@ -3693,15 +4173,366 @@ let defcnf3 fm = list_conj (map list_disj(mk_defcnf andcnf3 fm));;")
     ", 可能是一个笔误.}")
    (P "规则III也常被称为" (Em "归结(resolution)")
       "规则, 我们将会在第3章里对其进行详细研究. "
-      
-      )
+      "相应地, 子句" (&disj $C_i $D_j)
+      "被称为是子句" (&disj $p $C_i) "和"
+      (&disj (&- $p) $D_j) "的一个" (Em "resolvent")
+      ", 并且我们说它是由" (Em "归结")
+      "得到的, 或者更准确地说是" (Em $p "上的归结")
+      ". 在实现里, 我们也在最后把平凡 (或者说重言) "
+      "的子句过滤掉:"
+      (CodeB "let resolve_on p clauses =
+  let p' = negate p and pos,notpos = partition (mem p) clauses in
+  let neg,other = partition (mem p') notpos in
+  let pos' = image (filter (fun l -> l &lt;> p)) pos
+  and neg' = image (filter (fun l -> l &lt;> p')) neg in
+  let res0 = allpairs union pos' neg' in
+  union other (filter (non trivial) res0);;")
+      "{译注: 这里的输入实际上已经默认了, 或者说要求, "
+      "所有的平凡子句已被去除. 否则的话, 使用"
+      (Code "(mem p)") "进行筛选并不正确. "
+      "另外, 最后的过滤是因为归结可能产生新的平凡子句, "
+      "所以说从维护这一性质的角度考虑, "
+      "过滤不是可选的而是必要的.}")
+   (P "从理论上说, 我们可以将1-文字规则应用于单元子句"
+      $p "视为先利用subsumption化简, 然后再施行" $p
+      "上的归结. 这就推出了之前我们说要证明的东西:")
+   ((Corollary)
+    "1-文字规则保持可满足性.")
+   ((proof)
+    "如果原本的集合" $S "包含单元子句" (setE $p)
+    ", 那么根据subsumption规则, 集合" $S
+    "里所有其他牵涉" $p
+    "的子句都可以被移除而不改变可满足性, "
+    "设这个操作给出了" $S^
+    ". {译注: subsumption实际上保持逻辑等价性.} "
+    "现在根据上述定理, 由" $p
+    "上的归结所得到的新集合是等可满足的, "
+    "而这个操作相当于移除了这个单元子句本身, "
+    "以及" (&- $p) "的所有实例.")
+   (P "在实践中, 我们只会在应用1-文字规则和肯定否定规则之后应用归结规则. "
+      "在这种情况下, 我们可以假定" (Em "任何")
+      "还在的文字既有正面出现又有反面出现, "
+      "并且我们面临着要挑哪一个文字进行归结的选择. "
+      "给定一个文字" $l ", 我们可以预测由" $l
+      "上的归结所导致的子句数目变化:"
+      (CodeB "let resolution_blowup cls l =
+  let m = length(filter (mem l) cls)
+  and n = length(filter (mem (negate l)) cls) in
+  m * n - m - n;;")
+      "{译注: 其实肯定否定规则 (纯文字规则) "
+      "可以视为依次对于每个纯文字进行归结. "
+      "注意, 我这里说的其实" (B "并不符合归结的定义")
+      ", 但是可以从形式上理解.}")
+   (P "我们将会挑选最小化这个膨胀的文字. "
+      "(尽管这看起来很有说服力, 但实际上是过分简单化了的; "
+      "远为复杂的启发式是可能的, 并且或许也是更好的.)"
+      (CodeB "let resolution_rule clauses =
+  let pvs = filter positive (unions clauses) in
+  let p = minimize (resolution_blowup clauses) pvs in
+  resolve_on p clauses;;"))
    (H4. "DP过程")
+   (P "DP主过程是递归定义的. 如果子句集合为空 (返回"
+      (Code "true") ", 因为该集合是平凡可满足的), "
+      "或者子句集合包含了一个空子句 (返回"
+      (Code "false") ", 因为不可满足性), "
+      "那么这个过程就会终止. 否则的话, "
+      "它会依次试图不断应用规则I, II, III, "
+      "然后在新的子句集合上递归地继续. "
+      "这个递归过程必然会终止, "
+      "因为每条规则要么会降低不同原子的数目 "
+      "(在III的情形下, 并且我们假定了平凡子句总是会事先去除), "
+      "要么保持原子数目不变但降低了子句的总大小. "
+      "{译注: III之前在代码那里我们已经说过, "
+      "至于总大小, 个人感觉是所有子句的文字数目之和.} "
+      "{译注: 这里的后半句话似乎并不正确, "
+      "因为I和II在某种意义上其实都是III的特殊情形. "
+      "一旦I和II可以适用, 必定会导致不同原子的数目降低!}"
+      (CodeB "let rec dp clauses =
+  if clauses = [] then true else if mem [] clauses then false else
+  try dp (one_literal_rule clauses) with Failure _ ->
+  try dp (affirmative_negative_rule clauses) with Failure _ ->
+  dp(resolution_rule clauses);;")
+      "{译注: 这个过程经过我的思考, 发现并不像看上去那么简单. "
+      "我们需要厘清这三条规则之中哪一个可以为哪一个创造条件, "
+      "而实际上最终我发现厘清的过程异常地微妙. "
+      "单文字规则可以为肯定否定规则创造条件, "
+      "肯定否定规则是应用归结规则的前提. "
+      "(不过, 即便没有肯定否定规则, "
+      "归结规则在形式上仍然正确. "
+      "如果将其应用于某个纯文字, "
+      "实质上相当于消除了含有该纯文字的子句.) "
+      "归结规则因为要消除新生成的平凡子句, "
+      "所以可以为肯定否定规则创造条件. "
+      "但是, 最微妙的情况是其实归结规则可能为单文字规则创造条件. "
+      "乍看上去, 似乎归结规则生成的子句的大小都大于等于二, "
+      "但是实际上因为可能出现重复文字, "
+      "所以说单文字子句也是可能因为归结而出现的. "
+      "另一个同等微妙的情况是, 肯定否定规则应用之后, "
+      "肯定否定规则仍然可能适用, 例如"
+      (MB (setE (setE $p (&neg $r))
+                (setE $p $r)
+                (setE $q $r)
+                (setE (&neg $q) $r)))
+      "在第一轮应用后会得到"
+      (MB (setE (setE $q $r)
+                (setE (&neg $q) $r)))
+      "然而, 即便我们之前说过在纯文字上进行归结"
+      "在形式上和肯定否定规则是等效的, "
+      "就归结规则的这里的实际实现而言, "
+      "迭代应用肯定否定规则直至不能再应用却仍然是必要的. "
+      "这是因为归结规则假定了其输入公式里"
+      "所有原子必有作为肯定和否定文字出现的版本. "
+      "这是可以证明的性质, "
+      "而且它还依赖于输入公式里起码至少要有一个原子, "
+      "但实际上可以证明此时公式至少有两个不同的原子. "
+      "唯一稍显冗余的只是应用肯定否定规则之后, "
+      "单文字规则是不可能适用的. "
+      "或许最后我还想强调一下, 这部分内容非常微妙, "
+      "我实际上反复修改了无数遍 (大于等于五遍), "
+      "因为每次都发现我的陈述存在想当然的漏洞.}")
+   (P "代码可以用作进行可满足性和重言检查:"
+      (CodeB "let dpsat fm = dp(defcnfs fm);;
+
+let dptaut fm = not(dpsat(Not fm));;")
+      "令人振奋的是, " (Code "dptaut") "证明公式"
+      (Code "prime 11") "要比" (Code "tautology")
+      "函数快得多:"
+      (CodeB "# tautology(prime 11);;
+- : bool = true
+# dptaut(prime 11);;
+- : bool = true"))
+   (P "{译注: 以下是Scheme版本的DP过程:"
+      (CodeB "(define (dp clauses)
+  (cond ((null? clauses) #t)
+        ((member '() clauses) #f)
+        (else
+         (let ((new (one-literal-rule clauses)))
+           (if new (dp new)
+               (let ((new (affirmative-negative-rule clauses)))
+                 (if new (dp new)
+                     (dp (resolution-rule clauses)))))))))")
+      "这和原文的OCaml版本基本一致, "
+      "除了失败是通过返回" (Code "#f")
+      "而不是抛出异常进行通知的. "
+      "本来我设想了一些优化, "
+      "最后还是发现原文的写法最好! "
+      "这是因为, 最终我发现这些优化绝大多数都存在漏洞. "
+      "原文的代码风格相当偏向于正确性的易于证明, "
+      "不仅是这里, 其他地方也是如此.}")
    (H4. "DPLL过程")
+   (P "对于更具挑战性的问题, DP过程中生成的子句数量和规模可能会急剧增长, "
+      "并可能在得出结论之前耗尽可用内存. "
+      "在DP算法开发时期的早期计算机上, 这一问题尤为突出, "
+      "这促使Davis, Logemann和Loveland (1962) 用一种"
+      (Em "分裂规则") "来取代归结规则III. "
+      "如果规则I和规则II均不适用, 则选取某个文字" $p
+      ", 那么一个子句集合" Δ "的可满足性可以被归约为"
+      (&union Δ (setE (&- $p))) "和" (&union Δ (setE $p))
+      "的可满足性, 这可以分别测试. "
+      "注意到这保持可满足性: " Δ "是可满足的当且仅当"
+      (&union Δ (setE (&- $p))) "和" (&union Δ (setE $p))
+      "中至少有一个是可满足的, 因为任何赋值必然满足"
+      $p "和" (&- $p) "其中之一. "
+      "{译注: 注意到这句话里的" $p "和" (&- $p)
+      "所表示的其实是单元子句而非文字. "
+      "似乎本书只有一处用了" (setE $p)
+      "记号来表示单元子句, 其他时候都是使用" $p "记号.} "
+      "新加的单元子句可以立即被1-文字规则利用起来以简化子句集合. "
+      "因为这一步约简了(不同)原子的数目, "
+      "所以说过程的终止性仍然能得到保证.")
+   (P "一种对于分裂文字的合理选择方式似乎是挑选最频繁出现的文字 "
+      "(不论以肯定方式还是以否定方式), "
+      "这样的话之后的单元传播过程可以产生最大程度的化简. "
+      "{原注: 实际上精确地说, 分裂变量的最优选择比"
+      "解决可满足性问题本身还要困难 (Liberatore 2000).} "
+      "据此想法, 我们可以定义一个类似于DP过程的"
+      (Code "resolution_blowup") "的函数:"
+      (CodeB "let posneg_count cls l =
+  let m = length(filter (mem l) cls)
+  and n = length(filter (mem (negate l)) cls) in
+  m + n;;"))
+   (P "现在的算法基本上和之前是如出一辙的, "
+      "只不过归结规则被换成了分裂规则 (case-split):"
+      (CodeB "let rec dpll clauses =
+  if clauses = [] then true else if mem [] clauses then false else
+  try dpll(one_literal_rule clauses) with Failure _ ->
+  try dpll(affirmative_negative_rule clauses) with Failure _ ->
+  let pvs = filter positive (unions clauses) in
+  let p = maximize (posneg_count clauses) pvs in
+  dpll (insert [p] clauses) or dpll (insert [negate p] clauses);;")
+      "又一次, 代码可以用作进行可满足性和重言检查:"
+      (CodeB "let dpllsat fm = dpll(defcnfs fm);;
+
+let dplltaut fm = not(dpllsat(Not fm));;")
+      "并且此时对于相同的例子而言, DPLL过程比DP过程甚至更好:"
+      (CodeB "# dplltaut(prime 11);;
+- : bool = true"))
+   (P "{译注: 以下是Scheme版本的DPLL过程:"
+      (CodeB "(define (dpll clauses)
+  (cond ((null? clauses) #t)
+        ((member '() clauses) #f)
+        (else
+         (let ((new (one-literal-rule clauses)))
+           (if new (dpll new)
+               (let ((new (affirmative-negative-rule clauses)))
+                 (if new (dpll new)
+                     (splitting-rule clauses))))))))
+(define (splitting-rule clauses)
+  (define p*
+    (filter positive? (apply U* clauses)))
+  (define p
+    (maximize (posneg-count clauses) p*))
+  (or (dpll (cons (list p) clauses))
+      (dpll (cons (list (negate p)) clauses))))"))
    (H4. "迭代DPLL")
+   (P "对于规模非常大的问题, "
+      "我们已经呈现了的简单递归形式的DPLL过程"
+      "可能需要不切实际大小的内存, "
+      "这是由于分裂嵌套时中间状态的存储. "
+      "大多数现代实现转而采用尾递归 (迭代) 的控制结构, "
+      "使用显式的" (Em "踪迹(trail)") "来保存关于递归分裂的信息. "
+      "我们将这个踪迹就实现为序对的列表, "
+      "每个序对的第一个成员是我们正在假定的文字, "
+      "第二个则是一个标志 (flag), "
+      "其指明了这个文字到底是仅作为情形分裂的一半而假设的 ("
+      (Code "Guessed") "), 还是说它是由之前假设的文字根据单元传播而推出的 ("
+      (Code "Deduced") "). 踪迹以逆序存储, "
+      "也就是说列表的头部是最近才假设或者推出的文字. "
+      "并且, 标志取自以下这个枚举类型:"
+      (CodeB "type trailmix = Guessed | Deduced;;"))
+   (P "一般来说, 我们在探索情形分裂时不再修改输入问题中的子句, 而是保留原始公式, "
+      "仅在踪迹中记录我们进一步的 (通常是临时的) 假设. "
+      "踪迹中的所有文字都被视为在当前探索阶段成立. "
+      "为了找到可用于情形分裂的潜在原子公式, "
+      "我们使用以下方法来标识问题中那些"
+      "在踪迹中未有(正或负)指派的原子公式, "
+      "无论该文字是猜测得来的还是推导得来的:"
+      (CodeB "let unassigned =
+  let litabs p = match p with Not q -> q | _ -> p in
+  fun cls trail -> subtract (unions(image (image litabs) cls))
+                            (image (litabs ** fst) trail);;"))
+   (P "为了执行单元传播, 能够" (Em "内部")
+      "修改问题子句" (Code "cls") "是方便的, "
+      "并且为了更为高效的查找, 我们也会将踪迹"
+      (Code "trail") "处理为一个有限部分函数"
+      (Code "fn") ". 这都是在下列子函数里实现的, "
+      "其执行单元传播, 直至没有进展可以作出:"
+      (CodeB "let rec unit_subpropagate (cls,fn,trail) =
+  let cls' = map (filter ((not) ** defined fn ** negate)) cls in
+  let uu = function [c] when not(defined fn c) -> [c] | _ -> failwith &quot;&quot; in
+  let newunits = unions(mapfilter uu cls') in
+  if newunits = [] then (cls',fn,trail) else
+  let trail' = itlist (fun p t -> (p,Deduced)::t) newunits trail
+  and fn' = itlist (fun u -> (u |-> ())) newunits fn in
+  unit_subpropagate (cls',fn',trail');;")
+      "{译注: 原文还说了或者遇到了空子句, "
+      "不过代码并没有检查这一点, 也不需要检查这一点.}")
+   (P "然后这用在了整体的函数里, "
+      "既返回修改了的子句, 又返回踪迹, "
+      "尽管前者只是为了方便而使用的, "
+      "并不会在主循环中进行保留:"
+      (CodeB "let unit_propagate (cls,trail) =
+  let fn = itlist (fun (x,_) -> (x |-> ())) trail undefined in
+  let cls',fn',trail' = unit_subpropagate (cls,fn,trail) in cls',trail';;"))
+   (P "当我们遇到一个矛盾或者说" (Em "冲突")
+      "时, 我们需要进行回溯以最近分裂的另一分支. "
+      "这就是" (Em "决策文字(decision literal)")
+      " (标记以" (Code "Guessed") "的文字) "
+      "和踪迹里的其他文字有所区别的地方了: "
+      "我们从踪迹里移除诸项, 直至遇到最近的决策文字, "
+      "或者什么也不剩的情况."
+      (CodeB "let rec backtrack trail =
+  match trail with
+    (p,Deduced)::tt -> backtrack tt
+  | _ -> trail;;"))
+   (P "现在我们要用这种迭代改良重述经典的DPLL算法. "
+      (Code "dpli") "的参数是原本问题的子句" (Code "cls")
+      ", 其在递归调用的过程中保持不变, "
+      "还有一个参数是当前的" (Code "trail")
+      ". 首先我们执行穷竭性的单元传播以获得新的子句集合"
+      (Code "cls'") "和新的踪迹" (Code "trail'")
+      ". (我们没有考虑肯定否定规则, 尽管可以毫不费力地将其加入.) "
+      "如果我们推导出了空子句, 那么就回溯至最近的决策文字. "
+      "如果没有剩下来的决策文字, 我们就结束了: 该公式不可满足. "
+      "否则的话, 我们选取最近的决策文字, 将其否定置于踪迹中, "
+      "标记以" (Code "Deduced")
+      "以指出其是由之前在踪迹里假定的文字所推出的. "
+      "{译注: 实际上的意思就是不用回溯了.} "
+      "(从操作角度而言, "
+      "这意味着在下一次冲突时不会再次对其取反而陷入循环.) "
+      "如果没有冲突, 那么就和递归版本一样, 我们选取一个未指派的文字"
+      (Code "p") ", 启动情形分裂, 而若不存在未指派的文字, "
+      "那么该公式就是可满足的了."
+      (CodeB "let rec dpli cls trail =
+  let cls',trail' = unit_propagate (cls,trail) in
+  if mem [] cls' then
+    match backtrack trail with
+      (p,Guessed)::tt -> dpli cls ((negate p,Deduced)::tt)
+    | _ -> false
+  else
+      match unassigned cls trail' with
+        [] -> true
+      | ps -> let p = maximize (posneg_count cls') ps in
+              dpli cls ((p,Guessed)::trail');;"))
+   (P "与往常一样, 我们可以将其转化为对任意公式的可满足性检验和重言式检验:"
+      (CodeB "let dplisat fm = dpli (defcnfs fm) [];;
+
+let dplitaut fm = not(dplisat(Not fm));;"))
+   (P "它的运行效果与递归实现一样好, 尽管通常会慢一些, "
+      "原因在于我们朴素的数据结构不支持高效的查找和单元传播. "
+      "但当我们考虑进一步的优化时, 迭代结构的优势便真正得以体现.")
    (H4. "回跳和学习")
+   (P "对于一个不可满足的子句集合, 在递归情形分裂足够多次之后, "
+      "我们总是能得到空子句, 其表明了某种特定的文字指派组合是不一致的. "
+
+      )
    (H3. "Stålmarck方法")
    (H3. "二元决策图")
    (H3. "紧致性")
+   (P "我们现在建立命题逻辑的一个关键理论性质, "
+      "这一性质在下一章中将被重要地使用, "
+      "它涉及一个无穷公式集的可满足性. "
+      "回顾一下, 一个命题公式的集合" Γ "被称为是可满足的, "
+      "如果存在一个赋值能同时满足其中所有的公式. "
+      "紧致性定理陈述如下:")
+   (P "{原注: 这个名称源于与点集拓扑学的联系 (Engelking 1989; Kelley 1975). "
+      "赋予所有赋值的集合" $BB^NN
+      "基于离散拓扑的积拓扑, 其中"
+      (&= $BB (setE $false $true))
+      ". (这有时被称为Cantor空间.) 对于任意公式" $p
+      ", 满足它的赋值集合" $V_p "在这个拓扑中是闭的 (实际上也是开的), "
+      "因为每个公式只涉及有限多个命题变量. 由于" $BB
+      "是紧致的, 根据Tychonoff定理, " $BB^NN
+      "也是紧致的. 根据假设, 来源于集族" (setI $V_p (∈ $p Γ))
+      "的所有有限交都是非空的, 因此由紧致性的定义, "
+      "它们全部的交也是非空的, 这正是所需要的. "
+      "假定选择公理成立, 若将" $NN
+      "替换为任意原子集合, Tychonoff定理仍然成立, "
+      "从而给出了紧致性定理在一般情形下的证明.}")
+   ((Theorem)
+    "对于任意的命题公式集合" Γ
+    ", 如果其每个有限子集" (&sube Δ Γ)
+    "都是可满足的, 那么" Γ
+    "本身也是可满足的.")
+   ((proof)
+
+    )
+   ((Corollary)
+    "如果一个任意的命题公式集合" Γ
+    "是不可满足的, 那么存在某个有限子集"
+    (&sube Δ Γ) "是不可满足的.")
+   ((proof)
+    "假设每个有限子集" (&sube Δ Γ)
+    "都是可满足的. 根据紧致性定理, " Γ
+    "是可满足的, 这与题设矛盾.")
+   ((Corollary)
+
+    )
+   ((proof)
+
+    )
+
+   (H4. "无限图的着色")
    (H3. "深入阅读")
    (P "关于Boolean代数的一般理论, 包括对Boole原始系统的命题, 集合论及其他解释, "
       "可参见例如Abian (1976), Davey和Priestley (1990) 以及Halmos (1963). "
@@ -3746,7 +4577,7 @@ let defcnf3 fm = list_conj (map list_disj(mk_defcnf andcnf3 fm));;")
       "Queille和Sifakis 1982) 相结合时, 后者经历了一场小型革命. "
       "关于模型检查的详细介绍, 可参见Clarke, Grumberg和Peled (1999), "
       "以及一些关于计算机科学中的逻辑的书籍, 如Huth和Ryan (1999).")
-   
+
    (H3. "练习")
    (H2. "一阶逻辑")
    (P "我们现在从命题逻辑移至更为丰富的一阶逻辑, "
@@ -3819,7 +4650,7 @@ let defcnf3 fm = list_conj (map list_disj(mk_defcnf andcnf3 fm));;")
    (P "在特定上下文中, 我们会考虑受限" (Em "语言")
       "中的项和/或类型. 形式化地说, 我们将" (Em "签名")
       "定义为一对集合, 其中一个集合是函数的列表, "
-      "另一个集合是谓词的列表, 函数和集合都是由名字和元数构成的序对, "
+      "另一个集合是谓词的列表, 函数和谓词都是由名字和元数构成的序对, "
       "而签名所对应的" (Em "语言")
       "是所有只使用签名里的函数和谓词构建而成的项和公式的集合 "
       "(不过变量可以是任意的). "
@@ -3944,7 +4775,7 @@ let defcnf3 fm = list_conj (map list_disj(mk_defcnf andcnf3 fm));;")
       ", 对于每个" $x ", 存在一个" (&> $delta $0)
       "使得每当" (&< (&abs (&- $x^ $x)) $delta) "时, 我们也有"
       (&< (&abs (&- (app $f $x^) (app $f $x))) $epsilon)
-      "{译注: 原文的epsilon使用不太一致, 一会儿"
+      " {译注: 原文的epsilon使用不太一致, 一会儿"
       $epsilon ", 一会儿" $epsilonv "}:"
       (MB (∀ $epsilon
              (&=> (&> $epsilon $0)
@@ -3965,26 +4796,1838 @@ let defcnf3 fm = list_conj (map list_disj(mk_defcnf andcnf3 fm));;")
                             (∀ $x (∀ $x^ (&=> (&< (&abs (&- $x^ $x)) $delta)
                                               (&< (&abs (&- (app $f $x^) (app $f $x)))
                                                   $epsilon)))))))) "."))
-   
+   (P "请注意量词的顺序变化如何从根本上改变了其所断言的性质. (例如, "
+      (&= (app $f $x) $x^2) "在实轴上是连续的, 但并非一致连续的.) "
+      "一致连续性的概念在分析的算术化 (arithmetization) 过程中很晚才被明确提出, "
+      "而若干早期的" (Q "证明") "表面上只需要连续性, 实际上却需要一致连续性. "
+      "或许使用形式语言本可以更早地澄清许多概念上的困难.")
+   (P "{原注: 即便使用形式语言, 要理解"
+      (Q $forall) "和" (Q $exists)
+      "量词反复交替出现的含义往往仍然很困难. "
+      "正如我们将在第7章中看到的, "
+      "量词交替的次数是衡量一个公式" (Q "数学复杂性")
+      "的一个重要指标. 甚至有人提出, "
+      "复数和拓扑空间等整套数学概念与结构, "
+      "主要只是一种隐藏更多量词交替的手段, "
+      "从而使它们更容易为我们的直觉所理解.}")
+   (P "名字" (Q "一阶逻辑") "的由来在于量词只能应用于指称对象的变量, "
+      "而不能是函数或者谓词. 允许对于函数和谓词进行量化的逻辑 (例如"
+      (∃ $f (∀ $x (Appl $P $x (app $f $x))))
+      ") 被称为是" (Em "二阶的") "或是" (Em "高阶的")
+      ". 但是, 我们自限于一阶量词: "
+      "接下来定义的句法分析器会将这样的字符串里的第一个" $f
+      "当作通常的对象变量, 而第二个" $f
+      "会被当成一个幺元函数, 它们只是恰好同名.")
    (H3. "句法分析和打印")
+
    (H3. "一阶逻辑的语义")
+   (P "与命题公式一样, 一阶公式的意义是递归定义的, "
+      "并且依赖于赋予其各组成部分的基本意义. "
+      "在命题逻辑中, 唯一的组成部分是命题变量, "
+      "但在一阶逻辑中, 变量, 函数符号和谓词符号都需要被解释. "
+      "通常的做法是将这些关注点分开处理, "
+      "相对于一个解释和一个赋值来定义项或公式的含义, "
+      "其中解释刻画函数符号和谓词符号的解释, 赋值刻画变量的意义. "
+      "从数学上讲, 一个解释" $M "由三个部分组成."
+      (Ul (Li "一个非空集合" $D ", 其被称为解释的" (Em "论域")
+              ". 意图在于所有的项都取值于" $D ".")
+          (Li "一个映射, 将每个" $n "元函数符号" $f
+              "映射为一个函数" (func $f_M $D^n $D) ".")
+          (Li "一个映射, 将每个" $n "元谓词符号" $P
+              "映射为一个布尔函数"
+              (func $P_M $D^n (setE $false $true))
+              ". 等价地, 我们可以将这种解释想成是一个子集"
+              (&sube $P_M $D^n) ".")))
+   (P "我们基于一个特定的解释" $M "和赋值" $v
+      "来定义一个项的值, 只需注意变量是如何被"
+      $v "所解释的以及函数符号是如何被" $M
+      "所解释的:"
+      (eqn*
+       ((&termval $M $v $x) $= (app $v $x))
+       ((&termval $M $v (appl $f $t_1 $..h $t_n))
+        $=
+        (appl $f_M (&termval $M $v $t_1) $..h
+              (&termval $M $v $t_n)))))
+   (P "一个公式是否在某个特定的解释" $M "和赋值"
+      $v "下成立 (也就是具有真值" (Q $true)
+      "), 可以类似地递归定义 (Tarski 1936), "
+      "并且大部分都遵循着命题逻辑所建立的模式. "
+      "主要附加的复杂度是刻画量词的意义. "
+      "我们意在使得" (∀ $x (App $P $x))
+      "在一个特定解释" $M "和赋值" $v
+      "下成立恰当其体" (App $P $x)
+      "对于变量" $x "的" (Em "任何")
+      "解释都为真, 换言之, 不论我们怎样修改赋值"
+      $v "在" $x "上的值.")
+   (eqn*
+    ((&holds $M $v $bottom) $= $false)
+    ((&holds $M $v $top) $= $true)
+    ((&holds $M $v (appl $R $t_1 $..h $t_n))
+     $=
+     (appl $R_M (&termval $M $v $t_1) $..h
+           (&termval $M $v $t_n)))
+    ((&holds $M $v (@neg $p))
+     $=
+     (&not (&holds $M $v $p)))
+    ((&holds $M $v (@conj $p $q))
+     $=
+     (&and (&holds $M $v $p)
+           (&holds $M $v $q)))
+    ((&holds $M $v (@disj $p $q))
+     $=
+     (&or (&holds $M $v $p)
+          (&holds $M $v $q)))
+    ((&holds $M $v (@=> $p $q))
+     $=
+     (&or (&not (&holds $M $v $p))
+          (&holds $M $v $q)))
+    ((&holds $M $v (@<=> $p $q))
+     $=
+     (@= (&holds $M $v $p)
+         (&holds $M $v $q)))
+    ((&holds $M $v (@∀ $x $p))
+     $=
+     (: "对于所有的" (∈ $a $D) ",&nbsp;"
+        (&holds $M (@ext $v $x $a) $p)))
+    ((&holds $M $v (@∃ $x $p))
+     $=
+     (: "存在某个" (∈ $a $D) ",&nbsp;"
+        (&holds $M (@ext $v $x $a) $p))))
+   (P "解释里的论域" $D "是约定非空的, "
+      "但只要非空即可, 其可以具有任意有限或者无限的基数 "
+      "(例如, 集合" (setE $0 $1) "或者实数集" $RR
+      "), 并且函数和谓词可由任意的(可能不可计算的)数学函数所解释. "
+      "对于无限的" $D ", 我们无法直接在OCaml中实现" $holds
+      "函数, 因为解释一个量词牵涉在" $D
+      "的所有元素上运行测试. 不过, "
+      "我们将会实现一个只对于有限论域成立的弱化版本.")
+   (P "一个解释是由一个论域, 函数解释, 谓词解释的三元组表示的. "
+      "(为了使得解释有意义, 论域" $D "应该是非空的, "
+      "并且每个" $n "元函数符号" $f "应该被解释为一个将"
+      $D "的元素的" $n "元组映射至" $D "的一个函数" $f_M
+      ". 以下的OCaml函数只是假定参数" (Code "m")
+      "在这种解读下是有意义的.) "
+      "赋值被表示为一个有限部分函数 (见附录2). "
+      "然后, 项的语义可以遵循我们之前所给出的抽象描述进行递归定义:"
+      (CodeB "let rec termval (domain,func,pred as m) v tm =
+  match tm with
+    Var(x) -> apply v x
+  | Fn(f,args) -> func f (map (termval m v) args);;s")
+      "而公式的语义如下:"
+      (CodeB "let rec holds (domain,func,pred as m) v fm =
+  match fm with
+    False -> false
+  | True -> true
+  | Atom(R(r,args)) -> pred r (map (termval m v) args)
+  | Not(p) -> not(holds m v p)
+  | And(p,q) -> (holds m v p) &amp; (holds m v q)
+  | Or(p,q) -> (holds m v p) or (holds m v q)
+  | Imp(p,q) -> not(holds m v p) or (holds m v q)
+  | Iff(p,q) -> (holds m v p = holds m v q)
+  | Forall(x,p) -> forall (fun a -> holds m ((x |-> a) v) p) domain
+  | Exists(x,p) -> exists (fun a -> holds m ((x |-> a) v) p) domain;;"))
+   (P "为了澄清概念, 让我们尝试一些解释公式的例子, "
+      "这些公式牵涉零元函数符号" (Q $0) ", " (Q $1)
+      ", 二元函数符号" (Q $+) "和" (Q $d*)
+      ", 以及二元谓词符号" (Q $=)
+      ". {译注: 从某种意义上来说, "
+      "以下的程序暗示了名字和元数是要打包在一起出现的, "
+      "同名但不同元数的函数符号或谓词符号被视为(截然)不同的. "
+      "这点之后在原文中也有显式强调.} "
+      "我们考虑一种Boole本人式解释, 其中"
+      (Q $+) "被解读为不可兼的或:"
+      (CodeB "let bool_interp =
+  let func f args =
+    match (f,args) with
+      (&quot;0&quot;,[]) -> false
+    | (&quot;1&quot;,[]) -> true
+    | (&quot;+&quot;,[x;y]) -> not(x = y)
+    | (&quot;*&quot;,[x;y]) -> x &amp; y
+    | _ -> failwith &quot;uninterpreted function&quot;
+  and pred p args =
+    match (p,args) with
+      (&quot;=&quot;,[x;y]) -> x = y
+    | _ -> failwith &quot;uninterpreted predicate&quot; in
+  ([false; true],func,pred);;"))
+   (P "另一种解释是对于某个任意的正整数" $n
+      "的模" $n "算术:"
+      (CodeB "let mod_interp n =
+  let func f args =
+    match (f,args) with
+      (&quot;0&quot;,[]) -> 0
+    | (&quot;1&quot;,[]) -> 1 mod n
+    | (&quot;+&quot;,[x;y]) -> (x + y) mod n
+    | (&quot;*&quot;,[x;y]) -> (x * y) mod n
+    | _ -> failwith &quot;uninterpreted function&quot;
+  and pred p args =
+    match (p,args) with
+      (&quot;=&quot;,[x;y]) -> x = y
+    | _ -> failwith &quot;uninterpreted predicate&quot; in
+  (0--(n-1),func,pred);;"))
+   (P "如果所有的变量都由量词所绑定, "
+      "那么赋值就对于一个公式是否成立不产生任何影响. "
+      "(很快我们将会以更精确的方式陈述和证明这个结果.) "
+      "在这样的情形下, 我们可以就使用"
+      (Code "undefined") "进行实验. 例如, "
+      (∀ $x (&disj (&= $x $0) (&= $x $1)))
+      "在解释" (Code "bool_interp") "和"
+      (Code "mod_interp 2") "下均成立, 但在"
+      (Code "mod_interp 3") "下不成立:"
+      (CodeB "# holds bool_interp undefined &lt;&lt;forall x. (x = 0) \\/ (x = 1)>>;;
+- : bool = true
+# holds (mod_interp 2) undefined &lt;&lt;forall x. (x = 0) \\/ (x = 1)>>;;
+- : bool = true
+# holds (mod_interp 3) undefined &lt;&lt;forall x. (x = 0) \\/ (x = 1)>>;;
+- : bool = false"))
+   (P "考虑以下断言, 即论域里的每个非零对象均有一个乘法逆元."
+      (CodeB "# let fm = &lt;&lt;forall x. ~(x = 0) ==> exists y. x * y = 1>>;;"))
+   (P "对于了解一些数论的读者应该可以预料到, 这在"
+      (Code "mod_interp n") "中成立恰当" (Code "n")
+      "是一个素数, 或者是平凡情形为" $1 ":"
+      (CodeB "# filter (fun n -> holds (mod_interp n) undefined fm) (1--45);;
+- : int list = [1; 2; 3; 5; 7; 11; 13; 17; 19; 23; 29; 31; 37; 41; 43]"))
+   (P "读者可以确认, 这个公式在" (Code "bool_interp")
+      "下也是成立的. (实际上, 即便基于不同的论域, "
+      (Code "mod_interp 2") "和" (Code "bool_interp") "是"
+      (Em "同构的") ", 即本质上相同, 这是会在第4.2节有所解释的概念.")
+   (P "以下是个人Scheme版本的实现:"
+      (CodeB "(define (forall? pred lst)
+  (cond ((null? lst) #t)
+        ((pred (car lst))
+         (forall? pred (cdr lst)))
+        (else #f)))
+(define (exists? pred lst)
+  (cond ((null? lst) #f)
+        ((pred (car lst)) #t)
+        (else
+         (exists? pred (cdr lst)))))
+;&lt;term> ::= &lt;var> | (&lt;func> &lt;term>*)
+;&lt;predicate> ::= (&lt;pred> &lt;term>*)
+;&lt;exp> ::= &lt;bool>
+;       |  &lt;predicate>
+;       |  (not &lt;exp>)
+;       |  (and &lt;exp> &lt;exp>)
+;       |  (or &lt;exp> &lt;exp>)
+;       |  (=> &lt;exp> &lt;exp>)
+;       |  (&lt;=> &lt;exp> &lt;exp>)
+;       |  (forall &lt;var> &lt;exp>)
+;       |  (exists &lt;var> &lt;exp>)
+(struct interp (domain func pred))
+(define ((termval m v) term)
+  (match term
+    (,x (guard (symbol? x)) (v x))
+    ((,func . ,term*)
+     (apply (funcval m func)
+            (map (termval m v) term*)))))
+(define (funcval m f)
+  ((interp-func m) f))
+(define (predval m p)
+  ((interp-pred m) p))
+(define (extend v x a)
+  (lambda (y)
+    (if (eq? y x)
+        a
+        (v y))))
+(define (holds? m v exp)
+  (match exp
+    (,b (guard (boolean? b)) b)
+    ((not ,e) (not (holds? m v e)))
+    ((and ,e1 ,e2) (and (holds? m v e1)
+                        (holds? m v e2)))
+    ((or ,e1 ,e2) (or (holds? m v e1)
+                      (holds? m v e2)))
+    ((=> ,e1 ,e2) (or (not (holds? m v e1))
+                      (holds? m v e2)))
+    ((&lt;=> ,e1 ,e2) (eq? (holds? m v e1)
+                        (holds? m v e2)))
+    ((forall ,x ,e)
+     (forall? (lambda (a)
+                (holds? m (extend v x a) e))
+              (interp-domain m)))
+    ((exists ,x ,e)
+     (exists? (lambda (a)
+                (holds? m (extend v x a) e))
+              (interp-domain m)))
+    ((,pred . ,term*)
+     (apply (predval m pred)
+            (map (termval m v) term*)))))")
+      "模逆的例子的确十分有趣."
+      (CodeB "(define (mod-interp n)
+  (interp (range n)
+          (lambda (f)
+            (case f
+              ((zero) (lambda () 0))
+              ((one) (lambda () (modulo 1 n)))
+              ((+) (lambda (a b)
+                     (modulo (+ a b) n)))
+              ((*) (lambda (a b)
+                     (modulo (* a b) n)))
+              (else (error 'mod-interp &quot;unknown func symbol ~s&quot; f))))
+          (lambda (p)
+            (case p
+              ((=) (lambda (a b) (= a b)))
+              (else (error 'mod-interp &quot;unknown pred symbol ~s&quot; p))))))
+(define undefined
+  (lambda (x)
+    (error 'undefined &quot;unknown variable ~s&quot; x)))
+(define modulo_inverse_existence
+  '(forall x (=> (not (= x (zero)))
+                 (exists y (= (* x y) (one))))))")
+      (CodeB "> (filter (lambda (n)
+            (holds? (mod-interp n) undefined
+                    modulo_inverse_existence))
+          (range 1 46))
+'(1 2 3 5 7 11 13 17 19 23 29 31 37 41 43)"))
+   (H4. "自由变量的集合")
+   (P "对于一个项" $t "所牵涉的所有变量的集合我们记"
+      (&FVT $t) ", 例如"
+      (&= (&FVT (appl $f (&+ $x $y) (&+ $y $z)))
+          (setE $x $y $z))
+      ", 其可以在OCaml中递归实现如下:"
+      (CodeB "let rec fvt tm =
+  match tm with
+    Var x -> [x]
+  | Fn(f,args) -> unions (map fvt args);;"))
+   (P "一个项" $t "被称为是" (Em "ground")
+      "的, 如果其不含有变量, 即"
+      (&= (&FVT $t) $empty)
+      ". 正如我们所期望的, "
+      "一个项的语义只依赖于赋值在实际出现在项里的变量上的动作, "
+      "所以说作为特殊情形, ground项的语义和赋值无关.")
+   ((Theorem #:id "term-var-agree")
+    "如果赋值" $v "和" $v^ "在某个项里的所有变量上都相合, "
+    "即对于所有的" (∈ $x (&FVT $t)) ", 我们都有"
+    (&= (app $v $x) (app $v^ $x)) ", 那么"
+    (&= (&termval $M $v $t) (&termval $M $v^ $t)) ".")
+   ((proof)
+    "根据" $t "的结构上的归纳. 如果" $t
+    "只是一个变量" $x ", 那么"
+    (&= (&FVT $t) (setE $x))
+    ", 于是根据题设有"
+    (&= (&termval $M $v $x)
+        (app $v $x)
+        (app $v^ $x)
+        (&termval $M $v^ $x))
+    "." (Br)
+    "若" $t "具有形式" (appl $f $t_1 $..h $t_n)
+    ", 那么根据题设, " $v "和" $v^ "在集合"
+    (&FVT (appl $f $t_1 $..h $t_n))
+    "上相合, 因而其也在每个" (&FVT $t_i)
+    "上相合. 根据归纳假设, 对于每个" $t_i "有"
+    (&= (&termval $M $v $t_i)
+        (&termval $M $v^ $t_i))
+    ", 据此可以推得"
+    (&= (&termval $M $v (appl $f $t_1 $..h $t_n))
+        (&termval $M $v^ (appl $f $t_1 $..h $t_n)))
+    ".")
+   (P "下列函数返回出现在一个公式里的所有变量的集合."
+      (CodeB "let rec var fm =
+   match fm with
+    False | True -> []
+  | Atom(R(p,args)) -> unions (map fvt args)
+  | Not(p) -> var p
+  | And(p,q) | Or(p,q) | Imp(p,q) | Iff(p,q) -> union (var p) (var q)
+  | Forall(x,p) | Exists(x,p) -> insert x (var p);;"))
+   (P "和项一样, 一个项" $p "被称为是" (Em "ground")
+      "的, 如果其不包含变量, 即" (&= (&var $p) $empty)
+      ". 然而, 我们通常对于公式的自由变量集合"
+      (&FV $p) "更有兴趣, 忽略那些只会绑定出现的变量. "
+      "在这种情况下, 当我们经过一个量词时, "
+      "我们需要从其体的自由变量集合里去除量化了的变量而不是加上它:"
+      (CodeB "let rec fv fm =
+  match fm with
+    False | True -> []
+  | Atom(R(p,args)) -> unions (map fvt args)
+  | Not(p) -> fv p
+  | And(p,q) | Or(p,q) | Imp(p,q) | Iff(p,q) -> union (fv p) (fv q)
+  | Forall(x,p) | Exists(x,p) -> subtract (fv p) [x];;"))
+   (P "诚然如此, 在将以上定理从项推广至公式的过程里, "
+      "自由变量集合的概念是重要的:")
+   ((Theorem #:id "formula-var-agree")
+    "如果两个赋值" $v "和" $v^ "在一个公式" $p
+    "的所有自由变量上都相合, 即对于所有的"
+    (∈ $x (&FV $p)) "我们都有"
+    (&= (app $v $x) (app $v^ $x))
+    ", 那么"
+    (&= (&holds $M $v $p)
+        (&holds $M $v^ $p)) ".")
+   ((proof)
+    "根据" $p "的结构上的归纳. 若" $p "为" $bottom "或" $top
+    ", 那么该定理平凡为真. 如果" $p "具有形式"
+    (appl $R $t_1 $..h $t_n) ", 那么既然" $v "和" $v^
+    "在" (&FV (appl $R $t_1 $..h $t_n))
+    "上相合, 因而其也在每个" (&FVT $t_i)
+    "上相合. " (Ref "term-var-agree")
+    "表明, 对于每个" $t_i ", 我们有"
+    (&= (&termval $M $v $t_i)
+        (&termval $M $v^ $t_i))
+    ", 故"
+    (&= (&holds $M $v (appl $R $t_1 $..h $t_n))
+        (&holds $M $v^ (appl $R $t_1 $..h $t_n)))
+    "." (Br)
+    "如果" $p "具有形式" (&neg $q)
+    ", 那么既然根据定义有" (&= (&FV $p) (&FV $q))
+    ", 归纳假设给出了"
+    (&= (&holds $M $v $p)
+        (&not (&holds $M $v $q))
+        (&not (&holds $M $v^ $q))
+        (&holds $M $v^ $p))
+    ". 类似地, 如果" $p "具有形式" (&conj $q $r)
+    ", 那么既然"
+    (&= (&FV (&conj $q $r))
+        (&union (&FV $q) (&FV $r)))
+    ", 归纳假设保证了"
+    (&= (&holds $M $v $q) (&holds $M $v^ $q)) "和"
+    (&= (&holds $M $v $r) (&holds $M $v^ $r))
+    ", 于是"
+    (&= (&holds $M $v (@conj $q $r))
+        (&holds $M $v^ (@conj $q $r)))
+    ". 对于其他二元联结词情形的论证几乎都是一样的." (Br)
+    "如果" $p "具有形式" (∀ $x $q)
+    ", 那么根据题设, 我们有对于每个" (∈ $y (&FV $p))
+    ", " (&= (app $v $y) (app $v^ $y)) ". 既然"
+    (&= (&FV (∀ $x $q)) (&- (&FV $q) (setE $x)))
+    ", 这意味着对于每个" (∈ $y (&FV $q))
+    ", 除了" (&= $y $x) "的情况, 都有"
+    (&= (app $v $y) (app $v^ $y))
+    ". 但是, 这就保证了对于论域" $M
+    "里的任意元素" $a ", 对于" (Em "所有") "的"
+    (∈ $y (&FV $q)) ", 我们都有"
+    (&= (app (@ext $v $x $a) $y)
+        (app (@ext $v^ $x $a) $y))
+    ". 因此, 根据归纳假设, 对于所有这样的" $a ", 我们有"
+    (&= (&holds $M (@ext $v $x $a) $q)
+        (&holds $M (@ext $v^ $x $a) $q))
+    ". 根据定义, 这意味着"
+    (&= (&holds $M $v $p) (&holds $M $v^ $p))
+    ". 对于存在量词情形的论证也是类似的.")
+   (P "一个公式" $p "被称为是一个" (Em "句子(sentence)")
+      ", 如果其没有自由变量, 即" (&= (&FV $p) $empty)
+      ". 一个ground公式也是一个句子, 但是一个句子可以含有变量, "
+      "只要其所有的实例都有绑定即可, 例如"
+      (∀ $x (∃ $y (appl $P $x $y))) ".")
+   ((Corollary)
+    "如果" $p "是一个句子, 那么对于任意的解释" $M
+    "和任意的赋值" $v "和" $v^ ", 我们都有"
+    (&= (&holds $M $v $p) (&holds $M $v^ $p))
+    ". {译注: 当然, 这种解释需要合理才行.}")
+   ((proof)
+    "如果" (&= (&FV $p) $empty)
+    ", 那么不论赋值怎样, 它们都在"
+    (&FV $p) "上是相合的.")
+   (H4. "有效性和可满足性")
+   (P "类比于命题逻辑, 一个一阶公式被称为是" (Em "逻辑有效的")
+      ", 如果其在所有解释和所有赋值下都成立. "
+      "并且, 如果" (&<=> $p $q) "是逻辑有效的, 那么我们称"
+      $p "和" $q "是" (Em "逻辑等价的")
+      ". 有效公式是命题重言的一阶类比, "
+      "并且对于一阶情形我们有时也使用" (Q "重言")
+      "这个词汇. 的确如此, 每个命题重言都可以给出 (give rise to) "
+      "相应的有效一阶公式 (见之后的推论3.13). "
+      "一个牵涉量词的有效公式是"
+      (&=> (@∀ $x (App $P $x)) (App $P $a))
+      ", 其断言了如果" $P "对于所有的" $x
+      "均为真, 那么其也对于任何特定的常量"
+      $a "为真. 另外, 这个量词的存在和作用域都是关键的; "
+      (&=> (App $P $x) (App $P $a)) "和"
+      (∀ $x (&=> (App $P $x) (App $P $a)))
+      "都不是有效的. {译注: 这里说的不是有效的, "
+      "指的是不总是有效的, 但是不排除存在有效的情况. "
+      "这些记号都是元记号, " $x "是代表变量的元变量, "
+      $a "是代表常量 (零元函数应用) 的元变量, "
+      $P "是公式模式, 可以理解为根据一个项参数构造公式的方法.} "
+      "例如, 后者在某些解释下成立但是在其他解释下又不成立:"
+      (CodeB "# holds (mod_interp 3) undefined &lt;&lt;(forall x. x = 0) ==> 1 = 0>>;;
+- : bool = true
+# holds (mod_interp 3) undefined &lt;&lt;forall x. x = 0 ==> 1 = 0>>;;
+- : bool = false")
+      "{译注: 这里对于例子的描述和实际给出的例子是不一致的, "
+      "实际上给出的例子说的是在某个固定的解释下, "
+      (&=> (@∀ $x (App $P $x)) (App $P $a)) "的某个具体实例成立, "
+      "但是" (∀ $x (&=> (App $P $x) (App $P $a)))
+      "按照相同方式进行实例化得到的公式却不成立.}")
+   (P "一个相当令人意外的逻辑有效公式或许是"
+      (∃ $x (∀ $y (&=> (app $P $x) (app $P $y))))
+      ". {译注: 这个公式应该理解为字面上的而不是元的.} "
+      "从直觉上来说, 要么" $P "对于一切都为真, "
+      "此时后件" (app $P $y) "总是为真, 要么存在某个"
+      $x "使得前件" (app $P $x) "为假. 不论是哪种情况, "
+      "这整个推出式都是为真的. "
+      "(这经常被称为" (Q "酒鬼悖论")
+      ", 因为其可以想成是断言某人" $x
+      "的存在性, 其满足如果" $x "喝酒了, "
+      "那么所有人都喝酒了.)")
+   (P "我们称一个解释" $M (Em "满足")
+      "一个一阶公式" $p ", 或者说" $p
+      "在解释" $M "下成立, 如果对于所有的赋值" $v
+      ", 我们都有" (&= (&holds $M $v $p) $true)
+      ". 类似地, 我们称" $M "满足一个公式的集合" $S
+      ", 或者说" $S "在" $M "下成立, 如果" $M
+      "满足集合里的每个公式. 我们称一个一阶公式"
+      "或者一个一阶公式集合是" (Em "可满足的")
+      ", 如果存在某个能够满足它的解释. "
+      "注意到在可满足性定义里解释和赋值的非对称性: "
+      "存在某个解释" $M "使得对于所有的赋值" $v
+      "我们都有" (&holds $M $v $p)
+      "; 这看起来有点令人惊讶, "
+      "但是却使得之后的材料从技术上更为简单. "
+      "在任何情况下, 当我们考虑句子时, "
+      "这种不对称就消失了, 因为赋值不会造成任何影响. "
+      "很容易看出来, 一个句子" $p "是有效的当且仅当"
+      (&neg $p) "是不可满足的, 这和命题逻辑是一样的. "
+      "然而, 对于具有自由变量的公式而言, 这不再正确. "
+      "例如, " (&disj (app $P $x) (&neg (app $P $y)))
+      "不是有效的, 然而否定形式"
+      (&conj (&neg (app $P $x)) (app $P $y))
+      "仍是不可满足的, 因为其要被" (Em "所有")
+      "赋值满足, 包括那些给" $x "和" $y
+      "指派了相同对象的赋值.")
+   (P "满足了一个公式集合" Γ "的一个解释被称为是"
+      Γ "的一个" (Em "模型") ". 记号" (G!= $p) "的意思是"
+      (Q $p "在" Γ "的所有模型里均成立")
+      ", 并且我们通常将" (!= $empty $p) "记为"
+      (!= $p) ". 特别地, " Γ "是不可满足的当且仅当"
+      (G!= $bottom) " (既然" $bottom
+      "永远不能成立, 必然不存在" Γ "的模型). "
+      "然而, 和命题逻辑不同的是, 即便当"
+      (&= Γ (setE $p_1 $..h $p_n))
+      "有限时, 也不必满足"
+      (!= (setE $p_1 $..h $p_n) $p) "等价于"
+      (!= (&=> (&conj $p_1 $..c $p_n) $p))
+      ". 原因在于赋值上的量化在不同的位置发生. "
+      "例如, " (!= (setE (app $P $x)) (app $P $y))
+      "为真, 但是" (!= (&=> (app $P $x) (app $P $y)))
+      "不为真. 然而, 如果每个" $p_i "都是一个句子 "
+      "(也就是没有自由变量), 那么这两个会是等价的. "
+      "{译注: 对于非句子的情况, 右边可以推出左边, "
+      "但是左边无法推出右边.} "
+      "我们偶尔会使用记号" (!=_M Γ $p)
+      "来表达, 如果" (Em "特定") "的" $M "是"
+      Γ "的模型, 那么" $p "也在该模型中成立. "
+      "{译注: 原文没有对于单个公式定义模型, "
+      "但实际上这里的确可以说" $M "是" $p "的模型.} "
+      "于是, " (!=_M $p) "的意思就是"
+      $M "满足" $p ".")
+   (P "{译注: 前一段的讨论默认了"
+      (&cm $p_1 $..h $p_n $p)
+      "都是具有某个特定签名的语言里的公式, "
+      "并且解释应该与签名相匹配. 换言之, "
+      "恰好应该提供对于签名所描述的函数符号和谓词符号的解释, "
+      "并且元数也要与签名相符.}")
+   (P "正如我们已经指出的, "
+      "我们不可能直接基于语义来实现有效性或可满足性的检验. "
+      "我们完全无法评估一个公式在具有无限论域的解释下是否成立. "
+      "虽然我们可以检验它在某个有限解释下是否成立, "
+      "但我们无法检验它在所有这样的解释下是否成立, 因为有限解释有无穷多个. "
+      "请注意这与命题逻辑的对比: 在命题逻辑中, "
+      "命题变量的取值范围是一个有限的(" $2 "-元素的)集合, "
+      "因此可以穷举遍历, 而且也不存在单独的解释这一概念. "
+      "{译注: 并且, 一个命题公式的不同原子数目是有限的, "
+      "而命题公式的真值只依赖于其所牵涉的原子上的真值.}")
+   (P "然而, 这并不意味着先验地排除了以更巧妙的方式检验一阶有效性的一切希望. "
+      "实际上, 我们将以一种更间接的方式来解决有效性检验问题: "
+      "首先将一阶公式转化为一组命题公式, "
+      "使得这组命题公式可满足当且仅当原本的公式可满足. "
+      "因此, 我们将首先考虑如何对公式进行变换, "
+      "使量词移到最外层, 然后再将其彻底消去. "
+      "不过, 在着手这项工作之前, "
+      "我们需要精确地处理一些相当乏味的句法问题.")
    (H3. "句法操作")
+   (P "我们经常想要取一个一阶公式, 然后对于其所有的自由变量进行全称量化, 例如从"
+      (∃ $y (&< $x (&+ $y $z))) "到" (∀ $x (∃ $y (&< $x (&+ $y $z))))
+      ". {译注: 这里只是演示了对于部分自由变量进行全称量化而非全部, "
+      "全称闭包指的是对于所有的自由变量进行全称量化. "
+      "从语义角度来看, 全称量化的次序的确不重要.} "
+      "注意到这种" (Q "泛化") "或者说" (Q "全称闭包")
+      "是有效的当且仅当原本的公式是有效的, "
+      "因为不论哪种情况我们都要求在对于那个变量指派任意的论域元素时, "
+      "核心公式成立. (更为形式化地说, 使用" (Ref "formula-var-agree")
+      "以表明{对于所有的赋值" $v "和" (∈ $a $D) ", 我们有"
+      (&holds $M (@ext $v $x $a) $p) "}当且仅当{对于所有的赋值"
+      $v ", 我们有" (&holds $M $v $p) "}.) "
+      "{译注: 原文括号里的补充实际上是更强一些的, "
+      "它说明了解释" $M "满足新的公式当且仅当" $M
+      "满足原本的公式. 并且, 可以看到实际上" $x
+      "不一定要是" (&FV $p) "的元素, 任意的变量都具有这种性质. "
+      "不过, 后文指出了如果" (&!in $x (&FV $p))
+      ", 那么" (∀ $x $p) "和" $p "甚至是逻辑等价的. "
+      "逻辑等价性和这里所说的性质的区别在于, "
+      "逻辑等价需要逐模型逐赋值的真值相等, "
+      "但是这里只是逐模型的可满足性相同, "
+      "所以逻辑等价是更强的性质.} "
+      "不过, 与句子打交道更为方便; "
+      "例如, 如果所有牵涉的公式都是句子, 那么"
+      (!= (setE $p_1 $..h $p_n) $q) "当且仅当"
+      (!= (&=> (&conj $p_1 $..c $p_n) $q))
+      ", 并且" $p "的有效性和" (&neg $p)
+      "的不可满足性是相同的, "
+      "这两个和命题逻辑的情况保持一致. "
+      "以下是一个对于全称泛化的OCaml实现:"
+      (CodeB "let generalize fm = itlist mk_forall (fv fm) fm;;")
+      "{译注: " (Code "generalize")
+      "将任意的一阶公式转化为一个句子, 但是保持有效性不变. "
+      "更细致地说, 相对于每个特定模型的可满足性不变.}")
+   (H4. "项中的替换")
+   (P "我们需要定义的另一关键操作是将项或者公式里的变量替换为项, "
+      "例如将" (&=> (&< $x $2) (&<= $x $y)) "中的" $x
+      "替换为" $1 "可以得到" (&=> (&< $1 $2) (&<= $1 $y))
+      ". 我们将会把意图的变量指派或者说" (Em "实例化")
+      "描述为一个从变量到项的有限部分函数, "
+      "对于我们不想改变的变量, 这个函数可以是未定义的或者将"
+      (Code "x") "映射为" (Code "Var(x)")
+      ". 给定这样一种指派" (Code "sfn")
+      ", 项上的替换可以递归定义如下:"
+      (CodeB "let rec tsubst sfn tm =
+  match tm with
+    Var x -> tryapplyd sfn x tm
+  | Fn(f,args) -> Fn(f,map (tsubst sfn) args);;"))
+   (P "对于这个概念, 我们可以观察到一些重要的性质. "
+      "首先, 被替换后的项中的变量是可以预料的:")
+   ((Lemma #:id "tsubst-free")
+    "对于任意的项" $t "和实例化" $i
+    ", 被替换后的项中的自由变量恰好是用于替换"
+    $t "中的自由变量的那些项里的自由变量, 即"
+    (MB (&= (&FVT (&tsubst $i $t))
+            (Union (∈ $y (&FVT $t))
+                   (&FVT (app $i $y)))) ".")
+    "{译注: 这里的" $i "是从变量到项的(完全)函数, "
+    "但是我们可以将有限部分函数嵌入到完全函数里. "
+    "或许这里作者的想法就是嵌入, 所以说" $i
+    "并非所有可能的完全函数. 然而, 实际上像"
+    (Code "tsubst") "和之前的" (Code "termval")
+    "和" (Code "holds") "这样用到有限部分函数的过程"
+    "可以自然地推广至完全函数的版本. "
+    "并且, 这些论证也没有用到有限部分函数的特殊性. "
+    "所以说, 论证也不是错的, "
+    "并且在某种意义上证明了一个稍强的版本. "
+    "不过, 值得注意一下的是, 数学记号里"
+    $\|-> "这个操作可以应用于完全函数, "
+    "但是OCaml代码里" (Code "|->")
+    "只会应用于所谓的有限部分函数.}")
+   ((proof)
+    "根据项的结构上的归纳. 如果" $t
+    "是一个变量" $z ", 那么"
+    (MB (&= (&FVT (&tsubst $i $t))
+            (&FVT (app $i $z))
+            (Union (∈ $y (setE $z))
+                   (&FVT (app $i $y)))) ".")
+    "既然" (&= (&FVT $z) (setE $z))
+    ", 于是推出了想要的结果." (Br)
+    "若" $t "具有形式" (appl $f $t_1 $..h $t_n)
+    ", 那么根据归纳假设, 对于每个"
+    (&= $k (&cm $1 $..h $n)) ", 我们有:"
+    (MB (&= (&FVT (&tsubst $i $t_k))
+            (Union (∈ $y (&FVT $t_k))
+                   (&FVT (app $i $y)))) ".")
+    "由此可以推出:"
+    (MB (deriv^
+         (&FVT (&tsubst $i (appl $f $t_1 $..h $t_n)))
+         (&FVT (appl $f (&tsubst $i $t_1) $..h
+                     (&tsubst $i $t_n)))
+         (Union (&= $k $1) $n
+                (&FVT (&tsubst $i $t_k)))
+         (Union (&= $k $1) $n
+                (Union (∈ $y (&FVT $t_k))
+                       (&FVT (app $i $y))))
+         (Union (∈ $y (Union (&= $k $1) $n
+                             (&FVT $t_k)))
+                (&FVT (app $i $y)))
+         (Union (∈ $y (&FVT (appl $f $t_1 $..h $t_n)))
+                (&FVT (app $i $y))))))
+   (P "以下结果给出了关于替换后的项的解释的一个简单性质. "
+      "经过反思不难发现, 它相当符合预期. "
+      "{译注: 第2章有一个非常类似的定理, "
+      "只不过那里是对于单独一个变量进行替换, "
+      "而这里是同时对于所有变量进行替换.}")
+   ((Lemma #:id "tsubst-value")
+    "对于任意的项" $t "和实例化" $i ", 在任意的解释" $M "和赋值" $v
+    "下, 替换后的项的值和原本的项在修饰了的赋值"
+    (&compose (@termval $M $v) $i)
+    "下所得到的值是相同的, 即"
+    (MB (&= (&termval $M $v (@tsubst $i $t))
+            (&termval $M (@compose (@termval $M $v) $i) $t)) ".")
+    "{译注: 原文说的是原本的公式, 这只是一个笔误.}")
+   ((proof)
+    "如果" $t "是一个变量" $x ", 那么"
+    (MB (deriv^
+         (&termval $M $v (@tsubst $i $x))
+         (&termval $M $v (app $i $x))
+         (app (@compose (@termval $M $v) $i) $x)
+         (&termval $M (@compose (@termval $M $v) $i) $x)))
+    "这正是预期的结果. 若" $t "具有形式"
+    (appl $f $t_1 $..h $t_n)
+    ", 那么根据归纳假设, 对于每个"
+    (&= $k (&cm $1 $..h $n)) ", 我们有:"
+    (MB (&= (&termval $M $v (@tsubst $i $t_k))
+            (&termval $M (@compose (@termval $M $v) $i) $t_k)))
+    "于是:"
+    (MB (deriv^
+         (&termval $M $v (@tsubst $i (appl $f $t_1 $..h $t_n)))
+         (&termval $M $v (appl $f (&tsubst $i $t_1) $..h
+                               (&tsubst $i $t_n)))
+         (appl $f_M (&termval $M $v (@tsubst $i $t_1)) $..h
+               (&termval $M $v (@tsubst $i $t_n)))
+         (appl $f_M (&termval $M (@compose (@termval $M $v) $i) $t_1) $..h
+               (&termval $M (@compose (@termval $M $v) $i) $t_n))
+         (&termval $M (@compose (@termval $M $v) $i)
+                   (appl $f $t_1 $..h $t_n)))))
+   (H4. "公式中的替换")
+   (P "乍看之下, 我们似乎可以通过类似的结构递归来定义公式中的替换操作. "
+      "然而, 绑定变量的存在使问题变得复杂许多.")
+   (P "我们已经观察到, 绑定变量只是占位符, "
+      "用于指示绑定变量与其绑定实例之间的对应关系, "
+      "因此不应对它们进行替换. 例如, 对于" $x "进行替换不应对公式"
+      (∀ $x (&= $x $x)) "产生任何影响, 因为其中每个" $x
+      "都被量词所绑定. 此外, 即使避免对绑定变量本身进行替换, "
+      "我们仍然面临一个风险: "
+      "替换进去的项的自由变量可能被外部的变量绑定操作所捕获. "
+      "例如, 如果我们直接将公式" (∃ $x (&= (&+ $x $1) $y))
+      "中的" $y "替换为" $x ", 那么得到的公式"
+      (∃ $x (&= (&+ $x $1) $x)) "并不是我们所想要的, "
+      "因为替换进去了的变量" $x "被绑定了. "
+      "我们想要做的事情是" (Em "alpha变换")
+      ", 即对于绑定变量进行重命名, 例如这里将"
+      $x "重命名为" $z ". 然后我们可以安全地进行替换以得到"
+      (∃ $z (&= (&+ $z $1) $x))
+      ", 这既按照要求替换了自由变量, 又维护了正确的绑定对应. "
+      "为了实现这一点, 我们首先编写一个函数, "
+      "通过不断向变量名添加撇号字符来发明一个变量名的" (Q "变体")
+      ", 直到它与给定的需要避免的变量列表中的所有变量都不同为止; "
+      "这将在必要时用于重命名绑定变量:"
+      (CodeB "let rec variant x vars =
+  if mem x vars then variant (x^&quot;'&quot;) vars else x;;")
+      "例如:"
+      (CodeB "# variant &quot;x&quot; [&quot;y&quot;; &quot;z&quot;];;
+- : string = &quot;x&quot;
+# variant &quot;x&quot; [&quot;x&quot;; &quot;y&quot;];;
+- : string = &quot;x'&quot;
+# variant &quot;x&quot; [&quot;x&quot;; &quot;x'&quot;];;
+- : string = &quot;x''&quot;"))
+   (P "现在, 替换的定义从一系列直接的结构递归开始. "
+      "然而, 量化公式" (∀ $x $p) "和" (∃ $x $p)
+      "这两种微妙情形由一个互递归的函数"
+      (Code "substq") "处理:"
+      (CodeB "let rec subst subfn fm =
+  match fm with
+    False -> False
+  | True -> True
+  | Atom(R(p,args)) -> Atom(R(p,map (tsubst subfn) args))
+  | Not(p) -> Not(subst subfn p)
+  | And(p,q) -> And(subst subfn p,subst subfn q)
+  | Or(p,q) -> Or(subst subfn p,subst subfn q)
+  | Imp(p,q) -> Imp(subst subfn p,subst subfn q)
+  | Iff(p,q) -> Iff(subst subfn p,subst subfn q)
+  | Forall(x,p) -> substq subfn mk_forall x p
+  | Exists(x,p) -> substq subfn mk_exists x p"))
+   (P "这个" (Code "substq") "函数会检查如果绑定变量"
+      $x "没有重命名的话是否会出现变量捕获. "
+      "它进行检测的方法是, 判断是否会出现"
+      (&FV $p) "中的" (&!= $y $x)
+      "使得应用替换于" $y "产生一个具有"
+      $x "的自由出现的项. "
+      "{译注: 当然了, 项压根没有绑定结构, 所以只要出现即可.} "
+      "如果的确出现的变量捕获, 那么我们会挑选一个新的绑定变量"
+      $x^ ", 其不会与对于" $p "进行替换产生的结果发生(变量)冲突; "
+      "否则的话, 直接置" (&= $x^ $x)
+      ". 整体的结果是应用带有额外映射" (&\|-> $x $x^)
+      "的替换于体" $p "得到的. "
+      "注意到在不需要换名的情况下, 其会阻止对于" $x
+      "进行(非平凡的)替换, 这正是预期的行为."
+      (CodeB "and substq subfn quant x p =
+  let x' = if exists (fun y -> mem x (fvt(tryapplyd subfn y (Var y))))
+                     (subtract (fv p) [x])
+           then variant x (fv(subst (undefine x subfn) p)) else x in
+  quant x' (subst ((x |-> Var x') subfn) p);;")
+      "例如:"
+      (CodeB "# subst (&quot;y&quot; |=> Var &quot;x&quot;) &lt;&lt;forall x. x = y>>;;
+- : fol formula = &lt;&lt;forall x'. x' = x>>
+# subst (&quot;y&quot; |=> Var &quot;x&quot;) &lt;&lt;forall x x'. x = y ==> x = x'>>;;
+- : fol formula = &lt;&lt;forall x' x''. x' = x ==> x' = x''>>"))
+   (P "我们希望这种重命名的微妙至少看上去还算合理. "
+      "不过, 若要最终澄清我们的定义, 实际上我们需要表明"
+      (Code "subst") "满足与相对于" (Code "tsubst")
+      "而言的" (Ref "tsubst-free") "和" (Ref "tsubst-value")
+      "类似的性质, 尽管建立这些性质要远为困难.")
+   ((Lemma)
+    "对于任意的公式" $p "和实例化" $i
+    ", 替换后的项中的自由变量恰好是那些用于替换"
+    $p "的自由变量的项中自由出现的变量, 即"
+    (MB (&= (&FV (&subst $i $p))
+            (Union (∈ $y (&FV $p))
+                   (&FVT (app $i $y)))) "."))
+   ((proof)
+
+    )
+   ((Theorem #:id "subst-value")
+    "对于任意的公式" $p ", 实例化" $i
+    ", 解释" $M "以及赋值" $v ", 我们有"
+    (MB (&= (&holds $M $v (@subst $i $p))
+            (&holds $M (@compose (@termval $M $v) $i) $p)) "."))
+   ((proof)
+
+    )
+   (P "一个直接的推论如下, "
+      "如果我们将自由变量想成是隐式全称量化的, "
+      "那么这个结果的确不足为奇:")
+   ((Corollary)
+    "如果一个公式是有效的, 那么其任何替换实例也是有效的.")
+   ((proof)
+    "令" $p "是一个逻辑有效的公式. 对于任意的实例化"
+    $i ", 我们有"
+    (MB (&= (&holds $M $v (@subst $i $p))
+            (&holds $M (@compose (@termval $M $v) $i) $p)
+            $true) ".")
+    "这是因为, 既然对于任意的赋值" $v
+    "都有" (&= (&holds $M $v $p) $true)
+    ", 那么" (&compose (@termval $M $v) $i)
+    "作为赋值也不会例外. "
+    "{译注: 一个微妙之处在于" $v "是依赖于" $M
+    "的. 另外, 所有这些牵涉的对象都依赖于一个隐式的签名.} "
+    "{再次译注: 我读到后面才意识到, "
+    "作者在一般情况下应该都是假定解释/模型提供了一切函数符号和谓词符号的解释, "
+    "并非总是假定存在一个隐式的签名. 不过, "
+    "基本上所有结果也都可以在假定隐式签名的情况下成立, "
+    "只不过有的或许牵涉签名的扩张等修改, "
+    "所以说作者选择了这种解释一切的做法, "
+    "因为会比较方便, 无需特殊说明.}")
+   (P "替换的定义及其关键性质的证明相当乏味无聊. "
+      "一种替代方案是将自由变量和绑定变量分为不同的句法范畴, "
+      "从而使捕获不可能发生. "
+      "一种特别流行的方案由de Bruijn (1972) 提出, "
+      "它使用数值索引来表示绑定变量的嵌套深度. "
+      "然而, 这种方法本身也有一些缺点.")
    (H3. "前束范式")
+   (P "一个一阶公式被称为是具有"
+      (Em "前束范式(prenex normal form, PNF)")
+      ", 如果其所有的量词都出现在外部, "
+      "而体 (或者说" (Q "matrix")
+      ") 里只用到了命题联结词. 例如, "
+      (∀ $x (∃ $y (∀ $z (&=> (&conj (app $P $x)
+                                    (app $P $y))
+                             (app $P $z)))))
+      "具有PNF形式, 而"
+      (&=> (@∃ $x (app $P $x))
+           (∃ $y (&conj (app $P $y)
+                        (∀ $z (app $P $z)))))
+      "则不具有PNF形式, "
+      "因为量化了的子公式使用了命题联结词进行组合. "
+      "本节我们将会展示如何将任意的一阶公式"
+      "转换为一个与之逻辑等价的PNF形式.")
+   (P "当我们在命题逻辑中实现析取范式时 (第2.6节), "
+      "我们考虑了两种方法, 一种基于真值表, "
+      "另一种则是不断应用重言性变换, 例如"
+      (&--> (&conj $p (@disj $q $r))
+            (&disj (@conj $p $q)
+                   (@conj $p $r)))
+      ". 在一阶逻辑里, 我们没有和真值表手段类似的方法, "
+      "但是我们仍然可以通过反复将子公式转换为与之逻辑等价的形式, "
+      "从而将量词逐渐外拉, 最终将一个公式转换为前束范式. "
+      "鉴于并无方便的手段能够将量词从逻辑等价式中拉出来, "
+      "所以我们最好提前消去它们, 就像前一章里的命题否定范式. "
+      "实际上, 如果我们遵循与早前DNF变换类似的模式, 会使问题得到简化:"
+      (Ul (Li "将" (Code "False") ", " (Code "True")
+              ", 空虚量化等东西化简消除;")
+          (Li "消去推出式和等价式, 将否定下推;")
+          (Li "将量词外拉.")))
+   (P "化简阶段的处理方式和之前消去命题公式里的"
+      (Code "False") "和" (Code "True")
+      "时大致相同. 但是, 我们也会消除" (Em "空虚量词")
+      ", 也就是量化变量没有在体中自由出现的情况.")
+   ((Theorem)
+    "如果" (&!in $x (&FV $p)) ", 那么"
+    (∀ $x $p) "逻辑等价于" $p ".")
+   ((proof)
+    "公式" (∀ $x $p) "在模型" $M "和赋值" $v
+    "下成立当且仅当对于" $M "的论域里的每个" $a
+    ", " $p "在" $M "和赋值" (ext $v $x $a)
+    "下成立. 然而, 既然" $x "并没有在" $p
+    "中自由出现, 这种情况成立恰当" $p
+    "在" $M "和" $v "下成立, 鉴于论域是非空的.")
+   (P "类似地, 如果" (&!in $x (&FV $p))
+      ", 那么" (∃ $x $p) "逻辑等价于" $p
+      ". 因此, 我们可以看到下列化简函数"
+      "总是返回一个逻辑等价的公式:"
+      (CodeB "let simplify1 fm =
+  match fm with
+    Forall(x,p) -> if mem x (fv p) then fm else p
+  | Exists(x,p) -> if mem x (fv p) then fm else p
+  | _ -> psimplify1 fm;;")
+      "然后我们可以将其深入地反复应用:"
+      (CodeB "let rec simplify fm =
+  match fm with
+    Not p -> simplify1 (Not(simplify p))
+  | And(p,q) -> simplify1 (And(simplify p,simplify q))
+  | Or(p,q) -> simplify1 (Or(simplify p,simplify q))
+  | Imp(p,q) -> simplify1 (Imp(simplify p,simplify q))
+  | Iff(p,q) -> simplify1 (Iff(simplify p,simplify q))
+  | Forall(x,p) -> simplify1(Forall(x,simplify p))
+  | Exists(x,p) -> simplify1(Exists(x,simplify p))
+  | _ -> fm;;")
+      "例如:"
+      (CodeB "# simplify &lt;&lt;true ==> (p &lt;=> (p &lt;=> false))>>;;
+- : fol formula = &lt;&lt;p &lt;=> ~p>>
+# simplify &lt;&lt;exists x y z. P(x) ==> Q(z) ==> false>>;;
+- : fol formula = &lt;&lt;exists x z. P(x) ==> ~Q(z)>>
+# simplify &lt;&lt;(forall x y. P(x) \\/ (P(y) /\\ false)) ==> exists z. Q>>;;
+- : fol formula = &lt;&lt;(forall x. P(x)) ==> Q>>")
+      "{译注: 这个过程" (Code "simplify")
+      "的输出有一个很好的性质, 就是逻辑常量只能单独存在. "
+      "实际上, 这也是我们对于第2章的对应过程的要求.}")
+   (P "接着, 我们通过消去推出式和等价式并将否定下推以将公式转换为NNF形式. "
+      "回忆一下De Morgan律, 其可以反复使用以获得逻辑等价的公式 "
+      "{译注: 对于以下这些符号" (&cm $p_1 $p_2 $..h $p_n)
+      ", 我们应该将其理解为代表(一阶)公式的元变量, "
+      "而不应该像前一章那样将其理解为对象语言里的原子变量. "
+      "当然了, 硬要说的话, 将它们理解为零元谓词也不是不行, "
+      "但是没有必要采用这种别扭的角度}:"
+      (eqn*
+       ((&neg (@conj $p_1 $p_2 $..c $p_n))
+        $<=>
+        (&disj (&neg $p_1) (&neg $p_2) $..c (&neg $p_n)))
+       ((&neg (@disj $p_1 $p_2 $..c $p_n))
+        $<=>
+        (&conj (&neg $p_1) (&neg $p_2) $..c (&neg $p_n)))))
+   (P "根据类比, 我们有以下对于量词而言的" (Q "无穷De Morgan律")
+      ". 这里的逻辑等价性应该相当清晰; "
+      "例如, 如果不是对于所有的" $x "都有" (app $P $x)
+      "成立的情形, 那么必然存在某个" $x "使得" (app $P $x)
+      "不成立, 反之亦然:"
+      (eqn*
+       ((&neg (@∀ $x $p)) $<=> (∃ $x (&neg $p)))
+       ((&neg (@∃ $x $p)) $<=> (∀ $x (&neg $p)))))
+   (P "这些澄清了将否定下推经过量词的额外变换, "
+      "以补充已在命题情形所使用了的变换, "
+      "由此我们定义:"
+      (CodeB "let rec nnf fm =
+  match fm with
+    And(p,q) -> And(nnf p,nnf q)
+  | Or(p,q) -> Or(nnf p,nnf q)
+  | Imp(p,q) -> Or(nnf(Not p),nnf q)
+  | Iff(p,q) -> Or(And(nnf p,nnf q),And(nnf(Not p),nnf(Not q)))
+  | Not(Not p) -> nnf p
+  | Not(And(p,q)) -> Or(nnf(Not p),nnf(Not q))
+  | Not(Or(p,q)) -> And(nnf(Not p),nnf(Not q))
+  | Not(Imp(p,q)) -> And(nnf p,nnf(Not q))
+  | Not(Iff(p,q)) -> Or(And(nnf p,nnf(Not q)),And(nnf(Not p),nnf q))
+  | Forall(x,p) -> Forall(x,nnf p)
+  | Exists(x,p) -> Exists(x,nnf p)
+  | Not(Forall(x,p)) -> Exists(x,nnf(Not p))
+  | Not(Exists(x,p)) -> Forall(x,nnf(Not p))
+  | _ -> fm;;")
+      "例如:"
+      (CodeB "# nnf &lt;&lt;(forall x. P(x))
+        ==> ((exists y. Q(y)) &lt;=> exists z. P(z) /\\ Q(z))>>;;
+- : fol formula =
+&lt;&lt;(exists x. ~P(x)) \\/
+  (exists y. Q(y)) /\\ (exists z. P(z) /\\ Q(z)) \\/
+  (forall y. ~Q(y)) /\\ (forall z. ~P(z) \\/ ~Q(z))>>"))
+   (P "现在我们来到前束范式真正独特的部分, 即将量词拉出来. "
+      "到目前为止, 我们已经进行了化简和NNF变换, "
+      "任何不在外部的量词必然是由" (Q $conj) "或"
+      (Q $disj) "所连接的, 因为否定已经下推至原子公式, "
+      "而其他命题联结词已经被消除了. "
+      "因此, 症结在于将诸如" (&conj $p (∃ $x $q))
+      "这样的公式中的联结词上拉. "
+      "又一次, 根据DNF的分配规则:"
+      (MB (&<=> (&conj $p (@disj $q_1 $..c $q_n))
+                (&disj (&conj $p $q_1) $..c
+                       (&conj $p $q_n))))
+      "我们可以作出无限情形的类比, "
+      "似乎以下公式(模式)应该是逻辑有效的:"
+      (MB (&<=> (&conj $p (@∃ $x $q))
+                (∃ $x (&conj $p $q))) "."))
+   (P "这几乎是正确的, 但是若" $x "自由出现于"
+      $p ", 我们需要当心变量捕获. "
+      "例如, 以下公式不是逻辑有效的:"
+      (MB (&<=> (&conj (app $P $x)
+                       (@∃ $x (app $Q $x)))
+                (∃ $x (&conj (app $P $x)
+                             (app $Q $x)))) "."))
+   (P "如有必要, 我们总是可以通过对于绑定变量换名来避免这样的问题, "
+      "即将" $x "重命名为某个" $y ", 而" $y
+      "在" $p "或" $q "中都没有自由出现:"
+      (MB (&<=> (&conj $p (@∃ $x $q))
+                (∃ $y (&conj $p (@subst (@\|=> $x $y) $q)))) "."))
+   (P "这种等价可以使用前一节的定理进行严格澄清. "
+      "根据定义, 在模型" $M " (其论域为" $D ") 和赋值" $v
+      "下, 公式" (&conj $p (@∃ $x $q)) "成立, 如果"
+      (&holds $M $v $p) "且存在某个" (∈ $a $D)
+      "使得" (&holds $M (@ext $v $x $a) $q) ". 公式"
+      (∃ $y (&conj $p (@subst (@\|=> $x $y) $q)))
+      "成立, 如果存在一个" (∈ $a $D) "使得"
+      (&holds $M (@ext $v $y $a) $p) "且"
+      (&holds $M (@ext $v $y $a)
+              (@subst (@\|=> $x $y) $q))
+      ". 然而, 既然根据构造, " $y "没在" $p
+      "中自由出现, " (Ref "formula-var-agree")
+      "表明" (&holds $M (@ext $v $y $a) $p)
+      "等价于" (&holds $M $v $p) ". 至于"
+      (&holds $M (@ext $v $y $a)
+              (@subst (@\|=> $x $y) $q))
+      ", 根据" (Ref "subst-value") ", 其等价于"
+      (&holds $M (@compose (@termval $M (@ext $v $y $a))
+                           (@subst (@\|=> $x $y)))
+              $q)
+      ", 因而又等价于"
+      (&holds $M (@ext $v $x $a) $q)
+      ", 这正是我们所要的. "
+      "{译注: 这最后的两个等价于只要进行细致分析并不难理解. "
+      "不过, 我还是要指明这里的符号和语义滥用, "
+      "而归根结底这又应该算是程序和数学之间的gap. "
+      "在之前的数学论述和证明里, 我们把" $subst
+      "的第一个参数, 即所谓的实例化" $i
+      ", 都是当作一个从变量到项的完全函数. "
+      "但是在代码里, " $subst
+      "的第一个参数是在OCaml里实现的所谓有限部分函数. "
+      "这之间的语义差异, 是通过未定义变量会被映射至"
+      "等同于自身的项这一操作而抹平的. "
+      "但是, 从本质上来说, " $subst
+      "的代码定义的确也能用在完全函数上, "
+      "这里没有任何微妙之处. 此处证明的有趣之处在于, "
+      "数学论述里" (Ref "subst-value")
+      "需要在" $subst "的第一个参数是完全函数时才能应用, "
+      "但是这里的" (@\|=> $x $y) "显然不是一个完全函数. "
+      "那么, 作者其实是通过等式"
+      (&= (&subst (@\|=> $x $y) $q)
+          (&subst (@subst (@\|=> $x $y)) $q))
+      "把替换延拓成了一个完全函数. "
+      "而且细心的读者会发现, " $subst
+      "之前在数学论述里只会接受完全函数, "
+      "但这里打破了约定. 另外, "
+      (@subst (@\|=> $x $y))
+      "其实还用上了currying, "
+      "并且本来可以接受任意的项, "
+      "但这里作为替换只会接受变量. "
+      "另外还可以说一点无聊的, 原文要求"
+      $y "既不在" $p "又不在" $q
+      "中自由出现, 但是最宽松的要求其实是"
+      $y "不在" (&conj $p (@∃ $x $q))
+      "中自由出现. 当然了, 原文也说了如有必要, "
+      "那么说明" $x "已经在" $p
+      "中自由出现, 所以" $y
+      "的确不会是" $x
+      ". (读者还可以看出经过了前面的化简之后, "
+      "到了这里" $x "必然要在" $q
+      "中自由出现, 不会落空.)} "
+      "全然类似的论证允许我们将全称或存在量词经过合取或析取拉出来. "
+      "如果读者对于其中任何逻辑等价保有疑问, "
+      "那么的确它们可以按照类似的方法进行澄清:"
+      (eqn*
+       ((&conj (@∀ $x $p) $q)
+        $<=>
+        (∀ $y (&conj (@subst (@\|=> $x $y) $p) $q)))
+       ((&conj $p (@∀ $x $q))
+        $<=>
+        (∀ $y (&conj $p (@subst (@\|=> $x $y) $q))))
+       ((&disj (@∀ $x $p) $q)
+        $<=>
+        (∀ $y (&disj (@subst (@\|=> $x $y) $p) $q)))
+       ((&disj $p (@∀ $x $q))
+        $<=>
+        (∀ $y (&disj $p (@subst (@\|=> $x $y) $q))))
+       ((&conj (@∃ $x $p) $q)
+        $<=>
+        (∃ $y (&conj (@subst (@\|=> $x $y) $p) $q)))
+       ((&conj $p (@∃ $x $q))
+        $<=>
+        (∃ $y (&conj $p (@subst (@\|=> $x $y) $q))))
+       ((&disj (@∃ $x $p) $q)
+        $<=>
+        (∃ $y (&disj (@subst (@\|=> $x $y) $p) $q)))
+       ((&disj $p (@∃ $x $q))
+        $<=>
+        (∃ $y (&disj $p (@subst (@\|=> $x $y) $q))))))
+   (P "在立即子公式都为量化公式的特殊情形下, "
+      "我们有时可以运用逻辑等价产生具有更少量词的结果, "
+      "其中的" $z "要求不在原本的公式里自由出现即可."
+      (eqn*
+       ((&conj (@∀ $x $p) (@∀ $y $q))
+        $<=>
+        (∀ $z (&conj (@subst (@\|=> $x $z) $p)
+                     (@subst (@\|=> $y $z) $q))))
+       ((&disj (@∃ $x $p) (@∃ $y $q))
+        $<=>
+        (∃ $z (&disj (@subst (@\|=> $x $z) $p)
+                     (@subst (@\|=> $y $z) $q)))))
+      "{译注: 个人喜欢将其理解为两个量化变量相同时的逻辑等价的衍生结果.}")
+   (P "然而, 以下并不逻辑有效 "
+      "{译注: 这里不是双重否定, 只是正常否定一次}:"
+      (eqn*
+       ((&disj (@∀ $x $p) (@∀ $y $q))
+        $<=/=>
+        (∀ $z (&disj (@subst (@\|=> $x $z) $p)
+                     (@subst (@\|=> $y $z) $q))))
+       ((&conj (@∃ $x $p) (@∃ $y $q))
+        $<=/=>
+        (∃ $z (&conj (@subst (@\|=> $x $z) $p)
+                     (@subst (@\|=> $y $z) $q))))))
+   (P "例如, 对于上面第一条, 如果这有这种等价的话, 那么"
+      (&disj (@∀ $n (&Even $n)) (@∀ $n (&Odd $n)))
+      "应该逻辑等价于"
+      (∀ $n (&disj (&Even $n) (&Odd $n)))
+      ". 可是在基于整数的奇偶性的显然解释下, "
+      "前者为假而后者为真. "
+      "类似地, 如果第二条正确, 那么"
+      (&conj (@∃ $n (&Even $n)) (@∃ $n (&Odd $n)))
+      "应该逻辑等价于"
+      (∃ $n (&conj (&Even $n) (&Odd $n)))
+      ", 然而在同样的显然解释下, 前者为真而后者为假.")
+   (P "现在为了将所有出现于合取或者析取的立即子公式里的量词拉出来, "
+      "我们在OCaml中实现了以下变换:"
+      (CodeB "let rec pullquants fm =
+  match fm with
+    And(Forall(x,p),Forall(y,q)) ->
+                          pullq(true,true) fm mk_forall mk_and x y p q
+  | Or(Exists(x,p),Exists(y,q)) ->
+                          pullq(true,true) fm mk_exists mk_or x y p q
+  | And(Forall(x,p),q) -> pullq(true,false) fm mk_forall mk_and x x p q
+  | And(p,Forall(y,q)) -> pullq(false,true) fm mk_forall mk_and y y p q
+  | Or(Forall(x,p),q) ->  pullq(true,false) fm mk_forall mk_or x x p q
+  | Or(p,Forall(y,q)) ->  pullq(false,true) fm mk_forall mk_or y y p q
+  | And(Exists(x,p),q) -> pullq(true,false) fm mk_exists mk_and x x p q
+  | And(p,Exists(y,q)) -> pullq(false,true) fm mk_exists mk_and y y p q
+  | Or(Exists(x,p),q) ->  pullq(true,false) fm mk_exists mk_or x x p q
+  | Or(p,Exists(y,q)) ->  pullq(false,true) fm mk_exists mk_or y y p q
+  | _ -> fm")
+      "其中为了经济性, 各种各样类似的子情形都由一个互递归函数"
+      (Code "pullq") "处理, 其会调用主函数" (Code "pullquants")
+      "以在体上进一步拉出更多的量词:"
+      (CodeB "and pullq(l,r) fm quant op x y p q =
+  let z = variant x (fv fm) in
+  let p' = if l then subst (x |=> Var z) p else p
+  and q' = if r then subst (y |=> Var z) q else q in
+  quant z (pullquants(op p' q'));;"))
+   (P "整体的前束函数将量化公式的量词留下, "
+      "对于合取与析取则递归地将其立即子公式前束化, "
+      "然后再应用" (Code "pullquants") ":"
+      (CodeB "let rec prenex fm =
+  match fm with
+    Forall(x,p) -> Forall(x,prenex p)
+  | Exists(x,p) -> Exists(x,prenex p)
+  | And(p,q) -> pullquants(And(prenex p,prenex q))
+  | Or(p,q) -> pullquants(Or(prenex p,prenex q))
+  | _ -> fm;;")
+      "将其与NNF与化简阶段组合, 我们就得到:"
+      (CodeB "let pnf fm = prenex(nnf(simplify fm));;")
+      "例如:"
+      (CodeB "# pnf &lt;&lt;(forall x. P(x) \\/ R(y))
+        ==> exists y z. Q(y) \\/ ~(exists z. P(z) /\\ Q(z))>>;;
+- : fol formula =
+&lt;&lt;exists x. forall z. ~P(x) /\\ ~R(y) \\/ Q(x) \\/ ~P(z) \\/ ~Q(z)>>"))
    (H3. "Skolem化")
+   (P "前束范式将量词和命题部分 (或称" (Q "matrix") ") 分离开来, "
+      "但是量词前缀仍然可能包含任意复杂度的全称和存在量词嵌套. "
+      "我们可以更进一步, 消去存在量词而只保留全称量词, "
+      "这用到了一种叫做" (Em "Skolem化")
+      "的技术, 其以Thoraf Skolem (1928) 的名字而命名. "
+      "注意到以下陈述一般被认为是数学等价的:"
+      (Ol (Li "对于所有的" (∈ $x $D) ", 存在一个" (∈ $y $D)
+              "使得" (Appl $P $x $y) ";")
+          (Li "存在一个" (func $f $D $D) "使得对于所有的"
+              (∈ $x $D) ", " (Appl $P $x (app $f $x)) ".")))
+   (P "其中一个方向是相当简单的: 如果(2)成立, 那么取"
+      (&= $y (app $f $x)) ", 我们可以看到(1)也成立. "
+      "另一方向比较微妙: 即便对于每个" $x
+      "都存在至少一个" $y "使得" (Appl $P $x $y)
+      ", 然而也可能存在许多这样的元素, "
+      "于是为了得到一个函数" $f ", 对于每个"
+      $x "我们需要自限于一个特定的" $y
+      ". 一般而言, 对于逐" $x "得" $y
+      "的这样一种选择总是存在的断言 "
+      "(即便我们无法写下挑选的方法), "
+      "即是著名的选择公理 (Axiom of Choice, AC) "
+      "(Moore 1982; Jech 1973). "
+      "为了与通常的数学实践保持一致, "
+      "我们简单地选择假定该公理成立, "
+      "尽管这只是一种方便的做法, "
+      "而且如有必要则可以避免.")
+   (P "{原注: 选择公理在论域" $D
+      "良序时是毫无疑义的, 而可数是其一种特殊情形, "
+      "这是因为我们可以将" (app $f $x)
+      "定义为满足" (Appl $P $x $y) "的最小的"
+      $y ". 由向下Löwenheim–Skolem定理3.49可知, "
+      "对于我们的可数语言, 本质上可以将注意力限制在可数模型上. "
+      "尽管我们对该结论的证明使用了Skolem化方法, "
+      "但Henkin (1949) 提出了一种更为精巧的方法来避免这一点, "
+      "该方法代之以在可数个阶段中不断向语言添加新常量. "
+      "Enderton (1972) 等若干教材以此方式证明了完备性定理.}")
+   (P "即便接受了(1)和(2)的等价, "
+      "后者也并不对应于某个一阶公式的语义. "
+      "如果我们允许对于函数符号进行存在量化, "
+      "以一种从直觉上来说看起来较为合理的方式对于语义的概念进行扩展, "
+      "那么这种等价意味着以下公式(模式)应该是逻辑有效的:"
+      (MB (&<=> (@∀ $x (∃ $y (Appl $P $x $y)))
+                (@∃ $f (∀ $x (Appl $P $x (app $f $x))))))
+      "更为一般地:"
+      (MB (&<=> (@∀ $x_1 $..h $x_n
+                    (∃ $y (Appl $P $x_1 $..h $x_n $y)))
+                (@∃ $f (∀ $x_1 $..h $x_n
+                          (Appl $P $x_1 $..h $x_n
+                                (appl $f $x_1 $..h $x_n)))))))
+   (P "在一个合适的" (Em "二阶逻辑")
+      "系统之中, 这些的确是逻辑等价, "
+      "并且我们可以使用它们对于前束公式的量词前缀进行变换"
+      "以使得所有的存在量词都出现在所有的全称量词之前, 例如"
+      (MB (deriv^0
+           (@∀ $x (∃ $y (∀ $u (∃ $v (Appl $P $u $v $x $y)))))
+           $<=>
+           (@∃ $f (∀ $x $u (∃ $v (Appl $P $u $v $x (app $f $x)))))
+           $<=>
+           (@∃ $f $g (∀ $x $u (Appl $P $u (appl $g $x $u) $x (app $f $x)))))))
+   (P "我们注意到, 不论是变换等价还是最终的结果, "
+      "都无法以一阶公式表达, 所以我们不能确切遵循这个过程. "
+      "但是, 我们可以大致取得相同的效果, "
+      "如果我们能够接受作为结果的公式和原本的公式不是逻辑等价, "
+      "而仅仅是" (Em "等可满足") " (第2.8节). "
+      "要义在于函数上的存在量化已然在可满足性断言中隐式存在了: "
+      "一个公式是可满足的, 如果" (Em "存在")
+      "某个论域和对于函数与谓词符号的解释能够满足它. "
+      "因此, 进行" (Em "Skolem化") "的这一行为得到了澄清, "
+      "Skolem化指的是进行同样的变换, 但是不对于函数进行显式量化, "
+      "例如我们将公式"
+      (MB (∀ $x (∃ $y (∀ $u (∃ $v (Appl $P $u $v $x $y))))))
+      "转换为"
+      (MB (∀ $x $u (Appl $P $u (appl $g $x $u) $x (app $f $x))))
+      "其中的" $f "和" $g "是不在原本公式里的不同函数符号. "
+      "{译注: 其实无需强调不同, 因为这里的" $f "和" $g
+      "不是元函数符号, 而是具体的函数符号.} "
+      "另外, 既然对于自由变量的全称量化"
+      "在可满足性的定义里是隐式存在的, "
+      "我们还可以继续将其变换为"
+      (MB (Appl $P $u (appl $g $x $u) $x (app $f $x)) "."))
+   (P "虽然这些公式中没有任何两个是逻辑等价的, 但它们都是等可满足的. "
+      "因此, 如果我们想判断第一个公式是否可满足, "
+      "只需考虑最后一个公式即可, 因为它完全不含显式量词. "
+      "我们将在下一节中看到, 此类无量词公式的可满足性问题"
+      "可以借助命题逻辑中的技术加以解决. 但在此之前, "
+      "让我们对主要的 Skolem 化变换给出更为细致严格的说明, "
+      "并在此过程中定义实际实现中所用到的若干辅助概念.")
+   (P "有必要引入称为" (Em "Skolem函数")
+      "的新函数符号 (在零元情形下称为"
+      (Em "Skolem常量") "), 且这些符号不得出现在原公式中. "
+      "因此, 首先我们需要定义一个过程, "
+      "用于获取一个项和一个公式中已经存在的函数, "
+      "从而避免与之产生命名冲突. 这一实现是直接的, "
+      "值得注意的是, 我们以名称和元数的序对来标识函数, "
+      "因为同名但元数不同的函数被视为不同的函数."
+      (CodeB "let rec funcs tm =
+  match tm with
+    Var x -> []
+  | Fn(f,args) -> itlist (union ** funcs) args [f,length args];;
+
+let functions fm =
+  atom_union (fun (R(p,a)) -> itlist (union ** funcs) a []) fm;;"))
+   (P "正如" (&holds $M $v $p) "只依赖于对于"
+      (∈ $x (&FV $p)) "而言的取值" (app $v $x)
+      " (" (Ref "formula-var-agree")
+      "), 其也只依赖于实际出现于" $p
+      "中的那些函数符号在" $M "下的解释. ("
+      (Ref "formula-var-agree")
+      "的证明可以经过调整移用; "
+      "而且, 事情在某种意义上变得更简单了, "
+      "因为变量绑定不发挥作用.) "
+      "自现在起, 当我们言称"
+      (Q $p "并不牵涉" $n "元函数符号" $f)
+      "时, 从形式化的角度来看我们指的是"
+      (&!in (tu0 $f $n) (&functions $p)) ".")
+   ((Theorem)
+    "如果" $p "是一个并不牵涉" $n
+    "元函数符号" $f "的公式, 并且"
+    (&= (&FV (∃ $y $p))
+        (setE $x_1 $..h $x_n))
+    " (其中" $x_i "互异, 但是顺序无关紧要), "
+    "那么对于任意的解释" $M
+    ", 存在另一个解释" $M^
+    ", 其和" $M "只有对于" $f
+    "的解释(可能)不同, 使得在所有赋值" $v "下:"
+    (MB (&= (&holds $M $v (@∃ $y $p))
+            (&holds $M^ $v
+                    (@subst (@\|=> $y (appl $f $x_1 $..h $x_n))
+                            $p))))
+    "并且我们也有"
+    (MB (&= (&holds $M $v (@∃ $y $p))
+            (&holds $M^ $v (@∃ $y $p))))
+    "因为" $p "并不牵涉" $f ".")
+   (P "{译注: 这里的函数符号" $f "是和其元数" $n
+      "绑定在一起的, 不只是名字.}")
+   ((proof)
+    "我们将" $M^ "定义为按照以下方式将对于" $f
+    "的解释修改为了" (_ $f $M^) "的" $M
+    ". 对于" (∈ $a_1 $..h $a_n $D)
+    ", 如果存在某个" (∈ $b $D) "使得"
+    (MB (&holds $M (tu0 (&\|=> $x_1 $a_1) $..h
+                        (&\|=> $x_n $a_n)
+                        (&\|=> $y $b))
+                $p))
+    "那么" (appl (_ $f $M^) $a_1 $..h $a_n)
+    "就是某个这样的" $b ", 否则的话就选取任意一个"
+    (∈ $b $D) ". 这个定义的要义在于对于一个任意的赋值"
+    $v ", 断言"
+    (MB (&holds $M^
+                (@ext $v $y
+                      (appl (_ $f $M^)
+                            (app $v $x_1) $..h
+                            (app $v $x_n)))
+                $p))
+    "和"
+    (MB (存在某个
+         (∈ $b $D)
+         (&holds $M (@ext $v $y $b) $p)))
+    "是等价的, 这是因为如果的确存在这样一个" $b
+    ", 那么" (_ $f $M^) "就会挑选一个这样的元素. "
+    "{译注: 这里还用到了" $n "元函数符号"
+    $f "没有在" $p "中出现.} "
+    "使用" (Ref "subst-value") "和这个等价, "
+    "我们可以推出"
+    (MB (deriv^
+         (&holds $M^ $v
+                 (@subst (@\|=> $y (appl $f $x_1 $..h $x_n)) $p))
+         (&holds $M^
+                 (@compose
+                  (@termval $M^ $v)
+                  (@subst (@\|=> $y (appl $f $x_1 $..h $x_n))))
+                 $p)
+         (&holds $M^
+                 (@ext $v $y
+                       (&termval $M^ $v
+                                 (appl $f $x_1 $..h $x_n)))
+                 $p)
+         (&holds $M^
+                 (@ext $v $y
+                       (appl (_ $f $M^)
+                             (app $v $x_1) $..h
+                             (app $v $x_n)))
+                 $p)
+         (存在某个
+          (∈ $b $D)
+          (&holds $M (@ext $v $y $b) $p))
+         (&holds $M $v (@∃ $y $p))))
+    "这正是我们所要的.")
+   (P "因为这个等价对于所有的赋值成立, "
+      
+      )
    (H3. "canonical模型")
    (H3. "机械化Herbrand定理")
    (H3. "合一")
    (H3. "tableau")
    (H3. "归结")
-   
+   (H3. "subsumption和replacement")
+   (H3. "对于归结的改进")
+   (H3. "Horn子句和Prolog")
+   (H3. "模型消去")
+   (H3. "更多的一阶元定理")
+   (H3. "深入阅读")
+   (P "这里的基本理论结果可在大多数入门逻辑教材中找到, "
+      "例如Enderton (1972), Mendelson (1987), Boolos和Jeffrey (1989), "
+      "Goodstein (1971), Kreisel和Krivine (1971) 以及Andrews (1986), "
+      "而在模型论的高级教材中则有更深入的发展, "
+      "如Bell和Slomson (1969), Chang和Keisler (1992), Hodges (1993b), "
+      "Marcja和Toffalori (2003) 以及Poizat (2000). "
+      "Davis, Sigal和Weyuker (1994) 以更侧重机械化的视角涵盖了这些内容. "
+      "提供数理逻辑发展之更多历史与哲学背景的书籍包括Bochénski (1961), "
+      "Dumitriu (1977) 以及Kneale和Kneale (1962), "
+      "而Kneebone (1963) 则将哲学与技术性结果融为一体. "
+      "Van Heijenoort (1967) 是该领域经典论文的选集, "
+      "其中包括Löwenheim, Skolem, Gödel和Herbrand的奠基性工作, "
+      "这些工作构成了本章大多数方法的基础. "
+      "关于Skolem化和归约为子句范式的详细研究, "
+      "着重探讨与自动证明相关的效率问题, "
+      "可参见Nonnengart和Weidenbach (2001).")
+   (P "一阶逻辑有若干推广形式, 我们不作深入探讨. "
+      "最为彻底的推广是高阶逻辑 (HOL), 其中允许对函数和谓词进行量化; "
+      "在上述教材中, Andrews (1986) 是唯一对高阶逻辑有详尽论述的, "
+      "但Boolos和Jeffrey (1989) 以及Enderton (1972) 也有所提及. "
+      "一种较为适度的推广允许量词具有分支辖域 (branching scope), "
+      "这可视为高阶逻辑的一种受限形式. Hintikka (1996) 认为, "
+      "在某种意义上这种" (Q "独立友好")
+      "逻辑 (independence friendly logic) 比普通一阶逻辑更为基本, "
+      "但IF逻辑或HOL的有效性问题甚至不再是半可判定的 (semidecidable).")
+
+   (H3. "练习")
    (H2. "相等性")
+   (P "到目前为止, 相等性只是被处理为一个普通的二元谓词, 其可以被任意地解释. "
+      "然而, 相等性的地位是如此中心性的, 以至于我们往往只想要考虑使得"
+      (Q "相等意味着相等") "的解释. 之前的逻辑理论和编程的证明过程"
+      "可以通过轻松的修改以支持新的情况, "
+      "但是也存在着更为有效和特化的方式用于处理相等性.")
    (H3. "相等性公理")
+   (P "在逻辑的诸多应用之中, 特别是对于数学推理的应用, "
+      "相等性扮演着一个中心的角色. "
+      "我们对此已有所意识, 所以支持了常规的中缀记号"
+      (Q (&= $s $t)) "而不是使用" (Q (appl $= $s $t))
+      ". 而且, 我们还可以定义各种趁手的句法操作用于"
+      "测试一个公式是否是一个等式, "
+      "以及创建和分解等式, 例如"
+      (CodeB "let is_eq = function (Atom(R(&quot;=&quot;,_))) -> true | _ -> false;;
+
+let mk_eq s t = Atom(R(&quot;=&quot;,[s;t]));;
+
+let dest_eq fm =
+  match fm with
+    Atom(R(&quot;=&quot;,[s;t])) -> s,t
+  | _ -> failwith &quot;dest_eq: not an equation&quot;;;
+
+let lhs eq = fst(dest_eq eq) and rhs eq = snd(dest_eq eq);;"))
+   (P "但是, 从逻辑上讲, 相等性至此仅被当作了一个任意的二元谓词进行处理; "
+      "我们在对于逻辑有效性问题进行判定时所考虑的解释, "
+      "也包括那些对于" (Q $=) "的解释与真正的相等关系大相径庭的情况. "
+      "鉴于相等性所具有的中心地位, "
+      "研究将模型的类限制于" (Q "相等意味着相等") "的情形是非常自然的, "
+      "因为这正是我们在考虑诸如抽象代数之类的领域时心中通常会想到的东西. "
+      "我们称一个解释 (或者特定句子集合的模型) 是" (Em "规范的(normal)")
+      ", 如果相等性谓词" (Q $=) "被解释为其论域上的相等.")
+   (P "任何规范解释都必须满足断言相等是一个等价关系的公式, "
+      "即其是自反, 对称, 传递的:"
+      (MB (set-attr*
+           (&Table
+            ((∀ $x (&= $x $x)))
+            ((∀ $x $y (&<=> (&= $x $y) (&= $y $x))))
+            ((∀ $x $y $z
+                (&=> (&conj (&= $x $y) (&= $y $z))
+                     (&= $x $z)))))
+           'columnalign "left"))
+      "并且其还需要满足断言" (Em "congruence")
+      "的公式, 对于所考虑的语言的每个"
+      $n "元函数(符号)" $f "而言:"
+      (MB (∀ $x_1 $..h $x_n
+             $y_1 $..h $y_n
+             (&=> (&conj (&= $x_1 $y_1) $..c
+                         (&= $x_n $y_n))
+                  (&= (appl $f $x_1 $..h $x_n)
+                      (appl $f $y_1 $..h $y_n)))))
+      "对于每个" $n "元谓词(符号)" $R "也是类似的:"
+      (MB (∀ $x_1 $..h $x_n
+             $y_1 $..h $y_n
+             (&=> (&conj (&= $x_1 $y_1) $..c
+                         (&= $x_n $y_n))
+                  (&=> (appl $R $x_1 $..h $x_n)
+                       (appl $R $y_1 $..h $y_n))))))
+   (P "对于一个给定的一阶公式集合" Δ ", 我们记"
+      (&eqaxioms Δ) " (" (Q Δ "的相等性公理")
+      ") 以表示等价关系公式连带着之于出现在"
+      Δ "里的所有函数符号" $f "和谓词符号"
+      $R "的congruence公式.")
+   (P "我们观察到任意的规范解释都满足" (&eqaxioms Δ)
+      ", 但是满足" (&eqaxioms Δ) "的解释未必是规范的. "
+      "例如, 考虑仅具有两个二元函数符号" (Q $+) "和"
+      (Q $d*) "以及两个常量" $0 "和" $1
+      "的语言. 如果我们将所有这些符号以" $ZZ
+      "中的通常方式进行解释, 但是却把相等性解释为关系"
+      (mod= $x $y $2) ", 那么相等性公理仍然都得到满足, "
+      "即便这种解释不是规范的. "
+      "实际上, 并不存在公式集合能够限制其模型为规范的. "
+      "这是因为, 对于任意的规范模型, "
+      "我们总能创造一个非规范模型, "
+      "通过挑选论域里的某个" $a
+      ", 然后给论域添加任意多个额外元素" (∈ $b_i $B)
+      ", 并将所有的" $b_i "以和" $a
+      "相同的方式进行解释. 尽管如此, "
+      "我们仍然有以下的关键结果.")
+   ((Theorem)
+    "任意的一阶公式集合" Δ
+    "拥有一个规范模型当且仅当集合"
+    (&union Δ (&eqaxioms Δ))
+    "拥有一个模型.")
+   ((proof)
+    "其中一个方向是简单的: 如果" $M
+    "是" Δ "的一个规范模型, 那么显然"
+    (&eqaxioms Δ) "在其中成立; "
+    "因此, 对于" Δ "的任意规范模型, "
+    (&union Δ (&eqaxioms Δ))
+    "也在其中成立." (Br)
+    "反过来, 设" (&union Δ (&eqaxioms Δ))
+    "拥有一个模型" $M ". 在" $M "的论域" $D
+    "上通过置" (&~ $a $b) "恰当" (appl $=_M $a $b)
+    "来定义一个关系" (Q $~)
+    ", 即这个关系是基于解释" $=_M "的" (Q "相等")
+    ". 因为等价公理在" $M
+    "下成立, 所以这是一个等价关系. "
+    "于是, 我们可以将" $D
+    "划分为等价类, 其中每个"
+    (∈ $a $D) "属于等价类:"
+    (MB (&= (equivc $a) (setI (∈ $b $D) (&~ $b $a))))
+    "并且" (&= (equivc $a) (equivc $b))
+    "当且仅当" (&~ $a $b)
+    ". 我们将会使用等价类的集合"
+    (&= $D^ (setI (equivc $a) (∈ $a $D)))
+    "作为新模型" $M^ "的论域, "
+    "并且按照如下方式解释每个" $n
+    "元函数符号" $f ":"
+    (MB (&= (appl (_ $f $M^) (equivc $a_1) $..h (equivc $a_n))
+            (equivc (appl $f_M $a_1 $..h $a_n))) ".")
+    "注意到这个是良定义的, 即独立于每个等价类的特定代表元, "
+    "因为如果对于" (&= $i (&cm $1 $..h $n)) "有"
+    (&~ (_prime $a $i) $a_i) ", 我们也有"
+    (&~ (appl $f_M (_prime $a $1) $..h (_prime $a $n))
+        (appl $f_M $a_1 $..h $a_n))
+    ", 这恰是由于函数congruence公理在" $M
+    "下成立. 类似地, 我们以"
+    (MB (&= (appl (_ $R $M^) (equivc $a_1) $..h (equivc $a_n))
+            (appl $R_M $a_1 $..h $a_n)))
+    "来解释每个" $n "元谓词符号" $R
+    ". 当然, 这也是独立于等价类代表元的特定选择的, "
+    "因为谓词congruence公理在" $M "下成立." (Br)
+    "特别地, 我们有" (appl $=_M^ (equivc $a) (equivc $b))
+    "恰当" (&~ $a $b) ", 于是恰当"
+    (&= (equivc $a) (equivc $b))
+    ". 因此, " $M^ "是一个规范解释. "
+    "为了看出来为什么它满足" Δ "中的所有公式, "
+    "我们本质上需要表明我们可以将等价类构成运算"
+    (Q "提升") "至公式的语义层面. 首先, 注意到:"
+    (MB (&= (&termval $M^ $delta^ $t)
+            (equivc (&termval $M $delta $t))))
+    "其中对于每个变量" $x "有"
+    (&= (app $delta^ $x) (equivc (app $delta $x)))
+    ". 为了证明这一点, 只需要施行" $t
+    "上的结构归纳. 如果" $t "是变量" $x
+    ", 那么我们有"
+    (MB (deriv^
+         (&termval $M^ $delta^ $x)
+         (app $delta^ $x)
+         (equivc (app $delta $x))
+         (equivc (&termval $M $delta $x))))
+    "而若" (&= $t (appl $f $s_1 $..h $s_n))
+    ", 那么使用归纳假设和" (_ $f $M^)
+    "的定义, 我们得到:"
+    (MB (deriv^
+         (&termval $M^ $delta^ (appl $f $s_1 $..h $s_n))
+         (appl (_ $f $M^) (&termval $M^ $delta^ $s_1) $..h
+               (&termval $M^ $delta^ $s_n))
+         (appl (_ $f $M^) (equivc (&termval $M $delta $s_1))
+               $..h (equivc (&termval $M $delta $s_n)))
+         (equivc (appl $f_M (&termval $M $delta $s_1) $..h
+                       (&termval $M $delta $s_n)))
+         (equivc (&termval $M $delta (appl $f $s_1 $..h $s_n)))))
+    "现在我们声称对于任意的公式" $p ", 我们都有"
+    (&= (&holds $M^ $delta^ $p)
+        (&holds $M $delta $p))
+    ". 又一次, 证明是通过结构归纳进行的. 若" $p
+    "为" $bottom "或" $top ", 证明是平凡的. 而若"
+    $p "是一个原子公式, 这个结果根据" (_ $R $M^)
+    "的定义而成立. 命题运算显然保持这个性质, "
+    "剩下量化了的公式作为有趣的情形. 注意到:"
+    (MB (deriv^
+         (&holds $M^ $delta^ (@∀ $x $p))
+         (对于所有的
+          (∈ $A $D^)
+          (&holds $M^ (@ext $delta^ $x $A) $p))
+         (对于所有的
+          (∈ $a $D)
+          (&holds $M^ (@ext $delta^ $x (equivc $a)) $p))
+         (对于所有的
+          (∈ $a $D)
+          (&holds $M^ (&prime (@ext $delta $x $a)) $p))
+         (对于所有的
+          (∈ $a $D)
+          (&holds $M (@ext $delta $x $a) $p))
+         (&holds $M $delta (@∀ $x $p))))
+    "{译注: 本书之所以不在这里直接使用数学符号" (Q $forall)
+    "而是使用文字" (Q "对于所有的 (for all)")
+    ", 可能是因为想要避免因为" $forall
+    "在这里具有多重用途 (一个句法, 一个语义) 而引起混淆. "
+    "不过, 似乎直接使用符号是更多逻辑学书籍的选择.} "
+    "论证对于存在量词也是类似的. 因此, 既然每个"
+    (∈ $p Δ) "在" $M "下对于所有的赋值" $delta
+    "成立, 那么它也在" $M^ "下对于所有的赋值" $epsilonv
+    "成立, 因为" $epsilonv "必然对于某个" $M
+    "中的赋值" $delta "具有形式" $delta^
+    " (只需令" (app $delta $x) "为"
+    (app $epsilonv $x) "的任何一个成员).")
+   (P "{译注: 这个论证其实有一个问题, 就是"
+      (&eqaxioms Δ) "实际上只会限制对于出现在"
+      Δ "里的函数符号和谓词符号以及相等符号" $=
+      "的解释. 因此, 论证里的商构造只能对于这些符号进行. "
+      "当然了, 因为" Δ "里压根没有出现这些符号, "
+      "所以随便什么解释都是成立的. "
+      "但是, 我们必须要注意, "
+      "原文的结构归纳所论证的东西并不是"
+      "对于任意的项和任意的公式成立的, "
+      "项只能包含" Δ "既有的函数符号, "
+      "公式只能包含" Δ "既有的谓词符号以及相等符号. "
+      "另外, 我觉得原文其实有一个细节"
+      "稍微值得向读者说明一下, 就是"
+      (&eqaxioms Δ) "在其中存在二元谓词" (Q $=)
+      "时要不要包括对于" $= "的congruence公式. "
+      "实际上, 不论选择包括还是不包括都可以, "
+      "因为表达等价性的公式蕴涵" $=
+      "的congruence公式.}")
+   (P "在我们的实际应用里, 我们只会关心单个公式. 定义"
+      (&eqaxiom $p) "为相等性公理" (&eqaxioms (setE $p))
+      "里的所有公式的合取 (这些公式的数目必然是有限的), 那么:")
+   ((Corollary)
+    "任意的公式" $p "可被一个规范模型所满足当且仅当"
+    (&conj $p (&eqaxiom $p)) "是可满足的.")
+   ((proof)
+    "根据合取的语义的定义, 一个解释满足"
+    (&conj $p (&eqaxiom $p)) "当且仅当其满足"
+    $p "和" (&eqaxioms (setE $p)) ".")
+   (P "{译注: 一个解释满足集合"
+      (setE $p_1 $..h $p_n) "当且仅当其满足"
+      (&conj $p_1 $..c $p_n) ".}")
+   (P "我们有以下对于有效性的对偶结果.")
+   ((Corollary #:id "normal-validity")
+    "一个公式" $p "在所有的规范模型中成立当且仅当"
+    (&=> (&eqaxiom $p) $p) "在所有模型中成立.")
+   ((proof)
+    "因为" $p "在某个模型下成立当且仅当其全称闭包在该模型下成立, "
+    "我们可以不失一般性地假定" $p "为封闭公式. "
+    "因此, " $p "在所有规范模型下成立当且仅当"
+    (&neg $p) "没有规范模型, 于是当且仅当"
+    (&conj (&neg $p) (&eqaxiom (&neg $p)))
+    "没有模型. {译注: 原文将某个iff错写成了if.} "
+    "但是, 既然"
+    (&= (&eqaxiom (&neg $p)) (&eqaxiom $p))
+    ", 那么"
+    (&conj (&neg $p) (&eqaxiom (&neg $p)))
+    "逻辑等价于"
+    (&neg (@disj $p (&neg (&eqaxiom $p))))
+    ", 而这又逻辑等价于"
+    (&neg (@=> (&eqaxiom $p) $p))
+    ". 这个公式 (句子) 是不可满足的当且仅当"
+    (&=> (&eqaxiom $p) $p) "是有效的.")
+   (let* (($closure (Mi "closure"))
+          (&closure (λ (p) (app $closure p))))
+     (P "{译注: 个人对于这里的" (Q "不失一般性")
+        "不太满意, 所以想要补全这里的细节. 设"
+        (&closure $p) "是" $p "的全称闭包. "
+        "我们已经知道, " $p
+        "在所有的规范模型中成立当且仅当" (&closure $p)
+        "在所有的规范模型中成立, 当且仅当"
+        (&=> (&eqaxiom (&closure $p)) (&closure $p))
+        "在所有模型中成立. 于是, 如果我们能够说明"
+        (&=> (&eqaxiom (&closure $p)) (&closure $p))
+        "在所有模型中成立当且仅当"
+        (&=> (&eqaxiom $p) $p)
+        "在所有模型中成立, 就结束了. "
+        "当然了, 我们还应该注意到"
+        (&= (&eqaxiom (&closure $p)) (&eqaxiom $p))
+        ". 不过, 我们可以证明稍强一些的结论, "
+        "即对于所有可能的解释" $M ", " $M "满足"
+        (&=> (&eqaxiom (&closure $p)) (&closure $p))
+        "当且仅当" $M "满足" (&=> (&eqaxiom $p) $p)
+        ". 我们知道这两个推出式的前件实际上是相同的, "
+        "并且它们都是封闭公式, 即句子. 若"
+        (&eqaxiom $p) "不被" $M
+        "满足, 那么对于任意的赋值" $v
+        ", " (&holds $M $v (&eqaxiom $p))
+        "都为假, 于是" $M "同时满足这两个推出式. "
+        "如果" (&eqaxiom $p) "被" $M
+        "满足, 那么对于任意的赋值" $v "都有"
+        (MB (&= (&holds $M $v (@=> (&eqaxiom (&closure $p)) (&closure $p)))
+                (&holds $M $v (&closure $p))))
+        "并且"
+        (MB (&= (&holds $M $v (@=> (&eqaxiom $p) $p))
+                (&holds $M $v $p)))
+        "也就是说, 这两个推出式是否同时被" $M
+        "所满足或不满足的问题可以归约为"
+        (&closure $p) "和" $p "是否被" $M
+        "满足的问题. 然而, 我们知道既然"
+        (&closure $p) "是" $p "的全称闭包, "
+        "那么其相对于每个特定模型的可满足性必然是相同的. "
+        "综上所述, 这两个推出式相对于每个模型的可满足性都相同, "
+        "我们也就补全了gap.}"))
+   (P "在以上的抽象处理之中, "
+      "相等性公理包括了对于相等符号本身的谓词congruence性质:"
+      (MB (∀ $x_1 $x_2 $y_1 $y_2
+             (&=> (&conj (&= $x_1 $y_1)
+                         (&= $x_2 $y_2))
+                  (&=> (&= $x_1 $x_2)
+                       (&= $y_1 $y_2)))) ".")
+      "{译注: 严格说来, 这需要公式集里有" (Q $=) "的出现.}")
+   (P "不过我们可以接受省略这一条公式, "
+      "因为其是等价性公理的逻辑推论. "
+      "{译注: 或者说等价性公理语义蕴涵这一条公式.} "
+      "甚至我们可以更加经济一些, 只使用两条公理刻画等价性, "
+      "分别是自反性公式和传递性公式的一个变种, 即"
+      (∀ $x $y $z (&=> (&conj (&= $x $y)
+                              (&= $x $z))
+                       (&= $y $z)))
+      ". (对称性可以通过实例化该公理以使得" $x
+      "和" $z "相同, 然后再使用自反性得到.)")
+   (H4. "OCaml实现")
+   (P "在Skolem化里, 我们使用了" (Code "functions")
+      "来寻找一个项中的所有函数符号; "
+      "类似地, 以下函数找出所有出现的谓词(符号), "
+      "仍然以名称和元数的序对形式:"
+      (CodeB "let rec predicates fm = atom_union (fun (R(p,a)) -> [p,length a]) fm;;"))
+   (P "我们通过产生合适数目的参数" (&cm $x_1 $..h $x_n) "和"
+      (&cm $y_1 $..h $y_n) "并构造公式"
+      (MB (∀ $x_1 $..h $x_n
+             $y_1 $..h $y_n
+             (&=> (&conj (&= $x_1 $y_1) $..c
+                         (&= $x_n $y_n))
+                  (&= (appl $f $x_1 $..h $x_n)
+                      (appl $f $y_1 $..h $y_n)))))
+      "来对于每个函数符号制造一个congruence公理. "
+      "{译注: 原文的公式存在一个笔误, 漏了一个合取符号.}")
+   (P "我们会返回一个列表, 其通常具有一个元素, "
+      "但在零元函数 (即单独的常量) 的情形下会为空:"
+      (CodeB "let function_congruence (f,n) =
+  if n = 0 then [] else
+  let argnames_x = map (fun n -> &quot;x&quot;^(string_of_int n)) (1 -- n)
+  and argnames_y = map (fun n -> &quot;y&quot;^(string_of_int n)) (1 -- n) in
+  let args_x = map (fun x -> Var x) argnames_x
+  and args_y = map (fun x -> Var x) argnames_y in
+  let ant = end_itlist mk_and (map2 mk_eq args_x args_y)
+  and con = mk_eq (Fn(f,args_x)) (Fn(f,args_y)) in
+  [itlist mk_forall (argnames_x @ argnames_y) (Imp(ant,con))];;")
+      "例如:"
+      (CodeB "# function_congruence (&quot;f&quot;,3);;
+- : fol formula list =
+[&lt;&lt;forall x1 x2 x3 y1 y2 y3.
+     x1 = y1 /\\ x2 = y2 /\\ x3 = y3 ==> f(x1,x2,x3) = f(y1,y2,y3)>>]
+# function_congruence (&quot;+&quot;,2);;
+- : fol formula list =
+[&lt;&lt;forall x1 x2 y1 y2. x1 = y1 /\\ x2 = y2 ==> x1 + x2 = y1 + y2>>]"))
+   (P "针对谓词而言的类似函数几乎是相同的, "
+      "只不过在后件里我们用的是公式的推出而非项的相等:"
+      (CodeB "let predicate_congruence (p,n) =
+  if n = 0 then [] else
+  let argnames_x = map (fun n -> &quot;x&quot;^(string_of_int n)) (1 -- n)
+  and argnames_y = map (fun n -> &quot;y&quot;^(string_of_int n)) (1 -- n) in
+  let args_x = map (fun x -> Var x) argnames_x
+  and args_y = map (fun x -> Var x) argnames_y in
+  let ant = end_itlist mk_and (map2 mk_eq args_x args_y)
+  and con = Imp(Atom(R(p,args_x)),Atom(R(p,args_y))) in
+  [itlist mk_forall (argnames_x @ argnames_y) (Imp(ant,con))];;")
+      "正如之前所计划的, 我们使用以下等价性质变体:"
+      (CodeB "let equivalence_axioms =
+  [&lt;&lt;forall x. x = x>>; &lt;&lt;forall x y z. x = y /\\ x = z ==> y = z>>];;"))
+   (P "现在我们定义一个函数, 其对于输入公式" $p
+      "返回" (&=> (&eqaxiom $p) $p)
+      ". 如果" $p "压根不牵涉相等符号, "
+      "那么就保留" $p "本来的样子, "
+      "因为其规范和非规范模型之间没有区别. "
+      "{译注: 规范模型本质上只是对于相等符号的解释的约束. "
+      "不含有相等符号的" $p
+      "若在所有的规范解释下成立, "
+      "那么对于任意的解释, "
+      "我们可以修改其对于相等符号的解释, "
+      "然后就知道" $p "在这个修改版本下成立. "
+      "可是, 因为" $p "不含有相等符号, "
+      "所以成立与否和相等符号的解释无关, "
+      "由此也就知道了" $p "在所有解释下都成立.}"
+      (CodeB "let equalitize fm =
+  let allpreds = predicates fm in
+  if not (mem (&quot;=&quot;,2) allpreds) then fm else
+  let preds = subtract allpreds [&quot;=&quot;,2] and funcs = functions fm in
+  let axioms = itlist (union ** function_congruence) funcs
+                      (itlist (union ** predicate_congruence) preds
+                              equivalence_axioms) in
+  Imp(end_itlist mk_and axioms,fm);;"))
+   (P (Ref "normal-validity")
+      "的影响在于我们可以通过在常规一阶逻辑里测试"
+      (&equalitize $p) "的有效性来测试" $p
+      "在具有相等概念的一阶逻辑里的有效性. "
+      "因此, 我们可以将" $equalitize
+      "应用为既存证明过程的预处理步骤. "
+      
+      )
    (H3. "范畴性和初等等价")
    (H3. "等式逻辑和完备性")
    (H3. "congruence闭包")
    (H3. "重写")
-   
+   (H3. "终止排序")
+   (H3. "Knuth-Bendix补全")
+   (H3. "等式消去")
+   (H3. "paramodulation")
+   (H3. "深入阅读")
+   (P "专注于等式逻辑的模型论分支也被称为泛代数 (universal algebra), "
+      "相关教材有Cohn (1965) 以及Burris和Sankappanavar (1981) 等. "
+      "上一章所引用的几乎所有模型论书籍中也都涉及这里所描述的理论内容. "
+      "Corcoran (1980) 对范畴性 (categoricity) 概念提供了更多信息, "
+      "包括历史背景等方面. 关于" $kappa
+      "-范畴性还有两个难度更高的定理: 其一是Morley定理, "
+      "断言一个在某个不可数基数上范畴的理论在所有不可数基数上均范畴; "
+      "其二是Ryll-Nardzewski定理, 给出了" $aleph_0
+      "-范畴理论一个简洁的代数刻画. "
+      "这两个定理均可在Hodges (1993b) 中找到.")
+   (P "关于基于重写技术的纯等式推理, 请参阅Baader和Nipkow (1998) 的专著, "
+      "以及Huet和Oppen (1980), Klop (1992) 和Plaisted (1993) 的综述文章. "
+      "Dershowitz关于化简序 (simplification order) 是停机的这一结论, "
+      "通常由Kruskal定理的(一个简单情形)推导得出 "
+      "(Kruskal 1960; Nash-Williams 1963); "
+      "Baader和Nipkow (1998) 中有易于理解的阐述. "
+      "在实现LPO时我们未考虑效率问题, "
+      "但Löchner (2006) 对此作了细致的分析.")
+   (P "判定带等式逻辑中全称公式有效性的方法在验证领域有重要应用 (Burch和Dill 1994). "
+      "这推动了对合同闭包 (congruence closure) 之外的各种替代算法的探索. "
+      "关于基于Ackermann规约方法的进一步改进, "
+      "可参见Goel, Sajid, Zhou, Aziz和Singhal (1998), Velev和Bryant (1999) "
+      "以及Lahiri, Bryant, Goel和Talupur (2004).")
+   (P "已提到的一些自动定理证明教材中讨论了超模归结 (paramodulation), "
+      "包括Chang和Lee (1973) 以及Loveland (1978). 此外, "
+      "Argonne小组的Wos, Overbeek, Lusk和Boyle (1992) "
+      "等著作涵盖了利用超模归结求解非平凡问题的方法. "
+      "Bachmair和Ganzinger (1994) 是一篇关于超模归结及相关思想的综述, "
+      "Degtyarev和Voronkov (2001) 则综述了"
+      "如tableau等自顶向下自由变量演算中的等式推理.")
+   (P "TPTP问题库 (Sutcliffe和Suttner 1998) 包含大量等式问题, "
+      "并提供工具以便不直接处理等式的证明器添加等式公理. "
+      "自动推理在等式逻辑这一大领域中有若干最令人印象深刻的应用. "
+      "最著名的例子是Robbins猜想" --
+      "该猜想曾令包括Tarski在内的众多杰出数学家的证明尝试均告失败"
+      -- "最终由McCune (1997)使用EQP证明器自动求解. "
+      "这只是自动推理程序回答开放性问题的一个特别广为人知的案例. "
+      "更多案例可见于McCune和Padmanabhan (1996) "
+      "以及Wos和Pieper (2003) 的专著, 以及互联网上的相关资源.")
+   (H3. "练习")
    (H2. "可判定问题")
+   (H3. "判定问题")
+   (H3. "AE片段")
+   (H3. "Miniscoping and the monadic fragment")
+   (H3. "三段论")
+   (H3. "有限模型性质")
+   (H3. "量词消去")
+   (H3. "Presburger算术")
+   (H3. "复数")
+   (H3. "实数")
+   (H3. "环, 理想和word问题")
+   (H3. "Gr&ouml;bner基")
+   (H3. "几何定理证明")
+   (H3. "将判定过程进行组合")
+   (H3. "深入阅读")
+   (P "许多逻辑学教材讨论了判定问题. "
+      "关于判定问题在逻辑有效性方面可判定与不可判定的情形, "
+      "可参见 Börger, Grädel和Gurevich (2001), Ackermann (1954) "
+      "以及Dreben和Goldfarb (1979), "
+      "此外Hilbert和Ackermann (1950) 对此也有简要论述. "
+      "需要注意的是, 判定问题通常从可满足性而非有效性的对偶角度加以处理, "
+      "因此在将此类文献与本文的讨论相对照时, 需要在量词前缀中互换"
+      $forall "与" $exists "的角色. Rabin (1991) 对可判定理论进行了综述, "
+      "其中一些我们已在本章中加以讨论.")
+   (P "三段论在诸多逻辑史著作中有详尽讨论, "
+      "如Bocheński (1961), Dumitriu (1977), "
+      "Kneale和Kneale (1962) 以及Kneebone (1963).")
+   (P "文献中还有若干其他数学理论的量词消去结果. "
+      "两个较为困难的例子是Abel群理论 (Szmielew 1955) "
+      "与Boole代数理论 (Tarski 1949). "
+      "Kreisel和Krivine (1971) 有一章专门讨论量词消去, "
+      "内容涵盖可分Boole代数理论 (以及作为特例的原子Boole代数). "
+      "其他标准模型论教材, 如Chang和Keisler (1992), "
+      "Hodges (1993b) 以及Marcja和Toffalori (2003), "
+      "也讨论了量词消去及模型完备性, " $o "-极小性等相关概念; "
+      "模型完备性的一种表述 (A. Robinson 1963; MacIntyre 1991) 为: "
+      "对于理论" $T ", 每个公式都" $T "-等价于一个纯全称公式 "
+      "(或者等价地, 纯存在公式). "
+      "Ershov, Lavrov, Taimanov和Taitslin (1965) "
+      "在文末对量词消去方法成功应用的各类理论进行了综述. "
+      "Soloray (私人通信) 也向本书作者介绍了一种适用于"
+      "各类实与复向量空间的量词消去过程.")
+   (P "Presburger算术及若干相关理论的处理可见于Enderton (1972), "
+      "而Smoryński (1980) 则对Presburger与Skolem"
+      "的不同量词消去程序作了详细阐述. "
+      "该书包含大量相关主题的内容, "
+      "其中包括对相应乘法理论的讨论. "
+      "Smoryński (1981) 给出了Presburger算术量词消去的一个精彩应用. "
+      "Yap (2000) 进一步深入探讨了相关可判定性问题, "
+      "并包含许多其他相关材料. "
+      "Presburger算术的其他处理方法还包括"
+      "Omega测试 (Pugh 1992) 与Williams (1976) 的方法. "
+      "Weispfenning (1999) 给出了一种适用于"
+      "实数与整数混合线性算术的量词消去过程.")
+
+   (H3. "练习")
    (H2. "交互式定理证明")
    (P "我们迄今为止的努力一直致力于让计算机完全自动地证明定理. "
       "然而, 在任何相对现实的计算能力限制下, "
@@ -4191,7 +6834,7 @@ let defcnf3 fm = list_conj (map list_disj(mk_defcnf andcnf3 fm));;")
       "这些规则很好地形式化了人们通常使用等式进行推理的方式, "
       "尽管用它们来证明定理可能需要极大的技巧, 但每条规则本身都相当简单. "
       "此外, 这些规则是完备的 {译注: 且是可靠的 (sound)}: " (!- Δ (&= $s $t))
-      " (" (Q (&= $s $t) "可从" Δ "证明")") 当且仅当" (!= Δ (&= $s $t))
+      " (" (Q (&= $s $t) "可从" Δ "证明") ") 当且仅当" (!= Δ (&= $s $t))
       " (" (Q (&= $s $t) "是" Δ "的逻辑推论")
       "). 我们自然希望一般一阶逻辑的证明系统也具备所有这些性质.")
    (P "第一个适用于一阶逻辑的证明系统是由Frege (1879) 发展出来的. "
@@ -4217,7 +6860,178 @@ let defcnf3 fm = list_conj (map list_disj(mk_defcnf andcnf3 fm));;")
       (Ul (Li "Hilbert或Frege系统 (Frege 1879; Hilbert和Ackermann 1950),")
           (Li "自然演绎 (Gentzen 1935; Prawitz 1965),")
           (Li "相继式演算 (Gentzen 1935).")))
-   
+
    (H3. "一阶逻辑的LCF实现")
+   (P "和Frege一样, Russell对建立一种" (Q "逻辑主义")
+      "论题感兴趣, 即所有数学原则上都可以被还原为纯粹逻辑. "
+      "为此, 他在" (Em "Principia Mathematica")
+      " (Whitehead与Russell, 1910) 中通过显式的形式证明推导出了一批初等数学定理. "
+      "这是一项极其艰辛的工作, Russell (1968) 曾评论说他的智力"
+      (Q "从未从这种重压中完全恢复过来")
+      ". 然而, 借助计算机辅助, 形式证明的冗长与繁琐不再需要成为如此严重的障碍. "
+      "我们的首要任务是使基本推理规则尽可能简单, "
+      "这样我们才能真正对逻辑基础及其计算机实现充满信心. "
+      "如果这以更冗长的形式证明为代价, 我们也并不感到沮丧, "
+      "因为大多数底层证明的生成将被额外的编程层所隐藏.")
+   (P "通常, 一阶证明系统至少有一条涉及替换的规则或者说公理模式, "
+      "例如允许我们从一个全称性定理" (!- (∀ $x (App $P $x)))
+      "过渡到其任意的替换实例" (!- (App $P $t))
+      "的规则. 但正如我们在第3.4节中所见, 代入的正确实现并非完全平凡. "
+      "我们将通过建立更简单的规则来避免将任何此类复杂代码内置到我们的逻辑核心中, "
+      "由此替换是可推导的 (Tarski, 1965; Monk, 1976). 我们有两条"
+      (Q "本真 (proper)") "规则, 其取用定理而产生新的定理. "
+      "其一是modus ponens:"
+      (MB (&rule (!- (&=> $p $q)) (!- $p)
+                 (!- $q)))
+      "另一规则则是泛化, 其允许我们在任意的变量上对于一个定理进行全称量化:"
+      (MB (&rule (!- $p)
+                 (!- (∀ $x $p)))))
+   (P "每条" (Q "公理") "实际上是一条公理的" (Em "模式(schema)")
+      ", "
+      )
+   (H3. "命题导出规则")
+   (H3. "通过推理证明重言")
+   (H3. "一阶导出规则")
+   (H3. "通过推理进行一阶证明")
+   (H3. "交互式证明风格")
+   (H3. "深入阅读")
+   (P "交互式定理证明, 乃至面向人类的证明, 在教科书中几乎没有得到任何涉及. "
+      "究其原因, 主要在于这些内容不易以某套标准定理与方法的形式加以阐述; "
+      "或许在一定程度上, 它们也被认为缺乏足够的学术吸引力. 不过, "
+      "Reeves和Clarke (1990) 所著的" (Q "Logic for Computer Science")
+      "教材中包含了对交互式定理证明的讨论, Paulson (1991) "
+      "关于SML程序设计的书中也给出了一个较为详尽的示例. "
+      "MacKenzie (2001) 记述了交互式定理证明的历史及其应用, "
+      "而Wiedijk (2006) 则是对若干主要交互式定理证明器的综述, "
+      "展示了各系统中对" (Msqrt $2) "无理性的证明.")
+   (P "然而, 关于特定交互式系统的书籍为数不少, 其中许多属于LCF家族. "
+      "Gordon, Milner和Wadsworth (1979) "
+      "所著的第一本关于Edinburgh LCF的书描述了其最初的创新思想, "
+      "Paulson (1987) 则介绍了Cambridge LCF" --
+      "一个组织结构经过大幅优化的版本. "
+      "Constable (1986), Gordon和Melham (1993) 以及Paulson (1994) "
+      "分别描述了源自LCF的证明器 Nuprl, HOL与Isabelle. "
+      "Boyer和Moore (1979) 讨论了NQTHM, 即Boyer-Moore证明器" --
+      "尽管其自动化程度很高, 但就通常的使用方式而言, 仍可视为一个交互式系统. "
+      "ACL2是一个基于类似原理的更现代的系统 (Kaufmann, Manolios和Moore 2000).")
+   (P "形式演绎演算的研究是当代逻辑学的重要组成部分. "
+      "许多逻辑学教材 (Enderton 1972; Mendelson 1987) "
+      "对Hilbert系统进行了介绍并证明了其完备性, "
+      "而另一些教材如van Dalen (1994) 则采用自然演绎. "
+      "证明论是对证明系统本身的研究; "
+      "Troelstra和Schwichtenberg (1996), Prawitz (1965) "
+      "以及Girard, Lafont和Taylor (1989) "
+      "分别以各具风格的方式对该领域作了入门介绍. "
+      "Girard (1987) 是对若干进阶主题的导引, "
+      "而Goubault-Larrecq和Mackie (1997) "
+      "则从更具证明论风格的角度探讨了自动定理证明.")
+   (P "Gordon, Milner和Wadsworth (1979) "
+      "的原始LCF文献在策略 (tactics) 方面仍值得一读. "
+      "其他人则从各种方向对策略加以推广; "
+      "例如, Sokołowski (1983) 对策略进行了扩展, "
+      "使其能够维护一个可实例化的" (Q "元变量")
+      "列表, 这些元变量可在证明过程中逐步实例化. "
+      "这使得存在项的实例化可以在证明的不同阶段更自由地进行. "
+      "Isabelle (Paulson 1994) 通过一种更直接的基于定理的实现方式支持类似机制, "
+      "同时也支持具有无限数量可能后继目标状态的非确定性策略. "
+      "Boulton (1992) 将延迟推理的思想推广至整个LCF风格证明器. "
+      "在LCF风格系统中实现Mizar风格声明式证明的工作由"
+      "Harrison (1996a), Syme (1997), Wenzel (1999), "
+      "Zammit (1999a), Wiedijk (2001) 和Corbineau (2008) 分别描述, "
+      "而Harrison (1996c) 则是对声明式证明与过程式证明的更详细比较.")
+   (P "关于LCF风格证明器效率的更详细分析, "
+      "参见Boulton (1993) 和Harrison (1995). "
+      "后者还包含对定理证明中的反射及逻辑与计算机科学相关领域的更详细阐释, "
+      "尽管其对该领域工作的综述现已过时. "
+      "许多有用的高层派生规则已以LCF风格写就. 例如, "
+      "算术判定过程的LCF实现至少可追溯至Boulton (1993), "
+      "而Hörmander实数算法的近期LCF风格实现则由Mahboubi和Pottier (2002) "
+      "以及McLaughlin和Harrison (2005) 分别描述. "
+      "用于构造归纳或递归定义的复杂LCF风格派生规则由"
+      "Melham (1991) 和Slind (1996) 描述. "
+      "Chaieb (2008) 描述了若干判定过程的实现, "
+      "涵盖LCF风格与反射两种方式.")
+   (P "一次性验证代码与逐步检验特定结果 "
+      "(在程序运行时逐步进行, 或从日志乃至程序生成的更紧凑的证书中检验) "
+      "这两种方案可以推广至定理证明之外的更广泛领域. "
+      "Blum (1993) 指出, 在许多情形下, 检验结果可能比验证代码更为实际和有效" --
+      "Mehlhorn et al. (1996) 是将结果检验融入计算几何库的一个具体示例. "
+      "Harrison和Théry (1998) 描述了对计算机代数系统" (Q "答案")
+      "的检验, 而 Hurd (1999) 则描述了通过LCF推理检验一阶证明器所生成"
+      (Q "证明") "的方法.")
+   (P "目前, 交互式定理证明主要有两大应用领域: (i) 形式化纯数学, "
+      "以及 (ii) 验证计算机程序, 硬件, 协议等的正确性. "
+      "数学形式化工作或出于纯粹的学术兴趣 (Shankar 1994; Fleuriot 2001), "
+      "或为验证应用提供支撑 (Harrison 1998; Hurd 2001), "
+      "或因为对某个非形式证明存在真实的疑问或质疑 (Gonthier 2005). "
+      "目前规模最大的形式化数学语料库是Mizar Mathematical Library, "
+      "而Wiedijk (2006) 对该领域其他近期进展给出了简明扼要的综述. "
+      "Flyspeck 项目 (Hales 2006) 旨在给出Kepler球堆积猜想的完整形式化证明, "
+      "或许是迄今为止最具雄心的形式化项目, 撰写本文时该项目正取得良好进展. "
+      "至于验证方面, 在有限篇幅内难以概括交互式定理证明的众多令人印象深刻的应用. "
+      "粗略举例而言, 仅在浮点算术这一特定领域, "
+      "对真实工业硬件, 软件或微代码所做的验证工作便不乏其数, "
+      "包括Moore, Lynch和Kaufmann (1998), Russinoff (1998), "
+      "O'Leary, Zhao, Gerth和Seger (1999), Harrison (2000), "
+      "Kaivola和Aagaard (2000), Kaivola和Kohatsu (2001) "
+      "以及Slobodová (2007), 而这份列表尚不完整.")
+   (H3. "练习")
    (H2. "限制")
+   (P "本书大部分内容讨论的是正面结果: "
+      "某些逻辑问题原则上可以自动化处理. "
+      "本章则考察自动化的局限性, "
+      "说明通常意义下的算法对某些逻辑问题并不存在. "
+      "我们将特别证明, 纯一阶逻辑是不可判定的, "
+      "并且带有加法和乘法的自然数理论在精确意义下远非可判定. "
+      "在通往这些结论的过程中, "
+      "我们将证明Gödel著名的第一不完备性定理.")
+   (H3. "Hilbert纲领")
+   (P "将推理机械化的想法早在计算机出现之前便令人们深深着迷. "
+      "关于机械化的范围与局限的具体问题在二十世纪初得到了系统性研究, "
+      "这在很大程度上源于Hilbert将数学置于坚实基础之上这一纲领的影响. "
+      "为充分理解以下结果在文化层面的深远意义, "
+      "有必要审视当时围绕数学基础问题所涌现的思想激荡, "
+      "正是这种激荡使这些问题在那个时代显得如此重要.")
+   (P "在历史上的不同时期, 数学家们曾多次对本学科公认基础中所出现的明显问题深感忧虑. "
+      "例如, 毕达哥拉斯学派试图仅以有理数为基础构建数学, 因而对"
+      (Msqrt $2) "必为无理数这一发现深感不安. 此后, "
+      "Newton和Leibniz的微积分中对无穷小量看似自相矛盾的处理方式令许多人困惑不解 "
+      "(Berkeley 1734), 复数的使用以及非Euclid几何的发现同样引发了类似的疑虑. "
+      "再往后, 当无穷集合理论开始被独立探究并得到推广" --
+      "这主要归功于Cantor" -- "新一轮的基础性忧虑随之出现.")
+   (P "许多数学家虽然接受" (Q "潜无穷")
+      "的概念 (例如每个自然数都有后继), "
+      "却仍然认为数学必须植根于具体的计算. "
+      "例如, Kronecker乐于处理" (Em "代数")
+      "数, 即形如" (&+ (Msqrt $2) (Msqrt $3))
+      "这样的数" -- "它们是整系数多项式方程的根 (在此例中为"
+      (&+ (&- $x^4 (&i* 10 $x^2)) $1)
+      ")" -- "但他拒绝承认" (Em "超越") " (非代数) 数, "
+      "因为这类数似乎无法以有限表示进行显式计算. "
+      "据说, 他曾评价Lindemann (1882) 关于" $pi
+      "为超越数的证明" (Q "颇为有趣, 只是" $pi "并不存在")
+      ". 持此观点的数学家倾向于拒斥大部分Cantor式的理论体系, "
+      "以及非构造性的存在性证明: "
+      "Gordan在评价Hilbert借助如今所称的Hilbert基定理"
+      "对不变量理论中一个关键问题的解决时, 曾发出这样的感叹"
+      -- (Q "这不是数学, 这是神学!")
+      ". 为理解在此语境下" (Q "构造性") "与"
+      (Q "非构造性") "的含义, 请考虑以下内容.")
+   ((Theorem)
+    "存在代数无理数" $x "和" $y "使得" $x^y "是有理数.")
+   ((proof)
+
+    )
+   (H3. "关于真性的不可定义性的Tarski定理")
+   (H3. "公理系统的不完备性")
+   (H3. "Gödel不完备性定理")
+   (H3. "可定义性和可判定性")
+   (H3. "Church定理")
+   (H3. "更多的限制性结果")
+   (H3. "回顾: 逻辑的本质")
+   (H3. "深入阅读")
+   (H3. "练习")
+   (H2 "附录1: 数学背景")
+   (H2 "附录2: OCaml轻松入门")
+   (H2 "附录3: 公式的句法分析和打印")
    ))
