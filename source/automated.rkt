@@ -3995,7 +3995,25 @@ let dplltaut fm = not(dpllsat(Not fm));;")
       "使用显式的" (Em "踪迹(trail)") "来保存关于递归分裂的信息. "
       "我们将这个踪迹就实现为序对的列表, "
       "每个序对的第一个成员是我们正在假定的文字, "
-      
+      "第二个则是一个标志 (flag), "
+      "其指明了这个文字到底是仅作为情形分裂的一半而假设的 ("
+      (Code "Guessed") "), 还是说它是由之前假设的文字根据单元传播而推出的 ("
+      (Code "Deduced") "). 踪迹以逆序存储, "
+      "也就是说列表的头部是最近才假设或者推出的文字. "
+      "并且, 标志取自以下这个枚举类型:"
+      (CodeB "type trailmix = Guessed | Deduced;;"))
+   (P "一般来说, 我们在探索情形分裂时不再修改输入问题中的子句, 而是保留原始公式, "
+      "仅在踪迹中记录我们进一步的 (通常是临时的) 假设. "
+      "踪迹中的所有文字都被视为在当前探索阶段成立. "
+      "为了找到可用于情形分裂的潜在原子公式, "
+      "我们使用以下方法来标识问题中那些"
+      "在踪迹中未有(正或负)指派的原子公式, "
+      "无论该文字是猜测得来的还是推导得来的:"
+      (CodeB "let unassigned =
+  let litabs p = match p with Not q -> q | _ -> p in
+  fun cls trail -> subtract (unions(image (image litabs) cls))
+                            (image (litabs ** fst) trail);;"))
+   (P "为了执行单元传播, "
       )
    (H4. "回跳和学习")
    (H3. "Stålmarck方法")
@@ -5077,7 +5095,17 @@ let dplltaut fm = not(dpllsat(Not fm));;")
       "它使用数值索引来表示绑定变量的嵌套深度. "
       "然而, 这种方法本身也有一些缺点.")
    (H3. "前束范式")
-   
+   (P "一个一阶公式被称为是具有"
+      (Em "前束范式(prenex normal form, PNF)")
+      ", 如果其所有的量词都出现在外部, "
+      "而体 (或者说" (Q "matrix")
+      ") 里只用到了命题联结词. 例如, "
+      (∀ $x (∃ $y (∀ $z (&=> (&conj (app $P $x)
+                                    (app $P $y))
+                             (app $P $z)))))
+      "具有PNF形式, 而"
+      
+      )
    (H3. "Skolem化")
    (H3. "canonical模型")
    (H3. "机械化Herbrand定理")
