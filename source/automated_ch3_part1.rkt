@@ -2497,7 +2497,7 @@ let functions fm =
   let cntms = image (fun (c,_) -> Fn(c,[])) consts in
   length(gilmore_loop (simpdnf sfm) cntms funcs fvs 0 [[]] [] []);;"))
    (P "{译注: 对于这些程序的细节, 我们作如下说明. 若"
-      (Code "sfm") "没有自由变量或者没有元数大于等于一的函数符号, "
+      (Code "sfm") "没有元数大于等于一的函数符号, "
       "那么实际上第" $0 "层级就将ground实例的所有可能全部枚举完毕了. "
       "即便如此, 如果" (Code "fm") "不是有效的, 那么"
       (Code "herbloop") "也不会检测到不可满足性, "
@@ -2508,12 +2508,7 @@ let functions fm =
       "即便是ground实例的可能性有限的情况下. "
       "综上所述, " (Code "gilmore")
       "能够终止当且仅当" (Code "fm")
-      "是一个一阶有效公式. "
-      "当然了, 似乎OCaml的整数类型无法无限增大, "
-      "所以程序大概也会最终停下来 "
-      "(尽管运行时间很可能会超出合理范围), "
-      "但从编程语言理论的角度这不叫终止, "
-      "而应该称为发散.}")
+      "是一个一阶有效公式.}")
    (P "让我们在一些例子上尝试我们新的一阶证明器. "
       "我们会从很小的公式开始:"
       (CodeB "# gilmore &lt;&lt;exists x. forall y. P(x) ==> P(y)>>;;

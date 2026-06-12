@@ -192,10 +192,12 @@
          "logical_relations.rkt"
          "abstract_continuation.rkt"
          "galois_connections.rkt"
+         "tropical.rkt"
          
          )
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml tropical.html "../tropical.html")
     (emitXml galois_connections.html
              "../galois_connections.html")
     (emitXml abstract_continuation.html
