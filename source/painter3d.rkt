@@ -5,14 +5,8 @@
 (define-struct vec3
   (x y z)
   #:transparent)
-(define-struct vec2
-  (x y)
-  #:transparent)
 (define-struct pt3
   (x y z)
-  #:transparent)
-(define-struct pt2
-  (x y)
   #:transparent)
 (define-struct frame
   (o x y z)
@@ -45,10 +39,6 @@
    (+ (pt3-x p) (vec3-x v))
    (+ (pt3-y p) (vec3-y v))
    (+ (pt3-z p) (vec3-z v))))
-(define (pt2+ p v)
-  (make-pt2
-   (+ (pt2-x p) (vec2-x v))
-   (+ (pt2-y p) (vec2-y v))))
 (define (painterT f)
   (define o (frame-o f))
   (define x (frame-x f))
@@ -246,11 +236,8 @@
   (define x (pt3-x p))
   (define y (pt3-y p))
   (define z (pt3-z p))
-  (make-pt2
-   (/ (* (sqrt 3) (- x y)) 2)
-   (- (* 1/2 (+ x y)) z)))
-(define (n2s n)
-  (~r n #:precision 2))
+  (pt (/ (* (sqrt 3) (- x y)) 2)
+      (- (* 1/2 (+ x y)) z)))
 (define ((lerp t) a b)
   (+ a (* t (- b a))))
 (define ((biased-random t) n)
@@ -281,10 +268,10 @@
   (define P1 (proj p1))
   (define P2 (proj p2))
   (Line #:attr*
-        `((x1 ,(n2s (pt2-x P1)))
-          (y1 ,(n2s (pt2-y P1)))
-          (x2 ,(n2s (pt2-x P2)))
-          (y2 ,(n2s (pt2-y P2))))))
+        `((x1 ,(n2s (pt-x P1)))
+          (y1 ,(n2s (pt-y P1)))
+          (x2 ,(n2s (pt-x P2)))
+          (y2 ,(n2s (pt-y P2))))))
 (define ((compile-polygon proj) p*)
   (define P* (map proj p*))
   (Polygon #:attr*
@@ -293,8 +280,8 @@
                 string-append
                 (map (lambda (P)
                        (format "~a,~a "
-                               (n2s (pt2-x P))
-                               (n2s (pt2-y P))))
+                               (n2s (pt-x P))
+                               (n2s (pt-y P))))
                      P*)))
              (fill ,(random-color 0.75)))))
 (define ((compile-pict proj #:attr* [attr* '()]) pict)
