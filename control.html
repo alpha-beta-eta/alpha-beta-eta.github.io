@@ -941,7 +941,40 @@
     <p>第11章所描述的monad理论, 提供了对效应的传播与排序的通用描述. 然而, 它并未涉及效应如何被生成和实现. 相反, 每个monad都提供其自身特定的操作及其实现.</p>
     <p>本章所研究的代数效应 (algebraic effects) 理论, 在monad理论的基础上进一步扩展, 对效应的生成与处理提供了通用描述, 而不依赖于特定monad的具体细节. 该理论为effect handler提供了形式化基础并启发了其设计, effect handler是第10章所描述的控制运算符.</p>
     <h3>第12.1节 monadic程序的通用语义</h3>
-    <p><b>一个monadic语言. </b>作为本节的贯穿示例, 考虑第11.2节的计算性lambda演算, 其配备了state monad的操作<code>get</code>和<code>set</code>, 以及nondeterminism monad的操作<code>choose</code>和<code>fail</code>.</p>
+    <p><b>一个monadic语言. </b>作为本节的贯穿示例, 考虑第11.2节的计算性lambda演算, 其配备了state monad的操作<code>get</code>和<code>set</code>, 以及nondeterminism monad的操作<code>choose</code>和<code>fail</code>.
+      <math display="block">
+        <mtable columnalign="right right center left left">
+          <mtr>
+            <mtd><mtext>值:</mtext></mtd>
+            <mtd><mi>v</mi></mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow><mi>c</mi><mo>|</mo><mi>x</mi><mo>|</mo>
+                <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>M</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>计算:</mtext></mtd>
+            <mtd>
+              <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <msub><mi>v</mi><mn>1</mn></msub>
+                  <mspace width="2ex"/>
+                  <msub><mi>v</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi>if</mi><mspace width="2ex"/><mi>v</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi>else</mi><mspace width="2ex"/><mi>N</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
     <h2>第13章 类型和作用系统</h2>
     <p>类型系统通常被应用于编程语言, 以提高程序的可靠性和清晰性. 它们能够预防许多常见的编程错误, 并描述程序组件的接口.</p>
     <p>类型系统提供数据完整性保证, 例如<q>数组的所有元素具有相同的类型</q>或<q>函数只能应用于预期类型的参数</q>. 它们还能提供关于控制流的保证. 例如, 某些类型系统保证程序的终止性, 而另一些则保证程序中可能抛出的所有exception都在程序内部得到处理, 从而避免第9.4节中描述的uncaught exception问题.</p>

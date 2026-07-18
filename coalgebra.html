@@ -410,6 +410,87 @@
     <p>当这样一种余代数表示在定理证明器的类型化语言中形式化时 (如在[265]), 定理证明器的类型检查器可以保证其作出了合适的case distinction, 根据(1.3)中的输出类型. 也见[240], 其中Java的异常机制由这样的case distinction所描述, 紧密遵循着官方语言定义[173].</p>
     <p>这些例子刻画了作为具有结构化陪域的函数的余代数, 如(1.1), 其出现相当自然, 并且陪域指明了要施行的计算的种类. 这个想法将会进一步发展, 并应用于各种形式的计算. </p>
     <h3>第1.2节 余归纳的力量</h3>
+    <p>本节我们将会讨论序列&mdash;&mdash;或者说列表以及词 (word), 有时我们也这么说. 序列是基本的数据结构, 不论是在数学还是在计算机科学之中. 有限序列的数学理论已经得到了很好的理解, 并且也是计算机科学的基础组成部分, 其在诸多程序中都有用到 (特别是在Lisp语言里). 与有限列表相关的定义和推理一般是通过归纳完成的. 我们将会看到, 无限列表需要<em>余归纳</em>. 无限序列在计算中可以作为无限运行下去的程序的可观察输出存在. 另外, 在函数式编程语言中, 它们有时也以所谓的惰性列表出现, 如在语言Haskell [71] 或者Clean [381] 之中. {译注: 其实惰性列表既可以是有限的也可以是无限的.} 逻辑编程语言的现代扩展也有对于无限序列的支持 [431, 189]. (逻辑编程语言自身也可以使用余代数的方式进行描述; 见[78, 107, 305, 306, 80, 81].)</p>
+    <p>对于本节的剩余部分, 我们将使用一个任意但固定的集合<math><mi>A</mi></math>, 并希望讨论<math><mi>A</mi></math>的元素<math><msub><mi>a</mi><mi>i</mi></msub></math>的有限序列<math><mrow><mo stretchy="false">&lang;</mo><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>a</mi><mi>n</mi></msub></mrow><mo stretchy="false">&rang;</mo></mrow></math>和无限序列<math><mrow><mo stretchy="false">&lang;</mo><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>,</mo><msub><mi>a</mi><mn>2</mn></msub><mo>,</mo><mo>&hellip;</mo></mrow><mo stretchy="false">&rang;</mo></mrow></math>. 集合<math><mi>A</mi></math>可以理解为一个参数, 因而我们的序列由<math><mi>A</mi></math>参数化, 或者换言之, 多态于<math><mi>A</mi></math>.</p>
+    <p>我们将会建立关于序列的一个些许不同寻常和抽象的角度. 其并不将序列处理为一次性完全给出的对象, 而是以局部性的逐步的方式出现的. 这种余代数方法依赖于以下基本事实. 实际上有限和无限序列的集合都享有一种特定的<q>泛</q>性质, 即其为一个(合适类型的)<em>终</em>余代数. 我们将会解释这句话的意思是什么, 以及如何是利用这种特殊性质来定义序列上的诸多操作, 并证明关于序列的性质. 这种序列的终余代数的泛性质的一个特别性质在于其能够避免作出关于序列的有限和无限之间的(全局)区分.</p>
+    <p>首先是一些记号. 对于元素<math><mrow><msub><mi>a</mi><mi>i</mi></msub><mo>&in;</mo><mi>A</mi></mrow></math>的<em>有限</em>序列 (或者说列表或词) <math><mrow><mo stretchy="false">&lang;</mo><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>a</mi><mi>n</mi></msub></mrow><mo stretchy="false">&rang;</mo></mrow></math>之集合我们记<math><msup><mi>A</mi><mo>&#8270;</mo></msup></math>, 而对于无限序列<math><mrow><mo stretchy="false">&lang;</mo><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>,</mo><msub><mi>a</mi><mn>2</mn></msub><mo>,</mo><mo>&hellip;</mo></mrow><mo stretchy="false">&rang;</mo></mrow></math>之集合我们记<math><msup><mi>A</mi><mi>&Nopf;</mi></msup></math>. 后者也可以描述为函数<math><mrow><msub><mi>a</mi><mrow><mo stretchy="false">(</mo><mi>&minus;</mi><mo stretchy="false">)</mo></mrow></msub><mo>:</mo><mrow><mi>&Nopf;</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>, 其解释了指数记号<math><msup><mi>A</mi><mi>&Nopf;</mi></msup></math>. 有时, <math><msup><mi>A</mi><mi>&Nopf;</mi></msup></math>中的无限序列被称为<em>流</em>. 最后, 有限和无限序列之集合<math><msup><mi>A</mi><mi>&infin;</mi></msup></math>即(无交)并<math><mrow><msup><mi>A</mi><mo>&#8270;</mo></msup><mo>&cup;</mo><msup><mi>A</mi><mi>&Nopf;</mi></msup></mrow></math>.</p>
+    <p>序列之集合<math><msup><mi>A</mi><mi>&infin;</mi></msup></math>携带了一种余代数或者说转换结构, 我们就称其为<math><ms>next</ms></math>. 其试图将一个序列分解为其头部和尾部, 如果存在的话. 因此, 我们或可以将<math><ms>next</ms></math>理解为一个部分函数. 但是, 我们会将其描述为一个完全函数, 其可能对于未定义情形输出特殊元素<math><mi>&bottom;</mi></math>:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(1.4)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mtable columnalign="left">
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <msup><mi>A</mi><mi>&infin;</mi></msup>
+                      <mover><mo>&rarr;</mo>
+                        <mrow><mspace width="2em"/><ms>next</ms><mspace width="2em"/></mrow>
+                      </mover>
+                      <mrow>
+                        <mrow><mo stretchy="false">{</mo><mi>&bottom;</mi><mo stretchy="false">}</mo></mrow>
+                        <mo>&cup;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>A</mi><mo>&times;</mo>
+                            <msup><mi>A</mi><mi>&infin;</mi></msup>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow><mi>&sigma;</mi><mo>&mapsto;</mo>
+                      <mrow><mo>{</mo>
+                        <mtable displaystyle="true">
+                          <mtr>
+                            <mtd><mi>&bottom;</mi></mtd>
+                            <mtd columnalign="left"><mtext>, 如果</mtext><mi>&sigma;</mi><mtext>是空序列</mtext>
+                              <mrow><mo stretchy="false">&lang;</mo>
+                                <mrow/>
+                                <mo stretchy="false">&rang;</mo></mrow>
+                            </mtd>
+                          </mtr>
+                          <mtr>
+                            <mtd>
+                              <mrow><mo stretchy="false">(</mo>
+                                <mrow><mi>a</mi><mo>,</mo>
+                                  <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                                </mrow>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mtd>
+                            <mtd columnalign="left"><mtext>, 如果</mtext>
+                              <mrow><mi>&sigma;</mi><mo>=</mo>
+                                <mrow><mi>a</mi><mo>&sdot;</mo>
+                                  <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                                </mrow>
+                              </mrow>
+                              <mtext>, 其中头部</mtext>
+                              <mrow><mi>a</mi><mo>&in;</mo><mi>A</mi></mrow>
+                              <mtext>而尾部</mtext>
+                              <mrow>
+                                <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                                <mo>&in;</mo>
+                                <msup><mi>A</mi><mi>&infin;</mi></msup>
+                              </mrow>
+                            </mtd>
+                          </mtr>
+                        </mtable>
+                      </mrow>
+                    </mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+            </mtd>
+            <mtd><mtext>(1.4)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      这个余代数的类型因而是</p>
     <h3>第1.3节 余代数的时态逻辑的一般性</h3>
     <h3>第1.4节 余代数概念的抽象性</h3>
     <h2>第2章 多项式函子的余代数</h2>

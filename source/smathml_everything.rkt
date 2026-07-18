@@ -9,6 +9,7 @@
    (columnize
     (TITLE "SMathML参考 (新)" "smathml0.html")
     (TITLE "SMathML Reference (New)" "smathml1.html")
+    (TITLE "SMathML指南" "smathml_guide0.html")
     ;(TITLE "SMathML论文 (draft)" "notes/SMathML.pdf")
     ;(TITLE "SMathML参考" "smathml.html")
     ;(TITLE "SMathML Reference" "smathml_ref.html")

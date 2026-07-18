@@ -830,7 +830,14 @@
        (Code "get") "和" (Code "set")
        ", 以及nondeterminism monad的操作"
        (Code "choose") "和" (Code "fail") "."
-       
+       (MB (set-attr*
+            (&Table
+             ("值:" $v $::= (&\| $c $x (Lam $x $M)))
+             ("计算:" (&cm $M $N) $::= (&\| (App $v_1 $v_2) (If $v $M $N)))
+             
+             )
+            'columnalign
+            "right right center left left"))
        )
    (H2. "类型和作用系统")
    (P "类型系统通常被应用于编程语言, 以提高程序的可靠性和清晰性. "

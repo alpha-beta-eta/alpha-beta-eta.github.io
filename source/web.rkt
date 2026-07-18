@@ -204,12 +204,15 @@
          "imperative.rkt"
          "kailai.rkt"
          "aitr794.rkt"
+         "smathml_guide0.rkt"
          
          )
 (define emitXml (emit XML))
 (define emitXml-thunk (emit-thunk XML))
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml smathml_guide0.html
+             "../smathml_guide0.html")
     (emitXml aitr794.html "../aitr794.html")
     (emitXml kailai.html "../kailai.html")
     (emitXml imperative.html "../imperative.html")

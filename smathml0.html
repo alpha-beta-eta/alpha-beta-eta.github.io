@@ -1298,13 +1298,17 @@
         </mtable>
       </math>
       注记. 目前Firefox渲染上划线存在一个奇怪的bug, 而且这个bug在作者最初使用MathML时并不存在, 那就是上划线会变成左箭头.</p>
-    <h3>第4.16节 极限记号</h3>
+    <h3>第4.16节 函数记号</h3>
+    <p>SMathML提供了一些常用的函数相关表达方式.<pre><code>(define (func f A B)
+  (&amp;: f (&amp;-> A B)))</code></pre><code>func</code>用于指明函数的类型, 例如<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></math>.<pre><code>(define $\|-> (Mo &quot;&amp;mapsto;&quot;))</code></pre>常量<code>$\|-></code>所对应的过程<code>&amp;\|-></code>在数学中用于定义匿名函数, 这类似于编程语言和逻辑学中的<math><mi>&lambda;</mi></math>记号, 例如<math><mrow><mi>x</mi><mo>&mapsto;</mo><msup><mi>x</mi><mn>2</mn></msup></mrow></math>指称了一个平方函数.<pre><code>(define (func:def f A B x fx)
+  (&amp;: f (&amp;cm (&amp;-> A B) (&amp;\|-> x fx))))</code></pre>有的时候人们将函数的类型和具体映射规则并置, 例如<math><mrow><mi>f</mi><mo>:</mo><mrow><mrow><mrow><mi>&Ropf;</mi><mo>&times;</mo><mi>&Ropf;</mi></mrow><mo>&rarr;</mo><mi>&Ropf;</mi></mrow><mo>,</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&mapsto;</mo><msqrt><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mrow></msqrt></mrow></mrow></mrow></math>.</p>
+    <h3>第4.17节 极限记号</h3>
     <p>分析学中常用到极限记号.<pre><code>(define $lim (Mi &quot;lim&quot;))
 (define lim
   (case-lambda
     ((p f) (: (__ $lim p) f))
     ((x a f) (: (__ $lim (&amp;->0 x a)) f))))</code></pre>注意其中的过程<code>&amp;->0</code>所对应的运算符<code>$->0</code>是箭头<code>$-></code>的紧凑版本.</p>
-    <h3>第4.17节 推理规则</h3>
+    <h3>第4.18节 推理规则</h3>
     <p>逻辑学和编程语言领域经常需要排版推理规则和证明树. SMathML提供的相关功能完全是基于<code>Mfrac</code>的, 其效果并不特别符合一般审美, 但是至少能够让人理解.</p>
     <p><pre><code>(define (&amp;rule #:space [n 8] . j*)
   (let-values (((j* j1) (split-at-right j* 1)))
@@ -1997,7 +2001,7 @@
      (fup seed enjoying tag attr* xml*))
     (else (fhere seed xml))))</code></pre><code>Fold</code>和<code>Fold*</code>的想法来源于SSAX的上下文, 但是它直接作用于SXML, 而不是未进行句法分析的文本.</p>
     <h3>第8.10节 HTML美观打印</h3>
-    <p style="color: red">这部分的代码均为LLM生成, 且并无人工完全理解式的审查. 因此, 请谨慎使用该代码, 切勿将其用于任何生产环境.</p>
+    <p style="color: red">这部分的代码均为LLM生成, 且并无人工完全理解式的审查. 因此, 请谨慎使用该代码, 切勿将其用于任何生产环境. 不过, 这里所提供的<code>XML</code>可以说比绝大多数HTML美观打印工具都更为保守. 但是, 从原则上来说, HTML的正确缩进行为依赖于其CSS, 所以我们的美观打印功能不可能做到完全的正确性.</p>
     <p>基于前一节的<code>Fold</code>, 这里我们提供了一个HTML美观打印功能. 当然, 你也可以将其用于XML美观打印, 并且我们提供了参数<code>inline-tags</code>用于控制缩进.<pre><code>(struct state (idt ctx) #:transparent)
 (define inline-tags
   (make-parameter
@@ -2082,6 +2086,15 @@
   (A title #:attr* `((href ,link))))
 (define (TITLE title link)
   (H2 (LINK title link)))</code></pre>不过, 至少<code>LINK</code>对于一般性的使用场景还是有用的.</p>
+    <h3>第8.12节 XML标签辅助定义功能</h3>
+    <p><code>make-xml-tag</code>可以定义其名称参数所对应的SXML构造过程, 而<code>define-xml-tag*</code>则是用于定义大量SXML构造过程的辅助宏.<pre><code>(define (make-xml-tag name)
+  (lambda (#:attr* [attr* '()] . xml*)
+    `(,name ,attr* . ,xml*)))
+(define-syntax-rule
+  (define-xml-tag* (id name) ...)
+  (begin
+    (define id (make-xml-tag 'name))
+    ...))</code></pre></p>
     <h2>第9章 SVG绘图</h2>
     <p>SMathML所提供的SVG绘图机制还非常原始, 几乎不可使用. 不过, 有总是比没有更好就是了.</p>
     <h3>第9.1节 基本函数</h3>
@@ -4668,5 +4681,21 @@
        (apply (&amp;split n) j*) (car j1))))
 (define (&amp;rull label . x*)
   (: (apply &amp;rule x*) label))</code></pre>这些代码有的地方稍显尴尬, 说明SMathML存在一些值得改进的地方.</p>
+    <h2>第11章 和其他工具进行对比</h2>
+    <p>这里选择的对比项目要么是功能存在重合之处, 要么是设计决策存在重合之处. 其中许多我在设计和实现SMathML之前都没有听说过, 而是近来借助于LLM才得以知晓.</p>
+    <h3>第11.1节 Oleg Kiselyov's SXML</h3>
+    <p>SXML不仅是SXML本身, 还包含了一系列用于处理SXML的工具, 包括SSAX, SXPath, SXSLT. SXML, SSAX, SXPath, SXSLT这些名称暗示了其与XML, SAX, XPath, XSLT之间的联系. 然而, 这并不代表这些以S为前缀的工具仅仅做了句法层面的工作, 即仅仅是将Lisp系语言的括号句法转换为了常规句法.</p>
+    <h3>第11.2节 DSSSL</h3>
+    <p>DSSSL和XSLT的功能类似, 但其最初是为SGML设计的, 不过之后也开始支持XML. DSSSL最特殊的地方在于它是以Scheme语言为基础的. </p>
+    <h3>第11.3节 LAML</h3>
+    <h3>第11.4节 (Scheme) Scribe</h3>
+    <h3>第11.5节 Skribe</h3>
+    <h3>第11.6节 Skribilo</h3>
+    <h3>第11.7节 Beautiful Report Language</h3>
+    <h3>第11.8节 Scribble</h3>
+    <h3>第11.9节 LaTeX</h3>
+    <h3>第11.10节 Typst</h3>
+    <h3>第11.11节 SATysFi</h3>
+    <h3>第11.12节 MarkDown</h3>
   </body>
 </html>

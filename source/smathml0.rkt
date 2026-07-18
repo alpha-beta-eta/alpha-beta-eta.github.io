@@ -1379,6 +1379,22 @@
       "注记. 目前Firefox渲染上划线存在一个奇怪的bug, "
       "而且这个bug在作者最初使用MathML时并不存在, "
       "那就是上划线会变成左箭头.")
+   (H3. "函数记号")
+   (P "SMathML提供了一些常用的函数相关表达方式."
+      (CodeB "(define (func f A B)
+  (&amp;: f (&amp;-> A B)))")
+      (Code "func") "用于指明函数的类型, 例如"
+      (func $f $A $B) "."
+      (CodeB "(define $\\|-> (Mo &quot;&amp;mapsto;&quot;))")
+      "常量" (Code "$\\|->") "所对应的过程"
+      (Code "&amp;\\|->") "在数学中用于定义匿名函数, "
+      "这类似于编程语言和逻辑学中的" $lambda "记号, 例如"
+      (&\|-> $x $x^2) "指称了一个平方函数."
+      (CodeB "(define (func:def f A B x fx)
+  (&amp;: f (&amp;cm (&amp;-> A B) (&amp;\\|-> x fx))))")
+      "有的时候人们将函数的类型和具体映射规则并置, 例如"
+      (func:def $f (&c* $RR $RR) $RR
+                (tu0 $x $y) (Msqrt (&+ $x^2 $y^2))) ".")
    (H3. "极限记号")
    (P "分析学中常用到极限记号."
       (CodeB "(define $lim (Mi &quot;lim&quot;))
@@ -2289,7 +2305,11 @@
    (H3. "HTML美观打印")
    (P #:attr* '((style "color: red"))
       "这部分的代码均为LLM生成, 且并无人工完全理解式的审查. "
-      "因此, 请谨慎使用该代码, 切勿将其用于任何生产环境.")
+      "因此, 请谨慎使用该代码, 切勿将其用于任何生产环境. "
+      "不过, 这里所提供的" (Code "XML")
+      "可以说比绝大多数HTML美观打印工具都更为保守. "
+      "但是, 从原则上来说, HTML的正确缩进行为依赖于其CSS, "
+      "所以我们的美观打印功能不可能做到完全的正确性.")
    (P "基于前一节的" (Code "Fold")
       ", 这里我们提供了一个HTML美观打印功能. "
       "当然, 你也可以将其用于XML美观打印, "
@@ -2387,6 +2407,19 @@
   (H2 (LINK title link)))")
       "不过, 至少" (Code "LINK")
       "对于一般性的使用场景还是有用的.")
+   (H3. "XML标签辅助定义功能")
+   (P (Code "make-xml-tag")
+      "可以定义其名称参数所对应的SXML构造过程, 而"
+      (Code "define-xml-tag*")
+      "则是用于定义大量SXML构造过程的辅助宏."
+      (CodeB "(define (make-xml-tag name)
+  (lambda (#:attr* [attr* '()] . xml*)
+    `(,name ,attr* . ,xml*)))
+(define-syntax-rule
+  (define-xml-tag* (id name) ...)
+  (begin
+    (define id (make-xml-tag 'name))
+    ...))"))
    
    (H2. "SVG绘图")
    (P "SMathML所提供的SVG绘图机制还非常原始, 几乎不可使用. "
@@ -2701,5 +2734,34 @@
   (: (apply &amp;rule x*) label))")
       "这些代码有的地方稍显尴尬, "
       "说明SMathML存在一些值得改进的地方.")
+   (H2. "和其他工具进行对比")
+   (P "这里选择的对比项目要么是功能存在重合之处, "
+      "要么是设计决策存在重合之处. "
+      "其中许多我在设计和实现SMathML之前都没有听说过, "
+      "而是近来借助于LLM才得以知晓.")
+   (H3. "Oleg Kiselyov's SXML")
+   (P "SXML不仅是SXML本身, 还包含了一系列用于处理SXML的工具, "
+      "包括SSAX, SXPath, SXSLT. "
+      "SXML, SSAX, SXPath, SXSLT"
+      "这些名称暗示了其与XML, SAX, XPath, XSLT之间的联系. "
+      "然而, 这并不代表这些以S为前缀的工具仅仅做了句法层面的工作, "
+      "即仅仅是将Lisp系语言的括号句法转换为了常规句法.")
+   
+   (H3. "DSSSL")
+   (P "DSSSL和XSLT的功能类似, 但其最初是为SGML设计的, "
+      "不过之后也开始支持XML. "
+      "DSSSL最特殊的地方在于它是以Scheme语言为基础的. "
+      
+      )
+   (H3. "LAML")
+   (H3. "(Scheme) Scribe")
+   (H3. "Skribe")
+   (H3. "Skribilo")
+   (H3. "Beautiful Report Language")
+   (H3. "Scribble")
+   (H3. "LaTeX")
+   (H3. "Typst")
+   (H3. "SATysFi")
+   (H3. "MarkDown")
    
    ))
