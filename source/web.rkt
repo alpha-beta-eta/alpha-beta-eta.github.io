@@ -210,12 +210,14 @@
          "matrix.rkt"
          "differential.rkt"
          "seplogic.rkt"
+         "lax.rkt"
          
          )
 (define emitXml (emit XML))
 (define emitXml-thunk (emit-thunk XML))
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml lax.html "../lax.html")
     (emitXml seplogic.html "../seplogic.html")
     (emitXml differential.html
              "../differential.html")
