@@ -214,12 +214,17 @@
          "seplogic_notes.rkt"
          "ptlp.rkt"
          "linearlisp.rkt"
+         "monadic.rkt"
+         "judgmental.rkt"
          
          )
 (define emitXml (emit XML))
 (define emitXml-thunk (emit-thunk XML))
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml judgmental.html
+             "../judgmental.html")
+    (emitXml monadic.html "../monadic.html")
     (emitXml linearlisp.html
              "../linearlisp.html")
     (emitXml ptlp.html "../ptlp.html")

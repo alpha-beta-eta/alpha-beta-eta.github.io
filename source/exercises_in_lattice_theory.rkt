@@ -1,24 +1,54 @@
 #lang racket
 (provide exercises_in_lattice_theory.html)
 (require SMathML)
+(define $\\ (Mo "\\"))
+(define $sube:id (Mi "&sube;"))
+(define (GI S)
+  (: $lp S $rb))
+(define (GF S)
+  (: $lb S $rp))
+(define (Neigh x)
+  (app $N:script x))
+(define (ONeigh x)
+  (app $U:script x))
+(define (Open X)
+  (app $O:script X))
+(define (|(]| a b)
+  (: $lp0 a $cm b $rb0))
+(define (|()| a b)
+  (tu0 a b))
+(define (|[)| a b)
+  (: $lb0 a $cm b $rp0))
+(define (|[]| a b)
+  (li0 a b))
+(define $Fin (Mi "Fin"))
+(define (&Fin X)
+  (app $Fin X))
+(define $CoFin (Mi "CoFin"))
+(define (&CoFin X)
+  (app $CoFin X))
 (define (∃ Q P)
   (: $exists Q $cm P))
 (define (^-> X) (^ X $->))
 (define (^<- X) (^ X $<-))
-(define (powerset X)
-  (app $P:script X))
 (define $id (Mi "id"))
 (define (&id x) (_ $id x))
 (define $Idl (Mi "Idl"))
 (define $Fil (Mi "Fil"))
 (define (&Idl P)
   (app $Idl P))
+(define (PIdl P)
+  (&\\ (&Idl P) (setE P)))
 (define (&Fil P)
   (app $Fil P))
+(define (PFil P)
+  (&\\ (&Fil P) (setE P)))
+(define $darr:id (Mi "&darr;"))
 (define (↓ x)
-  (: $darr x))
+  (: $darr:id x))
+(define $uarr:id (Mi "&uarr;"))
 (define (↑ x)
-  (: $uarr x))
+  (: $uarr:id x))
 (define $Im (Mi "Im"))
 (define (&Im f) (app $Im f))
 (define $<_P (_ $< $P))
@@ -29,12 +59,17 @@
 (define $<=:id_Q (_ $<=:id $Q))
 (define $dashv (Mo "&dashv;"))
 (define $RightVector (Mo "&RightVector;"))
+(define $meet $conj)
+(define $join $disj)
+(define Meet Conj)
+(define Join Disj)
 (define-infix*
+  (&\\ $\\)
   (&<_P $<_P)
   (&<=_P $<=_P)
   (&<=_Q $<=_Q)
-  (&meet $conj)
-  (&join $disj)
+  (&meet $meet)
+  (&join $join)
   (&dashv $dashv)
   (&⊣ $dashv)
   (&RightVector $RightVector))
@@ -47,7 +82,8 @@
      #:title "格论练习和笔记"
      #:css "styles.css"
      (H1. "格论练习和笔记")
-     (P "注意, 这本书默认偏序集是非空的.")
+     (P "注意, 这本书默认偏序集是非空的. 另外, "
+        (&= $NN (setE $1 $2 $3 $..h)) ".")
      (H2. "偏序集与格")
      (H3. "偏序集")
    
@@ -135,8 +171,242 @@
         "的主理想 (principal ideal) "
         "(respectively, 主滤子 (principal filter)). "
         "我们记" (&Idl $P) "为" $P "的所有理想构成的集合, "
-        (&Fil $P) "为" $P "的所有滤子构成的集合.")
+        (&Fil $P) "为" $P "的所有滤子构成的集合. "
+        "注意, 理想和滤子首先都是非空子集.")
+     ((Example)
+      (Ol (Li "对于任意的" (∈ $a $RR) ", "
+              (|(]| (&- $inf) $a) "和"
+              (|()| (&- $inf) $a)
+              "都是" $RR "的理想, "
+              (|[)| $a (&+ $inf)) "和"
+              (|()| $a (&+ $inf))
+              "都是" $RR "的滤子.")
+          (Li "设" $X "是一个非空集合, "
+              (&= (&Fin $X)
+                  (setI (&sube $A $X)
+                        $A "有限"))
+              "是" (powset $X) "的理想, "
+              (&= (&CoFin $X)
+                  (setI (&sube $A $X)
+                        $A^ "有限"))
+              "是" (powset $X) "的滤子.")
+          (Li "设" (tu0 $X (Open $X))
+              "是一个拓扑空间, 对于任意的"
+              (∈ $x $X) ", " (Neigh $x)
+              "是" (tu0 (powset $X) $sube:id)
+              "的滤子, " (ONeigh $x) "是"
+              (tu0 (Open $X) $sube:id)
+              "的滤子, 其中"
+              (MB (&= (Neigh $x)
+                      (setI (&sube $V $X)
+                            (∃ (∈ $U (Open $X))
+                               (∈ $x (&sube $U $V))))))
+              "而"
+              (MB (&= (ONeigh $x)
+                      (setI (∈ $U (Open $X))
+                            (∈ $x $U)))))))
+     ((Theorem)
+      "设" $L "是一个格, " $I "是" $L "的非空子集, "
+      "则下列条件等价:"
+      (Ol (Li $I "是理想;")
+          (Li $I "是对于" $join "封闭的下集;")
+          (Li $I "对于" $join "封闭, 对于" $meet
+              "吸收 (即对于" (∈ $a $I) "和"
+              (∈ $b $L) ", 都有"
+              (∈ (&meet $a $b) $I) ").")))
+     ((proof)
+      "由1推出2: 对于" (∈ $x $y $I)
+      ", 我们知道存在" (∈ $z $I)
+      "满足" (&<= (&cm $x $y) $z)
+      ". 换言之, " $z "是" $x "和" $y
+      "的一个上界, 那么"
+      (&<= (&join $x $y) $z)
+      ". 鉴于" $I "是一个理想 (故为下集), 那么"
+      (∈ (&join $x $y) $I)
+      ", 即" $I "对于" $join "封闭." (Br)
+      "由2推出3: 对于" (∈ $a $I) "和"
+      (∈ $b $L) ", 我们知道"
+      (&<= (&meet $a $b) $a)
+      ". 鉴于" $I "是一个下集, 所以"
+      (∈ (&meet $a $b) $I)
+      ", 也就是" $I "对于" $meet "吸收." (Br)
+      "由3推出1: 由于" $I "对于" $join
+      "封闭, 故" $I "是一个定向子集. "
+      "如果" (∈ $y $I) "而" (&<= $x $y)
+      ", 那么根据吸收性质, 有"
+      (∈ (&meet $x $y) $I)
+      ", 由因为" (&<= $x $y) "等价于"
+      (&= (&meet $x $y) $x)
+      ", 所以说" (∈ $x $I)
+      ", 也就是说" $I "是一个下集.")
+     (P "对偶地, 我们有以下定理.")
+     ((Theorem)
+      "设" $L "是一个格, " $F "是" $L "的非空子集, "
+      "则下列条件等价:"
+      (Ol (Li $F "是滤子;")
+          (Li $F "是对于" $meet "封闭的上集;")
+          (Li $F "对于" $meet "封闭, 对于" $join "吸收.")))
+     ((Theorem)
+      "设" $L "是一个格, " $S "是" $L
+      "的一个非空子集, 令"
+      (MB (&= (GI $S)
+              (setI (∈ $a $L)
+                    "存在" (&cm (∈ $n $NN) (∈ $x_1 $..h $x_n $S))
+                    "满足" (&<= $a (&join $x_1 $..c $x_n)))))
+      (MB (&= (GF $S)
+              (setI (∈ $a $L)
+                    "存在" (&cm (∈ $n $NN) (∈ $x_1 $..h $x_n $S))
+                    "满足" (&<= (&meet $x_1 $..c $x_n) $a))))
+      "则" (GI $S) "是包含" $S "的最小理想, 称为" $S
+      "的生成理想; " (GF $S) "是包含" $S
+      "的最小滤子, 称为" $S "的生成滤子.")
+     ((proof)
+      
+      )
+     ((Theorem)
+      "设" $L "是一个有界格, 那么"
+      (Ol (Li (&Idl $L) "是完备格, 其最小元是" (setE $0)
+              ", 最大元是" $L ", 对于"
+              (&sube (setI $I_k (∈ $k $K))
+                     (&Idl $L))
+              ", " (&!= $K $empty) ", 我们有"
+              (MB (&cm (&= (Meet (∈ $k $K) $I_k)
+                           (Cap (∈ $k $K) $I_k))
+                       (&= (Join (∈ $k $K) $I_k)
+                           (GI (Cup (∈ $k $K) $I_k)))) ";"))
+          (Li (&Fil $L) "是完备格, 其最小元是" (setE $1)
+              ", 最大元是" $L ", 对于"
+              (&sube (setI $F_k (∈ $k $K))
+                     (&Fil $L))
+              ", " (&!= $K $empty) ", 我们有"
+              (MB (&cm (&= (Meet (∈ $k $K) $F_k)
+                           (Cap (∈ $k $K) $F_k))
+                       (&= (Join (∈ $k $K) $F_k)
+                           (GF (Cup (∈ $k $K) $F_k)))) "."))))
+     ((proof)
+      
+      )
+     ((Theorem)
+      "设" $L "是一个格 (不必有界), 那么"
+      (Ol (Li "对于任意的" (∈ $I_1 $I_2 (&Idl $L))
+              ", 我们有"
+              (MB (&= (&join $I_1 $I_2)
+                      (setI (∈ $a $L)
+                            "存在" (&cm (∈ $x_1 $I_1) (∈ $x_2 $I_2))
+                            "满足" (&<= $a (&join $x_1 $x_2)))))
+              "如果" $L "是分配格, 那么"
+              (MB (&= (&join $I_1 $I_2)
+                      (setI (&join $i_1 $i_2)
+                            (&cm (∈ $i_1 $I_1)
+                                 (∈ $i_2 $I_2))))))
+          (Li "对于任意的" (∈ $F_1 $F_2 (&Fil $L))
+              ", 我们有"
+              (MB (&= (&join $F_1 $F_2)
+                      (setI (∈ $a $L)
+                            "存在" (&cm (∈ $x_1 $F_1) (∈ $x_2 $F_2))
+                            "满足" (&<= (&meet $x_1 $x_2) $a))))
+              "如果" $L "是分配格, 那么"
+              (MB (&= (&join $F_1 $F_2)
+                      (setI (&meet $f_1 $f_2)
+                            (&cm (∈ $f_1 $F_1)
+                                 (∈ $f_2 $F_2))))))))
+     ((proof)
+      
+      )
+     ((Corollary)
+      
+      )
+     ((Definition)
+      "设" $L "是一个格, " $F "是一个真滤子, "
+      $I "是一个真理想."
+      (Ol (Li "如果对于任意的" (∈ $x $y $L)
+              ", " (∈ (&meet $x $y) $I)
+              "可以推出" (∈ $x $I) "或"
+              (∈ $y $I) ", 则称" $I
+              "为" $L "的素理想 (prime ideal).")
+          (Li "如果对于任意的" (∈ $x $y $L)
+              ", " (∈ (&join $x $y) $F)
+              "可以推出" (∈ $x $F) "或"
+              (∈ $y $F) ", 则称" $F
+              "为" $L "的素滤子 (prime filter).")))
+     ((Theorem)
+      "设" $S "是一个格, " (&sube $S $L)
+      ", 则下列条件等价:"
+      (Ol (Li $S "是素理想;")
+          (Li $S^ "是素滤子;")
+          (Li "存在格同态" 
+              )
+          )
+      )
+     ((proof)
+      
+      )
+     ((Theorem)
+      "设" $L "是一个分配格, " (∈ $I (&Idl $L))
+      ", " (∈ $F (&Fil $L)) ", 且"
+      (&= (&cap $I $F) $empty)
+      ", 则存在素理想" $P "使得"
+      (&sube $I $P) "且"
+      (&= (&cap $P $F) $empty) ".")
+     ((proof)
+      
+      )
+     ((Definition)
+      "设" $P "是一个偏序集, " (PIdl $P)
+      "中的极大元被称为" $P "的极大理想, "
+      (PFil $P) "中的极大元被称为" $P
+      "的极大滤子. {译注: 原文存在笔误, 将"
+      (PIdl $P) "写成了" (PIdl $L) ", "
+      (PFil $P) "写成了" (PFil $L) ".}")
+     (P "注意, 素理想, 素滤子, 极大理想, 极大滤子"
+        "首先都是非空真子集.")
+     ((Theorem)
+      "设" $L "是一个格, 那么"
+      (Ol (Li "若" $L "是分配格, 则极大理想都是素理想, 极大滤子都是素滤子;")
+          (Li "若" $L "是补格, 则素理想都是极大理想, 素滤子都是极大滤子;")
+          (Li "若" $L "是Boole代数, 则极大理想等同于素理想, 极大滤子等同于素滤子.")))
+     ((proof)
+      
+      )
      (H3. "格中的特殊元素")
+     ((Definition)
+      "设" $L "是一个格, " (∈ $a $L) "但不是最大元, "
+      (∈ $b $L) "但不是最小元. 注意, 我们并没有假定"
+      $L "是一个有界格."
+      (Ol (Li "若对于任意的" (∈ $x $y $L)
+              ", " (&<= (&meet $x $y) $a) "可以推出"
+              (&<= $x $a) "或" (&<= $y $a)
+              ", 则称" $a "为" $L
+              "的交素元 (meet-prime element).")
+          (Li "若对于任意的" (∈ $x $y $L)
+              ", " (&= (&meet $x $y) $a) "可以推出"
+              (&= $x $a) "或" (&= $y $a)
+              ", 则称" $a "为" $L
+              "的交既约元 (meet-irreducible element).")
+          (Li "若对于任意的" (∈ $x $y $L)
+              ", " (&<= $b (&join $x $y)) "可以推出"
+              (&<= $b $x) "或" (&<= $b $y)
+              ", 则称" $b "为" $L
+              "的并素元 (join-prime element).")
+          (Li ""
+              )
+          )
+      )
+     ((Theorem)
+      "设" $L "是一个格, 则"
+      (Ol (Li ""
+              )
+          )
+      )
+     ((proof)
+      
+      )
+     ((Theorem)
+      
+      )
+     ((proof)
+      
+      )
      (H3. "习题" #:auto? #f)
      ((Exercise)
       "找出所有的" $4 "元偏序集和" $5 "元格.")
@@ -271,8 +541,8 @@
       "是" $P "上的一个Galois伴随.")
      ((Example)
       (Ol (Li "设" (&sube $R (&c* $X $Y)) "是一个二元关系, 分别定义"
-              (func (^-> $R) (powerset $X) (powerset $Y)) "和"
-              (func (^<- $R) (powerset $Y) (powerset $X)) "为"
+              (func (^-> $R) (powset $X) (powset $Y)) "和"
+              (func (^<- $R) (powset $Y) (powset $X)) "为"
               (MB (&= (app (^-> $R) $A)
                       (setI (∈ $y $Y)
                             (∃ (∈ $x $A)
@@ -283,15 +553,15 @@
                                  (∈ $y $B)))))
               "则"
               (&: (&dashv (^-> $R) (^<- $R))
-                  (&RightVector (powerset $X) (powerset $Y)))
+                  (&RightVector (powset $X) (powset $Y)))
               ". {译注: 以上两个操作可以视为映射所诱导的image和preimage概念"
               "在关系上的推广.}")
           (Li "设" (&sube $R (&c* $X $Y)) "是一个二元关系, 分别定义"
               (func (Mmultiscripts $R (Mprescripts) $ $->)
-                    (powerset $X) (powerset $Y))
+                    (powset $X) (powset $Y))
               "和"
               (func (Mmultiscripts $R (Mprescripts) $ $<-)
-                    (powerset $Y) (powerset $X))
+                    (powset $Y) (powset $X))
               "为"
               (MB (&= (app (Mmultiscripts $R (Mprescripts) $ $->) $A)
                       (setI (∈ $y $Y)
@@ -304,7 +574,7 @@
               "则"
               (&: (&dashv (Mmultiscripts $R (Mprescripts) $ $<-)
                           (Mmultiscripts $R (Mprescripts) $ $->))
-                  (&RightVector (powerset $Y) (powerset $X)))
+                  (&RightVector (powset $Y) (powset $X)))
               ".")
           (Li "设" (func $f $X $Y) "是一个映射, 将" $f "视为二元关系"
               (setI (tu0 $x (app $f $x)) (∈ $x $X)) ", 那么"
@@ -330,5 +600,5 @@
               "是闭包算子, "
               (func (&i* $f $g) $Q $Q)
               "是内部算子.")))
-   
+     
      )))

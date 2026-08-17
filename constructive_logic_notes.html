@@ -38,8 +38,8 @@
         <li>一个对于<math><mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow></math>的证明是通过呈现一个对于<math><mi>A</mi></math>的证明或一个对于<math><mi>B</mi></math>的证明而给出的.</li>
         <li>一个对于<math><mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow></math>的证明是一个构造, 其允许我们将一个对于<math><mi>A</mi></math>的证明转换为一个对于<math><mi>B</mi></math>的证明.</li>
         <li>不存在对于<math><mi>&bottom;</mi></math>的证明. 另外, 一个对于<math><mrow><mo>&not;</mo><mi>A</mi></mrow></math>的证明是一个构造, 其将一个(假想的)对于<math><mi>A</mi></math>的证明转换为一个矛盾.</li>
-        <li>一个对于<math><mrow><mo>&exist;</mo><mi>x</mi><mo>.</mo><mi>A</mi></mrow></math>的证明是通过提供一个量化的论域里的见证者 (witness) <math><mi>d</mi></math>和一个对于<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>d</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow><mi>A</mi></mrow></math>的证明给出的.</li>
-        <li>一个对于<math><mrow><mo>&forall;</mo><mi>x</mi><mo>.</mo><mi>A</mi></mrow></math>的证明是一个构造, 其取量化的论域里的任意一个元素<math><mi>d</mi></math>, 然后给出对于<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>d</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow><mi>A</mi></mrow></math>的一个证明. {译注: 也就是说, 对于论域的每个元素都需要给出证明. 这其实和对于推出<math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math>的证明有些类似, 在类型论中这将会更加明显.}</li>
+        <li>一个对于<math><mrow><mo>&exist;</mo><mi>x</mi><mo lspace="0">.</mo><mi>A</mi></mrow></math>的证明是通过提供一个量化的论域里的见证者 (witness) <math><mi>d</mi></math>和一个对于<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>d</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow><mi>A</mi></mrow></math>的证明给出的.</li>
+        <li>一个对于<math><mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mi>A</mi></mrow></math>的证明是一个构造, 其取量化的论域里的任意一个元素<math><mi>d</mi></math>, 然后给出对于<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>d</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow><mi>A</mi></mrow></math>的一个证明. {译注: 也就是说, 对于论域的每个元素都需要给出证明. 这其实和对于推出<math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math>的证明有些类似, 在类型论中这将会更加明显.}</li>
       </ul>
       这个定义里提及<em>构造</em>的地方, 我们可以将定义向计算机科学倾斜, 将其想成是<em>函数</em>, 其必须是有效可计算的 (于是构造可以被实际施行). 在这样一种解释下, 直觉主义证明对应于函数, 而特定的直觉主义推理系统则会导致特定的编程语言.</p>
     <h3>第1.4节 第一个例子</h3>
@@ -74,7 +74,7 @@
               <mover><mo>=</mo><mi mathvariant="normal">&Delta;</mi></mover>
             </mtd>
             <mtd>
-              <mrow><mo>&exist;</mo><mi>y</mi><mo>.</mo>
+              <mrow><mo>&exist;</mo><mi>y</mi><mo lspace="0">.</mo>
                 <mrow><mi>x</mi><mo>=</mo>
                   <mrow><mn>2</mn><mo>&it;</mo><mi>y</mi></mrow>
                 </mrow>
@@ -91,7 +91,7 @@
               <mover><mo>=</mo><mi mathvariant="normal">&Delta;</mi></mover>
             </mtd>
             <mtd>
-              <mrow><mo>&exist;</mo><mi>y</mi><mo>.</mo>
+              <mrow><mo>&exist;</mo><mi>y</mi><mo lspace="0">.</mo>
                 <mrow><mi>x</mi><mo>=</mo>
                   <mrow>
                     <mrow><mn>2</mn><mo>&it;</mo><mi>y</mi></mrow>
@@ -103,7 +103,7 @@
         </mtable>
       </math>
     </p>
-    <div class="theorem"><b>定理3. </b><math><mrow><mo>&forall;</mo><mi>x</mi><mo>.</mo><mrow><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&or;</mo><mrow><mi mathvariant="sans-serif">odd</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></div>
+    <div class="theorem"><b>定理3. </b><math><mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mrow><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&or;</mo><mrow><mi mathvariant="sans-serif">odd</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></div>
     <div class="proof"><b>证明.</b> 根据<math><mi>x</mi></math>上的归纳.<br/><b>情形: <math><mrow><mi>x</mi><mo>=</mo><mn>0</mn></mrow></math>. </b>那么<math><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 鉴于对于<math><mrow><mi>y</mi><mo>=</mo><mn>0</mn></mrow></math>我们有<math><mrow><mi>x</mi><mo>=</mo><mrow><mn>2</mn><mo>&it;</mo><mi>y</mi></mrow></mrow></math>.<br/><b>情形: <math><mrow><mi>x</mi><mo>=</mo><mrow><msup><mi>x</mi><mo>&prime;</mo></msup><mo>+</mo><mn>1</mn></mrow></mrow></math>. </b>那么根据<math><msup><mi>x</mi><mo>&prime;</mo></msup></math>上的归纳假设有<math><mrow><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>x</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow><mo>&or;</mo><mrow><mi mathvariant="sans-serif">odd</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>x</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 我们分情形处理.
       <ul>
         <li><b>子情形: <math><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>x</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></math>. </b>那么对于某个<math><msup><mi>y</mi><mo>&prime;</mo></msup></math>有<math><mrow><msup><mi>x</mi><mo>&prime;</mo></msup><mo>=</mo><mrow><mn>2</mn><mo>&it;</mo><msup><mi>y</mi><mo>&prime;</mo></msup></mrow></mrow></math>. 然后<math><mrow><mi>x</mi><mo>=</mo><mrow><msup><mi>x</mi><mo>&prime;</mo></msup><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mrow><mrow><mn>2</mn><mo>&it;</mo><msup><mi>y</mi><mo>&prime;</mo></msup></mrow><mo>+</mo><mn>1</mn></mrow></mrow></math>, 于是<math><mrow><mi mathvariant="sans-serif">odd</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>.</li>
@@ -181,7 +181,7 @@ fun even_or_odd x = case x of
       </math>
       现在从直觉主义来说, 一个对于<math><mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow></math>的证明是一个函数, 其接受一个对于<math><mi>A</mi></math>的证明, 返回一个对于<math><mi>&bottom;</mi></math>的证明. 然而, 既然我们有了对于<math><mi>A</mi></math>的一个反驳, 并不存在对于<math><mi>A</mi></math>的证明, 所以说这样的一个函数永远也不可能应用. 非正式的结论是对于<math><mrow><mo>&not;</mo><mi>A</mi></mrow></math>的证明没有计算性内容. 这意味着我们可以通过将<math><mi>A</mi></math>替换为<math><mrow><mo>&not;</mo><mrow><mo>&not;</mo><mi>A</mi></mrow></mrow></math>来<q>隐藏</q>计算性内容. 例如, 如果我们并不想要见证者而只是想要知道某个数字<math><mi>x</mi></math>是奇是偶, 我们或许可以描述:
       <math display="block">
-        <mrow><mo>&forall;</mo><mi>x</mi><mo>.</mo>
+        <mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo>
           <mrow>
             <mrow><mo>&not;</mo>
               <mrow><mo>&not;</mo>
@@ -206,10 +206,10 @@ fun even_or_odd x = case x of
       <math display="block">
         <mrow><mo>&forall;</mo>
           <mrow><mi>u</mi><mo>,</mo><mi>v</mi></mrow>
-          <mo>.</mo>
+          <mo lspace="0">.</mo>
           <mrow>
             <mrow><mo stretchy="false">(</mo>
-              <mrow><mo>&exist;</mo><mi>p</mi><mo>.</mo>
+              <mrow><mo>&exist;</mo><mi>p</mi><mo lspace="0">.</mo>
                 <mrow><mi mathvariant="sans-serif">path</mi><mo>&af;</mo>
                   <mrow><mo stretchy="false">(</mo>
                     <mrow><mi>p</mi><mo>,</mo><mi>u</mi><mo>,</mo><mi>v</mi></mrow>
@@ -219,7 +219,7 @@ fun even_or_odd x = case x of
               <mo stretchy="false">)</mo></mrow>
             <mo>&or;</mo>
             <mrow><mo>&not;</mo>
-              <mrow><mo>&exist;</mo><mi>p</mi><mo>.</mo>
+              <mrow><mo>&exist;</mo><mi>p</mi><mo lspace="0">.</mo>
                 <mrow><mi mathvariant="sans-serif">path</mi><mo>&af;</mo>
                   <mrow><mo stretchy="false">(</mo>
                     <mrow><mi>p</mi><mo>,</mo><mi>u</mi><mo>,</mo><mi>v</mi></mrow>
@@ -231,12 +231,12 @@ fun even_or_odd x = case x of
         </mrow>
       </math>
       假如量化的论域得当, 并且图中路径<math><mi>p</mi></math>连接的<math><mi>u</mi></math>和<math><mi>v</mi></math>时谓词<math><mrow><mi mathvariant="sans-serif">path</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>p</mi><mo>,</mo><mi>u</mi><mo>,</mo><mi>v</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>为真, 那么这个命题可以充当对于图可达性的刻画. 我们的意思是对于这个命题的一个<em>构造性证明</em>必然包含一个算法, 其确定了给定的顶点<math><mi>u</mi></math>和<math><mi>v</mi></math>之间是否存在一条路径, 并且若是存在则要返回某条路径. 我们可以使用诸多方式证明这个命题, 这将会导致诸多不同的算法 (通过路径长度上的归纳, 通过未访问结点集合上的归纳, 通过路径的边集上的归纳, 等等). 如果我们不想要路径本身, 只需要对于路径是否存在的指示, 那么我们可以在第一个存在量化子之前加上一个双重否定.</p>
-    <p>另一个角度是, <em>从古典逻辑来说</em>, 这是一个全然平凡的陈述, 因为其有着<math><mrow><mo>&forall;</mo><mrow><mi>u</mi><mo>,</mo><mi>v</mi></mrow><mo>.</mo><mrow><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>u</mi><mo>,</mo><mi>v</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&or;</mo><mrow><mo>&not;</mo><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>u</mi><mo>,</mo><mi>v</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math>的形式, 故其是排中律的一个实例.</p>
+    <p>另一个角度是, <em>从古典逻辑来说</em>, 这是一个全然平凡的陈述, 因为其有着<math><mrow><mo>&forall;</mo><mrow><mi>u</mi><mo>,</mo><mi>v</mi></mrow><mo lspace="0">.</mo><mrow><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>u</mi><mo>,</mo><mi>v</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&or;</mo><mrow><mo>&not;</mo><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>u</mi><mo>,</mo><mi>v</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math>的形式, 故其是排中律的一个实例.</p>
     <p>最后, 在编程语言领域我们可以将一个类型检查器描述为
       <math display="block">
         <mrow><mo>&forall;</mo>
           <mrow><mi>e</mi><mo>,</mo><mi>&tau;</mi></mrow>
-          <mo>.</mo>
+          <mo lspace="0">.</mo>
           <mrow>
             <mrow><mi mathvariant="sans-serif">type</mi><mo>&af;</mo>
               <mrow><mo stretchy="false">(</mo>
@@ -256,10 +256,10 @@ fun even_or_odd x = case x of
       </math>
       其中若表达式<math><mi>e</mi></math>具有类型<math><mi>&tau;</mi></math>则谓词<math><mrow><mi mathvariant="sans-serif">type</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>e</mi><mo>,</mo><mi>&tau;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>成立. 这个主题的一个变种是<em>类型推导</em>:
       <math display="block">
-        <mrow><mo>&forall;</mo><mi>e</mi><mo>.</mo>
+        <mrow><mo>&forall;</mo><mi>e</mi><mo lspace="0">.</mo>
           <mrow>
             <mrow><mo stretchy="false">(</mo>
-              <mrow><mo>&exist;</mo><mi>&tau;</mi><mo>.</mo>
+              <mrow><mo>&exist;</mo><mi>&tau;</mi><mo lspace="0">.</mo>
                 <mrow><mi mathvariant="sans-serif">type</mi><mo>&af;</mo>
                   <mrow><mo stretchy="false">(</mo>
                     <mrow><mi>e</mi><mo>,</mo><mi>&tau;</mi></mrow>
@@ -269,7 +269,7 @@ fun even_or_odd x = case x of
               <mo stretchy="false">)</mo></mrow>
             <mo>&or;</mo>
             <mrow><mo>&not;</mo>
-              <mrow><mo>&exist;</mo><mi>&tau;</mi><mo>.</mo>
+              <mrow><mo>&exist;</mo><mi>&tau;</mi><mo lspace="0">.</mo>
                 <mrow><mi mathvariant="sans-serif">type</mi><mo>&af;</mo>
                   <mrow><mo stretchy="false">(</mo>
                     <mrow><mi>e</mi><mo>,</mo><mi>&tau;</mi></mrow>
@@ -280,7 +280,7 @@ fun even_or_odd x = case x of
           </mrow>
         </mrow>
       </math>
-      从实现的角度来说, 这两个刻画都不那么尽如人意, 因为当程序并非良类型时我们不能获得任何信息. 为了解决这个问题, 我们可以定义另外一个谓词<math><mrow><mi mathvariant="sans-serif">not_type</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>e</mi><mo>,</mo><mi>&tau;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>使得其证明携带了所需的信息. 这有点类似于我们的奇数/偶数例子的逆, 因为我们本可以说<math><mrow><mo>&forall;</mo><mi>x</mi><mo>.</mo><mrow><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&or;</mo><mrow><mo>&not;</mo><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math>, 但是我们转而选择了使用<math><mi mathvariant="sans-serif">odd</mi></math>的一个显式定义.</p>
+      从实现的角度来说, 这两个刻画都不那么尽如人意, 因为当程序并非良类型时我们不能获得任何信息. 为了解决这个问题, 我们可以定义另外一个谓词<math><mrow><mi mathvariant="sans-serif">not_type</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>e</mi><mo>,</mo><mi>&tau;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>使得其证明携带了所需的信息. 这有点类似于我们的奇数/偶数例子的逆, 因为我们本可以说<math><mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mrow><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&or;</mo><mrow><mo>&not;</mo><mrow><mi mathvariant="sans-serif">even</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math>, 但是我们转而选择了使用<math><mi mathvariant="sans-serif">odd</mi></math>的一个显式定义.</p>
     <h3>第1.8节 一些命题的地位 (status)</h3>
     <p>讲座里有一些关于特定的命题是否拥有直觉主义逻辑中的证明的讨论. 在下次讲座之后, 我们会有些工具来证明其中一些命题, 但是直到数次讲座之后我们才能证明其中一些命题不是直觉主义可证的. 以下是一些我所能回忆起来的命题:</p>
     <p>我们有<math><mrow><mi>A</mi><mo>&sup;</mo><mrow><mo>&not;</mo><mrow><mo>&not;</mo><mi>A</mi></mrow></mrow></mrow></math>: 如果<math><mi>A</mi></math>为真, 那么<math><mi>A</mi></math>一定不为假. 从另一个方向来说, <math><mrow><mo>&not;</mo><mrow><mo>&not;</mo><mi>A</mi></mrow></mrow></math>在一般情况下不能推出<math><mi>A</mi></math>, 因为在<math><mrow><mo>&not;</mo><mrow><mo>&not;</mo><mi>A</mi></mrow></mrow></math>的证明中我们或许没有足够的信息. 不过, 我们有<math><mrow><mrow><mo>&not;</mo><mi>A</mi></mrow><mo>&harr;</mo><mrow><mo>&not;</mo><mrow><mo>&not;</mo><mrow><mo>&not;</mo><mi>A</mi></mrow></mrow></mrow></mrow></math>, 对于更深的否定迭代也是类似的. 从直觉上来说, 这是因为对于<math><mrow><mo>&not;</mo><mi>A</mi></mrow></math>的证明没有计算性内容.</p>
@@ -1277,7 +1277,115 @@ fun even_or_odd x = case x of
     <h2>第3章 和谐</h2>
     <h2>Rec 1: Dcheck与和谐</h2>
     <h2>第4章 证明作为程序</h2>
+    <h3>第4.1节 引论</h3>
+    <p>在本次讲座中, 我们将检视构造性证明的一种计算解释, 并将其与函数式编程联系起来. 在命题逻辑的层面上, 这被称为Curry-Howard同构 [Howard, 1969]. 从构造性逻辑与构造性数学发展的最初阶段起, 一个核心思想就是: 证明应当表示构造. Curry-Howard同构只是这一思想的一个尤为深刻而优美的实现. 在后来一篇极具影响力的论文中, Martin-Löf [1980] 将其进一步发展为一种表达力更强的演算, 称为<em>直觉主义类型论</em>.</p>
+    <h3>第4.2节 命题作为类型</h3>
+    <p>为了阐明证明与程序之间的关系, 我们引入一个新的判断:
+      <blockquote><math><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></math>, <math><mi>M</mi></math>是命题<math><mi>A</mi></math>的一个证明项</blockquote>
+      当我们写下这个判断时, 我们预设<math><mi>A</mi></math>是一个命题. 我们也将<math><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></math>解读为<q><math><mi>M</mi></math>是类型为<math><mi>A</mi></math>的一个程序</q>. 对同一判断的这两种对偶解读正是Curry-Howard同构的核心. 我们既可以将<math><mi>M</mi></math>视为表示<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明的一个句法项, 也可以将<math><mi>A</mi></math>视为程序<math><mi>M</mi></math>的类型. 在讨论每个逻辑联结词时, 我们给出规则的两种解读, 以强调这种类比.</p>
+    <p>我们期望: 若<math><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></math>, 则<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>. 反过来, 若<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>, 则存在某个适当的证明项<math><mi>M</mi></math>使得<math><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></math>. 但我们还想要更多: <math><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></math>的每一个推导都应当与<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的一个具有相同结构的推导相对应, 反之亦然. 换言之, 我们用证明项来标注自然演绎的推理规则. 这样一来, 上述性质就应当是显然的. 如此, <math><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></math>中的证明项<math><mi>M</mi></math>将直接对应于<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的相应证明.</p>
+    <p>在术语上, 我们将<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>称为综合判断 (synthetic judgment), 因为我们需要以自然演绎的形式为其提供外部证据. 另一方面, <math><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></math>是一个分析判断 (analytic judgment), 因为它自身包含了证据, 我们可以有效地验证它. Martin-Löf [1994] 进一步详细阐述了这一重要区分.</p>
+    <p><b>合取. </b>从构造性的角度, 我们将<math><mrow><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明看作一对证明: 一个用于<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>, 一个用于<math><mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>. 因此, 若<math><mi>M</mi></math>是<math><mi>A</mi></math>的证明且<math><mi>N</mi></math>是<math><mi>B</mi></math>的证明, 则序对<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow><mo stretchy="false">&rang;</mo></mrow></math>是<math><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow></math>的证明.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow><mi>N</mi><mo>:</mo><mi>B</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                <mo stretchy="false">&rang;</mo></mrow>
+              <mo>:</mo>
+              <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&and;</mi><mi>I</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>消去规则对应于从序对到其第一个和第二个分量的投影, 即从序对<math><mi>M</mi></math>中取回各个独立的证明.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow><mi>M</mi><mo>:</mo>
+                <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="bold">fst</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo>:</mo><mi>A</mi></mrow>
+            </mfrac>
+            <mrow><mi>&and;</mi>
+              <msub><mi>E</mi><mn>1</mn></msub>
+            </mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow><mi>M</mi><mo>:</mo>
+                <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="bold">snd</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo>:</mo><mi>B</mi></mrow>
+            </mfrac>
+            <mrow><mi>&and;</mi>
+              <msub><mi>E</mi><mn>2</mn></msub>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      因此, 合取<math><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow></math>作为命题, 对应于积类型<math><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow></math>. 而且, 函数式编程语言中的积类型确实具有与合取<math><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow></math>相同的性质. 构造一个类型为<math><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow></math>的序对<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow><mo stretchy="false">&rang;</mo></mrow></math>需要一个类型为<math><mi>A</mi></math>的程序<math><mi>M</mi></math>和一个类型为<math><mi>B</mi></math>的程序<math><mi>N</mi></math> (如<math><mrow><mi>&and;</mi><mi>I</mi></mrow></math>所示). 给定一个类型为<math><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow></math>的序对<math><mi>M</mi></math>, 其类型为<math><mi>A</mi></math>的第一个分量可以通过投影<math><mrow><mi mathvariant="bold">fst</mi><mo>&af;</mo><mi>M</mi></mrow></math>获得 (如<math><mrow><mi>&and;</mi><msub><mi>E</mi><mn>1</mn></msub></mrow></math>所示), 其类型为<math><mi>B</mi></math>的第二个分量可以通过投影<math><mrow><mi mathvariant="bold">snd</mi><mo>&af;</mo><mi>M</mi></mrow></math>获得 (如<math><mrow><mi>&and;</mi><msub><mi>E</mi><mn>2</mn></msub></mrow></math>所示).</p>
+    <p>一般而言, 一个逻辑联结词的引入规则对应于相应类型的构造子 (constructor). 反之, 消去规则对应于解构子 (destructor).</p>
+    <p><b>Truth. </b>从构造性的角度, 我们将<math><mrow><mi>&top;</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明看作一个不携带任何信息的单位元素.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <mrow/>
+                <mo stretchy="false">&rang;</mo></mrow>
+              <mo>:</mo><mi>&top;</mi></mrow>
+          </mfrac>
+          <mrow><mi>&top;</mi><mi>I</mi></mrow>
+        </mrow>
+      </math>
+      因此, <math><mi>&top;</mi></math>对应于只有一个元素的单位类型<math><mi mathvariant="bold">1</mi></math>. 它没有消去规则, 因而也没有进一步的证明项构造用于truth. {译注: 指用于解构的构造.} 事实上, 我们在通过<math><mrow><mi>&top;</mi><mi>I</mi></mrow></math>构造<math><mrow><mo stretchy="false">&lang;</mo><mrow/><mo stretchy="false">&rang;</mo></mrow></math>时没有放入任何信息, 所以也不能指望通过消去规则从中取出任何信息.</p>
+    <p><b>推出. </b>从构造性的角度, 我们将<math><mrow><mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明看作一个将<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明变换为<math><mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明的函数.</p>
+    <p>在数学和许多编程语言中, 我们通过写<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mo>&hellip;</mo></mrow></math>来定义一个关于变量<math><mi>x</mi></math>的函数<math><mi>f</mi></math>, 其中右端的<q><math><mo>&hellip;</mo></math></q>依赖于<math><mi>x</mi></math>. 例如, 我们可以写<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>x</mi></mrow><mo>&minus;</mo><mn>1</mn></mrow></mrow></math>. 在函数式编程中, 我们可以改写为<math><mrow><mi>f</mi><mo>=</mo><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mrow><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>x</mi></mrow><mo>&minus;</mo><mn>1</mn></mrow></mrow></mrow></math>, 也就是说, 我们通过对一个变量 (在此例中为<math><mi>x</mi></math>) 进行<math><mi>&lambda;</mi></math>-抽象来显式地构成一个函数对象.</p>
+    <p>在Standard ML语言的具体句法中, <math><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>M</mi></mrow></math>写作<code>fn x => M</code>, 但我们将使用Church and Rosser [1936] 提出的通用且原始的记法. 一般而言, 我们用一个点号 (<q><math><mo lspace="0">.</mo></math></q>) 将所谓的绑定变量与其作用域分隔开来. 这与自然演绎中假设的辖域概念完全相同.</p>
     <h2>第5章 验证</h2>
+    <h3>第5.1节 引论</h3>
+    <p>验证主义 (verificationist) 的观点在本课程前面已经介绍过, 它主张: 一个逻辑联结词的意义应当由它的引入规则来确定. 从这一意义出发, 我们推导出消去规则, 并检验其可靠性与完备性. 这些<q>局部</q>的检查每次只涉及单个联结词.</p>
+    <p>在这一观点下, 一个由多个逻辑联结词构成的命题, 其意义又是什么呢? 我们说, 一个命题的意义由它的诸多验证所确定 [Martin-Löf, 1983]. 为了与对联结词的解释保持一致, 一个验证因此应当通过引入规则来进行. 然而, 我们同样需要把消去规则考虑在内, 因为它们不可避免地会出现在命题的证明之中.</p>
+    <p>从直觉上来说, 一个验证应当是这样一种证明: 它只分析命题自身的构成成分. 这种对全部可能证明所构成之空间的限制是必要的, 它使得该定义是良基的. 例如, 如果我们允许所有的证明, 那么为了理解<math><mi>A</mi></math>的意义, 我们就不得不去理解<math><mrow><mi>B</mi><mo>&sup;</mo><mi>A</mi></mrow></math>与<math><mi>B</mi></math>的意义, 于是整个验证主义进路便岌岌可危, 因为<math><mi>B</mi></math>可能是一个包含<math><mi>A</mi></math>的命题. 而这样一来, <math><mi>A</mi></math>的意义反过来又依赖于<math><mi>A</mi></math>的意义, 从而造成恶性循环.</p>
+    <p>在本节中, 我们将使验证的结构更加明确. 我们用<math><mrow><mi>A</mi><mi>&uarr;</mi></mrow></math>表示判断<q><math><mi>A</mi></math>有一个验证</q>. 自然地, 这应当意味着<math><mi>A</mi></math>为真, 并且其证据具有某种特殊的形式. 最终我们还将确立其逆命题: 若<math><mi>A</mi></math>为真, 则<math><mi>A</mi></math>有一个验证. 验证在证明搜索中也起着有益的作用, 因为<math><mrow><mi>A</mi><mi>&uarr;</mi></mrow></math>限制了<math><mi>A</mi></math>的证明可以被如何构造.</p>
+    <p>从证明搜索的角度看, 验证这一概念被称为插入 (intercalation) [Sieg and Byrnes, 1998]. 这个名称暗示了: 在构造一个推导时, 我们只从下方使用引入规则, 只从上方使用消去规则, 从而向中间靠拢.</p>
+    <p>除了理解命题的意义和刻画一种搜索策略之外, 研究验证还有第三个重要理由: 从程序设计语言的角度看, 它们催生了重要的双向类型检查 (bidirectional typechecking) 算法 [Dunfield and Krishnaswami, 2022].</p>
+    <p>实际上, 以上这三者&mdash;&mdash;验证, 插入, 以及双向定型&mdash;&mdash;是同一回事!</p>
+    <h3>第5.2节 验证主义者的验证</h3>
+    <p>合取容易理解. <math><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow></math>的一个验证应当由<math><mi>A</mi></math>的一个验证和<math><mi>B</mi></math>的一个验证组成.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>A</mi><mi>&uarr;</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow><mi>B</mi><mi>&uarr;</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+              <mi>&uarr;</mi></mrow>
+          </mfrac>
+          <mrow><mi>&and;</mi><mi>I</mi></mrow>
+        </mrow>
+      </math>
+      我们在此沿用引入规则的名称, 因为这条规则与合取为真的引入规则是严格类似的.</p>
+    <p>然而, 推出 (implication) 引入了一个新的假设, 该假设并非由某条引入规则显式地证成, 而仅仅是一个新的标签. 例如, 在如下证明中</p>
     <h2>Rec 2: 验证和证明项</h2>
     <h2>第6章 规则作为算法</h2>
     <h2>第7章 相继式演算</h2>
