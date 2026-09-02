@@ -1,0 +1,500 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>编程语言中的控制结构</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>编程语言中的控制结构: 从goto到代数效应</h1>
+    <h2>术语表</h2>
+    <table align="center">
+      <tr>
+        <td>effect</td>
+        <td>效应</td>
+      </tr>
+      <tr>
+        <td>effect handler</td>
+        <td>效应处理器</td>
+      </tr>
+      <tr>
+        <td>algebraic effect</td>
+        <td>代数效应</td>
+      </tr>
+      <tr>
+        <td>effect system</td>
+        <td>效应系统</td>
+      </tr>
+      <tr>
+        <td>continuation</td>
+        <td>延续</td>
+      </tr>
+      <tr>
+        <td>monad</td>
+        <td>单子</td>
+      </tr>
+      <tr>
+        <td>implication</td>
+        <td>后承 (翻译成蕴涵或推出都不太合理)</td>
+      </tr>
+      <tr>
+        <td>alias</td>
+        <td>别名共享</td>
+      </tr>
+    </table>
+    <h2>第1章 早期编程语言</h2>
+    <h2>第2章 结构化编程</h2>
+    <h2>第3章 非局部控制</h2>
+    <h2>第4章 控制反转</h2>
+    <h2>第5章 函数式语言</h2>
+    <h2>第6章 延续和CPS变换</h2>
+    <h3>第6.1节 延续的概念</h3>
+    <p><b>程序点的延续. </b>考虑程序执行中的一个点. 这个程序点在该程序中的<em>延续</em>是抵达该点之后还需要执行以完成整个程序执行的计算序列.</p>
+    <p>往往延续可以作为命令或者函数在编程语言中表示. (见以下例子.) 延续也可以是语义对象, 见以下的第6.3节.</p>
+    <p><b>基于语句的语言之中的延续的例子. </b>考虑以下四个程序, 以具有结构化控制的Algol风格命令式语言写成:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <msub><mi>p</mi><mn>1</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msup>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                  <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                </msup>
+                <mo>;</mo>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>p</mi><mn>2</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>if</mi><mspace width="2ex"/><mi>be</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/>
+                  <mmultiscripts>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                    <mprescripts/>
+                    <mrow/>
+                    <mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow>
+                  </mmultiscripts>
+                  <mspace width="2ex"/><mi>else</mi><mspace width="2ex"/>
+                  <mmultiscripts>
+                    <msub><mi>s</mi><mn>2</mn></msub>
+                    <mprescripts/>
+                    <mrow/>
+                    <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+                  </mmultiscripts>
+                </mrow>
+                <mo>;</mo>
+                <msub><mi>s</mi><mn>3</mn></msub>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>p</mi><mn>3</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>while</mi><mspace width="2ex"/><mi>be</mi><mspace width="2ex"/><mi>do</mi><mspace width="2ex"/>
+                <mmultiscripts><mi>s</mi>
+                  <mrow/>
+                  <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+                  <mprescripts/>
+                  <mrow/>
+                  <mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow>
+                </mmultiscripts>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>p</mi><mn>4</mn></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>for</mi><mspace width="2ex"/>
+                <mrow><mi>i</mi><mo>&colone;</mo><mn>1</mn></mrow>
+                <mspace width="2ex"/><mi>to</mi><mspace width="2ex"/><mn>10</mn><mspace width="2ex"/><mi>do</mi><mspace width="2ex"/>
+                <mmultiscripts><mi>s</mi>
+                  <mprescripts/>
+                  <mrow/>
+                  <mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow>
+                </mmultiscripts>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      程序点记作<math><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>, <math><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math>, 等等. 并且, 要么标记在语句<math><mi>s</mi></math>执行的开始, 如<math><mmultiscripts><mi>s</mi><mprescripts/><mrow/><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mmultiscripts></math>, 要么标记在<math><mi>s</mi></math>执行的结束, 如<math><msup><mi>s</mi><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></msup></math>.</p>
+    <p>在程序<math><msub><mi>p</mi><mn>1</mn></msub></math>中, <math><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>的延续是语句<math><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math>: 一旦执行抵达<math><msub><mi>s</mi><mn>1</mn></msub></math>的结束, 序列<math><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>;</mo><msub><mi>s</mi><mn>2</mn></msub></mrow></math>继续以执行<math><msub><mi>s</mi><mn>2</mn></msub></math>, 直至抵达程序的结束.</p>
+    <p>在<math><msub><mi>p</mi><mn>2</mn></msub></math>中, <math><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math>的延续是<math><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>;</mo><msub><mi>s</mi><mn>3</mn></msub></mrow></math>, 而<math><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></math>的延续是<math><mrow><msub><mi>s</mi><mn>2</mn></msub><mo>;</mo><msub><mi>s</mi><mn>3</mn></msub></mrow></math>. 当条件式的<math><mi>then</mi></math>分支<math><msub><mi>s</mi><mn>1</mn></msub></math>已经执行完毕, 我们仍然需要执行<math><msub><mi>s</mi><mn>3</mn></msub></math>. 这对于<math><mi>else</mi></math>分支<math><msub><mi>s</mi><mn>2</mn></msub></math>也是一样的.</p>
+    <p>在<math><msub><mi>p</mi><mn>3</mn></msub></math>中, <math><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></math>的延续是<math><mrow><mi>s</mi><mo>;</mo><mrow><mi>while</mi><mspace width="2ex"/><mi>be</mi><mspace width="2ex"/><mi>do</mi><mspace width="2ex"/><mi>s</mi></mrow></mrow></math>, 因为我们需要执行循环体<math><mi>s</mi></math>, 然后重新执行<math><mi>while</mi></math>循环直至<math><mi>be</mi></math>为假. 出于相同的原因, <math><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></math>的延续是循环<math><mrow><mi>while</mi><mspace width="2ex"/><mi>be</mi><mspace width="2ex"/><mi>do</mi><mspace width="2ex"/><mi>s</mi></mrow></math>.</p>
+    <p>在<math><msub><mi>p</mi><mn>4</mn></msub></math>中, <math><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></math>的延续是<math><mrow><mi>s</mi><mo>;</mo><mrow><mi>while</mi><mspace width="2ex"/><mrow><mi>i</mi><mo>&ne;</mo><mn>10</mn></mrow><mspace width="2ex"/><mi>do</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>i</mi><mo>&colone;</mo><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></mrow><mo>;</mo><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 我们需要执行计数循环的体<math><mi>s</mi></math>, 然后重新对于递增的<math><mi>i</mi></math>执行该体, 直至<math><mi>i</mi></math>抵达上界<math><mn>10</mn></math>.</p>
+    <p><b>子表达式的延续. </b>在函数式语言之中, 其程序是表达式, 程序点通常标记在对于某个子表达式求值的结束. 因此, 我们可以将程序<math><mi>p</mi></math>的子表达式<math><mi>e</mi></math>的延续想成是函数
+      <math display="block">
+        <mrow>
+          <mrow><mi>e</mi><mtext>之值</mtext></mrow>
+          <mo>&mapsto;</mo>
+          <mrow><mi>p</mi><mtext>之值</mtext></mrow>
+        </mrow>
+      </math>
+      这个函数捕获了我们在有了<math><mi>e</mi></math>之值之后为了完成<math><mi>p</mi></math>的求值仍需进行的计算.</p>
+    <p><b>基于表达式的语言中的延续的例子. </b>考虑一个算术表达式的语言, 自左向右求值, 而程序为
+      <math display="block">
+        <mrow><mi>p</mi><mo>=</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&times;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math><mi>p</mi></math>中<math><mn>1</mn></math>的延续是函数<math><mrow><mi>&lambda;</mi><mi>v</mi><mo lspace="0">.</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>v</mi><mo>+</mo><mn>2</mn></mrow><mo stretchy="false">)</mo></mrow><mo>&times;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 从直觉上来说, 在对于<math><mn>1</mn></math>求值得到了一个值<math><mi>v</mi></math>之后, 我们仍需求值<q>加上<math><mn>2</mn></math></q>和<q>乘上<math><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow></math></q>.</p>
+    <p><math><mi>p</mi></math>中<math><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow></math>的延续是函数<math><mrow><mi>&lambda;</mi><mi>v</mi><mo lspace="0">.</mo><mrow><mi>v</mi><mo>&times;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 一旦我们已经对于<math><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow></math>求值完毕, 我们仍不得不计算<q>乘上<math><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow></math></q>.</p>
+    <p><math><mi>p</mi></math>中<math><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow></math>的延续是函数<math><mrow><mi>&lambda;</mi><mi>v</mi><mo lspace="0">.</mo><mrow><mn>3</mn><mo>&times;</mo><mi>v</mi></mrow></mrow></math>, 而非<math><mrow><mi>&lambda;</mi><mi>v</mi><mo lspace="0">.</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow><mo stretchy="false">)</mo></mrow><mo>&times;</mo><mi>v</mi></mrow></mrow></math>. 因为求值自左向右进行处理, 我们在开始对于<math><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow></math>求值之前就已经对于<math><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow></math>求值过了. 因此, 在我们将<math><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow></math>求值至<math><mi>v</mi></math>完毕之时, <math><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow></math>已经求值为<math><mn>3</mn></math>, 于是所有剩余的工作是计算<math><mrow><mn>3</mn><mo>&times;</mo><mi>v</mi></mrow></math>.</p>
+    <p>注意到延续依赖于求值策略. 如果我们自右向左求值, 那么<math><mi>p</mi></math>中<math><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow></math>的延续就会是<math><mrow><mi>&lambda;</mi><mi>v</mi><mo lspace="0">.</mo><mrow><mi>v</mi><mo>&times;</mo><mn>7</mn></mrow></mrow></math>, 而<math><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow></math>的延续会是<math><mrow><mi>&lambda;</mi><mi>v</mi><mo lspace="0">.</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>+</mo><mn>2</mn></mrow><mo stretchy="false">)</mo></mrow><mo>&times;</mo><mi>v</mi></mrow></mrow></math>.</p>
+    <p><b>延续和跳跃. </b>延续的概念可以帮助我们理解跳跃 (<math><mi>goto</mi></math>, <math><mi>break</mi></math>, <math><mi>return</mi></math>, 抛出异常, 等等) 和其他命令 (赋值, 条件式, 等等) 的不同.</p>
+    <p>考虑一个命令<math><mmultiscripts><mi>s</mi><mrow/><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow><mprescripts/><mrow/><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mmultiscripts></math>与其两个程序点, <math><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>在开始, <math><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math>在结束. 如果<math><mi>s</mi></math>没有包含任何跳跃, 那么<math><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>的延续总是<math><mi>s</mi></math>后面跟着<math><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></math>的延续. 若<math><mi>s</mi></math>是一个跳跃, 那就不是一回事了:
+      <table align="center">
+        <tr>
+          <td>如果<math><mi>s</mi></math>是...</td>
+          <td><math><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>的延续是...</td>
+        </tr>
+        <tr>
+          <td><math><mrow><mi>goto</mi><mspace width="2ex"/><mi>L</mi></mrow></math></td>
+          <td>标签<math><mi>L</mi></math>的延续</td>
+        </tr>
+        <tr>
+          <td><math><mi>break</mi></math></td>
+          <td>围绕它的循环的延续</td>
+        </tr>
+        <tr>
+          <td><math><mi>return</mi></math></td>
+          <td>对于当前函数的最后调用的延续</td>
+        </tr>
+        <tr>
+          <td><math><mi>throw</mi></math></td>
+          <td>最近的<math><mi>try</mi></math>的<math><mi>catch</mi></math>子句的延续</td>
+        </tr>
+      </table>
+      例如, 以下程序
+      <math display="block">
+        <mrow>
+          <mrow><mi>while</mi><mspace width="2ex"/><mi>be</mi><mspace width="2ex"/><mi>do</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>if</mi><mspace width="2ex"/>
+                <msup><mi>be</mi><mo>&prime;</mo></msup>
+                <mspace width="2ex"/><mi>then</mi><mspace width="2ex"/>
+                <mrow>
+                  <mmultiscripts><mi>break</mi>
+                    <mprescripts/>
+                    <mrow/>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mmultiscripts>
+                  <mo>;</mo>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>;</mo>
+          <msub><mi>s</mi><mn>2</mn></msub>
+        </mrow>
+      </math>
+      中的<math><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></math>的延续仅是<math><msub><mi>s</mi><mn>2</mn></msub></math>, 而非<math><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>;</mo><mrow><mi>while</mi><mo>&hellip;</mo></mrow><mo>;</mo><msub><mi>s</mi><mn>2</mn></msub></mrow></math>.</p>
+    <h3>第6.2节 指称语义回顾</h3>
+    <h3>第6.3节 基于延续的指称语义</h3>
+    <h3>第6.4节 标签和跳跃的指称语义</h3>
+    <h3>第6.5节 CPS变换</h3>
+    <h3>第6.6节 CPS变换的语义性质</h3>
+    <h2>第7章 延续编程</h2>
+    <h2>第8章 控制算子</h2>
+    <h2>第9章 异常</h2>
+    <h2>第10章 用户定义效应的效应处理器</h2>
+    <h3>第10.1节 从异常到效应</h3>
+    <h2>第11章 单子</h2>
+    <h2>第12章 代数效应</h2>
+    <h2>第13章 类型和效应系统</h2>
+    <h2>第14章 控制结构的Hoare逻辑</h2>
+    <h2>第15章 控制算子的分离逻辑</h2>
+    <h3>第15.1节 分离逻辑备忘</h3>
+    <p>分离逻辑由Reynolds (2002) 引入, 作为Hoare逻辑的扩展, 其对于使用指针和动态内存分配的程序有着更好的支持. 这样的程序可能会碰到一些难于单独使用平直Hoare逻辑排除的问题 (issue). 例如, 别名 (指向相同块的不同指针变量) 可能会导致藉由某个指针变量的写影响藉由另外指针变量的读. 人们可能会忘了释放一个不再需要的动态分配的块, 这会导致内存泄露. 人们可能会在某个块释放之后访问, 这会导致未定义行为. 除了内存块之外, 诸多类似的<em>资源</em>都会导致类似的问题, 例如系统资源 (文件描述符, 等等), security capabilities, 甚至是某些类型的延续, 这我们会在本章之后看到.</p>
+    <p>在Hoare逻辑之中, 断言具有真值并描述了程序的可变变量的当前状态. 在分离逻辑之中, 断言既有真值, 也有一个<em>足迹</em>, 这是一集资源, 既描述了这些资源的当前状态, 也描述了其由该断言唯一拥有的事实. 这就使得定义资源敏感 (resource-aware) 逻辑联结词成为可能, 例如分离合取<math><mrow><mi>A</mi><mo>&#8270;</mo><mi>B</mi></mrow></math>, 其成立若<math><mi>A</mi></math>和<math><mi>B</mi></math>断言均成立, 且它们的足迹互不相交. 因此, 如果由<math><mi>A</mi></math>拥有的资源被修改了, <math><mi>B</mi></math>仍然保持有效, 因为<math><mi>B</mi></math>所拥有的资源仍然未被修改.</p>
+    <p>在资源是动态分配内存块的情形下, 分离逻辑的断言是内存堆上的谓词. 以下是常常使用的断言, 以及它们作为堆<math><mi>h</mi></math>上的谓词的形式化定义. 对于<math><mi>h</mi></math>的domain, 我们记<math><mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow></math>, 即<math><mi>h</mi></math>中的有效位置的集合.
+      <math display="block">
+        <mtable columnalign="left" columnlines="solid" rowlines="solid" frame="solid">
+          <mtr>
+            <mtd>
+              <mrow><mi>l</mi><mo>&mapsto;</mo><mi>_</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>位置</mtext><mi>l</mi><mtext>是有效的</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                <mo>=</mo>
+                <mrow><mo stretchy="false">{</mo><mi>l</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>l</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>位置</mtext><mi>l</mi><mtext>含有</mtext><mi>v</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                  <mo>=</mo>
+                  <mrow><mo stretchy="false">{</mo><mi>l</mi><mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mo>&and;</mo>
+                <mrow>
+                  <mrow><mi>h</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>=</mo><mi>v</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>emp</mi></mtd>
+            <mtd><mtext>堆为空</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                <mo>=</mo><mi>&empty;</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&lang;</mo><mi>P</mi><mo stretchy="false">&rang;</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>逻辑命题</mtext><mi>P</mi><mtext>成立且堆为空</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                  <mo>=</mo><mi>&empty;</mi></mrow>
+                <mo>&and;</mo><mi>P</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>A</mi><mo>&#8270;</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd><mtext>分离合取</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo>&exist;</mo>
+                <mrow>
+                  <msub><mi>h</mi><mn>1</mn></msub>
+                  <mo>,</mo>
+                  <msub><mi>h</mi><mn>2</mn></msub>
+                </mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow>
+                      <mrow><mi>D</mi><mo>&af;</mo>
+                        <msub><mi>h</mi><mn>1</mn></msub>
+                      </mrow>
+                      <mo>&cap;</mo>
+                      <mrow><mi>D</mi><mo>&af;</mo>
+                        <msub><mi>h</mi><mn>2</mn></msub>
+                      </mrow>
+                    </mrow>
+                    <mo>=</mo><mi>&empty;</mi></mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi>h</mi><mo>=</mo>
+                    <mrow>
+                      <msub><mi>h</mi><mn>1</mn></msub>
+                      <mo>&cup;</mo>
+                      <msub><mi>h</mi><mn>2</mn></msub>
+                    </mrow>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi>A</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>h</mi><mn>1</mn></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi>B</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>h</mi><mn>2</mn></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>A</mi><mo>&minus;&#8270;</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd><mtext>分离后承, 或称魔杖</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <msup><mi>h</mi><mo>&prime;</mo></msup>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow>
+                      <mrow>
+                        <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                        <mo>&cap;</mo>
+                        <mrow><mi>D</mi><mo>&af;</mo>
+                          <msup><mi>h</mi><mo>&prime;</mo></msup>
+                        </mrow>
+                      </mrow>
+                      <mo>=</mo><mi>&empty;</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow><mi>A</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <msup><mi>h</mi><mo>&prime;</mo></msup>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>&rArr;</mo>
+                  <mrow><mi>B</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>h</mi><mo>&cup;</mo>
+                        <msup><mi>h</mi><mo>&prime;</mo></msup>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>例如, 考虑断言
+      <math display="block">
+        <mrow><mo>&exist;</mo>
+          <mrow>
+            <msub><mi>n</mi><mn>1</mn></msub>
+            <mo>,</mo>
+            <msub><mi>n</mi><mn>2</mn></msub>
+          </mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow>
+              <msub><mi>l</mi><mn>1</mn></msub>
+              <mo>&mapsto;</mo>
+              <msub><mi>n</mi><mn>1</mn></msub>
+            </mrow>
+            <mo>&#8270;</mo>
+            <mrow>
+              <msub><mi>l</mi><mn>2</mn></msub>
+              <mo>&mapsto;</mo>
+              <msub><mi>n</mi><mn>2</mn></msub>
+            </mrow>
+            <mo>&#8270;</mo>
+            <mrow><mo stretchy="false">&lang;</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>n</mi><mn>1</mn></msub>
+                  <mo>+</mo>
+                  <msub><mi>n</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>=</mo><mn>10</mn></mrow>
+              <mo stretchy="false">&rang;</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其陈述了<math><msub><mi>l</mi><mn>1</mn></msub></math>和<math><msub><mi>l</mi><mn>2</mn></msub></math>是合法的位置, 其分别含有整数<math><msub><mi>n</mi><mn>1</mn></msub></math>和<math><msub><mi>n</mi><mn>2</mn></msub></math>, 而它们之和为<math><mn>10</mn></math>. 因为该断言使用了分离合取, 所以这也保证了<math><mrow><msub><mi>l</mi><mn>1</mn></msub><mo>&ne;</mo><msub><mi>l</mi><mn>2</mn></msub></mrow></math>, 即指针<math><msub><mi>l</mi><mn>1</mn></msub></math>和<math><msub><mi>l</mi><mn>2</mn></msub></math>之间没有别名共享.</p>
+    <p>因此, 如果我们对于<math><msub><mi>l</mi><mn>1</mn></msub></math>的内容进行增量, 我们可以安全地断言
+      <math display="block">
+        <mrow><mo>&exist;</mo>
+          <mrow>
+            <msub><mi>n</mi><mn>1</mn></msub>
+            <mo>,</mo>
+            <msub><mi>n</mi><mn>2</mn></msub>
+          </mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow>
+              <msub><mi>l</mi><mn>1</mn></msub>
+              <mo>&mapsto;</mo>
+              <msub><mi>n</mi><mn>1</mn></msub>
+            </mrow>
+            <mo>&#8270;</mo>
+            <mrow>
+              <msub><mi>l</mi><mn>2</mn></msub>
+              <mo>&mapsto;</mo>
+              <msub><mi>n</mi><mn>2</mn></msub>
+            </mrow>
+            <mo>&#8270;</mo>
+            <mrow><mo stretchy="false">&lang;</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>n</mi><mn>1</mn></msub>
+                  <mo>+</mo>
+                  <msub><mi>n</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>=</mo><mn>11</mn></mrow>
+              <mo stretchy="false">&rang;</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      如果没有<math><mrow><msub><mi>l</mi><mn>1</mn></msub><mo>&ne;</mo><msub><mi>l</mi><mn>2</mn></msub></mrow></math>这一保证, 那么这个结论就是无效的了; 若这两个指针别名共享 (alias), 对于<math><msub><mi>l</mi><mn>1</mn></msub></math>的内容进行增量也会对于<math><msub><mi>l</mi><mn>2</mn></msub></math>的内容进行增量, 导致和为<math><mn>12</mn></math>.</p>
+    <h3>第15.2节 一个函数式命令式语言的一种分离逻辑</h3>
+    <p><b>FUNREF语言. </b>图15.1展示了FUNREF的抽象句法, 这是本章所采用的玩具语言. FUNREF是一个函数式语言, 其也通过可以就地修改的引用而支持命令式编程, 这类似于OCaml以及其他ML族的语言. 引用藉由四个操作呈现:
+      <ul>
+        <li><code>alloc</code>创建一个新鲜的未初始化的引用;</li>
+        <li><code>x := v</code>将值<math><mi>v</mi></math>存储于引用<math><mi>x</mi></math>;</li>
+        <li></li>
+      </ul>
+    </p>
+    <h2>参考文献</h2>
+  </body>
+</html>

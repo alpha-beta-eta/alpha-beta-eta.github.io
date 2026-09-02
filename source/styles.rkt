@@ -69,7 +69,7 @@
      (width "100%")
      (border-top "1.5px solid black")
      (break-inside "avoid"))
-    ("table.law div.frame"
+    ("div.frame"
      (width "60%")
      (margin "auto")
      (padding "10px")

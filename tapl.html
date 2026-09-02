@@ -2059,6 +2059,15 @@
     <p>研究规范化证明的另一个理由是, 它们属于类型理论文献中最优美, 也最令人拍案叫绝的数学之列, 并且常常 (正如本章这样) 用到逻辑关系 (logical relations) 这一基本证明技术.</p>
     <p>某些读者在初次阅读时或许愿意跳过本章; 这样做不会给后续章节带来任何问题. (完整的章节依赖关系表见第xvi页.)</p>
     <h3>第12.1节 简单类型的规范化</h3>
+    <div class="exercise"><b>练习12.1.1. </b></div>
+    <div class="definition"><b>定义12.1.2. </b>
+      <ul>
+        <li><math><mrow><msub><mi>R</mi><mi mathvariant="sans-serif">A</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></math>当且仅当<math><mi>t</mi></math>终止.</li>
+        <li><math><mrow><msub><mi>R</mi><mrow><msub><mi>T</mi><mn>1</mn></msub><mo>&rarr;</mo><msub><mi>T</mi><mn>2</mn></msub></mrow></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></math>当且仅当<math><mi>t</mi></math>终止, 且每当<math><mrow><msub><mi>R</mi><msub><mi>T</mi><mn>1</mn></msub></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 我们有<math><mrow><msub><mi>R</mi><msub><mi>T</mi><mn>2</mn></msub></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>t</mi><mspace width="2ex"/><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>.</li>
+      </ul>
+    </div>
+    <p>这个定义给了我们所需要的加强过了的归纳假设. 我们的主要目的是表明所有的程序, 即所有具有基类型的封闭项, 都会终止. 但是, 具有基类型的封闭项可以含有具有函数类型的子项, 所以我们也需要知道关于这些项的信息. 而且, 知道这些子项终止并不足够, 因为应用规范化了的函数于规范化了的参数牵涉替换, 可能导致需要更多的求值步骤. 因此, 对于具有函数类型的项而言, 我们需要更强的条件: 不仅它们自身终止, 而且当应用于终止的项时, 它们也应该产生终止的结果.</p>
+    <p>这个定义的形式对于<em>逻辑关系</em>证明技术而言是典型的. (不过我们处理的是幺元关系, 所以更正确的说法是<em>逻辑谓词</em>). 如果我们想要证明所有具有类型<math><mi mathvariant="sans-serif">A</mi></math>的封闭项的某个性质<math><mi>P</mi></math>, 我们的处理方法是在类型上进行归纳, </p>
     <h3>第12.2节 注记</h3>
     <h2>第13章 引用</h2>
     <h2>第14章 异常</h2>

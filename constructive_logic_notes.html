@@ -38,8 +38,8 @@
         <li>一个对于<math><mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow></math>的证明是通过呈现一个对于<math><mi>A</mi></math>的证明或一个对于<math><mi>B</mi></math>的证明而给出的.</li>
         <li>一个对于<math><mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow></math>的证明是一个构造, 其允许我们将一个对于<math><mi>A</mi></math>的证明转换为一个对于<math><mi>B</mi></math>的证明.</li>
         <li>不存在对于<math><mi>&bottom;</mi></math>的证明. 另外, 一个对于<math><mrow><mo>&not;</mo><mi>A</mi></mrow></math>的证明是一个构造, 其将一个(假想的)对于<math><mi>A</mi></math>的证明转换为一个矛盾.</li>
-        <li>一个对于<math><mrow><mo>&exist;</mo><mi>x</mi><mo lspace="0">.</mo><mi>A</mi></mrow></math>的证明是通过提供一个量化的论域里的见证者 (witness) <math><mi>d</mi></math>和一个对于<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>d</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow><mi>A</mi></mrow></math>的证明给出的.</li>
-        <li>一个对于<math><mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mi>A</mi></mrow></math>的证明是一个构造, 其取量化的论域里的任意一个元素<math><mi>d</mi></math>, 然后给出对于<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>d</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow><mi>A</mi></mrow></math>的一个证明. {译注: 也就是说, 对于论域的每个元素都需要给出证明. 这其实和对于推出<math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math>的证明有些类似, 在类型论中这将会更加明显.}</li>
+        <li>一个对于<math><mrow><mo>&exist;</mo><mi>x</mi><mo lspace="0">.</mo><mi>A</mi></mrow></math>的证明是通过提供一个量化的论域里的见证者 (witness) <math><mi>d</mi></math>和一个对于<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>d</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow><mo>&af;</mo><mi>A</mi></mrow></math>的证明给出的.</li>
+        <li>一个对于<math><mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mi>A</mi></mrow></math>的证明是一个构造, 其取量化的论域里的任意一个元素<math><mi>d</mi></math>, 然后给出对于<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>d</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow><mo>&af;</mo><mi>A</mi></mrow></math>的一个证明. {译注: 也就是说, 对于论域的每个元素都需要给出证明. 这其实和对于推出<math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math>的证明有些类似, 在类型论中这将会更加明显.}</li>
       </ul>
       这个定义里提及<em>构造</em>的地方, 我们可以将定义向计算机科学倾斜, 将其想成是<em>函数</em>, 其必须是有效可计算的 (于是构造可以被实际施行). 在这样一种解释下, 直觉主义证明对应于函数, 而特定的直觉主义推理系统则会导致特定的编程语言.</p>
     <h3>第1.4节 第一个例子</h3>
@@ -3381,7 +3381,539 @@ fun even_or_odd x = case x of
       </math>
       这个局部展开表明: 消去规则<math><mrow><mi>&and;</mi><msub><mi>E</mi><mn>1</mn></msub></mrow></math>与<math><mrow><mi>&and;</mi><msub><mi>E</mi><mn>2</mn></msub></mrow></math>合在一起, 从判断<math><mrow><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>中抽取出了用引入规则<math><mrow><mi>&and;</mi><mi>I</mi></mrow></math>重新证明<math><mrow><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>所需的全部信息. 请记住, 假设<math><mrow><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>一旦可用, 就可以被多次使用, 这一点在局部展开中体现得非常明显: <math><mrow><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明<math><mi mathvariant="script">D</mi></math>可以在左前提和右前提上分别重复使用.</p>
     <p>作为局部完备性失效的一个例子, 考虑我们<q>忘记</q>了合取的第二条 (右) 消去规则<math><mrow><mi>&and;</mi><msub><mi>E</mi><mn>2</mn></msub></mrow></math>的情形. 剩下的那条规则仍然是局部可靠的, 因为它所证明的东西正是被放进<math><mrow><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明之中的; 但它不是局部完备的, 因为我们无法从假设<math><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow></math>中抽取出<math><mi>B</mi></math>的证明. 于是, 举例来说, 我们将无法证明<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&sup;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>&and;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 尽管这显然应当为真.</p>
-    <p><b>替换原理. </b>在讨论推出 (implication) 之前, 我们需要假言判断的定义性质. </p>
+    <p><b>替换原理. </b>在能够讨论推出 (implication) 之前, 我们需要假言判断的定义性质. 从直觉上来说, 我们总是可以将<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的一个演绎替换进对于假设<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的任意使用. 为了避免歧义, 我们确保假设都已附上标签, 而我们对于具有某个给定标签的假设的所有使用都要进行替换. 注意到我们只应该替换那些没有被我们正在考虑的子证明discharge的假设. {译注: 这是因为, 那些被discharge的假设相当于绑定变量, 而我们要去替换的是自由变量.} 那么, 替换原理应该理解如下:
+      <blockquote>如果
+        <math display="block">
+          <mtable>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mfrac displaystyle="true">
+                    <mrow/>
+                    <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                  </mfrac>
+                  <mi>u</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">E</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+        是一个对于<math><mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的假言证明, 其在标记了<math><mi>u</mi></math>的(未discharge)假设<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>之下, 并且
+        <math display="block">
+          <mtable>
+            <mtr>
+              <mtd><mi mathvariant="script">D</mi></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+        是对于<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的一个证明, 那么
+        <math display="block">
+          <mtable>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">D</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mfrac>
+                        <mi>u</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">E</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+        是我们对于将<math><mi mathvariant="script">D</mi></math>替换进<math><mi mathvariant="script">E</mi></math>中所有对于标记为<math><mi>u</mi></math>的假设的所有使用的记号. 这个演绎, 有时也记为<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi mathvariant="script">D</mi><mo lspace="0" rspace="0">/</mo><mi>u</mi></mrow><mo stretchy="false">]</mo></mrow><mo>&af;</mo><mi mathvariant="script">E</mi></mrow></math>, 不再依赖于<math><mi>u</mi></math>.</blockquote>
+    </p>
+    <p><b>推出. </b>为了见证局部可靠性, 我们使用替换操作来归约推出引入后面跟着推出消去的情形.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow>
+                  <mfrac displaystyle="true">
+                    <mtable>
+                      <mtr>
+                        <mtd>
+                          <mrow>
+                            <mfrac displaystyle="true">
+                              <mrow/>
+                              <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                            </mfrac>
+                            <mi>u</mi></mrow>
+                        </mtd>
+                      </mtr>
+                      <mtr>
+                        <mtd>
+                          <mtable>
+                            <mtr>
+                              <mtd><mi mathvariant="script">E</mi></mtd>
+                            </mtr>
+                            <mtr>
+                              <mtd>
+                                <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                              </mtd>
+                            </mtr>
+                          </mtable>
+                        </mtd>
+                      </mtr>
+                    </mtable>
+                    <mrow>
+                      <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                      <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                  </mfrac>
+                  <mrow><mi>&sup;</mi>
+                    <msup><mi>I</mi><mi>u</mi></msup>
+                  </mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">D</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+              <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+            </mfrac>
+            <mrow><mi>&sup;</mi><mi>E</mi></mrow>
+          </mrow>
+          <msub><mo>&xrArr;</mo><mi>R</mi></msub>
+          <mtable>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">D</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mfrac>
+                        <mi>u</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">E</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+          </mtable>
+        </mrow>
+      </math>
+      替换操作的条件是满足的, 因为<math><mi>u</mi></math>是在<math><mrow><mi>&sup;</mi><msup><mi>I</mi><mi>u</mi></msup></mrow></math>这个推理引入的, 因而在<math><mi mathvariant="script">E</mi></math>中没有被discharge. {译注: 这里的引入大概只是为了避免和discharge重复才这样说, 另外那个假言子证明里甚至都可以不出现<math><mi>u</mi></math>.}</p>
+    <p>局部完备性由以下扩展见证.
+      <math display="block">
+        <mrow>
+          <mtable>
+            <mtr>
+              <mtd><mi mathvariant="script">D</mi></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                  <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+          <msub><mo>&xrArr;</mo><mi>E</mi></msub>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow>
+                    <mtable>
+                      <mtr>
+                        <mtd><mi mathvariant="script">D</mi></mtd>
+                      </mtr>
+                      <mtr>
+                        <mtd>
+                          <mrow>
+                            <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                            <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mtd>
+                      </mtr>
+                    </mtable>
+                    <mspace width="8ex"/>
+                    <mrow>
+                      <mfrac displaystyle="true">
+                        <mrow/>
+                        <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                      </mfrac>
+                      <mi>u</mi></mrow>
+                  </mrow>
+                  <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                </mfrac>
+                <mrow><mi>&sup;</mi><mi>E</mi></mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+            </mfrac>
+            <mrow><mi>&sup;</mi>
+              <msup><mi>I</mi><mi>u</mi></msup>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      这里的<math><mi>u</mi></math>必须要选择成fresh的: 其指挥标记新的假设<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>, 这个假设仅仅使用了一次. {译注: 我有一个奇怪的疑问, 这里的证明<math><mi mathvariant="script">D</mi></math>应该是封闭的, 否则的话应该进行标记, 那么在封闭的情况下说明没有被<math><mrow><mi>&sup;</mi><msup><mi>I</mi><mi>u</mi></msup></mrow></math>处的推理绑定有什么意义呢? 当然, 或许这里的确可以有自由变量, 那么可以类比于<math><mi>&eta;</mi></math>扩展.}</p>
+    <p><b>析取. </b>对于析取, 我们也采用替换原理, 因为对于消去规则我们所考虑的两种情形, 其都引入了假设. 另外, 为了表明局部可靠性, 引入规则存在两种可能性, 不过这两种情况下跟着的都是唯一的那条消去规则.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow>
+                  <mfrac displaystyle="true">
+                    <mtable>
+                      <mtr>
+                        <mtd><mi mathvariant="script">D</mi></mtd>
+                      </mtr>
+                      <mtr>
+                        <mtd>
+                          <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mtd>
+                      </mtr>
+                    </mtable>
+                    <mrow>
+                      <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                      <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                  </mfrac>
+                  <mrow><mi>&or;</mi>
+                    <msub><mi>I</mi><mn>1</mn></msub>
+                  </mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mtable>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mfrac>
+                        <mi>u</mi></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mtable>
+                        <mtr>
+                          <mtd><mi mathvariant="script">E</mi></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mspace width="8ex"/>
+                <mtable>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mfrac>
+                        <mi>w</mi></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mtable>
+                        <mtr>
+                          <mtd><mi mathvariant="script">F</mi></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+              <mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+            </mfrac>
+            <mrow><mi>&or;</mi>
+              <msup><mi>E</mi>
+                <mrow><mi>u</mi><mo>,</mo><mi>w</mi></mrow>
+              </msup>
+            </mrow>
+          </mrow>
+          <msub><mo>&xrArr;</mo><mi>R</mi></msub>
+          <mtable>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">D</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mfrac>
+                        <mi>u</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">E</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+          </mtable>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow>
+                  <mfrac displaystyle="true">
+                    <mtable>
+                      <mtr>
+                        <mtd><mi mathvariant="script">D</mi></mtd>
+                      </mtr>
+                      <mtr>
+                        <mtd>
+                          <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mtd>
+                      </mtr>
+                    </mtable>
+                    <mrow>
+                      <mrow><mi>B</mi><mo>&or;</mo><mi>A</mi></mrow>
+                      <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                  </mfrac>
+                  <mrow><mi>&or;</mi>
+                    <msub><mi>I</mi><mn>1</mn></msub>
+                  </mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mtable>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mfrac>
+                        <mi>u</mi></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mtable>
+                        <mtr>
+                          <mtd><mi mathvariant="script">E</mi></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mspace width="8ex"/>
+                <mtable>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mfrac>
+                        <mi>w</mi></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mtable>
+                        <mtr>
+                          <mtd><mi mathvariant="script">F</mi></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+              <mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+            </mfrac>
+            <mrow><mi>&or;</mi>
+              <msup><mi>E</mi>
+                <mrow><mi>u</mi><mo>,</mo><mi>w</mi></mrow>
+              </msup>
+            </mrow>
+          </mrow>
+          <msub><mo>&xrArr;</mo><mi>R</mi></msub>
+          <mtable>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">D</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>B</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mfrac>
+                        <mi>w</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mtable>
+                  <mtr>
+                    <mtd><mi mathvariant="script">F</mi></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mtd>
+            </mtr>
+          </mtable>
+        </mrow>
+      </math>
+    </p>
+    <p>并不局部可靠的规则的一个例子是</p>
+    <h3>第3.3节 应用证明归约</h3>
+    <p>如我们之前所提到的, 证明归约对应于编程语言中的计算. 在我们在下一次讲座里详细阐明这一点之前, 让我们在这里先以一个简单的例子刻画些许概念.</p>
+    <p>考虑我们关于<math><mrow><mrow><mi>A</mi><mo>&sup;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>&sup;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明:
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mfrac displaystyle="true">
+                    <mrow/>
+                    <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                  </mfrac>
+                  <mi>x</mi></mrow>
+                <mrow>
+                  <mrow><mi>B</mi><mo>&sup;</mo><mi>A</mi></mrow>
+                  <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+              </mfrac>
+              <mrow><mi>&sup;</mi>
+                <msup><mi>I</mi><mi>y</mi></msup>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi>A</mi><mo>&sup;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>B</mi><mo>&sup;</mo><mi>A</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+          </mfrac>
+          <mrow><mi>&sup;</mi>
+            <msup><mi>I</mi><mi>x</mi></msup>
+          </mrow>
+        </mrow>
+      </math>
+      我们也想要证明<math><mrow><mi>B</mi><mo>&sup;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>&sup;</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 一种方法是直接证明, 但是为了应用证明归约, 我们想要使用<math><mrow><mi>A</mi><mo>&sup;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>&sup;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>作为引理. 但是怎么做呢? 似乎很困难.</p>
+    <p>作为最初的一步, 我们作如下的观察: </p>
+    <h3>第3.4节 证明归约作为计算</h3>
+    <h3>第3.5节 逻辑等价作为联结词</h3>
+    <p>作为另外一个例子, 现在我们想要定义一个新的联结词, 建立引入和消去规则, 检查其局部可靠性和局部完备性 (如果的确成立的话). 首先, 提出的引入规则定义了该联结词:</p>
+    <h3>参考文献</h3>
+    <p>Michael Dummett. The Logical Basis of Metaphysics. Harvard University Press, Cambridge, Massachusetts, 1991. The William James Lectures, 1976. (形而上学的逻辑基础)</p>
     <h2>Rec 1: Dcheck与和谐</h2>
     <h2>第4章 证明作为程序</h2>
     <h3>第4.1节 引论</h3>

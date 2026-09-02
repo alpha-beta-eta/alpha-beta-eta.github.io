@@ -1,0 +1,1062 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Hoare逻辑</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>Hoare逻辑</h1>
+    <h2>第1章 程序规约</h2>
+    <h3>第1.1节 引论</h3>
+    <p>为了从数学上证明一个程序的正确性, 我们必须首先刻画正确本身的含义. 本章我们描述了一种用于刻画命令式程序的预期行为的记号. 这种记号应该归功于C.A.R. Hoare.</p>
+    <p>执行命令式程序有着改变<em>状态</em>的作用, 直到第7章之前, 我们将状态取为程序变量的值. 为了使用这样的程序, 我们需要建立初始状态, 也就是将一些变量的值设置为有趣的值 (value of interest). 然后我们执行程序. 这将初始状态变换为最终状态. 然后我们检视最终状态里的变量的值来得到预期的结果. 例如, 为了计算<math><mi mathvariant="monospace">y</mi></math>除以<math><mi mathvariant="monospace">x</mi></math>, 我们可能会将<math><mi mathvariant="monospace">x</mi></math>和<math><mi mathvariant="monospace">y</mi></math>分别载入程序变量<math><mi mathvariant="monospace">X</mi></math>和<math><mi mathvariant="monospace">Y</mi></math>. 然后我们可能会执行一个合适的程序 (见第1.4节的例子7) 来将初始状态变换为最终状态以使得变量<math><mi mathvariant="monospace">Q</mi></math>和<math><mi mathvariant="monospace">R</mi></math>分别存放着商和余数.</p>
+    <p>这些笔记里要使用的编程语言将于下一节进行描述.</p>
+    <h3>第1.2节 一种小语言</h3>
+    <p>程序由诸如赋值和条件式等命令构建而成. 术语<q>程序</q>和<q>命令</q>的确可以算是近义词; 前者只会用于表示完整算法的命令. 这里的术语<q>陈述 (statement)</q>用于程序变量上的条件, 其出现于正确性规约之中 (见第1.3节). 这里存在混淆的风险, 因为一些作者将这个词用于命令 (如<q>for-statement</q> [14]).</p>
+    <p>现在我们描述我们的小语言里的各种命令的句法 (即形式) 和语义 (即意义). 以下约定将会采用:
+      <ol>
+        <li>符号<math><mrow><mi>V</mi><mo>,</mo><msub><mi>V</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>V</mi><mi>n</mi></msub></mrow></math>代表任意的变量. 特定变量的例子有<math><mrow><mi mathvariant="monospace">X</mi><mo>,</mo><mi mathvariant="monospace">R</mi><mo>,</mo><mi mathvariant="monospace">Q</mi></mrow></math>等等.</li>
+        <li>符号<math><mrow><mi>E</mi><mo>,</mo><msub><mi>E</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>E</mi><mi>n</mi></msub></mrow></math>代表任意的表达式 (或者说项). 这些是像<math><mrow><mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow><mo>,</mo><msqrt><mn>2</mn></msqrt></mrow></math>之类的东西, 其指称着值 (通常是数字).</li>
+        <li>符号<math><mrow><mi>S</mi><mo>,</mo><msub><mi>S</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>S</mi><mi>n</mi></msub></mrow></math>代表任意的陈述. 这些是像<math><mrow><mrow><mi mathvariant="monospace">X</mi><mo>&lt;</mo><mi mathvariant="monospace">Y</mi></mrow><mo>,</mo><mrow><msup><mi mathvariant="monospace">X</mi><mn>2</mn></msup><mo>=</mo><mn>1</mn></mrow></mrow></math>之类的条件, 其要么为真要么为假.</li>
+        <li>符号<math><mrow><mi>C</mi><mo>,</mo><msub><mi>C</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>C</mi><mi>n</mi></msub></mrow></math>代表我们编程语言里的任意命令; 这些会在本节的剩余部分进行描述.</li>
+      </ol>
+      项和陈述在第1.5节进行了更为细致的描述.</p>
+    <h4>第1.2.1小节 赋值</h4>
+    <p><b>句法: </b><math><mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow></math></p>
+    <p><b>语义: </b>状态的改变由将项<math><mi>E</mi></math>之值赋给变量<math><mi>V</mi></math>完成. 所有的变量都假定具有全局作用域.</p>
+    <p><b>例子: </b><code>X:=X+1</code></p>
+    <p>这给变量<math><mi mathvariant="monospace">X</mi></math>之值加上一.</p>
+    <h4>第1.2.2小节 序列</h4>
+    <p><b>句法: </b><math><mrow><msub><mi>C</mi><mn>1</mn></msub><mo>;</mo><mo>&ctdot;</mo><mo>;</mo><msub><mi>C</mi><mi>n</mi></msub></mrow></math></p>
+    <p><b>语义: </b>命令<math><mrow><msub><mi>C</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>C</mi><mi>n</mi></msub></mrow></math>按照顺序进行执行.</p>
+    <p><b>例子: </b><code>R:=X; X:=Y; Y:=R</code></p>
+    <p>变量<math><mi mathvariant="monospace">X</mi></math>和<math><mi mathvariant="monospace">Y</mi></math>之值经由临时变量<math><mi mathvariant="monospace">R</mi></math>进行了互换. 这个命令具有将变量<math><mi mathvariant="monospace">R</mi></math>之值变为变量<math><mi mathvariant="monospace">X</mi></math>之旧值的<em>副作用</em>. {译注: 这个还是这些?}</p>
+    <h4>第1.2.3小节 条件式</h4>
+    <p><b>句法: </b><math><mrow><mi mathvariant="monospace">IF</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">THEN</mi><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub><mspace width="2ex"/><mi mathvariant="monospace">ELSE</mi><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub></mrow></math></p>
+    <p><b>语义: </b>如果陈述<math><mi>S</mi></math>在当前状态下为真, 那么<math><msub><mi>C</mi><mn>1</mn></msub></math>被执行. 如果<math><mi>S</mi></math>为假, 那么<math><msub><mi>C</mi><mn>2</mn></msub></math>被执行.</p>
+    <p><b>例子: </b><code>IF X&lt;Y THEN MAX:=Y ELSE MAX:=X</code></p>
+    <h4>第1.2.4小节 <math><mi mathvariant="monospace">WHILE</mi></math>命令</h4>
+    <p><b>句法: </b><math><mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow></math></p>
+    <p><b>语义: </b>如果陈述<math><mi>S</mi></math>在当前状态下为真, 那么<math><mi>C</mi></math>被执行, 然后<math><mi mathvariant="monospace">WHILE</mi></math>命令重复. 如果<math><mi>S</mi></math>为假, 那么什么也不做. 因此, <math><mi>C</mi></math>反复执行, 直至<math><mi>S</mi></math>的值变为假. 如果<math><mi>S</mi></math>永远不变为假, 那么该命令的执行永远不终止.</p>
+    <p><b>例子: </b><code>WHILE ¬(X=0) DO X:=X-2</code></p>
+    <p>如果<math><mi mathvariant="monospace">X</mi></math>之值非零, 那么其值会减去<math><mn>2</mn></math>, 然后进程重复. 这个<math><mi mathvariant="monospace">WHILE</mi></math>命令将会终止 (此时<math><mi mathvariant="monospace">X</mi></math>有着值<math><mn>0</mn></math>), 如果<math><mi mathvariant="monospace">X</mi></math>的值是一个非负的偶数. 其他状态下都不会终止.</p>
+    <h4>第1.2.5小节 句法总结</h4>
+    <h4>第1.2.6小节 历史注记</h4>
+    <h3>第1.3节 Hoare记号</h3>
+    <p>在一篇开创性论文 [13] 里C.A.R. Hoare引入了记号<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>, 其有时被称为<em>Hoare三元组</em>, 用于刻画一个程序做了什么. 在这样一个Hoare三元组之中:
+      <ul>
+        <li><math><mi>C</mi></math>是一个程序.</li>
+        <li><math><mi>P</mi></math>和<math><mi>Q</mi></math>是<math><mi>C</mi></math>中用到的程序变量上的条件. 程序变量上的条件以标准的数学记号连带着诸如<math><mrow><mo>&and;</mo><mo>,</mo><mo>&or;</mo><mo>,</mo><mo>&not;</mo><mo>,</mo><mo>&rArr;</mo></mrow></math>这样的逻辑联结词书写. 这些在第1.5节有进一步描述.</li>
+      </ul>
+    </p>
+    <p>我们称<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>为真, 如果每当<math><mi>C</mi></math>在某个满足<math><mi>P</mi></math>的状态下执行且<math><mi>C</mi></math>的执行终止, 那么<math><mi>C</mi></math>执行终止的状态满足<math><mi>Q</mi></math>.</p>
+    <p><b>例子: </b><math><mrow><mrow><mo stretchy="false">{</mo><mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mn>1</mn></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><ms>X:=X+1</ms><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mn>2</mn></mrow><mo stretchy="false">}</mo></mrow></mrow></math>. 这里的<math><mi>P</mi></math>是</p>
+    <p>一个表达式<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>被称为一个<em>部分正确性规约</em>; <math><mi>P</mi></math>被称为其<em>前条件</em>而<math><mi>Q</mi></math>被称为其<em>后条件</em>.</p>
+    <h3>第1.4节 一些例子</h3>
+    <h3>第1.5节 项和陈述</h3>
+    <h2>第2章 Hoare逻辑</h2>
+    <p>本章讨论了形式化证明的想法. 然后, 我们引入了Hoare逻辑 (或称Floyd-Hoare逻辑) 作为对于程序进行形式化推理的方法.</p>
+    <p>上一章我们引入了三种可能为真或假的表达式:
+      <ol type="i">
+        <li>部分正确性规约<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>.</li>
+        <li>完全正确性规约<math><mrow><mrow><mo stretchy="false">[</mo><mi>P</mi><mo stretchy="false">]</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">[</mo><mi>Q</mi><mo stretchy="false">]</mo></mrow></mrow></math>.</li>
+        <li>数学陈述, 例如<math><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>=</mo><mrow><msup><mi mathvariant="monospace">X</mi><mn>2</mn></msup><mo>+</mo><mrow><mn>2</mn><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow><mo>+</mo><mn>1</mn></mrow></mrow></math>.</li>
+      </ol>
+      我们假定读者已经知道如何证明简单的数学陈述, 例如以上的iii中的那条. 例如, 以下是该事实的一个证明.
+      <math display="block">
+        <mtable columnalign="left">
+          <mtr>
+            <mtd><mtext>1.</mtext></mtd>
+            <mtd>
+              <msup>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mn>2</mn></msup>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&times;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow>
+                <msup>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow/>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mn>2</mn></msup>
+                <mtext>的定义.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>2.</mtext></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&times;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+                <mo>+</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&times;</mo><mn>1</mn></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo>&times;</mo><mtext>之于</mtext><mo>+</mo><mtext>的左分配律.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>3.</mtext></mtd>
+            <mtd>
+              <msup>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mn>2</mn></msup>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+                <mo>+</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&times;</mo><mn>1</mn></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>将第2行代入第1行.</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>4.</mtext></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&times;</mo><mn>1</mn></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mn>1</mn><mtext>的恒元律.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>5.</mtext></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+                <mo>+</mo>
+                <mrow><mn>1</mn><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo>&times;</mo><mtext>之于</mtext><mo>+</mo><mtext>的右分配律.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>6.</mtext></mtd>
+            <mtd>
+              <msup>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mn>2</mn></msup>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+                <mo>+</mo>
+                <mrow><mn>1</mn><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+                <mo>+</mo><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+            </mtd>
+            <mtd><mtext>将第4行和第5行代入第3行.</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>7.</mtext></mtd>
+            <mtd>
+              <mrow><mn>1</mn><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi mathvariant="monospace">X</mi></mtd>
+            <mtd>
+              <mrow><mn>1</mn><mtext>的恒元律.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>8.</mtext></mtd>
+            <mtd>
+              <msup>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mn>2</mn></msup>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+                <mo>+</mo><mi mathvariant="monospace">X</mi><mo>+</mo><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+            </mtd>
+            <mtd><mtext>将第7行代入第6行.</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>9.</mtext></mtd>
+            <mtd>
+              <mrow><mi mathvariant="monospace">X</mi><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <msup><mi mathvariant="monospace">X</mi><mn>2</mn></msup>
+            </mtd>
+            <mtd>
+              <mrow>
+                <msup>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow/>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mn>2</mn></msup>
+                <mtext>的定义.</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>10.</mtext></mtd>
+            <mtd>
+              <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mi mathvariant="monospace">X</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mn>2</mn><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mn>2</mn><mo>=</mo>
+                  <mrow><mn>1</mn><mo>+</mo><mn>1</mn></mrow>
+                </mrow>
+                <mo>,</mo><mtext>分配律</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>11.</mtext></mtd>
+            <mtd>
+              <msup>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mn>2</mn></msup>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msup><mi mathvariant="monospace">X</mi><mn>2</mn></msup>
+                <mo>+</mo>
+                <mrow><mn>2</mn><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow>
+                <mo>+</mo><mn>1</mn></mrow>
+            </mtd>
+            <mtd><mtext>将第9行和第10行代入第8行.</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>这个证明由一系列行构成, 每行都是某个<em>公理</em>的实例或者根据之前的行由<em>推理规则</em>推出. 这个证明的最后一行是其所证明的陈述, 也就是<math><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>=</mo><mrow><msup><mi mathvariant="monospace">X</mi><mn>2</mn></msup><mo>+</mo><mrow><mn>2</mn><mo>&times;</mo><mi mathvariant="monospace">X</mi></mrow><mo>+</mo><mn>1</mn></mrow></mrow></math>.</p>
+    <p>为了构造部分正确性规约的形式化证明, 需要公理和推理规则. 这正是Hoare逻辑所提供的. 该演绎系统的形式化表述归功于Hoare [13], 但其中一些基本思想源自Floyd [9].</p>
+    <p>Hoare逻辑中的证明是一系列行的序列, 其中每一行要么是该逻辑的一条公理, 要么是由前面的行通过该逻辑的一条推理规则推导而来.</p>
+    <p>构造形式化证明的原因在于试图确保只使用可靠的演绎方法. 有了可靠的公理和推理规则, 我们就可以确信所得出的结论是真的. 另一方面, 如果任何公理或推理规则是不可靠的, 那么就有可能推导出错误的结论; 例如:</p>
+    <p>形式化证明明确指出了为得出结论所使用的公理和推理规则. 人们很容易提出一些看似合理但实际上不可靠的程序推理规则. 计算机程序的正确性证明往往非常复杂, 需要形式化方法来确保其有效性. 因此, 将所使用的推理原则完全显式化是很重要的, 这样才能对其可靠性进行分析.</p>
+    <p>对于某些应用而言, 正确性尤为重要. 例子包括生命攸关的系统, 如核反应堆控制器, 汽车制动系统, 电传飞控飞机以及软件控制的医疗设备. 曾有一起法律诉讼源于一台癌症治疗设备因软件缺陷导致辐射过量, 造成数人死亡 [15]. 当穷举测试不可能实现时 (几乎总是如此), 形式化正确性证明提供了一种确认程序中不存在缺陷的方法.</p>
+    <p>本章将解释并举例说明用于程序推理的Hoare演绎系统. 该系统的可靠性和完备性的数学分析将在第4章中讨论.</p>
+    <h3>第2.1节 Hoare逻辑的公理和规则</h3>
+    <p>正如本章开头所讨论的, 一个命题的形式化证明是以该命题为最后一行的一个行序列, 其中每一行要么是一条公理的实例, 要么是由前面的行通过一条推理规则推导而来. 若<math><mi>S</mi></math>是一个命题 (无论是普通数学的还是Hoare逻辑的), 我们记<math><mrow><mrow/><mo>&vdash;</mo><mi>S</mi></mrow></math>来表示<math><mi>S</mi></math>有一个证明. 拥有证明的命题称为定理. 如前所述, 在本讲义中只描述Hoare逻辑的公理和推理规则; 因此, 若<math><mi>S</mi></math>是一个数学定理, 我们将直接断言<math><mrow><mrow/><mo>&vdash;</mo><mi>S</mi></mrow></math>而不给出任何形式化的论证. 当然, 为了达到完全的严格性, 这些断言必须被证明, 但如何做到这一点的细节假定读者已经了解 (例如通过逻辑与证明课程).</p>
+    <p>Hoare逻辑的公理在下面通过模式来指定, 这些模式可以被实例化以得到特定的部分正确性规约. Hoare逻辑的推理规则将用如下形式的记号来描述:
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <msub><mi>S</mi><mn>1</mn></msub>
+            </mrow>
+            <mspace width="8ex"/><mo>&ctdot;</mo><mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <msub><mi>S</mi><mi>n</mi></msub>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo><mi>S</mi></mrow>
+        </mfrac>
+      </math>
+      这是说结论<math><mrow><mrow/><mo>&vdash;</mo><mi>S</mi></mrow></math>可以从<math><mrow><mrow><mrow/><mo>&vdash;</mo><msub><mi>S</mi><mn>1</mn></msub></mrow><mo>,</mo><mo>&hellip;</mo><mo>,</mo><mrow><mrow/><mo>&vdash;</mo><msub><mi>S</mi><mi>n</mi></msub></mrow></mrow></math>推导而来, 后者是该规则的假设. 这些假设可以全部是Hoare逻辑的定理 (如下面的顺序规则), 也可以是Hoare逻辑定理与数学定理的混合 (如第2.1.2节中描述的前条件加强规则).</p>
+    <h4>第2.1.1小节 赋值公理</h4>
+    <p>赋值公理表达了这样一个事实: 在执行赋值命令<math><mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow></math>之后, 变量<math><mi>V</mi></math>的值等于执行前表达式<math><mi>E</mi></math>的值. 为了将此形式化, 注意到如果一个命题<math><mi>P</mi></math>在赋值之后为真, 那么在执行赋值之前, 将<math><mi>P</mi></math>中的<math><mi>V</mi></math>替换为<math><mi>E</mi></math>所得到的命题必须为真. {译注: 这似乎和以下公理所表达的内容方向相反.}</p>
+    <p>为了形式化地表达这一点, 定义<math><mrow><mi>P</mi><mrow><mo stretchy="false">[</mo><mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></math>以表示将<math><mi>P</mi></math>中所有<math><mi>V</mi></math>的出现替换为<math><mi>E</mi></math>之结果. <math><mrow><mi>P</mi><mrow><mo stretchy="false">[</mo><mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></math>读作<q><math><mi>P</mi></math>with <math><mi>E</mi></math> for <math><mi>V</mi></math></q>. 例如,
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                <mo>></mo><mi mathvariant="monospace">X</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">Y</mi><mo>+</mo><mi mathvariant="monospace">Z</mi></mrow>
+                <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">X</mi></mrow>
+              <mo stretchy="false">]</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">Y</mi><mo>+</mo><mi mathvariant="monospace">Z</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>+</mo><mn>1</mn></mrow>
+              <mo>></mo>
+              <mrow><mi mathvariant="monospace">Y</mi><mo>+</mo><mi mathvariant="monospace">Z</mi></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      记住这个记号的方法是<q>消去律</q>
+      <math display="block">
+        <mrow>
+          <mrow><mi>V</mi>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+              <mo stretchy="false">]</mo></mrow>
+          </mrow>
+          <mo>=</mo><mi>E</mi></mrow>
+      </math>
+      这类比于分式的消去性质
+      <math display="block">
+        <mrow>
+          <mrow><mi>v</mi><mo>&times;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>e</mi><mo lspace="0" rspace="0">/</mo><mi>v</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo><mi>e</mi></mrow>
+      </math>
+    </p>
+    <div class="frame">
+      <div style="text-align: center;"><b>Hoare赋值公理</b></div>
+      <math display="block">
+        <mrow>
+          <mrow/>
+          <mo>&vdash;</mo>
+          <mrow>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow><mi>P</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其中<math><mi>V</mi></math>是任意的变量, <math><mi>E</mi></math>是任意的表达式, <math><mi>P</mi></math>是任意的陈述, 而<math><mrow><mi>P</mi><mrow><mo stretchy="false">[</mo><mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></math>代表将陈述<math><mi>P</mi></math>中变量<math><mi>V</mi></math>的所有出现都替换为项<math><mi>E</mi></math>.</div>
+    <p>赋值公理的实例有:
+      <ol>
+        <li><math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mi mathvariant="monospace">Y</mi><mo>=</mo><mn>2</mn></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo><mn>2</mn></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi mathvariant="monospace">Y</mi><mo>=</mo><mi mathvariant="monospace">X</mi></mrow><mo stretchy="false">}</mo></mrow></mrow></mrow></math></li>
+        <li><math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow><mo>=</mo><mrow><mi mathvariant="monospace">n</mi><mo>+</mo><mn>1</mn></mrow></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo><mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mrow><mi mathvariant="monospace">n</mi><mo>+</mo><mn>1</mn></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></mrow></math></li>
+        <li><math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>E</mi><mo>=</mo><mi>E</mi></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo><mi>E</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mi>E</mi></mrow><mo stretchy="false">}</mo></mrow></mrow></mrow></math>, 如果<math><mi mathvariant="monospace">X</mi></math>在<math><mi>E</mi></math>中没有出现.</li>
+      </ol>
+    </p>
+    <p>许多人会感到赋值公理和他们所期望的相反. 两种常见的错误直觉如下:
+      <ol type="i">
+        <li><math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi>P</mi><mrow><mo stretchy="false">[</mo><mrow><mi>V</mi><mo lspace="0" rspace="0">/</mo><mi>E</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></mrow></math></li>
+        <li><math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi>P</mi><mrow><mo stretchy="false">[</mo><mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></mrow></math></li>
+      </ol>
+    </p>
+    <p>关于赋值公理容易产生错误直觉这一事实表明, 拥有严格的手段来确立公理和规则的有效性是很重要的. 我们将在后面的第4章中深入讨论这个主题, 届时我们将给出我们这个小型编程语言的形式化语义, 然后证明Hoare逻辑的公理和推理规则是可靠的. 当然, 这一过程只有在我们相信形式化语义本身的正确性的前提下, 才能增强我们对公理和规则的信心. 上述简单的赋值公理对于<q>真实的</q>编程语言是不成立的. 例如, G. Ligler [17] 的工作表明, 它在(现已过时的)语言Algol 60中以六种不同的方式失效.</p>
+    <h4>第2.1.2小节 前条件强化</h4>
+    <div class="frame">
+      <div style="text-align: center;"><b>前条件强化</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow><mi>P</mi><mo>&rArr;</mo>
+                <msup><mi>P</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msup><mi>P</mi><mo>&prime;</mo></msup>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <h4>第2.1.3小节 后条件弱化</h4>
+    <div class="frame">
+      <div style="text-align: center;"><b>后条件弱化</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msup><mi>Q</mi><mo>&prime;</mo></msup>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <msup><mi>Q</mi><mo>&prime;</mo></msup>
+                <mo>&rArr;</mo><mi>Q</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <h4>第2.1.4小节 规约合取与析取</h4>
+    <div class="frame">
+      <div style="text-align: center;"><b>规约合取</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>Q</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>Q</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo>&and;</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>Q</mi><mn>1</mn></msub>
+                  <mo>&and;</mo>
+                  <msub><mi>Q</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <div style="text-align: center;"><b>规约析取</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>Q</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>Q</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo>&or;</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>Q</mi><mn>1</mn></msub>
+                  <mo>&or;</mo>
+                  <msub><mi>Q</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <h4>第2.1.5小节 顺序规则</h4>
+    <div class="frame">
+      <div style="text-align: center;"><b>顺序规则</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>2</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mo>;</mo>
+                <msub><mi>C</mi><mn>2</mn></msub>
+              </mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <h4>第2.1.6小节 导出顺序规则</h4>
+    <h4>第2.1.7小节 条件规则</h4>
+    <div class="frame">
+      <div style="text-align: center;"><b>条件规则</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>P</mi><mo>&and;</mo>
+                    <mrow><mo>&not;</mo><mi>S</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>2</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi mathvariant="monospace">IF</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">THEN</mi><mspace width="2ex"/>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mspace width="2ex"/><mi mathvariant="monospace">ELSE</mi><mspace width="2ex"/>
+                <msub><mi>C</mi><mn>2</mn></msub>
+              </mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <h4>第2.1.8小节 <math><mi mathvariant="monospace">WHILE</mi></math>规则</h4>
+    <div class="frame">
+      <div style="text-align: center;"><b><math><mi mathvariant="monospace">WHILE</mi></math>规则</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>P</mi><mo>&and;</mo>
+                  <mrow><mo>&not;</mo><mi>S</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <h4>第2.1.9小节 <math><mi mathvariant="monospace">FOR</mi></math>规则</h4>
+    <h4>第2.1.10小节 数组</h4>
+    <h2>第3章 机械化程序验证</h2>
+    <p>本章描述了一个简单的程序验证器的架构. 其操作相对于Hoare逻辑的规则而澄清.</p>
+    <p>在摆弄了一些例子之后, 以下两件事情一目了然:
+      <ol type="i">
+        <li>证明一般冗长且乏味 (即便要验证的程序相当简单).</li>
+        <li>存在大量琐碎的细节需要弄对, 其中许多极其平凡, 例如证明<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi mathvariant="monospace">R</mi><mo>=</mo><mi mathvariant="monospace">X</mi></mrow><mo>&and;</mo><mrow><mi mathvariant="monospace">Q</mi><mo>=</mo><mn>0</mn></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>&rArr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mrow><mi mathvariant="monospace">R</mi><mo>+</mo><mrow><mi mathvariant="monospace">Y</mi><mo>&times;</mo><mi mathvariant="monospace">Q</mi></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      </ol>
+    </p>
+    <p>人们已经进行了许多尝试(并且仍在继续), 试图通过设计系统来自动完成正确性证明, 让这些系统处理在Hoare逻辑中生成形式化证明时那些枯燥而繁琐的部分. 不幸的是, 逻辑学家已经证明, 从原理上讲, 不可能设计出一种判定过程来自动判定任意数学命题的真假 [10]. 然而, 这并不意味着我们无法拥有能够证明许多有用定理的过程. 一般判定过程的不存在仅仅表明, 我们不能期望自动证明一切. 在实践中, 构建一个能够将验证过程中许多枯燥和常规方面机械化的系统是完全可行的. 本章描述了一种常用的实现方法.</p>
+    <p>尽管不可能自动判定任意命题的真假, 但检验一个任意的形式化证明是否有效却是可能的. 这包括检查证明中每一行出现的结果是否确实是公理, 或者是由前面的行推导出的结论. 由于程序正确性的证明通常非常冗长且枯燥, 手动生成时往往会包含错误. 因此, 即使证明只能在人工辅助下生成, 对其进行机械化检验仍然是有价值的.</p>
+    <h3>第3.1节 概览</h3>
+    <p>前一章展示了如何证明<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>, 方法是证明<math><mi>C</mi></math>的各部分之性质, 然后(以合适的证明规则)将它们拼在一起以获得关于<math><mi>C</mi></math>本身的预期性质. 例如, 为了证明<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><msub><mi>C</mi><mn>1</mn></msub><mo>;</mo><msub><mi>C</mi><mn>2</mn></msub></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>, 我们首先证明<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>和<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math> (对于某个合适的<math><mi>R</mi></math>而言), 然后根据顺序规则可以推出<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><msub><mi>C</mi><mn>1</mn></msub><mo>;</mo><msub><mi>C</mi><mn>2</mn></msub></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>.</p>
+    <p>这种过程被称为<em>前向证明</em>, 因为人们由公理通过规则向前推进到结论. 在实践中, 更为自然的是后向工作: 从表明<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>的目标开始, 我们生成子目标, 子目标, 如此反复直至问题解决. 例如, 假定我们想要证明:
+      <math display="block">
+        <mrow>
+          <mrow/>
+          <mo>&vdash;</mo>
+          <mrow>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mi mathvariant="monospace">x</mi></mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="monospace">Y</mi><mo>=</mo><mi mathvariant="monospace">y</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow>
+              <mrow><mi mathvariant="monospace">R</mi><mo>&colone;</mo><mi mathvariant="monospace">X</mi></mrow>
+              <mo>;</mo>
+              <mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo><mi mathvariant="monospace">Y</mi></mrow>
+              <mo>;</mo>
+              <mrow><mi mathvariant="monospace">Y</mi><mo>&colone;</mo><mi mathvariant="monospace">R</mi></mrow>
+            </mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">Y</mi><mo>=</mo><mi mathvariant="monospace">x</mi></mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mi mathvariant="monospace">y</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      那么根据赋值公理和顺序规则, 证明以下子目标就足够了:
+      <math display="block">
+        <mrow>
+          <mrow/>
+          <mo>&vdash;</mo>
+          <mrow>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mi mathvariant="monospace">x</mi></mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="monospace">Y</mi><mo>=</mo><mi mathvariant="monospace">y</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow>
+              <mrow><mi mathvariant="monospace">R</mi><mo>&colone;</mo><mi mathvariant="monospace">X</mi></mrow>
+              <mo>;</mo>
+              <mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo><mi mathvariant="monospace">Y</mi></mrow>
+            </mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">R</mi><mo>=</mo><mi mathvariant="monospace">x</mi></mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mi mathvariant="monospace">y</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      鉴于<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mrow><mi mathvariant="monospace">R</mi><mo>=</mo><mi mathvariant="monospace">x</mi></mrow><mo>&and;</mo><mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mi mathvariant="monospace">y</mi></mrow></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">Y</mi><mo>&colone;</mo><mi mathvariant="monospace">R</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mrow><mi mathvariant="monospace">Y</mi><mo>=</mo><mi mathvariant="monospace">x</mi></mrow><mo>&and;</mo><mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mi mathvariant="monospace">y</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></mrow></math>. 根据类似的论证, 这个子目标可以被归约为
+      <math display="block">
+        <mrow>
+          <mrow/>
+          <mo>&vdash;</mo>
+          <mrow>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mi mathvariant="monospace">x</mi></mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="monospace">Y</mi><mo>=</mo><mi mathvariant="monospace">y</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mi mathvariant="monospace">R</mi><mo>&colone;</mo><mi mathvariant="monospace">X</mi></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">R</mi><mo>=</mo><mi mathvariant="monospace">x</mi></mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="monospace">Y</mi><mo>=</mo><mi mathvariant="monospace">y</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      这显然可由赋值公理推出.</p>
+    <p>这一章描述了如何形式化这样一种面向目标的证明方法.</p>
+    <p>这里所描述的验证系统可以被视为一个证明检查器, 同时它也为证明的生成提供了一定的帮助. 下图给出了该系统的概览.</p>
+    <math display="block">
+      <mrow>
+        <menclose notation="box"><mtext>要证明的规约</mtext></menclose>
+        <mover><mo>&rarr;</mo><mtext>人类专家</mtext></mover>
+        <menclose notation="box"><mtext>注解了的规约</mtext></menclose>
+        <mover><mo>&rarr;</mo><mtext>vc生成器</mtext></mover>
+        <menclose notation="box"><mtext>逻辑陈述集合</mtext></menclose>
+        <mover><mo>&rarr;</mo><mtext>定理证明器</mtext></mover>
+        <menclose notation="box"><mtext>简化的验证条件集合</mtext></menclose>
+        <mover><mo>&rarr;</mo><mtext>人类专家</mtext></mover>
+        <menclose notation="box"><mtext>证明结束</mtext></menclose>
+      </mrow>
+    </math>
+    <p>该系统的输入是一个部分正确性规约, 其中标注了描述变量之间关系的数学陈述. 系统从标注后的规约中生成一组纯数学陈述, 称为验证条件 (即VC). 在3.5节中将会证明, 如果这些验证条件是可证明的, 那么原始规约就可以从Hoare逻辑的公理和规则中推导出来.</p>
+    <p>验证条件被传递给一个定理证明器程序, 该程序尝试自动地证明它们; 如果证明失败, 则向用户寻求建议. 我们将集中讨论与Hoare逻辑相关的方面, 而对定理证明本身着墨甚少.</p>
+    <p>当前大量研究的目标是构建能够将缓慢且昂贵的人类专家的参与降到最低的系统. 这可以通过以下途径实现:
+      <ul>
+        <li>减少所需标注的数量和复杂度, 以及</li>
+        <li>增强定理证明器的能力.</li>
+      </ul>
+    </p>
+    <p>下一节将解释验证条件的工作原理. 在3.5节中, 将依据Hoare逻辑的公理和规则来论证其使用的合理性. 除了作为机械化验证系统的基础之外, 验证条件也是手工进行证明的一种有用方式.</p>
+    <h3>第3.2节 验证条件</h3>
+    <p>以下各节描述了如何将面向目标的证明风格形式化. 为了证明一个目标<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>, 需要完成三件事. 这些将在后文中详细解释, 但这里先给出一个简要概述:
+      <ol type="i">
+        <li>通过在程序<math><mi>C</mi></math>中插入陈述 (通常称为断言) 来对其进行标注, 这些断言表达了在各个中间点上应当成立的条件. 这一步骤是棘手的, 需要智慧以及对程序工作方式的深刻理解. 将其自动化是一个人工智能问题.</li>
+        <li>然后从标注后的规约中生成一组称为验证条件 (简称VC) 的逻辑陈述. 这一过程是纯机械的, 很容易由程序完成.</li>
+        <li>证明这些验证条件. 将其自动化同样是一个人工智能问题.</li>
+      </ol>
+    </p>
+    <p>我们将证明, 如果能够证明由<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>生成的所有验证条件 (其中<math><mi>C</mi></math>已被适当注解), 则<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>.</p>
+    <p>由于验证条件只是数学陈述, 可以将上述第2步视为将验证问题<q>编译</q>或翻译为传统数学问题的过程.</p>
+    <p>下面的例子将给出关于验证条件用法的初步感受.</p>
+    <p>假设目标是证明 (参见第24页的例子)<pre><code>{T}
+   R:=X;
+   Q:=0;
+   WHILE Y≤R DO (R:=R-Y; Q:=Q+1)
+{X=R+Y×Q ∧ R&lt;Y}</code></pre>第一步 (上述的i) 是插入注解. 一个合适的注解过了的规约如下:</p>
+    <h3>第3.3节 注解</h3>
+    <h3>第3.4节 验证条件生成</h3>
+    <p>本节描述了一个过程, 其为注解过了的部分正确性规约<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>生成验证条件. 这个过程是<math><mi>C</mi></math>上的递归.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b>赋值命令</b></div>
+      由
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+          <mspace width="2ex"/>
+          <mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow>
+          <mspace width="2ex"/>
+          <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      生成的单条验证条件为
+      <math display="block">
+        <mrow><mi>P</mi><mo>&rArr;</mo>
+          <mrow><mi>Q</mi>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+              <mo stretchy="false">]</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </div>
+    <p><b>例子: </b>
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mn>0</mn></mrow>
+            <mo stretchy="false">}</mo></mrow>
+          <mspace width="2ex"/>
+          <mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo>
+            <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+          </mrow>
+          <mspace width="2ex"/>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mn>1</mn></mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      的验证条件为
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="monospace">X</mi><mo>=</mo><mn>0</mn></mrow>
+          <mo>&rArr;</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>=</mo><mn>1</mn></mrow>
+        </mrow>
+      </math>
+      这显然为真.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b>条件式</b></div>
+      由
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+          <mspace width="2ex"/>
+          <mrow><mi mathvariant="monospace">IF</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">THEN</mi><mspace width="2ex"/>
+            <msub><mi>C</mi><mn>1</mn></msub>
+            <mspace width="2ex"/><mi mathvariant="monospace">ELSE</mi><mspace width="2ex"/>
+            <msub><mi>C</mi><mn>2</mn></msub>
+          </mrow>
+          <mspace width="2ex"/>
+          <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      生成的验证条件为
+      <ol type="i">
+        <li>
+          <math display="block">
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <msub><mi>C</mi><mn>1</mn></msub>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </math>
+          所生成的验证条件</li>
+        <li>
+          <math display="block">
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>P</mi><mo>&and;</mo>
+                  <mrow><mo>&not;</mo><mi>S</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <msub><mi>C</mi><mn>2</mn></msub>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </math>
+          所生成的验证条件</li>
+      </ol>
+    </div>
+    <div class="frame">
+      <div style="text-align: center;"><b>序列</b></div>
+      <ol>
+        <li></li>
+      </ol>
+    </div>
+    <div class="frame">
+      <div style="text-align: center;"><b><math><mi mathvariant="monospace">WHILE</mi></math>命令</b></div>
+      由
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+          <mspace width="2ex"/>
+          <mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow>
+            <mspace width="2ex"/><mi>C</mi></mrow>
+          <mspace width="2ex"/>
+          <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      所生成的验证条件为
+      <ol type="i">
+        <li><math><mrow><mi>P</mi><mo>&rArr;</mo><mi>R</mi></mrow></math></li>
+        <li><math><mrow><mrow><mi>R</mi><mo>&and;</mo><mrow><mo>&not;</mo><mi>S</mi></mrow></mrow><mo>&rArr;</mo><mi>Q</mi></mrow></math></li>
+        <li>由<math><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>R</mi><mo>&and;</mo><mi>S</mi></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow></mrow></math>所生成的验证条件</li>
+      </ol>
+    </div>
+    <h3>第3.5节 验证条件的澄清</h3>
+    <p>本节将证明, 若一个带注解的规约<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>所生成的验证条件是可证的, 则该规约在Hoare逻辑中也是可证的, 即<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>. 这说明验证条件是充分的, 但并不意味着它们是必要的. 事实上, 验证条件是最弱的充分条件, 但我们在此既不对此作更精确的表述, 也不深入讨论细节. 关于前条件的深入研究可参见Dijkstra的著作 [8].</p>
+    <p>容易证明验证条件不是必要的, 即<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>的验证条件不可证并不意味着<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>不可推导. 例如, 带注解规约<math><mrow><mrow><mo stretchy="false">{</mo><mi mathvariant="monospace">T</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi mathvariant="monospace">F</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi mathvariant="monospace">F</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo><mn>0</mn></mrow></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi mathvariant="monospace">T</mi><mo stretchy="false">}</mo></mrow></mrow></math>的验证条件是不可证的, 但该Hoare三元组在Hoare逻辑中是可证的.</p>
+    <p>验证条件充分性的论证将对<math><mi>C</mi></math>的结构进行归纳. 这类归纳论证包含两个部分. 首先, 证明结论对赋值命令成立. 其次, 证明当<math><mi>C</mi></math>不是赋值命令时, 若结论对<math><mi>C</mi></math>的各组成命令成立 (这称为归纳假设), 则结论对<math><mi>C</mi></math>也成立. 前者称为归纳基础, 后者称为归纳步骤. 由归纳基础和归纳步骤即可得出结论对所有命令成立.</p>
+    <h4>第3.5.1小节 赋值</h4>
+    <p><math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>唯一的验证条件是<math><mrow><mi>P</mi><mo>&rArr;</mo><mrow><mi>Q</mi><mrow><mo stretchy="false">[</mo><mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></mrow></math>. 如果这是可证的, 那么鉴于<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>Q</mi><mrow><mo stretchy="false">[</mo><mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math> (赋值公理), 根据前条件强化可以推出<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi>V</mi><mo>&colone;</mo><mi>E</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>.</p>
+    <h4>第3.5.2小节 条件式</h4>
+    <p>如果<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">IF</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">THEN</mi><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub><mspace width="2ex"/><mi mathvariant="monospace">ELSE</mi><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>的验证条件是可证的, 那么<math><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>和<math><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>P</mi><mo>&and;</mo><mrow><mo>&not;</mo><mi>S</mi></mrow></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>的验证条件都是可证的. 根据归纳假设, 我们可以假定<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>和<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>P</mi><mo>&and;</mo><mrow><mo>&not;</mo><mi>S</mi></mrow></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>. 因此, 根据条件式规则可得<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">IF</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">THEN</mi><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub><mspace width="2ex"/><mi mathvariant="monospace">ELSE</mi><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>.</p>
+    <h4>第3.5.3小节 序列</h4>
+    <p>存在两种需要考虑的情形:
+      <ol type="i">
+        <li></li>
+      </ol>
+    </p>
+    <h4>第3.5.4小节 <math><mi mathvariant="monospace">WHILE</mi></math>命令</h4>
+    <p>如果<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>生成的验证条件是可证的, 那么<math><mrow><mrow/><mo>&vdash;</mo><mrow><mi>P</mi><mo>&rArr;</mo><mi>R</mi></mrow></mrow></math>, <math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>R</mi><mo>&and;</mo><mrow><mo>&not;</mo><mi>S</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>&rArr;</mo><mi>Q</mi></mrow></mrow></math>且由<math><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>R</mi><mo>&and;</mo><mi>S</mi></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow></mrow></math>所生成的验证条件是可证的. 根据归纳可得<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mi>R</mi><mo>&and;</mo><mi>S</mi></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>, 因而根据<math><mi mathvariant="monospace">WHILE</mi></math>规则有<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi>R</mi><mo>&and;</mo><mrow><mo>&not;</mo><mi>S</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></mrow></math>. 然后, 根据consequence规则可得<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>.</p>
+    <h2>第4章 可靠性和完备性</h2>
+    <p>本章研究了Hoare逻辑的公理和规则是否正确 (可靠性) 以及是否充分 (完备性) 的问题. 这要求明确地给出编程语言的意义 (语义), 从而能够严格地定义Hoare三元组的语义.</p>
+    <h3>第4.1节 语义</h3>
+    <p>一条命令<math><mi>C</mi></math>将一个初始状态转换为一个最终状态 (或者不终止). 对于目前所描述的语言, 从一个给定的初始状态出发, 至多只能到达一个终止状态&mdash;&mdash;即命令是确定性的&mdash;&mdash;但后面当我们向语言中加入存储分配时, 情况就不再如此了. 在数学上, 有几种本质上等价的方式来表示命令的意义. 我们将使用关系, 但部分函数也是常用的方式. 使用关系通常与操作语义相关联, 而部分函数则与指称语义相关联, 不过这并不是严格固定的: 指称语义可以使用关系作为指称, 操作语义也可以归纳地定义函数. 事实上, 在下面的第4.1.2节中, 我们给出了一种命令的指称语义, 其中指称就是关系.</p>
+    <p>各种风格的语义在很大程度上只是表示相同数学思想的不同方式. 某些数学表示更适合某些目的, 而另一些表示则更适合其他目的. 我在下面给出的语义可能与你在之前课程中见过的语义一致, 也可能不一致. 如果它看起来不同, 那么一个很好的练习就是思考它们之间有何关联.</p>
+    <p>我们将用状态集合上的一个二元关系来表示命令<math><mi>C</mi></math>的意义: 在这个关系中, <math><msub><mi>s</mi><mn>1</mn></msub></math>与<math><msub><mi>s</mi><mn>2</mn></msub></math>相关联, 当且仅当<math><mi>C</mi></math>在状态<math><msub><mi>s</mi><mn>1</mn></msub></math>下执行后终止于状态<math><msub><mi>s</mi><mn>2</mn></msub></math>.</p>
+    <h4>第4.1.1小节 表达式和陈述的语义</h4>
+    <p>命令中可能包含表达式或陈述: 表达式出现在赋值的右侧, 而陈述出现在条件语句和<math><mi mathvariant="monospace">WHILE</mi></math>命令的测试条件中. Hoare三元组的前条件和后条件也是陈述. Hoare逻辑的经典处理建立在一阶逻辑之上, 表达式被视为逻辑中的项, 陈述被视为公式. 你应该在之前的课程中已经熟悉了一阶逻辑的语义, 我不想在这里重复那些内容. 此外, 在现代应用中, 用于书写前条件和后条件的语言有时比一阶逻辑更弱或更强, 例如无量词逻辑 (更弱) 或高阶逻辑 (更强).</p>
+    <h3>第4.2节 Hoare逻辑的可靠性</h3>
+    <h3>第4.3节 可判定性和完备性</h3>
+    <h2>第5章 完全 (total) 正确性</h2>
+    <h3>第5.1节 非循环命令</h3>
+    <h3>第5.2节 赋值的终止性</h3>
+    <h3>第5.3节 用于完全正确性的<math><mi mathvariant="monospace">WHILE</mi></math>规则</h3>
+    <h3>第5.4节 终止规约</h3>
+    <h3>第5.5节 终止性的验证条件</h3>
+    <h3>第5.6节 验证条件生成</h3>
+    <h2>第6章 程序精化</h2>
+    <h3>第6.1节 引论</h3>
+    <h2>第7章 指针和局部推理</h2>
+    <h3>第7.1节 指针操纵构造</h3>
+    <h3>第7.2节 例子: 反转链表</h3>
+    <h3>第7.3节 分离逻辑断言</h3>
+    <h4>第7.3.1小节 指向关系: <math><mrow><mi>E</mi><mo>&mapsto;</mo><mi>F</mi></mrow></math></h4>
+    <h3>第7.4节 语义和分离逻辑</h3>
+  </body>
+</html>
