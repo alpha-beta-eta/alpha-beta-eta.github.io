@@ -149,5 +149,53 @@
                       (&amp;true (reify type))))))
 (define (ND proof)
   (cdr (proof '())))</code></pre>当然这里我有意省略了所有并不直接算是这个DSL的实现的次要代码, 那些代码实际上都是用于绘制自然演绎的定义.</p>
+    <h2>第3章 2026年9月17日</h2>
+    <p>今日根据Mike Gordon的Hoare逻辑讲义写了一个最小的验证条件生成器.<pre><code>(define (subst Q E V)
+  (cond ((pair? Q) (cons (subst (car Q) E V)
+                         (subst (cdr Q) E V)))
+        ((eq? Q V) E)
+        (else Q)))
+(define (:= V E)
+  (case-lambda
+    ((P Q) (list `(=> ,P ,(subst Q E V))))
+    ((Q) (values (subst Q E V) '()))))
+(define ((IF S C1 C2) P Q)
+  (append (C1 `(and ,P ,S) Q)
+          (C2 `(and ,P (not ,S)) Q)))
+(define ((WHILE S R C) P Q)
+  `((=> ,P ,R)
+    (=> (and ,R (not ,S)) ,Q)
+    . ,(C `(and ,R ,S) R)))
+(define ((PRE R C) Q)
+  (values R (C R Q)))
+(define ((SEQ C . C*) P Q)
+  (let iter ((RC* (reverse C*))
+             (R Q) (VC '()))
+    (if (null? RC*)
+        (append (C P R) VC)
+        (let-values (((R VC0) ((car RC*) R)))
+          (iter (cdr RC*) R (append VC0 VC))))))
+(define (Hoare P C Q) (C P Q))</code></pre>以下是一个例子.<pre><code>> (Hoare
+   '(and (= X a) (= Y b)
+         (>= b 0) (= R 1))
+   (WHILE '(> Y 0)
+          '(and (= (* R (^ X Y)) (^ a b))
+                (>= Y 0) (>= b 0))
+          (IF '(= (mod Y 2) 0)
+              (SEQ (:= 'X '(* X X))
+                   (:= 'Y '(div Y 2)))
+              (SEQ (:= 'R '(* R X))
+                   (:= 'Y '(- Y 1)))))
+   '(and (= R (^ a b)) (= Y 0) (>= b 0)))
+'((=> (and (= X a) (= Y b) (>= b 0) (= R 1)) (and (= (* R (^ X Y)) (^ a b)) (>= Y 0) (>= b 0)))
+  (=>
+   (and (and (= (* R (^ X Y)) (^ a b)) (>= Y 0) (>= b 0)) (not (> Y 0)))
+   (and (= R (^ a b)) (= Y 0) (>= b 0)))
+  (=>
+   (and (and (and (= (* R (^ X Y)) (^ a b)) (>= Y 0) (>= b 0)) (> Y 0)) (= (mod Y 2) 0))
+   (and (= (* R (^ (* X X) (div Y 2))) (^ a b)) (>= (div Y 2) 0) (>= b 0)))
+  (=>
+   (and (and (and (= (* R (^ X Y)) (^ a b)) (>= Y 0) (>= b 0)) (> Y 0)) (not (= (mod Y 2) 0)))
+   (and (= (* (* R X) (^ X (- Y 1))) (^ a b)) (>= (- Y 1) 0) (>= b 0))))</code></pre></p>
   </body>
 </html>
