@@ -32,6 +32,14 @@
 (define (GIVEN l t)
   (lambda (env)
     (result t (label l (&true (reify t))))))
+(define (HYP l t u t^)
+  (lambda (env)
+    (result t (walk (assume u (&true (reify t^)))
+                    (label l (&true (reify t)))))))
+(define (HYP0 l t l^ u t^)
+  (lambda (env)
+    (result t (walk (label l^ (assume u (&true (reify t^))))
+                    (label l (&true (reify t)))))))
 (define (CONS a b)
   (lambda (env)
     (match-define (result ta ca) (a env))
@@ -199,7 +207,7 @@
 (define (&odd x) (app $odd x))
 (define $def= (^^ $= $Delta:normal))
 (define (subst d x A)
-  (: (bra0 (&/ d x)) A))
+  (ap (bra0 (&/ d x)) A))
 (define $impl $sup)
 (define $==>R (_ $==> $R))
 (define $==>E (_ $==> $E))
@@ -1621,9 +1629,117 @@ fun even_or_odd x = case x of
       (&impl (@conj $A $B) (@conj $B $A))
       ", 尽管这显然应当为真.")
    (P (B "替换原理. ")
-      "在讨论推出 (implication) 之前, 我们需要假言判断的定义性质. "
+      "在能够讨论推出 (implication) 之前, 我们需要假言判断的定义性质. "
+      "从直觉上来说, 我们总是可以将" (&true $A)
+      "的一个演绎替换进对于假设" (&true $A)
+      "的任意使用. 为了避免歧义, 我们确保假设都已附上标签, "
+      "而我们对于具有某个给定标签的假设的所有使用都要进行替换. "
+      "注意到我们只应该替换那些没有被我们正在考虑的子证明discharge的假设. "
+      "{译注: 这是因为, 那些被discharge的假设相当于绑定变量, "
+      "而我们要去替换的是自由变量.} "
+      "那么, 替换原理应该理解如下:"
+      (Blockquote
+       "如果"
+       (MB (ND (HYP $E:script $B $u $A)))
+       "是一个对于" (&true $B) "的假言证明, 其在标记了"
+       $u "的(未discharge)假设" (&true $A)
+       "之下, 并且"
+       (MB (ND (GIVEN $D:script $A)))
+       "是对于" (&true $A) "的一个证明, 那么"
+       (MB (ND (HYP0 $E:script $B
+                     $D:script $u $A)))
+       "是我们对于将" $D:script "替换进"
+       $E:script "中所有对于标记为" $u
+       "的假设的所有使用的记号. "
+       "这个演绎, 有时也记为"
+       (subst $D:script $u $E:script)
+       ", 不再依赖于" $u "."))
+   (P (B "推出. ")
+      "为了见证局部可靠性, "
+      "我们使用替换操作来归约推出引入后面跟着推出消去的情形."
+      (MB (&==>R
+           (ND (APP (LAM $u $A
+                         (HYP $E:script $B $u $A))
+                    (GIVEN $D:script $A)))
+           (ND (HYP0 $E:script $B
+                     $D:script $u $A))))
+      "替换操作的条件是满足的, 因为" $u
+      "是在" (&implI $u) "这个推理引入的, 因而在"
+      $E:script "中没有被discharge. "
+      "{译注: 这里的引入大概只是为了避免和discharge重复才这样说, "
+      "另外那个假言子证明里甚至都可以不出现" $u ".}")
+   (P "局部完备性由以下扩展见证."
+      (let ((FUN (GIVEN $D:script `(-> ,$A ,$B))))
+        (MB (&==>E
+             (ND FUN)
+             (ND (LAM $u $A
+                      (APP FUN (VAR $u)))))))
+      "这里的" $u "必须要选择成fresh的: "
+      "其指挥标记新的假设" (&true $A)
+      ", 这个假设仅仅使用了一次. "
+      "{译注: 我有一个奇怪的疑问, "
+      "这里的证明" $D:script
+      "应该是封闭的, 否则的话应该进行标记, "
+      "那么在封闭的情况下说明没有被"
+      (&implI $u) "处的推理绑定有什么意义呢? "
+      "当然, 或许这里的确可以有自由变量, "
+      "那么可以类比于" $eta "扩展.}")
+   (P (B "析取. ")
+      "对于析取, 我们也采用替换原理, "
+      "因为对于消去规则我们所考虑的两种情形, "
+      "其都引入了假设. 另外, "
+      "为了表明局部可靠性, "
+      "引入规则存在两种可能性, "
+      "不过这两种情况下跟着的都是唯一的那条消去规则."
+      (MB (&==>R
+           (ND (CASE (INL $B (GIVEN $D:script $A))
+                     $u (HYP $E:script $C $u $A)
+                     $w (HYP $F:script $C $w $B)))
+           (ND (HYP0 $E:script $C $D:script $u $A))))
+      (MB (&==>R
+           (ND (CASE (INL $A (GIVEN $D:script $B))
+                     $u (HYP $E:script $C $u $A)
+                     $w (HYP $F:script $C $w $B)))
+           (ND (HYP0 $F:script $C $D:script $w $B)))))
+   (P "并不局部可靠的规则的一个例子是"
       
       )
+   (H3. "应用证明归约")
+   (P "如我们之前所提到的, 证明归约对应于编程语言中的计算. "
+      "在我们在下一次讲座里详细阐明这一点之前, "
+      "让我们在这里先以一个简单的例子刻画些许概念.")
+   (P "考虑我们关于"
+      (&true (&impl $A (@impl $B $A)))
+      "的证明:"
+      (MB (ND (LAM $x $A
+                   (LAM $y $B
+                        (VAR $x)))))
+      "我们也想要证明"
+      (&impl $B (@impl $C $C))
+      ". 一种方法是直接证明, "
+      "但是为了应用证明归约, "
+      "我们想要使用"
+      (&impl $A (@impl $B $A))
+      "作为引理. 但是怎么做呢? "
+      "似乎很困难.")
+   (P "作为最初的一步, 我们作如下的观察: "
+      
+      )
+   (H3. "证明归约作为计算")
+   
+   (H3. "逻辑等价作为联结词")
+   (P "作为另外一个例子, 现在我们想要定义一个新的联结词, "
+      "建立引入和消去规则, 检查其局部可靠性和局部完备性 "
+      "(如果的确成立的话). "
+      "首先, 提出的引入规则定义了该联结词:"
+      
+      )
+   (H3 "参考文献")
+   (P "Michael Dummett. The Logical Basis of Metaphysics. "
+      "Harvard University Press, Cambridge, "
+      "Massachusetts, 1991. "
+      "The William James Lectures, 1976. "
+      "(形而上学的逻辑基础)")
    (H2 "Rec 1: Dcheck与和谐")
    (H2. "证明作为程序")
    (H3. "引论")

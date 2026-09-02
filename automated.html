@@ -7656,6 +7656,56 @@ val p20 : int = 19</code></pre></p>
     <p>任何失败都会指出其中一个中间问题是不可解的, 要么是其牵涉了不兼容的顶层函数, 例如序对<math><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>, 要么是其牵涉了循环, 其中unifier要对于<math><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>t</mi></mrow><mo stretchy="false">)</mo></mrow></math>进行合一而<math><mrow><mi>x</mi><mo>&in;</mo><mrow><mi>FVT</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mi>x</mi><mo>&ne;</mo><mi>t</mi></mrow></math>. </p>
     <h4>第3.9.2小节 使用合一</h4>
     <h3>第3.10节 tableau</h3>
+    <p>根据Herbrand定理和紧致性, 如果一个无量词一阶公式<math><mrow><mi>P</mi><mo>&af;</mo><mrow><mo stretchy="false">[</mo><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>x</mi><mi>n</mi></msub></mrow><mo stretchy="false">]</mo></mrow></mrow></math>是不可满足的, 那么存在有限多个ground实例 (设数目为<math><mi>k</mi></math>) 使得其合取是命题不可满足的:
+      <math display="block">
+        <mrow>
+          <mrow><mi>P</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow>
+                <msubsup><mi>t</mi><mn>1</mn><mn>1</mn></msubsup>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <msubsup><mi>t</mi><mi>n</mi><mn>1</mn></msubsup>
+              </mrow>
+              <mo stretchy="false">]</mo></mrow>
+          </mrow>
+          <mo>&and;</mo><mo>&ctdot;</mo><mo>&and;</mo>
+          <mrow><mi>P</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow>
+                <msubsup><mi>t</mi><mn>1</mn><mi>k</mi></msubsup>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <msubsup><mi>t</mi><mi>n</mi><mi>k</mi></msubsup>
+              </mrow>
+              <mo stretchy="false">]</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      在Gilmore方法之中, 这种命题不可满足性的验证方式如下: 先将该合取扩展为DNF, 然后逐一检查每个析取分量是否包含互补文字对. 假设我们没有创建ground实例, 而是将变量<math><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>x</mi><mi>n</mi></msub></mrow></math>替换以不同变量的元组:
+      <math display="block">
+        <mrow>
+          <mrow><mi>P</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow>
+                <msubsup><mi>z</mi><mn>1</mn><mn>1</mn></msubsup>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <msubsup><mi>z</mi><mi>n</mi><mn>1</mn></msubsup>
+              </mrow>
+              <mo stretchy="false">]</mo></mrow>
+          </mrow>
+          <mo>&and;</mo><mo>&ctdot;</mo><mo>&and;</mo>
+          <mrow><mi>P</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow>
+                <msubsup><mi>z</mi><mn>1</mn><mi>k</mi></msubsup>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <msubsup><mi>z</mi><mi>n</mi><mi>k</mi></msubsup>
+              </mrow>
+              <mo stretchy="false">]</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </p>
+    <p>这个公式可以用类似的方式扩展为DNF形式. 如果我们现在应用实例化<math><mi>&theta;</mi></math>, </p>
     <h3>第3.11节 归结</h3>
     <h3>第3.12节 subsumption和replacement</h3>
     <h3>第3.13节 对于归结的改进</h3>

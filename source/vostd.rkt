@@ -1,0 +1,48 @@
+#lang racket
+(provide vostd.html)
+(require SMathML)
+(define vostd.html
+  (TnTmPrelude
+   #:title "vostd阅读"
+   #:css "styles.css"
+   (H1. "vostd阅读")
+   (H2. "verified_libs\\vstd_extra\\src\\ownership.rs")
+   (CodeB "//inv(self)是一个谓词, 从自身到布尔值, 表达了是否满足不变量.
+pub trait Inv {
+    spec fn inv(self) -> bool;
+}
+//对于可选值, Inv会自动提升, 不变量在值缺失的情况下始终为真.
+impl&lt;T: Inv> Inv for Option&lt;T> {
+    open spec fn inv(self) -> bool {
+        match self {
+            Some(t) => t.inv(),
+            None => true,
+        }
+    }
+}
+//View是一个trait, 方法是view(), 其给出了具体值的抽象版本.
+//InvView这个trait是一个保证, 即若具体值满足不变量, 则其抽象版本也必须满足不变量.
+//因此, 如果我们证明了任意的抽象值(在满足不变量的情况下)具有什么性质,
+//那么我们就知道任意的具体值(在满足不变量的情况下)的抽象版本也具有这样的性质.
+//当然了, 这两个不变量并非相同.
+pub trait InvView: Inv + View where &lt;Self as View>::V: Inv {
+    proof fn view_preserves_inv(self)
+        requires
+            self.inv(),
+        ensures
+            self.view().inv(),
+    ;
+}
+//wf(self, owner)的直觉性理解是self属于owner.
+//wf可能是well-formed的缩写.
+//一般owner本身也应该满足其不变量.
+pub trait OwnerOf {
+    //似乎Inv已经蕴涵Sized
+    type Owner: Inv + Sized;
+    spec fn wf(self, owner: Self::Owner) -> bool
+        recommends
+            owner.inv(),
+    ;
+}")
+   
+   ))
