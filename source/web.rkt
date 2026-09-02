@@ -218,12 +218,17 @@
          "judgmental.rkt"
          "ownership.rkt"
          "cbpv.rkt"
+         "control0.rkt"
+         "type_theory.rkt"
          
          )
 (define emitXml (emit XML))
 (define emitXml-thunk (emit-thunk XML))
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml type_theory.html
+             "../type_theory.html")
+    (emitXml control0.html "../control0.html")
     (emitXml cbpv.html "../cbpv.html")
     (emitXml ownership.html
              "../ownership.html")

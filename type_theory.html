@@ -1,0 +1,115 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>计算类型论</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>计算类型论</h1>
+    <p>这是Robert Harper写下的一系列关于类型论的讲义, 主要是从更语义的视角看待类型论.</p>
+    <h2>第1章 如何(重新)发明Tait的方法</h2>
+    <h3>第1.1节 引论</h3>
+    <p>类型论中两个最为重要的发展分别是由W. W. Tait发明的函数类型的<em>Tait方法</em>, 以及之后由J. Y. Girard扩展得到的类型量化的<em>Girard方法</em>, 这两种方法融为一体形成了<em>逻辑关系</em>这个一般性理论, 可用于诸多类型理论. Tait方法继续以其原始名称而为人所知, 即<em>可计算性方法</em>, 其以下面要建立的方式将类型解释为谓词.</p>
+    <p>Tait所考虑的问题是证明对于简单类型<math><mi>&lambda;</mi></math>演算而言<math><mi>&beta;</mi></math>归约是<em>强规范化的</em>, 这通常定义为不存在自某个良类型项开始的无限<math><mi>&beta;</mi></math>归约序列: <math><mrow><mi>M</mi><mo>=</mo><mrow><msub><mi>M</mi><mn>0</mn></msub><msub><mo>&rarr;</mo><mi>&beta;</mi></msub><msub><mi>M</mi><mn>1</mn></msub><msub><mo>&rarr;</mo><mi>&beta;</mi></msub><mo>&ctdot;</mo></mrow></mrow></math>. 一种更好的定义 (具有直接的可用性) 为<em>归约上的超限归纳</em>的有效性, 陈述如下: 对于任意的类型化<math><mi>&lambda;</mi></math>项的性质<math><mi mathvariant="script">P</mi></math>, 为了表明<math><mi mathvariant="script">P</mi></math>对于所有这样的项都成立, 仅需表明对于每个良类型的类型化项<math><mi>M</mi></math>, 若其所有直接<math><mi>&beta;</mi></math>归约项 (reduct) 满足<math><mi mathvariant="script">P</mi></math>则能够推出<math><mi>M</mi></math>也满足<math><mi mathvariant="script">P</mi></math>. 更简单地说, 即
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo>
+              <mrow><mi>M</mi><mo>:</mo><mi>&tau;</mi></mrow>
+              <mo lspace="0">.</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mo>&forall;</mo>
+                      <mrow><mi>N</mi><mo>:</mo><mi>&tau;</mi></mrow>
+                      <mo lspace="0">.</mo>
+                      <mrow>
+                        <mrow><mi>M</mi>
+                          <msub><mo>&rarr;</mo><mi>&beta;</mi></msub>
+                          <mi>N</mi></mrow>
+                        <mo>&sup;</mo>
+                        <mrow><mi mathvariant="script">P</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo><mi>N</mi><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&sup;</mo>
+                  <mrow><mi mathvariant="script">P</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>&sup;</mo>
+          <mrow><mo>&forall;</mo>
+            <mrow><mi>M</mi><mo>:</mo><mi>&tau;</mi></mrow>
+            <mo lspace="0">.</mo>
+            <mrow><mi mathvariant="script">P</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      强规范化的重要性恰恰就在于由这条原理兑现的证明其他性质的实用性. 例如, 使用归约上的超限归纳, 可以证明弱合流性 </p>
+    <h2>第2章 幂集的Tarski不动点定理</h2>
+    <h3>第2.1节 引论</h3>
+    <p>Tarski定理说的是完备格上的单调函数具有由不动点构成的完备格, 特别是有最小不动点和最大不动点. {译注: 即其不动点构成了完备格.} 一类实用的特殊情形是由包含关系排序的幂集格.</p>
+    <h3>第2.2节 Tarski定理</h3>
+    <p>令<math><mi>X</mi></math>是一个集合, 不必非空, 并令<math><mrow><mi>&wp;</mi><mo>&af;</mo><mi>X</mi></mrow></math>是由<math><mi>X</mi></math>的所有子集构成的集合. 集合<math><mrow><mi>&wp;</mi><mo>&af;</mo><mi>X</mi></mrow></math>在集合包含关系下构成了一个完备格, 其meet由交给出, join由并给出. 也就是说, 如果<math><mrow><mi mathvariant="script">X</mi><mo>&sube;</mo><mrow><mi>&wp;</mi><mo>&af;</mo><mi>X</mi></mrow></mrow></math>, 那么<math><mrow><mo>&bigcap;</mo><mi mathvariant="script">X</mi></mrow></math>是其meet (最大下界), 而<math><mrow><mo>&bigcup;</mo><mi mathvariant="script">X</mi></mrow></math>是其join (最小上界). 最小元素是空集的join, 即<math><mi>&empty;</mi></math>, 而最大元素是空集的meet, 即<math><mi>X</mi></math>.</p>
+    <p>一个函数<math><mrow><mi>F</mi><mo>:</mo><mrow><mrow><mi>&wp;</mi><mo>&af;</mo><mi>X</mi></mrow><mo>&rarr;</mo><mrow><mi>&wp;</mi><mo>&af;</mo><mi>X</mi></mrow></mrow></mrow></math>是单调的, 如果其保持包含关系: 如果<math><mrow><mi>A</mi><mo>&sube;</mo><mi>B</mi><mo>&sube;</mo><mi>X</mi></mrow></math>, 那么<math><mrow><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&sube;</mo><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&sube;</mo><mi>X</mi></mrow></math>. 对于<math><mrow><mi>&wp;</mi><mo>&af;</mo><mi>X</mi></mrow></math>上的单调函数<math><mi>F</mi></math>, <math><mi>F</mi></math>的一个前不动点是一个集合<math><mrow><mi>A</mi><mo>&sube;</mo><mi>X</mi></mrow></math>满足<math><mrow><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&sube;</mo><mi>A</mi></mrow></math>, 而<math><mi>F</mi></math>的一个后不动点是一个集合<math><mrow><mi>A</mi><mo>&sube;</mo><mi>X</mi></mrow></math>满足<math><mrow><mi>A</mi><mo>&sube;</mo><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. <math><mi>F</mi></math>的前不动点也被称为是<math><mi>F</mi></math>封闭的, <math><mi>F</mi></math>的后不动点也被称为是<math><mi>F</mi></math>一致的. 单调函数<math><mi>F</mi></math>的最小前不动点指的是(在包含关系下)最小的<math><mi>F</mi></math>封闭集合, <math><mi>F</mi></math>的最大后不动点指的是最大的<math><mi>F</mi></math>一致集合. 将这种格视为一个(瘦)范畴的话, 其上的一个单调函数<math><mi>F</mi></math>是一个函子, <math><mi>F</mi></math>的一个前不动点是一个<math><mi>F</mi></math>代数, 而<math><mi>F</mi></math>的一个后不动点是一个<math><mi>F</mi></math>余代数. 因此, <math><mi>F</mi></math>的一个最小前不动点是一个始<math><mi>F</mi></math>代数, <math><mi>F</mi></math>的一个最大后不动点是一个终<math><mi>F</mi></math>余代数.</p>
+    <p>每个单调函数<math><mrow><mi>F</mi><mo>:</mo><mrow><mrow><mi>&wp;</mi><mo>&af;</mo><mi>X</mi></mrow><mo>&rarr;</mo><mrow><mi>&wp;</mi><mo>&af;</mo><mi>X</mi></mrow></mrow></mrow></math>都有一个(唯一的)最小前不动点和一个(唯一的)最大后不动点, 由以下等式给出:
+      <math display="block">
+        <mtable>
+          <mtr>
+            <mtd>
+              <mrow><mi>&mu;</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>F</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo>&bigcap;</mo>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow>
+                    <mrow><mi>A</mi><mo>&sube;</mo><mi>X</mi></mrow>
+                    <mo>|</mo>
+                    <mrow>
+                      <mrow><mi>F</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&sube;</mo><mi>A</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>&nu;</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>F</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo>&bigcup;</mo>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow>
+                    <mrow><mi>A</mi><mo>&sube;</mo><mi>X</mi></mrow>
+                    <mo>|</mo>
+                    <mrow><mi>A</mi><mo>&sube;</mo>
+                      <mrow><mi>F</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      显然</p>
+  </body>
+</html>

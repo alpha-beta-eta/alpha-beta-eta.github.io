@@ -1,0 +1,328 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>编程语言中的控制结构</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>编程语言中的控制结构: 从goto到代数效应</h1>
+    <h2>术语表</h2>
+    <table align="center">
+      <tr>
+        <td>effect</td>
+        <td>效应</td>
+      </tr>
+      <tr>
+        <td>effect handler</td>
+        <td>效应处理器</td>
+      </tr>
+      <tr>
+        <td>algebraic effect</td>
+        <td>代数效应</td>
+      </tr>
+      <tr>
+        <td>effect system</td>
+        <td>效应系统</td>
+      </tr>
+      <tr>
+        <td>continuation</td>
+        <td>延续</td>
+      </tr>
+      <tr>
+        <td>monad</td>
+        <td>单子</td>
+      </tr>
+      <tr>
+        <td>implication</td>
+        <td>后承 (翻译成蕴涵或推出都不太合理)</td>
+      </tr>
+      <tr>
+        <td>alias</td>
+        <td>别名共享</td>
+      </tr>
+    </table>
+    <h2>第1章 早期编程语言</h2>
+    <h2>第2章 结构化编程</h2>
+    <h2>第3章 非局部控制</h2>
+    <h2>第4章 控制反转</h2>
+    <h2>第5章 函数式语言</h2>
+    <h2>第6章 延续和CPS变换</h2>
+    <h2>第7章 延续编程</h2>
+    <h2>第8章 控制算子</h2>
+    <h2>第9章 异常</h2>
+    <h2>第10章 用户定义效应的效应处理器</h2>
+    <h2>第11章 单子</h2>
+    <h2>第12章 代数效应</h2>
+    <h2>第13章 类型和效应系统</h2>
+    <h2>第14章 控制结构的Hoare逻辑</h2>
+    <h2>第15章 控制算子的分离逻辑</h2>
+    <h3>第15.1节 分离逻辑备忘</h3>
+    <p>分离逻辑由Reynolds (2002) 引入, 作为Hoare逻辑的扩展, 其对于使用指针和动态内存分配的程序有着更好的支持. 这样的程序可能会碰到一些难于单独使用平直Hoare逻辑排除的问题 (issue). 例如, 别名 (指向相同块的不同指针变量) 可能会导致藉由某个指针变量的写影响藉由另外指针变量的读. 人们可能会忘了释放一个不再需要的动态分配的块, 这会导致内存泄露. 人们可能会在某个块释放之后访问, 这会导致未定义行为. 除了内存块之外, 诸多类似的<em>资源</em>都会导致类似的问题, 例如系统资源 (文件描述符, 等等), security capabilities, 甚至是某些类型的延续, 这我们会在本章之后看到.</p>
+    <p>在Hoare逻辑之中, 断言具有真值并描述了程序的可变变量的当前状态. 在分离逻辑之中, 断言既有真值, 也有一个<em>足迹</em>, 这是一集资源, 既描述了这些资源的当前状态, 也描述了其由该断言唯一拥有的事实. 这就使得定义资源敏感 (resource-aware) 逻辑联结词成为可能, 例如分离合取<math><mrow><mi>A</mi><mo>&#8270;</mo><mi>B</mi></mrow></math>, 其成立若<math><mi>A</mi></math>和<math><mi>B</mi></math>断言均成立, 且它们的足迹互不相交. 因此, 如果由<math><mi>A</mi></math>拥有的资源被修改了, <math><mi>B</mi></math>仍然保持有效, 因为<math><mi>B</mi></math>所拥有的资源仍然未被修改.</p>
+    <p>在资源是动态分配内存块的情形下, 分离逻辑的断言是内存堆上的谓词. 以下是常常使用的断言, 以及它们作为堆<math><mi>h</mi></math>上的谓词的形式化定义. 对于<math><mi>h</mi></math>的domain, 我们记<math><mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow></math>, 即<math><mi>h</mi></math>中的有效位置的集合.
+      <math display="block">
+        <mtable columnalign="left" columnlines="solid" rowlines="solid" frame="solid">
+          <mtr>
+            <mtd>
+              <mrow><mi>l</mi><mo>&mapsto;</mo><mi>_</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>位置</mtext><mi>l</mi><mtext>是有效的</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                <mo>=</mo>
+                <mrow><mo stretchy="false">{</mo><mi>l</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>l</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>位置</mtext><mi>l</mi><mtext>含有</mtext><mi>v</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                  <mo>=</mo>
+                  <mrow><mo stretchy="false">{</mo><mi>l</mi><mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mo>&and;</mo>
+                <mrow>
+                  <mrow><mi>h</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>=</mo><mi>v</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>emp</mi></mtd>
+            <mtd><mtext>堆为空</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                <mo>=</mo><mi>&empty;</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&lang;</mo><mi>P</mi><mo stretchy="false">&rang;</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>逻辑命题</mtext><mi>P</mi><mtext>成立且堆为空</mtext></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                  <mo>=</mo><mi>&empty;</mi></mrow>
+                <mo>&and;</mo><mi>P</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>A</mi><mo>&#8270;</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd><mtext>分离合取</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo>&exist;</mo>
+                <mrow>
+                  <msub><mi>h</mi><mn>1</mn></msub>
+                  <mo>,</mo>
+                  <msub><mi>h</mi><mn>2</mn></msub>
+                </mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow>
+                      <mrow><mi>D</mi><mo>&af;</mo>
+                        <msub><mi>h</mi><mn>1</mn></msub>
+                      </mrow>
+                      <mo>&cap;</mo>
+                      <mrow><mi>D</mi><mo>&af;</mo>
+                        <msub><mi>h</mi><mn>2</mn></msub>
+                      </mrow>
+                    </mrow>
+                    <mo>=</mo><mi>&empty;</mi></mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi>h</mi><mo>=</mo>
+                    <mrow>
+                      <msub><mi>h</mi><mn>1</mn></msub>
+                      <mo>&cup;</mo>
+                      <msub><mi>h</mi><mn>2</mn></msub>
+                    </mrow>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi>A</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>h</mi><mn>1</mn></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi>B</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>h</mi><mn>2</mn></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>A</mi><mo>&minus;&#8270;</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd><mtext>分离后承, 或称魔杖</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <msup><mi>h</mi><mo>&prime;</mo></msup>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow>
+                      <mrow>
+                        <mrow><mi>D</mi><mo>&af;</mo><mi>h</mi></mrow>
+                        <mo>&cap;</mo>
+                        <mrow><mi>D</mi><mo>&af;</mo>
+                          <msup><mi>h</mi><mo>&prime;</mo></msup>
+                        </mrow>
+                      </mrow>
+                      <mo>=</mo><mi>&empty;</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow><mi>A</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <msup><mi>h</mi><mo>&prime;</mo></msup>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>&rArr;</mo>
+                  <mrow><mi>B</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>h</mi><mo>&cup;</mo>
+                        <msup><mi>h</mi><mo>&prime;</mo></msup>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>例如, 考虑断言
+      <math display="block">
+        <mrow><mo>&exist;</mo>
+          <mrow>
+            <msub><mi>n</mi><mn>1</mn></msub>
+            <mo>,</mo>
+            <msub><mi>n</mi><mn>2</mn></msub>
+          </mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow>
+              <msub><mi>l</mi><mn>1</mn></msub>
+              <mo>&mapsto;</mo>
+              <msub><mi>n</mi><mn>1</mn></msub>
+            </mrow>
+            <mo>&#8270;</mo>
+            <mrow>
+              <msub><mi>l</mi><mn>2</mn></msub>
+              <mo>&mapsto;</mo>
+              <msub><mi>n</mi><mn>2</mn></msub>
+            </mrow>
+            <mo>&#8270;</mo>
+            <mrow><mo stretchy="false">&lang;</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>n</mi><mn>1</mn></msub>
+                  <mo>+</mo>
+                  <msub><mi>n</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>=</mo><mn>10</mn></mrow>
+              <mo stretchy="false">&rang;</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其陈述了<math><msub><mi>l</mi><mn>1</mn></msub></math>和<math><msub><mi>l</mi><mn>2</mn></msub></math>是合法的位置, 其分别含有整数<math><msub><mi>n</mi><mn>1</mn></msub></math>和<math><msub><mi>n</mi><mn>2</mn></msub></math>, 而它们之和为<math><mn>10</mn></math>. 因为该断言使用了分离合取, 所以这也保证了<math><mrow><msub><mi>l</mi><mn>1</mn></msub><mo>&ne;</mo><msub><mi>l</mi><mn>2</mn></msub></mrow></math>, 即指针<math><msub><mi>l</mi><mn>1</mn></msub></math>和<math><msub><mi>l</mi><mn>2</mn></msub></math>之间没有别名共享.</p>
+    <p>因此, 如果我们对于<math><msub><mi>l</mi><mn>1</mn></msub></math>的内容进行增量, 我们可以安全地断言
+      <math display="block">
+        <mrow><mo>&exist;</mo>
+          <mrow>
+            <msub><mi>n</mi><mn>1</mn></msub>
+            <mo>,</mo>
+            <msub><mi>n</mi><mn>2</mn></msub>
+          </mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow>
+              <msub><mi>l</mi><mn>1</mn></msub>
+              <mo>&mapsto;</mo>
+              <msub><mi>n</mi><mn>1</mn></msub>
+            </mrow>
+            <mo>&#8270;</mo>
+            <mrow>
+              <msub><mi>l</mi><mn>2</mn></msub>
+              <mo>&mapsto;</mo>
+              <msub><mi>n</mi><mn>2</mn></msub>
+            </mrow>
+            <mo>&#8270;</mo>
+            <mrow><mo stretchy="false">&lang;</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>n</mi><mn>1</mn></msub>
+                  <mo>+</mo>
+                  <msub><mi>n</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>=</mo><mn>11</mn></mrow>
+              <mo stretchy="false">&rang;</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      如果没有<math><mrow><msub><mi>l</mi><mn>1</mn></msub><mo>&ne;</mo><msub><mi>l</mi><mn>2</mn></msub></mrow></math>这一保证, 那么这个结论就是无效的了; 若这两个指针别名共享 (alias), 对于<math><msub><mi>l</mi><mn>1</mn></msub></math>的内容进行增量也会对于<math><msub><mi>l</mi><mn>2</mn></msub></math>的内容进行增量, 导致和为<math><mn>12</mn></math>.</p>
+    <h3>第15.2节 一个函数式命令式语言的一种分离逻辑</h3>
+    <p><b>FUNREF语言. </b>图15.1展示了FUNREF的抽象句法, 这是本章所采用的玩具语言. FUNREF是一个函数式语言, 其也通过可以就地修改的引用而支持命令式编程, 这类似于OCaml以及其他ML族的语言. 引用藉由四个操作呈现:
+      <ul>
+        <li><code>alloc</code>创建一个新鲜的未初始化的引用;</li>
+        <li><code>x := v</code>将值<math><mi>v</mi></math>存储于引用<math><mi>x</mi></math>;</li>
+        <li></li>
+      </ul>
+    </p>
+    <h2>参考文献</h2>
+  </body>
+</html>
