@@ -1,6 +1,10 @@
 #lang racket
 (provide type_theory.html)
 (require SMathML)
+(define (PreFixed F X)
+  (&sube (app F X) X))
+(define (PostFixed F X)
+  (&sube X (app F X)))
 (define $wp (Mi "&wp;"))
 (define (powerset X)
   (ap $wp X))
@@ -75,9 +79,9 @@
       (&sube (app $F $A) (app $F $B) $X)
       ". 对于" (powerset $X) "上的单调函数" $F
       ", " $F "的一个前不动点是一个集合" (&sube $A $X)
-      "满足" (&sube (app $F $A) $A) ", 而" $F
+      "满足" (PreFixed $F $A) ", 而" $F
       "的一个后不动点是一个集合" (&sube $A $X)
-      "满足" (&sube $A (app $F $A))
+      "满足" (PostFixed $F $A)
       ". " $F "的前不动点也被称为是" $F
       "封闭的, " $F "的后不动点也被称为是" $F
       "一致的. 单调函数" $F "的最小前不动点指的是"
@@ -95,9 +99,50 @@
       "由以下等式给出:"
       (MB (&Table
            ((μ $F) $= (Cap (setI (&sube $A $X)
-                                 (&sube (app $F $A) $A))))
+                                 (PreFixed $F $A))))
            ((ν $F) $= (Cup (setI (&sube $A $X)
-                                 (&sube $A (app $F $A)))))))
-      "显然"
+                                 (PostFixed $F $A))))))
+      "显然" (μ $F) "被包含于所有" $F
+      "的前不动点之中, 鉴于其是它们之交. "
+      "{译注: 即" (μ $F) "是每个" $F "的前不动点的子集.} "
+      "实际上, " (μ $F) "本身就是" $F "的一个前不动点, 即"
+      (PreFixed $F (μ $F)) ", 因而是最小前不动点. "
+      "为了看出这一点, 表明如果" (PreFixed $F $A)
+      "则有" (&sube (app $F (μ $F)) $A)
+      ". {译注: 这说明" (app $F (μ $F)) "是"
+      (setI (&sube $A $X) (PreFixed $F $A))
+      "的一个下界, 而" (μ $F) "根据定义是其最大下界.} "
+      "但是如果" (PreFixed $F $A) ", 那么根据定义有"
+      (&sube (μ $F) $A) ", 然后根据单调性可得"
+      (&sube (app $F (μ $F)) (app $F $A) $A)
+      ", 而这正是我们所要的. 接着我们又运用单调性可知"
+      (PreFixed $F (app $F (μ $F)))
+      ", 这是在说" (app $F (μ $F)) "是" $F
+      "的一个前不动点, 因而"
+      (PostFixed $F (μ $F))
+      ". 换言之, " (μ $F) "是" $F
+      "的一个不动点. 并且, 鉴于任何的不动点都是前不动点, "
+      (μ $F) "是最小的不动点. 对偶地, " (ν $F)
+      "包含了所有" $F "的后不动点, 鉴于其是它们之并. "
+      "并且, 通过和之前对偶的论证, " (ν $F) "是" $F
+      "的一个后不动点. 因此, 其是最大的后不动点, "
+      "又是最大的不动点. (用范畴论的语言来说, "
+      "这是Lambek引理, 其是说始" $F
+      "代数和终" $F "余代数都是同构.)")
+   (P (powerset $X) "上的单调函数" $F
+      "的最小不动点兑现了" (Em "归纳原理")
+      ": 为了证明" (&sube (μ $F) $A)
+      ", 证明" (PreFixed $F $A)
+      "就足够了, 这是在说" $A
+      "是" $F "封闭的. 类似地, " $F
+      "的最大不动点" (ν $F)
+      "兑现了" (Em "余归纳原理")
+      ": 为了证明" (&sube $A (ν $F))
+      ", 证明" (PostFixed $F $A)
+      "就足够了, 这是在说" $A
+      "是" $F "一致的. "
+      "以谓词和后承 (implication) 的术语重述, "
+      "单调函数" $F "的最小不动点" (μ $F)
+      
       )
    ))
