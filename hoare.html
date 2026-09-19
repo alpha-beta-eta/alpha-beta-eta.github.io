@@ -86,7 +86,7 @@
     </p>
     <p>完全正确性是我们最终感兴趣的, 但通常更容易通过分别建立部分正确性和终止性来证明它.</p>
     <p>终止性通常是容易建立的, 但有一些著名的例子并非如此. 例如, 未解决的Collatz猜想与下面的程序是否对<math><mi mathvariant="monospace">X</mi></math>的所有值都终止有关 (见下面的练习):<pre><code>WHILE X>1 DO
-  IF ODD(X) THEN X := (3×X)+1 ELSE X := X DIV 2</code></pre>(表达式<code>X DIV 2</code>求值为<math><mrow><mi mathvariant="monospace">X</mi><mo lspace="0" rspace="0">/</mo><mn>2</mn></mrow></math>向下取整到一个整数的结果, 不过由于这里条件语句的<math><mi mathvariant="monospace">ELSE</mi></math>分支仅在<math><mi mathvariant="monospace">X</mi></math>为偶数时才被执行, 实际上不需要取整.)</p>
+  IF ODD(X) THEN X := (3×X)+1 ELSE X := X DIV 2</code></pre>(表达式<code>X DIV 2</code>求值为<math><mrow><mi mathvariant="monospace">X</mi><mo lspace="0" rspace="0">/</mo><mn>2</mn></mrow></math>向下取整到一个整数的结果, 不过由于这里条件式的<math><mi mathvariant="monospace">ELSE</mi></math>分支仅在<math><mi mathvariant="monospace">X</mi></math>为偶数时才被执行, 实际上不需要取整.)</p>
     <p>著名数学家Paul Erdős关于Collatz猜想说道: <q>数学对于这样的问题尚未准备好.</q> 他为其解答提供500美元奖励.</p>
     <h3>第1.4节 一些例子</h3>
     <p>以下的例子刻画了部分正确性的各种方面.</p>
@@ -2704,8 +2704,8 @@ WHILE Y≤R DO {X = R+Y×Q}
       </math>
       {译注: 这是所谓的外延相等, 或者说指称相等.}</p>
     <h4>第4.1.1小节 表达式和陈述的语义</h4>
-    <p>命令中可能包含表达式或陈述: 表达式出现在赋值的右侧, 而陈述出现在条件语句和<math><mi mathvariant="monospace">WHILE</mi></math>命令的测试条件中. Hoare三元组的前条件和后条件也是陈述. Hoare逻辑的经典处理建立在一阶逻辑之上, 表达式被视为逻辑中的项, 陈述被视为公式. 你应该在之前的课程中已经熟悉了一阶逻辑的语义, 我不想在这里重复那些内容. 此外, 在现代应用中, 用于书写前条件和后条件的语言有时比一阶逻辑更弱或更强, 例如无量词逻辑 (更弱) 或高阶逻辑 (更强).</p>
-    <p>为了避免涉及特定逻辑及其语义的细节, 我们假设已给定表达式集合<math><mi>Exp</mi></math>和语句集合<math><mi>Sta</mi></math>, 以及定义它们语义的语义函数<math><mi mathvariant="sans-serif">Esem</mi></math>和<math><mi mathvariant="sans-serif">Ssem</mi></math>, 其中:
+    <p>命令中可能包含表达式或陈述: 表达式出现在赋值的右侧, 而陈述出现在条件式和<math><mi mathvariant="monospace">WHILE</mi></math>命令的测试条件中. Hoare三元组的前条件和后条件也是陈述. Hoare逻辑的经典处理建立在一阶逻辑之上, 表达式被视为逻辑中的项, 陈述被视为公式. 你应该在之前的课程中已经熟悉了一阶逻辑的语义, 我不想在这里重复那些内容. 此外, 在现代应用中, 用于书写前条件和后条件的语言有时比一阶逻辑更弱或更强, 例如无量词逻辑 (更弱) 或高阶逻辑 (更强).</p>
+    <p>为了避免涉及特定逻辑及其语义的细节, 我们假设已给定表达式集合<math><mi>Exp</mi></math>和陈述集合<math><mi>Sta</mi></math>, 以及定义它们语义的语义函数<math><mi mathvariant="sans-serif">Esem</mi></math>和<math><mi mathvariant="sans-serif">Ssem</mi></math>, 其中:
       <math display="block">
         <mtable columnalign="right center left" displaystyle="true">
           <mtr>
@@ -3061,7 +3061,7 @@ WHILE Y≤R DO {X = R+Y×Q}
         </mrow>
       </math>
     </p>
-    <p>如果<math><mi>S</mi></math>在状态<math><msub><mi>s</mi><mn>1</mn></msub></math>中为真, 则从<math><msub><mi>s</mi><mn>1</mn></msub></math>出发执行条件语句<math><mrow><mi mathvariant="monospace">IF</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">THEN</mi><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub><mspace width="2ex"/><mi mathvariant="monospace">ELSE</mi><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub></mrow></math>能够到达状态<math><msub><mi>s</mi><mn>2</mn></msub></math>, 当且仅当从<math><msub><mi>s</mi><mn>1</mn></msub></math>出发执行<math><mi mathvariant="monospace">THEN</mi></math>分支<math><msub><mi>C</mi><mn>1</mn></msub></math>能够到达<math><msub><mi>s</mi><mn>2</mn></msub></math>. 然而, 如果<math><mi>S</mi></math>在状态<math><msub><mi>s</mi><mn>1</mn></msub></math>中为假, 则从<math><msub><mi>s</mi><mn>1</mn></msub></math>出发执行该条件语句能够到达状态<math><msub><mi>s</mi><mn>2</mn></msub></math>, 当且仅当从<math><msub><mi>s</mi><mn>1</mn></msub></math>出发执行<math><mi mathvariant="monospace">ELSE</mi></math>分支<math><msub><mi>C</mi><mn>2</mn></msub></math>能够到达<math><msub><mi>s</mi><mn>2</mn></msub></math>.
+    <p>如果<math><mi>S</mi></math>在状态<math><msub><mi>s</mi><mn>1</mn></msub></math>中为真, 则从<math><msub><mi>s</mi><mn>1</mn></msub></math>出发执行条件式<math><mrow><mi mathvariant="monospace">IF</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">THEN</mi><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub><mspace width="2ex"/><mi mathvariant="monospace">ELSE</mi><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub></mrow></math>能够到达状态<math><msub><mi>s</mi><mn>2</mn></msub></math>, 当且仅当从<math><msub><mi>s</mi><mn>1</mn></msub></math>出发执行<math><mi mathvariant="monospace">THEN</mi></math>分支<math><msub><mi>C</mi><mn>1</mn></msub></math>能够到达<math><msub><mi>s</mi><mn>2</mn></msub></math>. 然而, 如果<math><mi>S</mi></math>在状态<math><msub><mi>s</mi><mn>1</mn></msub></math>中为假, 则从<math><msub><mi>s</mi><mn>1</mn></msub></math>出发执行该条件式能够到达状态<math><msub><mi>s</mi><mn>2</mn></msub></math>, 当且仅当从<math><msub><mi>s</mi><mn>1</mn></msub></math>出发执行<math><mi mathvariant="monospace">ELSE</mi></math>分支<math><msub><mi>C</mi><mn>2</mn></msub></math>能够到达<math><msub><mi>s</mi><mn>2</mn></msub></math>.
       <math display="block">
         <mrow>
           <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/>
@@ -3491,8 +3491,176 @@ WHILE Y≤R DO {X = R+Y×Q}
           </mrow>
         </mrow>
       </math>
-    </p>
+      通过特化<math><msub><mi>s</mi><mn>1</mn></msub></math>和<math><msub><mi>s</mi><mn>2</mn></msub></math>为<math><mi>s</mi></math>, 这又化简为了<math><mrow><mo>&forall;</mo><mi>s</mi><mo lspace="0">.</mo><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>s</mi></mrow></mrow></math>, 即<math><mi>P</mi></math>为真. 因此, 如果我们能够使用Hoare逻辑推导出任意为真的Hoare三元组, 那么我们就能使用Hoare逻辑推导出断言语言的任何为真的陈述. 绝大多数适用于刻画程序的逻辑都是不完备的 (例如一阶算术), 于是Hoare逻辑也不可能是完备的.</p>
+    <div class="tcomment"><b>译者注记. </b>
+      <math display="block">
+        <mrow><mo>&forall;</mo>
+          <mrow>
+            <msub><mi>s</mi><mn>1</mn></msub>
+            <mo>,</mo>
+            <msub><mi>s</mi><mn>2</mn></msub>
+          </mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>s</mi><mn>2</mn></msub>
+                <mo>=</mo>
+                <msub><mi>s</mi><mn>1</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&rArr;</mo>
+            <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+              <msub><mi>s</mi><mn>2</mn></msub>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      通过特化推出
+      <math display="block">
+        <mrow><mo>&forall;</mo><mi>s</mi><mo lspace="0">.</mo>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>s</mi></mrow>
+        </mrow>
+      </math>
+      是一个单向行为, 但是因为反方向过于明显, 所以说这的确是一个等价. 换言之, 对于断言所使用的逻辑的真陈述<math><mi>P</mi></math>, 在Hoare逻辑里<math><mrow><mrow><mo stretchy="false">{</mo><mi mathvariant="monospace">T</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo><mi mathvariant="monospace">X</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow></mrow></math>也是有效的Hoare三元组. 假如Hoare逻辑是完备的, 那么就存在Hoare逻辑的证明可以推出<math><mrow><mrow><mo stretchy="false">{</mo><mi mathvariant="monospace">T</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mrow><mi mathvariant="monospace">X</mi><mo>&colone;</mo><mi mathvariant="monospace">X</mi></mrow><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow></mrow></math>, 那么变相就推出了<math><mi>P</mi></math>. 对于较强的逻辑而言, 这都是不可能的, 因其是不完备的.</div>
+    <p>然而, 上述那种完备性之所以不可能实现, 仅仅是因为用于描述前条件和后条件的规约语言本身的不完备性. 如果我们将<q>程序逻辑</q>与<q>规约逻辑</q>分离开来, 那么就有可能构造出一种称为相对完备性 [6] 的概念, 它在一定程度上让我们确信, Hoare逻辑对于我们所讨论的这一小组简单命令的推理是充分的&mdash;&mdash;也就是说, 不存在<q>缺失</q>的公理或规则. 然而事实证明, 即便是这种有限的完备性, 对于许多实际编程语言中存在的构造 (但不包括我们的<q>玩具</q>语言) 而言也可能是不可能的 [5].</p>
+    <p>我们不打算详细解释Cook等人在相对完备性方面的工作, 因为其中涉及的技术逻辑问题及其直觉解释都相当微妙 [1, 16]. 此外, 这样做将要求我们对表达前条件和后条件的规约语言的句法, 语义和证明理论进行比我们所期望的更为精确的刻画. 不过, 我们将概述其中的关键思想. 在证明相对完备性时所使用的一个概念是最弱前条件. 这一概念不仅在证明相对完备性方面发挥着作用, 它还具有实际应用价值, 包括提供一种改进的验证条件方法 (我们将在后文讨论), 以及作为程序精化理论的基础.</p>
     <h4>第4.3.1小节 相对完备性</h4>
+    <p>我们将通过使用最弱自由前条件来解释相对完备性的思想, 并证明它对我们的小型程序语言成立. 然而, 我们将把其详细定义和分析推迟到第4.3.2节. 在本节中, 我们仅就最弱自由前条件是什么以及它们具有哪些性质 (下文的<math><mrow><msub><mi>P</mi><mn>1</mn></msub><mo>,</mo><msub><mi>P</mi><mn>2</mn></msub><mo>,</mo><msub><mi>P</mi><mn>3</mn></msub></mrow></math>) 做出足够的说明, 以便我们能够解释相对完备性.</p>
+    <p>对于每个命令<math><mi>C</mi></math>和陈述<math><mi>Q</mi></math>, 我们假设存在一个陈述<math><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>&mdash;&mdash;直觉上它是确保在执行<math><mi>C</mi></math>之后<math><mi>Q</mi></math>成立的最弱前条件&mdash;&mdash;并且它具有以下性质:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow/>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                  <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>P</mi><mn>1</mn></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      陈述<math><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>在规约语言中的存在性取决于规约语言是否足够强. 一个强到足以定义<math><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的语言被称为是<em>有表达力的 (expressive)</em>.</p>
+    <p>算子<math><mi mathvariant="sans-serif">wlp</mi></math>从一个命令和一个陈述构造出另一个陈述, 而陈述是形式语言中的一个句子. 因此<math><mi mathvariant="sans-serif">wlp</mi></math>是由两个句法实体 (一个命令和一个陈述) 构造出一个句法实体 (一个陈述). 我们还假设存在<math><mi mathvariant="sans-serif">wlp</mi></math>的一个语义对应物, 称为<math><mi mathvariant="sans-serif">Wlp</mi></math>, 它作用于命令的意义 (表示状态上的二元关系的函数) 和陈述的意义 (状态上的谓词). <math><mi mathvariant="sans-serif">Wlp</mi></math>是一个curry化的函数:
+      <math display="block">
+        <mrow><mi mathvariant="sans-serif">Wlp</mi><mo>:</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>State</mi><mo>&rarr;</mo><mi>State</mi><mo>&rarr;</mo><mi>Bool</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&rarr;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>State</mi><mo>&rarr;</mo><mi>Bool</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&rarr;</mo><mi>State</mi><mo>&rarr;</mo><mi>Bool</mi></mrow>
+        </mrow>
+      </math>
+      我们假定以下性质将<math><mi mathvariant="sans-serif">wlp</mi></math>和<math><mi mathvariant="sans-serif">Wlp</mi></math>联系起来, 其对所有命令<math><mi>C</mi></math>和陈述<math><mi>Q</mi></math>成立:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+                  <mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo>=</mo>
+                <mrow><mi mathvariant="sans-serif">Wlp</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><mi>C</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>P</mi><mn>2</mn></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      注意这是一个谓词之间的等式. 我们还假定:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>P</mi><mn>3</mn></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                <mo>=</mo>
+                <mrow><mo>&forall;</mo><mi>s</mi><mo lspace="0">.</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>s</mi></mrow>
+                    <mo>&rArr;</mo>
+                    <mrow><mi mathvariant="sans-serif">Wlp</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><mi>C</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mspace width="2ex"/><mi>s</mi></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>P</mi><mn>3</mn></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>相对完备性证明的轮廓现在可以概述如下. 假设<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>为真, 即<math><mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mi>Q</mi></mrow></math>为真. 我们将证明陈述<math><mrow><mi>P</mi><mo>&rArr;</mo><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>也必定为真&mdash;&mdash;暂时先假定这一点. 如果我们能够证明这个真陈述, 即有<math><mrow><mrow/><mo>&vdash;</mo><mrow><mi>P</mi><mo>&rArr;</mo><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>, 那么通过前条件加强规则和性质<math><msub><mi>P</mi><mn>1</mn></msub></math>, 就可以由Hoare逻辑推出<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>. 因此, Hoare逻辑的完备性是相对于一个能够证明所有形如<math><mrow><mi>P</mi><mo>&rArr;</mo><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>的真陈述的神谕机而言的.</p>
+    <p>总结一下: 相对完备性表明, 如果<math><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>在规约语言中是可表达的, 并且存在一个神谕机能够证明形如<math><mrow><mi>P</mi><mo>&rArr;</mo><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>的真陈述, 那么任何为真的Hoare三元组<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>都可以使用Hoare逻辑来证明.</p>
     <h4>第4.3.2小节 句法和语义最弱前条件</h4>
     <h4>第4.3.3小节 句法前条件和可表达性</h4>
     <h2>第5章 完全 (total) 正确性</h2>
@@ -3899,11 +4067,63 @@ WHILE Y≤R DO {X = R+Y×Q}
       由此关于<math><mrow><mi>m</mi><mo lspace="0" rspace="0">/</mo><mn>0</mn></mrow></math>并不能推出任何东西.</p>
     <p>另一种处理错误的方法在于扩展命令的语义, 允许错误和状态一样作为结果. 这种方法用在第7章以处理内存错误, 但是类似的想法也能用来处理表达式求值错误 (尽管代价是语义更为复杂).</p>
     <h3>第5.3节 用于完全正确性的<math><mi mathvariant="monospace">WHILE</mi></math>规则</h3>
+    <p><math><mi mathvariant="monospace">WHILE</mi></math>命令是我们这个小语言中唯一可能导致不终止的命令, 因此也是唯一具有非平凡终止规则的命令. <math><mi mathvariant="monospace">WHILE</mi></math>规则用于完全正确性的核心思想是: 要证明<math><mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow></math>能够终止, 必须证明某个非负量在<math><mi>C</mi></math>的每次迭代中都会减少. 这个递减的量称为变式量 (variant). {译注: 我感觉很多人也将其称为终止度量.} 在下面的规则中, 变式量为<math><mi>E</mi></math>, 而它递减的事实通过一个辅助变量<math><mi>n</mi></math>来刻画. 一个额外的假设<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow><mo>&rArr;</mo><mrow><mi>E</mi><mo>&ge;</mo><mn>0</mn></mrow></mrow></mrow></math>确保了变式量是非负的.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b>完全正确性的<math><mi mathvariant="monospace">WHILE</mi></math>规则</b></div>
+    </div>
     <h3>第5.4节 终止规约</h3>
+    <p>正如第1.3节已经讨论过了的, 部分正确性和完全正确性之间的关系可以非正式地表述为以下等式:
+      <math display="block">
+        <mrow><mtext>完全正确性</mtext><mo>=</mo>
+          <mrow><mtext>终止性</mtext><mo>+</mo><mtext>部分正确性</mtext></mrow>
+        </mrow>
+      </math>
+    </p>
     <h3>第5.5节 终止性的验证条件</h3>
     <h3>第5.6节 验证条件生成</h3>
     <h2>第6章 程序精化</h2>
+    <p>Floyd-Hoare逻辑是一种证明现有程序满足其规约的方法. 它也可以作为将规约<q>精化</q>为程序的基础&mdash;&mdash;即作为一种程序设计方法论的基础.</p>
     <h3>第6.1节 引论</h3>
+    <p>程序员的任务可以被看作: 给定一个由前条件<math><mi>P</mi></math>和后条件<math><mi>Q</mi></math>组成的规约, 然后构造出一个命令<math><mi>C</mi></math>, 使得<math><mrow><mrow><mo stretchy="false">[</mo><mi>P</mi><mo stretchy="false">]</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">[</mo><mi>Q</mi><mo stretchy="false">]</mo></mrow></mrow></math>成立.</p>
+    <p>精化理论提出了从规约<math><mi>P</mi></math>和<math><mi>Q</mi></math><q>计算</q>出程序<math><mi>C</mi></math>的规则. 一个关键思想来自芬兰的Ralph Back (后来被Joseph Morris和Carroll Morgan各自独立地重新发现), 即引入一类新的程序构造, 称为规约. 这些构造在句法上扮演与命令相同的角色, 但它们不可直接执行, 不过它们能保证在给定的前条件下达成给定的后条件. 由此产生的广义编程语言包含纯规约, 纯代码以及二者的混合体. 这样的语言被称为<em>宽谱语言</em>.</p>
+    <p>本章采用的方法遵循Morgan所发展的精化风格, 但其基础是Floyd-Hoare逻辑, 而非Dijkstra的最弱前条件理论 (见4.3.3节). 与传统方法相比, 这一基础更加具体和句法化: 规约被等同于其所有可能实现的集合, 精化则被表示为对普通命令集合的操作. 这种方法旨在利用前面各章所引入的记号和概念工具, 传达 (Morgan风格的) 精化的<q>外观和感觉</q>.</p>
+    <p>记号<math><mrow><mo stretchy="false">[</mo><mrow><mi>P</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">]</mo></mrow></math>将用于表示规约, 因此:
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">[</mo>
+            <mrow><mi>P</mi><mo>,</mo><mi>Q</mi></mrow>
+            <mo stretchy="false">]</mo></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow><mi>C</mi><mo>|</mo>
+              <mrow>
+                <mrow/>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">[</mo><mi>P</mi><mo stretchy="false">]</mo></mrow>
+                  <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">[</mo><mi>Q</mi><mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      精化过程将由一系列步骤组成, 这些步骤通过系统性的设计决策逐步缩小可能实现的集合, 直到达到唯一的实现. 因此, 从规约<math><mi mathvariant="script">S</mi></math>到实现<math><mi>C</mi></math>的精化具有如下形式:
+      <math display="block">
+        <mrow><mi mathvariant="script">S</mi><mo>&supe;</mo>
+          <msub><mi mathvariant="script">S</mi><mn>1</mn></msub>
+          <mo>&supe;</mo>
+          <msub><mi mathvariant="script">S</mi><mn>2</mn></msub>
+          <mo>&supe;</mo><mo>&ctdot;</mo><mo>&supe;</mo>
+          <msub><mi mathvariant="script">S</mi><mi>n</mi></msub>
+          <mo>&supe;</mo>
+          <mrow><mo stretchy="false">{</mo><mi>C</mi><mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>初始规约<math><mi mathvariant="script">S</mi></math>具有<math><mrow><mo stretchy="false">[</mo><mrow><mi>P</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">]</mo></mrow></math>的形式, 每个中间规约<math><msub><mi mathvariant="script">S</mi><mi>i</mi></msub></math>都是通过对其前驱<math><msub><mi mathvariant="script">S</mi><mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow></msub></math>应用一条精化律而得到的.</p>
+    <p>在文献中, <math><mrow><mi mathvariant="script">S</mi><mo>&supe;</mo><msup><mi mathvariant="script">S</mi><mo>&prime;</mo></msup></mrow></math>通常写作<math><mrow><mi mathvariant="script">S</mi><mo>&sqsube;</mo><msup><mi mathvariant="script">S</mi><mo>&prime;</mo></msup></mrow></math>. 这里使用<q><math><mo>&supe;</mo></math></q>而非更抽象的<q><math><mo>&sqsube;</mo></math></q>, 反映了精化作为逐步缩小实现集合这一具体解释.</p>
     <h3>第6.2节 精化律</h3>
     <h3>第6.3节 一个例子</h3>
     <h3>第6.4节 一般评注</h3>
