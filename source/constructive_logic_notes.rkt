@@ -6,7 +6,7 @@
         (else (error 'type-of "unknown variable ~s" var))))
 (define (extend-env var type env)
   (cons (cons var type) env))
-(define (reify t)
+(define (reify-type t)
   (define (reify t)
     (match t
       ((-> ,t1 ,t2) (&impl (@reify t1) (@reify t2)))
@@ -24,22 +24,48 @@
       (top $top)
       (,else t)))
   (reify t))
+(define (reify-term t)
+  (define (r t)
+    (match t
+      ((cons ,t1 ,t2) (tupa0 (r t1) (r t2)))
+      ((car ,t) (&fst (@r t)))
+      ((cdr ,t) (&snd (@r t)))
+      ((lam ,x ,body) (Lam x (r body)))
+      ((app ,t1 ,t2) (App (@r t1) (@r t2)))
+      (,else t)))
+  (define (@r t)
+    (match t
+      ((cons ,t1 ,t2) (tupa0 (r t1) (r t2)))
+      ((car ,t) (@fst (r t)))
+      ((cdr ,t) (@snd (r t)))
+      ((lam ,x ,body) (@Lam x (r body)))
+      ((app ,t1 ,t2) (@App (@r t1) (@r t2)))
+      (,else t)))
+  (r t))
 (struct result (t c) #:transparent)
+(struct result0
+  (term type construction)
+  #:transparent)
 (define (VAR u)
   (lambda (env)
     (define t (type-of u env))
-    (result t (assume u (&true (reify t))))))
+    (result t (assume u (&true (reify-type t))))))
+(define (VAR0 u)
+  (lambda (env)
+    (define type (type-of u env))
+    (result0 u type
+             (assume u (&: u (reify-type type))))))
 (define (GIVEN l t)
   (lambda (env)
-    (result t (label l (&true (reify t))))))
+    (result t (label l (&true (reify-type t))))))
 (define (HYP l t u t^)
   (lambda (env)
-    (result t (walk (assume u (&true (reify t^)))
-                    (label l (&true (reify t)))))))
+    (result t (walk (assume u (&true (reify-type t^)))
+                    (label l (&true (reify-type t)))))))
 (define (HYP0 l t l^ u t^)
   (lambda (env)
-    (result t (walk (label l^ (assume u (&true (reify t^))))
-                    (label l (&true (reify t)))))))
+    (result t (walk (label l^ (assume u (&true (reify-type t^))))
+                    (label l (&true (reify-type t)))))))
 (define (CONS a b)
   (lambda (env)
     (match-define (result ta ca) (a env))
@@ -47,21 +73,51 @@
     (define type `(conj ,ta ,tb))
     (result type
             (&rull $conjI ca cb
-                   (&true (reify type))))))
+                   (&true (reify-type type))))))
+(define (CONS0 a b)
+  (lambda (env)
+    (match-define (result0 terma typea ca) (a env))
+    (match-define (result0 termb typeb cb) (b env))
+    (define term `(cons ,terma ,termb))
+    (define type `(conj ,typea ,typeb))
+    (result0 term type
+             (&rull $conjI ca cb
+                    (&: (reify-term term)
+                        (reify-type type))))))
 (define (CAR a)
   (lambda (env)
     (match-define (result ta ca) (a env))
     (match ta
       ((conj ,t1 ,t2)
        (result t1 (&rull $conjE1 ca
-                         (&true (reify t1))))))))
+                         (&true (reify-type t1))))))))
+(define (CAR0 a)
+  (lambda (env)
+    (match-define (result0 terma typea ca) (a env))
+    (define term `(car ,terma))
+    (match typea
+      ((conj ,t1 ,t2)
+       (result0 term t1
+                (&rull $conjE1 ca
+                       (&: (reify-term term)
+                           (reify-type t1))))))))
 (define (CDR a)
   (lambda (env)
     (match-define (result ta ca) (a env))
     (match ta
       ((conj ,t1 ,t2)
        (result t2 (&rull $conjE2 ca
-                         (&true (reify t2))))))))
+                         (&true (reify-type t2))))))))
+(define (CDR0 a)
+  (lambda (env)
+    (match-define (result0 terma typea ca) (a env))
+    (define term `(cdr ,terma))
+    (match typea
+      ((conj ,t1 ,t2)
+       (result0 term t2
+                (&rull $conjE2 ca
+                       (&: (reify-term term)
+                           (reify-type t2))))))))
 (define (LAM u t body)
   (lambda (env)
     (match-define (result tbody cbody)
@@ -69,7 +125,17 @@
     (define type `(-> ,t ,tbody))
     (result type
             (&rull (&implI u) cbody
-                   (&true (reify type))))))
+                   (&true (reify-type type))))))
+(define (LAM0 u t body)
+  (lambda (env)
+    (match-define (result0 termbody typebody cbody)
+      (body (extend-env u t env)))
+    (define term `(lam ,u ,termbody))
+    (define type `(-> ,t ,typebody))
+    (result0 term type
+             (&rull (&implI u) cbody
+                    (&: (reify-term term)
+                        (reify-type type))))))
 (define (APP a b)
   (lambda (env)
     (match-define (result ta ca) (a env))
@@ -79,19 +145,32 @@
        (unless (equal? t1 tb)
          (error 'APP "type mismatch"))
        (result t2 (&rull $implE ca cb
-                         (&true (reify t2))))))))
+                         (&true (reify-type t2))))))))
+(define (APP0 a b)
+  (lambda (env)
+    (match-define (result0 terma typea ca) (a env))
+    (match-define (result0 termb typeb cb) (b env))
+    (match typea
+      ((-> ,t1 ,t2)
+       (unless (equal? t1 typeb)
+         (error 'APP "type mismatch"))
+       (define term `(app ,terma ,termb))
+       (result0 term t2
+                (&rull $implE ca cb
+                       (&: (reify-term term)
+                           (reify-type t2))))))))
 (define (INL tb a)
   (lambda (env)
     (match-define (result ta ca) (a env))
     (define type `(disj ,ta ,tb))
     (result type (&rull $disjI1 ca
-                        (&true (reify type))))))
+                        (&true (reify-type type))))))
 (define (INR ta b)
   (lambda (env)
     (match-define (result tb cb) (b env))
     (define type `(disj ,ta ,tb))
     (result type (&rull $disjI2 cb
-                        (&true (reify type))))))
+                        (&true (reify-type type))))))
 (define (CASE a u1 b1 u2 b2)
   (lambda (env)
     (match-define (result ta ca) (a env))
@@ -104,9 +183,13 @@
        (unless (equal? tb1 tb2)
          (error 'CASE "branch type mismatch"))
        (result tb1 (&rull (&disjE u1 u2) ca cb1 cb2
-                          (&true (reify tb1))))))))
+                          (&true (reify-type tb1))))))))
 (define (ND proof)
   (result-c (proof '())))
+(define (ND0 proof)
+  (result0-construction
+   (proof '())))
+(define $id (Mi "id"))
 (define $D:script^
   (&prime $D:script))
 (define (assume u t)
@@ -131,7 +214,7 @@
   (let-values (((j* j1) (split-at-right j* 1)))
     (~ #:attr* '((displaystyle "true"))
        (apply (&split n) j*) (car j1))))
-(define &split16 (&split 16))
+(define split16 (&split 16))
 (define (&rull label . x*)
   (if label
       (: (apply &rule x*) label)
@@ -179,15 +262,31 @@
 (define $snd (make-bold "snd"))
 (define (&snd p)
   (ap $snd p))
+(define $inl (make-bold "inl"))
+(define (&inl M)
+  (ap $inl M))
+(define $inr (make-bold "inr"))
+(define (&inr M)
+  (ap $inr M))
+(define $case (make-bold "case"))
+(define (&case M u N w P)
+  (appl $case M (bind u N) (bind w P)))
+(define $.:compact
+  (Mo "." #:attr* '((lspace "0") (rspace "0"))))
+(define $abort (make-bold "abort"))
+(define (&abort M)
+  (ap $abort M))
+(define $void (make-bold "0"))
 (define $unit (make-bold "1"))
 (define $name (make-italic "name"))
 (define $true (make-italic "true"))
 (define $false (make-italic "false"))
-(define &split2 (&split 2))
+(define split2 (&split 2))
+(define App split2)
 (define (&true A)
-  (&split2 A $true))
+  (split2 A $true))
 (define (&false A)
-  (&split2 A $false))
+  (split2 A $false))
 (define $not_type (make-sans "not_type"))
 (define (&not_type e t)
   (appl $not_type e t))
@@ -212,6 +311,7 @@
 (define $==>R (_ $==> $R))
 (define $==>E (_ $==> $E))
 (define-infix*
+  (bind $.:compact)
   (&==>R $==>R)
   (&==>E $==>E)
   (&def= $def=)
@@ -224,6 +324,10 @@
 (define (∃ x A)
   (: $exists x $. A))
 (define-@lized-op*
+  (@fst &fst)
+  (@snd &snd)
+  (@App App)
+  (@Lam Lam)
   (@impl &impl)
   (@∃ ∃))
 (define &impl*
@@ -700,7 +804,7 @@ fun even_or_odd x = case x of
       "根据以上的规则, 拥有对于" (&conj $A $B)
       "的一个验证意味着拥有对于" $A "和" $B
       "的验证. 因此, 以下两条规则得到了澄清:"
-      (MB (&split16
+      (MB (split16
            (&rull
             $conjE1
             (&true (&conj $A $B))
@@ -1034,7 +1138,7 @@ fun even_or_odd x = case x of
       ") 更为复杂, 但并不需要新的判断形式. "
       "析取是由两条引入规则刻画的: " (&disj $A $B)
       "为真, 如果" $A "或者" $B "为真."
-      (MB (&split16
+      (MB (split16
            (&rull
             $disjI1
             (&true $A)
@@ -1403,7 +1507,7 @@ fun even_or_odd x = case x of
       "我们应当理解, 这些规则即便可能被称为引入规则或消去规则, "
       "也与那些定义了联结词的规则具有不同的地位. "
       "在这一特定的情形, 我们得到如下导出规则:"
-      (MB (&split16
+      (MB (split16
            (&rull
             (&negI $u)
             (walk
@@ -1723,10 +1827,47 @@ fun even_or_odd x = case x of
       "作为引理. 但是怎么做呢? "
       "似乎很困难.")
    (P "作为最初的一步, 我们作如下的观察: "
-      
-      )
+      "如果我们有了一个带有模式变量 (例如这里的"
+      $A "或" $B ") 的命题的证明, "
+      "那么我们可以将这样的模式变量替换为任意的命题, "
+      "仍然得到一个正确的证明. 这是因为, "
+      "例如判断" (&true (&impl $A (@impl $B $A)))
+      "表达了这个嵌套的推出对于任意的"
+      $A "和" $B "都为真.")
+   (P "根据将" $A "机械替换为" (&impl $C $C)
+      ", 我们可以得到以下证明:"
+      (MB (ND (LAM $x `(-> ,$C ,$C)
+                   (LAM $y $B
+                        (VAR $x)))))
+      "现在我们可以用外部的对于" (&impl $C $C)
+      "的证明来使用推出消去:"
+      (MB (ND (APP (LAM $x `(-> ,$C ,$C)
+                        (LAM $y $B
+                             (VAR $x)))
+                   (LAM $z $C (VAR $z)))))
+      "现在我们有了一个经典的引入后跟着消去的例子: "
+      (&implI $x) "引入了一个推出, 而就在下一步其由"
+      $implE "消去.")
+   (P "为了归约这个证明 (消去" (Q "迂回")
+      "), 我们将" (&true (&impl $C $C))
+      "的证明替换进" (&implI $x)
+      "之上对于标记为" $x "的假设的使用."
+      (MB (ND (LAM $y $B
+                   (LAM $z $C (VAR $z)))))
+      "当然我们本也可以直接构造这个证明, "
+      "但是这里我们使用了一个引理来得到它. "
+      "这里似乎有些多余, "
+      "但是在数学推理中这是非常常见的, "
+      "即便并不严格必要的时候我们也会使用引理.")
    (H3. "证明归约作为计算")
-   
+   (P "在课上, 我们现在已经预告了这样一个想法: "
+      "直觉主义证明对应于构造, "
+      "而证明的归约对应于计算. "
+      "由于我们会在下一讲中更详细地再次讲到这一点, "
+      "因此本讲的讲义中将其略去. "
+      "下面附上了一些额外的补充材料, "
+      "演示如何在又一个联结词上逐步"
+      "检验局部可靠性与局部完备性.")
    (H3. "逻辑等价作为联结词")
    (P "作为另外一个例子, 现在我们想要定义一个新的联结词, "
       "建立引入和消去规则, 检查其局部可靠性和局部完备性 "
@@ -1796,7 +1937,7 @@ fun even_or_odd x = case x of
                      (&conj $A $B)))))
    (P "消去规则对应于从序对到其第一个和第二个分量的投影, 即从序对"
       $M "中取回各个独立的证明."
-      (MB (&split16
+      (MB (split16
            (&rull $conjE1
                   (&: $M (&conj $A $B))
                   (&: (&fst $M) $A))
@@ -1854,7 +1995,255 @@ fun even_or_odd x = case x of
       "一般而言, 我们用一个点号 (" (Q $.)
       ") 将所谓的绑定变量与其作用域分隔开来. "
       "这与自然演绎中假设的辖域概念完全相同.")
-   
+   (P "现在我们以" $lambda
+      "抽象为推出引入规则注解证明项."
+      (MB (&rull
+           (&implI $u)
+           (walk (assume $u (&: $u $A))
+                 $..v
+                 (&: $M $B))
+           (&: (Lam $u $M)
+               (&impl $A $B))))
+      "假设标签" $u "的行为如同变量, 而"
+      $B "的证明中任何对于标记为" $u
+      "的假设的使用都对应于" $M
+      "里一次" $u "的出现.")
+   (P "我们应该注意为了建立"
+      (&true (&impl $A $B))
+      ", 根据额外假设" (&true $A)
+      "而来的对于" (&true $B)
+      "的构造性证明, 是如何也描述了从"
+      (&true $A) "的证明到"
+      (&true $B) "的证明的变换的. "
+      "但是, 证明项" (Lam $u $M)
+      "显式地将这个变换句法地表示为一个函数, "
+      "而不是将这种构造保留为隐式的, "
+      "需要检视证明做了什么.")
+   (P "作为一个具体例子, 考虑"
+      (&true (&impl $A $A))
+      "的简单证明:"
+      (MB (ND (LAM $u $A (VAR $u))))
+      "如果我们以证明项对于这个演绎进行注解, "
+      "我们就得到了"
+      (MB (&rull
+           (&implI $u)
+           (assume $u (&: $u $A))
+           (&: (@Lam $u $u)
+               (&impl $A $A))))
+      "所以说我们的证明对应于类型"
+      $A "处的恒等函数" $id
+      ", 其直接返回它的参数.")
+   (P "从构造主义角度而言, "
+      (&true (&impl $A $B))
+      "的一个证明是一个函数, 其将"
+      (&true $A) "的一个证明转换为"
+      (&true $B) "的一个证明. "
+      "因此, 根据消去规则" $implE
+      "使用" (&true (&impl $A $B))
+      ", 对应于提供"
+      (&true (&impl $A $B))
+      "所等待的" (&true $A)
+      "的证明以得到" (&true $B)
+      "的一个证明. 推出消去规则对应于函数应用. "
+      "根据函数式编程的惯例, 对于函数"
+      $M "应用于参数" $N ", 我们记"
+      (App $M $N) "而非" (app $M $N) "."
+      (MB (&rull
+           $implE
+           (&: $M (&impl $A $B))
+           (&: $N $A)
+           (&: (App $M $N) $B)))
+      (&impl $A $B) "作为类型的意义是什么呢? "
+      "从之前的讨论可以看出, 其显然可以解释为函数类型"
+      (&-> $A $B) ". 推出的引入和消去规则也可以视为"
+      "函数抽象" (Lam $u $M) "和应用" (App $M $N)
+      "的定型规则. 构成一个函数" (Lam $u $M)
+      "对应于一个接受类型为" $A "的参数" $u
+      "产生类型为" $B "的" $M "的函数, 如"
+      $implI "所言. 使用一个函数"
+      (&: $M (&-> $A $B))
+      "对应于将其应用于具有类型" $A "的参数"
+      $N "以获得具有类型" $B "的输出"
+      (App $M $N) ".")
+   (P "注意到如果我们将证明项擦除就得到了"
+      "通常的推出的引入和消去规则. "
+      "对于本节剩余的所有规则也是如此, "
+      "并且这是证明项演算 (proof term calculus) "
+      "的可靠性的直接证据. 也就是说, 如果"
+      (&: $M $A) ", 那么" (&true $A) ".")
+   (P (B "析取. ")
+      "从构造主义的角度, 我们将"
+      (&true (&disj $A $B))
+      "的一个证明想成是要么有对于" (&true $A)
+      "的一个证明, 要么有对于" (&true $B)
+      "的一个证明. 因此, 析取对应于"
+      (Em "无交和") "类型" (&+ $A $B)
+      ", 其值要么具有类型" $A "要么具有类型"
+      $B ". 为了保证我们能够分辨出究竟是哪个类型, "
+      "这样的值会被打上标记, 要么是"
+      $inl " (如果其具有类型" $A
+      "), 要么是" $inr
+      " (如果其具有类型" $B "). 我们称"
+      $inl "和" $inr "分别" (Em "注入")
+      "了一个类型为" $A "或" $B
+      "的值进入和类型" (&+ $A $B) "."
+      (MB (split16
+           (&rull $disjI1
+                  (&: $M $A)
+                  (&: (&inl $M) (&disj $A $B)))
+           (&rull $disjI2
+                  (&: $N $B)
+                  (&: (&inr $N) (&disj $A $B)))))
+      "当在一个证明中使用一个析取"
+      (&true (&disj $A $B))
+      "时, 我们需要既需要准备处理"
+      (&true $A) "也需要准备处理" (&true $B)
+      ", 因为我们并不知道其是用"
+      $disjI1 "还是" $disjI2
+      "证明的. 消去规则对应于一个分情况讨论的结构, "
+      "其区分注入和类型的是左还是右."
+      (MB (&rull
+           (&disjE $u $w)
+           (&: $M (&disj $A $B))
+           (walk (assume $u (&: $u $A))
+                 $..v
+                 (&: $N $C))
+           (walk (assume $w (&: $w $B))
+                 $..v
+                 (&: $P $C))
+           (&: (&case $M $u $N $w $P) $C)))
+      "回忆一下标记为" $u
+      "的假设只在证明的第二个假设里能用, 标记为"
+      $w "的假设只在证明的第三个假设里能用. "
+      "这意味着变量" $u "的作用域是" $N
+      ", 变量" $w "的作用域是" $P
+      ". 通过写下" (bind $u $N) "和"
+      (bind $w $P) ", 我们指明了"
+      $u "和" $w "在其相应的作用域"
+      $N "和" $P "中被绑定.")
+   (P (B "谬. ")
+      "谬" $falsehood "不存在引入规则. "
+      "因此, 我们可以将其视为空类型"
+      $void ". 相应的消去规则允许具有类型"
+      $falsehood "的项在以" $abort
+      "包裹时代表具有任意类型的表达式. "
+      "然而, 其并不存在计算规则, "
+      "也就是说在合法程序计算时"
+      "我们永远也不会试图对于具有形式"
+      (&abort $M) "的项进行求值."
+      (MB (&rull
+           $falsehoodE
+           (&: $M $falsehood)
+           (&: (&abort $M) $C))))
+   (H3. "一些例子")
+   (P "考虑"
+      (&true (&impl (@conj $A (@impl $A $B)) $B))
+      ". 让我们首先写下一个自然演绎."
+      (MB (ND (LAM $x `(conj ,$A (-> ,$A ,$B))
+                   (APP (CDR (VAR $x))
+                        (CAR (VAR $x))))))
+      "尽管我们在构造这个自然演绎的时候"
+      "结合了自底而上和自顶而下的步骤, "
+      "将其以证明项注解时最好是自顶而下的. "
+      "我们从假设开始." (Br)
+      "{译注: 省略原文的中间过程, 最后得到以下结果.}"
+      (MB (ND0 (LAM0 $x `(conj ,$A (-> ,$A ,$B))
+                     (APP0 (CDR0 (VAR0 $x))
+                           (CAR0 (VAR0 $x)))))))
+   (P "我们也可以走别的路, "
+      "先写下程序然后再将其扩展为自然演绎. "
+      "例如, 考虑写下具有类型"
+      (&-> (@c* $A $B) (@c* $B $A))
+      "的程序这一任务. 这常被写成"
+      (&-> (@c* $alpha $beta)
+           (@c* $beta $alpha))
+      ", 或者更具体地可以写为"
+      (Code "'a * 'b -> 'b * 'a")
+      ". 这样一个函数很容易构造: "
+      "它应该交换序对的元素."
+      (MB (&: (Lam $x (tupa0 (&snd $x) (&fst $x)))
+              (&impl (@conj $A $B)
+                     (@conj $B $A))))
+      "现在我们可以将其" (Q "展开 (unwind)")
+      "为自然演绎. 对于这个方向, 我们自底而上运作."
+      (Br) "{译注: 省略原文的中间过程.}"
+      (MB (ND0 (LAM0 $x `(conj ,$A ,$B)
+                     (CONS0 (CDR0 (VAR0 $x))
+                            (CAR0 (VAR0 $x))))))
+      "构造性命题逻辑中的程序有些乏味, "
+      "因为它们并不操作诸如自然数, "
+      "整数, 列表, 树等基本数据类型. "
+      "我们将在本课程的后续部分引入这些数据类型, "
+      "所采用的方法与我们发展逻辑时所用的方法相同.")
+   (P (B "总结. ")
+      "作为本节的结尾, 我们回顾一下这一对应关系背后的指导原则:"
+      (Ol (Li "每个命题都对应一个类型, 反之亦然.")
+          (Li "引入规则对应于值的构造子 (value constructors).")
+          (Li "消去规则对应于值的解构子 (value destructors).")
+          (Li "对于" (&true $A)
+              "的每个推导, 都存在一个证明项" $M
+              "以及" (&: $M $A) "的一个推导. "
+              "我们可以自顶向下地有效地构造出它.")
+          (Li "对于" (&: $M $A) "的每个推导, 都存在"
+              (&true $A) "的一个推导. "
+              "我们可以自底向上地有效地构造出它.")))
+   (P "我们还可以注意到, 一个给定的项可以对应于不止一个证明. "
+      "例如, " (Lam $x $x) "可以是" (&impl $A $A)
+      "的一个证明, 也可以是"
+      (&impl (@impl $A $B) (@impl $A $B))
+      "的一个证明. 由编程语言理论Milner [1978] 我们知道, "
+      "对于一个(良类型的)项, "
+      "总存在一个最一般类型 (most general type), "
+      "它对应于给定证明项所证明的最一般的命题. "
+      "具体而言, 这意味着我们可以通过用"
+      "其他命题实例化其中的模式变量 (如" (&cm $A $B)
+      "等), 从最一般的自然演绎得到所有其他的自然演绎, "
+      "而不影响该推导的结构.")
+   (P "我们也可以通过添加类型信息来消除项的歧义. 例如"
+      (Lam (&: $x (&impl $A $A)) $x) "就必定是"
+      (&impl (@impl $A $A) (@impl $A $A))
+      "的证明. 我们将在以后的某一讲 (也许就在下一讲) "
+      "中进一步发展这一想法.")
+   (H3. "归约")
+   (P "在前一节中, 我们介绍了如何为自然演绎指派证明项. "
+      "如果证明就是程序, 那么我们就需要解释证明该如何被执行, "
+      "以及一次计算可以返回哪些结果.")
+   (P "我们分两步来解释证明的操作性解读. "
+      "第一步, 我们引入一个归约判断, 写作"
+      (&==>R $M $M^) ", 读作"
+      (Q $M "归约至" $M^)
+      ". 第二步, 计算则按照一个固定的策略, "
+      "通过一系列归约"
+      (&==>R $M $M_1 $M_2 $..c)
+      ", 直到我们到达一个值, 它就是该计算的结果. "
+      "本节我们讨论归约; "
+      "归约策略可能会在以后的某一讲中再回过头来讨论.")
+   (P "正如在命题逻辑的展开过程中那样, "
+      "我们分别讨论每一个联结词, "
+      "并小心地确保这些解释彼此独立. "
+      "这意味着我们可以考察各种子语言, "
+      "并且日后可以扩展我们的逻辑或编程语言, "
+      "而不会使本节的结论失效. 此外, "
+      "这也极大地简化了对归约规则各种性质的分析.")
+   (P "如前所述, 我们把对应于引入规则的证明项看作构造子, "
+      "把对应于消去规则的证明项看作析构子. 关键的指导原则是:"
+      (Blockquote
+       "当一个析构子被作用于一个构造子时, 就产生归约.")
+      "事实表明, 这恰恰等同于:"
+      (Blockquote
+       "当我们把一条消去规则应用于某条引入规则的结果时, "
+       "就产生一个证明归约.")
+      "因此, 局部证明归约 "
+      "(即我们用以说明消去规则局部可靠性的依据) "
+      "恰好对应于项的归约.")
+   (P (B "合取. ")
+      "回顾合取的两个局部归约之一:"
+      (let ((A (GIVEN $D:script $A))
+            (B (GIVEN $E:script $B)))
+        (MB (&==>R (ND (CAR (CONS A B)))
+                   (ND A))))
+      
+      )
    (H2. "验证")
    (H3. "引论")
    (P "验证主义 (verificationist) 的观点在本课程前面已经介绍过, 它主张: "

@@ -3392,11 +3392,7 @@ WHILE Y≤R DO {X = R+Y×Q}
       这可以化简为:
       <math display="block">
         <mrow><mo>&forall;</mo>
-          <mrow>
-            <msub><mi>s</mi><mn>1</mn></msub>
-            <mo>,</mo>
-            <msub><mi>s</mi><mn>2</mn></msub>
-          </mrow>
+          <msub><mi>s</mi><mn>1</mn></msub>
           <mo lspace="0">.</mo>
           <mrow>
             <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
@@ -3430,8 +3426,1206 @@ WHILE Y≤R DO {X = R+Y×Q}
           </mrow>
         </mrow>
       </math>
-      这乍看上去可能有点令人困惑, 因为前件和后件里的记号<math><mrow><mo stretchy="false">[</mo><mrow><mo>&ctdot;</mo><mo lspace="0" rspace="0">/</mo><mo>&ctdot;</mo></mrow><mo stretchy="false">]</mo></mrow></math>有着不同的含义. </p>
-    <p><b>关于替换的离题.</b></p>
+      这乍看上去可能有点令人困惑, 因为前件和后件里的记号<math><mrow><mo stretchy="false">[</mo><mrow><mo>&ctdot;</mo><mo lspace="0" rspace="0">/</mo><mo>&ctdot;</mo></mrow><mo stretchy="false">]</mo></mrow></math>有着不同的含义. 前件里的<math><mrow><mi>P</mi><mrow><mo stretchy="false">[</mo><mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></math>指称着将陈述<math><mi>P</mi></math>中的变量<math><mi>V</mi></math>替换为表达式<math><mi>E</mi></math>的结果. 后件里的<math><mrow><msub><mi>s</mi><mn>1</mn></msub><mrow><mo stretchy="false">[</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="sans-serif">Esem</mi><mspace width="2ex"/><mi>E</mi><mspace width="2ex"/><msub><mi>s</mi><mn>1</mn></msub></mrow><mo stretchy="false">)</mo></mrow><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></math>指称着状态, 其由更新<math><msub><mi>s</mi><mn>1</mn></msub></math>以使得<math><mi>V</mi></math>之值为<math><mi>E</mi></math>在<math><msub><mi>s</mi><mn>1</mn></msub></math>中的值得到 (所有其他的变量之值保持不变).</p>
+    <p><b>关于替换的离题.</b>我们避免了细致刻画表达式和陈述的句法到底是什么, 所以说也不可能证明关于它们的一般性质. 然而, 对于任何理想的定义, 我们会期望:
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>P</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/><mi>s</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>s</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="sans-serif">Esem</mi><mspace width="2ex"/><mi>E</mi><mspace width="2ex"/><mi>s</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      例如, 取<math><mi>P</mi></math>为<math><mrow><mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mi mathvariant="monospace">Y</mi></mrow><mo>></mo><mi mathvariant="monospace">Z</mi></mrow></math>, <math><mi>E</mi></math>为<math><mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow></math>, <math><mi>V</mi></math>为<math><mi mathvariant="monospace">Y</mi></math>, 那么这个等式就变成了:
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mi mathvariant="monospace">Y</mi></mrow>
+                    <mo>></mo><mi mathvariant="monospace">Z</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">Y</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/><mi>s</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mi mathvariant="monospace">Y</mi></mrow>
+                <mo>></mo><mi mathvariant="monospace">Z</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>s</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="sans-serif">Esem</mi><mspace width="2ex"/>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mspace width="2ex"/><mi>s</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">Y</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      既然<math><mrow><mrow><mi mathvariant="sans-serif">Esem</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mi>s</mi></mrow><mo>=</mo><mrow><mrow><mi>s</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow></mrow><mo>+</mo><mn>1</mn></mrow></mrow></math>, 于是以上等式变成了:
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mi mathvariant="monospace">Y</mi></mrow>
+                    <mo>></mo><mi mathvariant="monospace">Z</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">Y</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/><mi>s</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mi mathvariant="monospace">Y</mi></mrow>
+                <mo>></mo><mi mathvariant="monospace">Z</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>s</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <mrow><mi>s</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo>+</mo><mn>1</mn></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">Y</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      对于左边的替换求值就将其归约为了:
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>+</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mn>1</mn></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>></mo><mi mathvariant="monospace">Z</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/><mi>s</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">X</mi><mo>+</mo><mi mathvariant="monospace">Y</mi></mrow>
+                <mo>></mo><mi mathvariant="monospace">Z</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>s</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <mrow><mi>s</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo>+</mo><mn>1</mn></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">Y</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      对于<math><mi mathvariant="sans-serif">Ssem</mi></math>求值给出:
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi>s</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>+</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>s</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>></mo>
+              <mrow><mi>s</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">Z</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>s</mi>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow>
+                              <mrow><mi>s</mi><mo>&af;</mo>
+                                <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo>+</mo><mn>1</mn></mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                          <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">Y</mi></mrow>
+                        <mo stretchy="false">]</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>+</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>s</mi>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow>
+                              <mrow><mi>s</mi><mo>&af;</mo>
+                                <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo>+</mo><mn>1</mn></mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                          <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">Y</mi></mrow>
+                        <mo stretchy="false">]</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">Y</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>></mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>s</mi>
+                    <mrow><mo stretchy="false">[</mo>
+                      <mrow>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow>
+                            <mrow><mi>s</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mo>+</mo><mn>1</mn></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mo lspace="0" rspace="0">/</mo><mi mathvariant="monospace">Y</mi></mrow>
+                      <mo stretchy="false">]</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">Z</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      使用<math><mrow><mi>s</mi><mrow><mo stretchy="false">[</mo><mrow><mi>n</mi><mo lspace="0" rspace="0">/</mo><mi>v</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></math>, 右边的等式可以化简, 这就给出 {译注: 原文说<math><mrow><mi mathvariant="monospace">X</mi><mo>,</mo><mi mathvariant="monospace">Y</mi><mo>,</mo><mi mathvariant="monospace">Z</mi></mrow></math>要不同, 这不大对, 因为它们不是元变量, 而是对象语言中的变量}:
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi>s</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>+</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>s</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>></mo>
+              <mrow><mi>s</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">Z</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi>s</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>+</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>s</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">X</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>+</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>></mo>
+              <mrow><mi>s</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">Z</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      这显然为真, 因为左边和右边是等同的.<br/>尽管这只是一个例子, 其刻画了为什么对于所有的<math><mrow><mi>S</mi><mo>,</mo><mi>E</mi><mo>,</mo><mi>V</mi><mo>,</mo><mi>s</mi></mrow></math>都有
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>S</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/><mi>s</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>s</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="sans-serif">Esem</mi><mspace width="2ex"/><mi>E</mi><mspace width="2ex"/><mi>s</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      实际上, 如果这个等式并不成立的话, 那么这个替换的定义就很糟糕了&mdash;&mdash;这个等式的确应该当作替换的语义定义!<br/><b>离题结束.</b></p>
+    <p>回到赋值公理的可靠性上来, 回忆一下其等价于对于所有的<math><mrow><mi>P</mi><mo>,</mo><mi>E</mi><mo>,</mo><mi>V</mi></mrow></math>, 以下公式成立:
+      <math display="block">
+        <mrow><mo>&forall;</mo>
+          <msub><mi>s</mi><mn>1</mn></msub>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>P</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow><mi>E</mi><mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mspace width="2ex"/>
+              <msub><mi>s</mi><mn>1</mn></msub>
+            </mrow>
+            <mo>&rArr;</mo>
+            <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="sans-serif">Esem</mi><mspace width="2ex"/><mi>E</mi><mspace width="2ex"/>
+                          <msub><mi>s</mi><mn>1</mn></msub>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo lspace="0" rspace="0">/</mo><mi>V</mi></mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      如果之前离题讨论的替换等式成立, 那么这个推出当然也成立. 这是因为, 对于任意的陈述<math><mi>P</mi></math>和<math><mi>Q</mi></math>, 如果<math><mrow><mi>P</mi><mo>=</mo><mi>Q</mi></mrow></math>, 那么可以推出<math><mrow><mi>P</mi><mo>&rArr;</mo><mi>Q</mi></mrow></math>.</p>
+    <p>除了<math><mi mathvariant="monospace">WHILE</mi></math>规则之外的其他Hoare逻辑规则的可靠性几乎都是平凡的, 即便是<math><mi mathvariant="monospace">WHILE</mi></math>规则的可靠性也是相当直接的. 我们将会重述规则, 然后给出可靠性证明的提纲.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b>前条件强化</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow><mi>P</mi><mo>&rArr;</mo>
+                <msup><mi>P</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msup><mi>P</mi><mo>&prime;</mo></msup>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <p>如果以下公式对于所有的<math><mrow><mi>P</mi><mo>,</mo><msup><mi>P</mi><mo>&prime;</mo></msup><mo>,</mo><mi>C</mi><mo>,</mo><mi>Q</mi></mrow></math>均成立:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mo>&forall;</mo><mi>s</mi><mo lspace="0">.</mo>
+                <mrow>
+                  <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>s</mi></mrow>
+                  <mo>&rArr;</mo>
+                  <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+                    <msup><mi>P</mi><mo>&prime;</mo></msup>
+                    <mspace width="2ex"/><mi>s</mi></mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&and;</mo>
+            <mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/>
+              <msup><mi>P</mi><mo>&prime;</mo></msup>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+          </mrow>
+          <mo>&rArr;</mo>
+          <mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+        </mrow>
+      </math>
+      那么这条规则就是可靠的.<br/>这在以<math><mi mathvariant="sans-serif">Hsem</mi></math>的定义扩展之后就变成了:
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo><mi>s</mi><mo lspace="0">.</mo>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>s</mi></mrow>
+                <mo>&rArr;</mo>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+                  <msup><mi>P</mi><mo>&prime;</mo></msup>
+                  <mspace width="2ex"/><mi>s</mi></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>&and;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo>
+              <mrow>
+                <msub><mi>s</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+              <mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+                    <msup><mi>P</mi><mo>&prime;</mo></msup>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+                <mo>&rArr;</mo>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      <math display="block"><mo>&rArr;</mo></math>
+      <math display="block">
+        <mrow><mo stretchy="false">(</mo>
+          <mrow><mo>&forall;</mo>
+            <mrow>
+              <msub><mi>s</mi><mn>1</mn></msub>
+              <mo>,</mo>
+              <msub><mi>s</mi><mn>2</mn></msub>
+            </mrow>
+            <mo lspace="0">.</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                  <mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+              <mo>&rArr;</mo>
+              <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi><mspace width="2ex"/>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mo stretchy="false">)</mo></mrow>
+      </math>
+      这是以下陈述的一个实例, 如果我们取<math><mrow><mi>p</mi><mo>,</mo><msup><mi>p</mi><mo>&prime;</mo></msup><mo>,</mo><mi>q</mi><mo>,</mo><mi>c</mi></mrow></math>分别为<math><mrow><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi></mrow><mo>,</mo><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><msup><mi>P</mi><mo>&prime;</mo></msup></mrow><mo>,</mo><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi></mrow><mo>,</mo><mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><mi>C</mi></mrow></mrow></math>.
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo><mi>s</mi><mo lspace="0">.</mo>
+              <mrow>
+                <mrow><mi>p</mi><mspace width="2ex"/><mi>s</mi></mrow>
+                <mo>&rArr;</mo>
+                <mrow>
+                  <msup><mi>p</mi><mo>&prime;</mo></msup>
+                  <mspace width="2ex"/><mi>s</mi></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>&and;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo>
+              <mrow>
+                <msub><mi>s</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+              <mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow>
+                    <msup><mi>p</mi><mo>&prime;</mo></msup>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi>c</mi><mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+                <mo>&rArr;</mo>
+                <mrow><mi>q</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      <math display="block"><mo>&rArr;</mo></math>
+      <math display="block">
+        <mrow><mo stretchy="false">(</mo>
+          <mrow><mo>&forall;</mo>
+            <mrow>
+              <msub><mi>s</mi><mn>1</mn></msub>
+              <mo>,</mo>
+              <msub><mi>s</mi><mn>2</mn></msub>
+            </mrow>
+            <mo lspace="0">.</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi>p</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>&and;</mo>
+                <mrow><mi>c</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                  <mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+              <mo>&rArr;</mo>
+              <mrow><mi>q</mi><mspace width="2ex"/>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mo stretchy="false">)</mo></mrow>
+      </math>
+      这显然为真.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b>后条件弱化</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msup><mi>Q</mi><mo>&prime;</mo></msup>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <msup><mi>Q</mi><mo>&prime;</mo></msup>
+                <mo>&rArr;</mo><mi>Q</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <p>以类似的论证, 这是可靠的.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b>规约合取</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>Q</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>Q</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo>&and;</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>Q</mi><mn>1</mn></msub>
+                  <mo>&and;</mo>
+                  <msub><mi>Q</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <div style="text-align: center;"><b>规约析取</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>Q</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>Q</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>P</mi><mn>1</mn></msub>
+                  <mo>&or;</mo>
+                  <msub><mi>P</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>Q</mi><mn>1</mn></msub>
+                  <mo>&or;</mo>
+                  <msub><mi>Q</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <p>以类似的论证, 这是可靠的.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b>顺序规则</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>2</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mo>;</mo>
+                <msub><mi>C</mi><mn>2</mn></msub>
+              </mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>R</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <p>如果以下公式对于所有的<math><mrow><mi>P</mi><mo>,</mo><mi>Q</mi><mo>,</mo><mi>R</mi><mo>,</mo><msub><mi>C</mi><mn>1</mn></msub><mo>,</mo><msub><mi>C</mi><mn>2</mn></msub></mrow></math>为真:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+              <msub><mi>C</mi><mn>1</mn></msub>
+              <mspace width="2ex"/><mi>Q</mi></mrow>
+            <mo>&and;</mo>
+            <mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/><mi>Q</mi><mspace width="2ex"/>
+              <msub><mi>C</mi><mn>2</mn></msub>
+              <mspace width="2ex"/><mi>R</mi></mrow>
+          </mrow>
+          <mo>&rArr;</mo>
+          <mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mo>;</mo>
+                <msub><mi>C</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/><mi>R</mi></mrow>
+        </mrow>
+      </math>
+      那么这条规则就是可靠的.<br/>这在以<math><mi mathvariant="sans-serif">Hsem</mi></math>的定义扩展之后就变成了:
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo>
+              <mrow>
+                <msub><mi>s</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+              <mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/>
+                    <msub><mi>C</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+                <mo>&rArr;</mo>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>&and;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo>
+              <mrow>
+                <msub><mi>s</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+              <mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi><mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/>
+                    <msub><mi>C</mi><mn>2</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+                <mo>&rArr;</mo>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>R</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      <math display="block"><mo>&rArr;</mo></math>
+      <math display="block">
+        <mrow><mo stretchy="false">(</mo>
+          <mrow><mo>&forall;</mo>
+            <mrow>
+              <msub><mi>s</mi><mn>1</mn></msub>
+              <mo>,</mo>
+              <msub><mi>s</mi><mn>2</mn></msub>
+            </mrow>
+            <mo lspace="0">.</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>C</mi><mn>1</mn></msub>
+                      <mo>;</mo>
+                      <msub><mi>C</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                  <mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+              <mo>&rArr;</mo>
+              <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>R</mi><mspace width="2ex"/>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mo stretchy="false">)</mo></mrow>
+      </math>
+      这是以下陈述的一个实例, 如果我们展开<math><mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><msub><mi>C</mi><mn>1</mn></msub><mo>;</mo><msub><mi>C</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的定义并取<math><mrow><mi>p</mi><mo>,</mo><mi>q</mi><mo>,</mo><mi>r</mi><mo>,</mo><msub><mi>c</mi><mn>1</mn></msub><mo>,</mo><msub><mi>c</mi><mn>2</mn></msub></mrow></math>分别为<math><mrow><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi></mrow><mo>,</mo><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi></mrow><mo>,</mo><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>R</mi></mrow><mo>,</mo><mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><msub><mi>C</mi><mn>1</mn></msub></mrow><mo>,</mo><mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><msub><mi>C</mi><mn>2</mn></msub></mrow></mrow></math>.
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo>
+              <mrow>
+                <msub><mi>s</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+              <mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi>p</mi><mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+                <mo>&rArr;</mo>
+                <mrow><mi>q</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>&and;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo>&forall;</mo>
+              <mrow>
+                <msub><mi>s</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+              <mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi>q</mi><mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow>
+                    <msub><mi>c</mi><mn>2</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>s</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+                <mo>&rArr;</mo>
+                <mrow><mi>r</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      <math display="block"><mo>&rArr;</mo></math>
+      <math display="block">
+        <mrow><mo stretchy="false">(</mo>
+          <mrow><mo>&forall;</mo>
+            <mrow>
+              <msub><mi>s</mi><mn>1</mn></msub>
+              <mo>,</mo>
+              <msub><mi>s</mi><mn>2</mn></msub>
+            </mrow>
+            <mo lspace="0">.</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi>p</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>&and;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mo>&exist;</mo><mi>s</mi><mo lspace="0">.</mo>
+                    <mrow>
+                      <mrow>
+                        <msub><mi>c</mi><mn>1</mn></msub>
+                        <mspace width="2ex"/>
+                        <msub><mi>s</mi><mn>1</mn></msub>
+                        <mspace width="2ex"/><mi>s</mi></mrow>
+                      <mo>&and;</mo>
+                      <mrow>
+                        <msub><mi>c</mi><mn>2</mn></msub>
+                        <mspace width="2ex"/><mi>s</mi><mspace width="2ex"/>
+                        <msub><mi>s</mi><mn>2</mn></msub>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&rArr;</mo>
+              <mrow><mi>r</mi><mspace width="2ex"/>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mo stretchy="false">)</mo></mrow>
+      </math>
+      这显然为真.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b>条件规则</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow/>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>P</mi><mo>&and;</mo>
+                    <mrow><mo>&not;</mo><mi>S</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>2</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi mathvariant="monospace">IF</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">THEN</mi><mspace width="2ex"/>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mspace width="2ex"/><mi mathvariant="monospace">ELSE</mi><mspace width="2ex"/>
+                <msub><mi>C</mi><mn>2</mn></msub>
+              </mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <p>和顺序规则类似的论证表明条件规则是可靠的.</p>
+    <div class="frame">
+      <div style="text-align: center;"><b><math><mi mathvariant="monospace">WHILE</mi></math>规则</b></div>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow/>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>P</mi><mo>&and;</mo>
+                  <mrow><mo>&not;</mo><mi>S</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+    </div>
+    <p>如果以下公式对于所有的<math><mrow><mi>P</mi><mo>,</mo><mi>S</mi><mo>,</mo><mi>C</mi></mrow></math>均为真:
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mi>P</mi></mrow>
+          <mo>&rArr;</mo>
+          <mrow><mi mathvariant="sans-serif">Hsem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>P</mi><mo>&and;</mo>
+                <mrow><mo>&not;</mo><mi>S</mi></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      那么这条规则就是可靠的.<br/>在以<math><mi mathvariant="sans-serif">Hsem</mi></math>的定义扩展之后, 这就变成了:
+      <math display="block">
+        <mrow><mo stretchy="false">(</mo>
+          <mrow><mo>&forall;</mo>
+            <mrow>
+              <msub><mi>s</mi><mn>1</mn></msub>
+              <mo>,</mo>
+              <msub><mi>s</mi><mn>2</mn></msub>
+            </mrow>
+            <mo lspace="0">.</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>P</mi><mo>&and;</mo><mi>S</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                  <mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+              <mo>&rArr;</mo>
+              <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mo stretchy="false">)</mo></mrow>
+      </math>
+      <math display="block"><mo>&rArr;</mo></math>
+      <math display="block">
+        <mrow><mo stretchy="false">(</mo>
+          <mrow><mo>&forall;</mo>
+            <mrow>
+              <msub><mi>s</mi><mn>1</mn></msub>
+              <mo>,</mo>
+              <msub><mi>s</mi><mn>2</mn></msub>
+            </mrow>
+            <mo lspace="0">.</mo>
+            <mrow>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>&and;</mo>
+                <mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>1</mn></msub>
+                  <mspace width="2ex"/>
+                  <msub><mi>s</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+              <mo>&rArr;</mo>
+              <mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>P</mi><mo>&and;</mo>
+                    <mrow><mo>&not;</mo><mi>S</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>s</mi><mn>2</mn></msub>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mo stretchy="false">)</mo></mrow>
+      </math>
+      使用等式<math><mrow><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>&and;</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><msub><mi>s</mi><mn>1</mn></msub></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><msub><mi>s</mi><mn>1</mn></msub></mrow><mo>&and;</mo><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi><mspace width="2ex"/><msub><mi>s</mi><mn>1</mn></msub></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>和<math><mrow><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>&and;</mo><mrow><mo>&not;</mo><mi>Q</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><msub><mi>s</mi><mn>2</mn></msub></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><msub><mi>s</mi><mn>2</mn></msub></mrow><mo>&and;</mo><mrow><mo>&not;</mo><mrow><mi mathvariant="sans-serif">Ssem</mi><mspace width="2ex"/><mi>Q</mi><mspace width="2ex"/><msub><mi>s</mi><mn>2</mn></msub></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>并扩展<math><mrow><mi mathvariant="sans-serif">Csem</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">WHILE</mi><mspace width="2ex"/><mi>S</mi><mspace width="2ex"/><mi mathvariant="monospace">DO</mi><mspace width="2ex"/><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的定义可以将其转换为:</p>
     <h3>第4.3节 可判定性和完备性</h3>
     <p><math><mrow><mrow><mo stretchy="false">{</mo><mi mathvariant="monospace">T</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi mathvariant="monospace">F</mi><mo stretchy="false">}</mo></mrow></mrow></math>为真当且仅当<math><mi>C</mi></math>并不终止, 因而既然停机问题是不可判定的, 于是Hoare逻辑也是不可判定的.</p>
     <p>可靠性是指, 凡是能用Hoare逻辑的公理和推理规则推导出的Hoare三元组都是真的. 其逆命题, 即完备性, 则是说任何真的Hoare三元组都能用Hoare逻辑的公理和推理规则推导出来. 遗憾的是, 这在一般情况下并不成立.</p>
@@ -3795,7 +4989,48 @@ WHILE Y≤R DO {X = R+Y×Q}
     <p>为了完成上述概要, 我们必须定义<math><mi mathvariant="sans-serif">wlp</mi></math>和<math><mi mathvariant="sans-serif">Wlp</mi></math>并证明性质<math><mrow><msub><mi>P</mi><mn>1</mn></msub><mo>,</mo><msub><mi>P</mi><mn>2</mn></msub><mo>,</mo><msub><mi>P</mi><mn>3</mn></msub></mrow></math>. Hoare逻辑的公理和规则将被用于证明<math><msub><mi>P</mi><mn>1</mn></msub></math>, 而它们能够证明<math><msub><mi>P</mi><mn>1</mn></msub></math>这一事实, 正是其完备性的本质所在.</p>
     <div class="tcomment"><b>译者注记. </b><math><msub><mi>P</mi><mn>1</mn></msub></math>说的是<math><mi mathvariant="sans-serif">wlp</mi></math>的确是句法上的自由前条件. <math><msub><mi>P</mi><mn>2</mn></msub></math>说的是<math><mi mathvariant="sans-serif">wlp</mi></math>和<math><mi mathvariant="sans-serif">Wlp</mi></math>是一致的. <math><msub><mi>P</mi><mn>3</mn></msub></math>结合<math><msub><mi>P</mi><mn>2</mn></msub></math>说的是<math><mi>P</mi></math>在语义上是<math><mi>C</mi></math>和<math><mi>Q</mi></math>的自由前条件当且仅当<math><mi>P</mi></math>在语义层次上比<math><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>强.</div>
     <h4>第4.3.2小节 句法和语义最弱前条件</h4>
-    <p>如果<math><mrow><mi>P</mi><mo>&rArr;</mo><mi>Q</mi></mrow></math>, 我们说<math><mi>P</mi></math>比<math><mi>Q</mi></math>强, 对偶地, <math><mi>Q</mi></math>比<math><mi>P</mi></math>弱. </p>
+    <p>如果<math><mrow><mi>P</mi><mo>&rArr;</mo><mi>Q</mi></mrow></math>, 我们说<math><mi>P</mi></math>比<math><mi>Q</mi></math>强, 对偶地, <math><mi>Q</mi></math>比<math><mi>P</mi></math>弱. 命令<math><mi>C</mi></math>相对于后条件<math><mi>Q</mi></math>的<em>最弱前条件</em>记作<math><mrow><mi mathvariant="sans-serif">wp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 其是满足<math><mrow><mrow><mo stretchy="false">[</mo><mrow><mi mathvariant="sans-serif">wp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">]</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">[</mo><mi>Q</mi><mo stretchy="false">]</mo></mrow></mrow></math>的最弱谓词. 注意到这和完全正确性相关联. 部分正确性的相应概念是<em>最弱自由前条件</em>, 记作<math><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>: 陈述<math><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是满足<math><mrow><mrow><mo stretchy="false">{</mo><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></math>的最弱谓词. 本章我们只会使用最弱自由前条件. 其关键性质是<math><msub><mi>P</mi><mn>1</mn></msub></math>, 即<math><mrow><mrow/><mo>&vdash;</mo><mrow><mrow><mo stretchy="false">{</mo><mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>C</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>, 以及对于所有的<math><mi>P</mi></math>都有
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+            <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+          </mrow>
+          <mo>&rArr;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>P</mi><mo>&rArr;</mo>
+              <mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      这些性质可以更为精确地表述为单一等式:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+            <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>P</mi><mo>&rArr;</mo>
+              <mrow><mi mathvariant="sans-serif">wlp</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>C</mi><mo>,</mo><mi>Q</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      我们可以很容易地看出来这个等式与刚才提及的关键性质是等价的, 只需使用前条件加强规则和<math><mo>&rArr;</mo></math>的自反性.</p>
+    <div class="tcomment"><b>译者注记. </b>这里没有看上去这么简单, 我不确定作者想表达什么. 但是这个等价需要神谕机, 或者说Hoare逻辑的(相对)完备性.</div>
     <h4>第4.3.3小节 句法前条件和可表达性</h4>
     <h2>第5章 完全 (total) 正确性</h2>
     <p>本章Hoare逻辑的公理和规则被扩展到了完全正确性, 其给出了完全正确性规约的验证条件.</p>

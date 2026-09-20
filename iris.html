@@ -1,0 +1,1085 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Iris from the ground up</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>Iris from the ground up</h1>
+    <h2>第1章 引论</h2>
+    <h2>第2章 Iris之旅</h2>
+    <p>Iris是一种通用的高阶并发分离逻辑. 这里的<q>通用</q>指的是该逻辑以人们希望推理的程序表达式所属的语言为参数, 因此同一种逻辑可以用于多种多样的语言. 为了使本节的讨论更加具体, 我们用一种类ML的语言来实例化Iris, 该语言支持高阶存储, fork以及比较并交换 (compare-and-set, CAS), 如下所示:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>v</mi><mo>&in;</mo><mi>Val</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow/>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>|</mo><mi>z</mi><mo>|</mo><mi mathvariant="monospace">true</mi><mo>|</mo><mi mathvariant="monospace">false</mi><mo>|</mo><mi>&ell;</mi><mo>|</mo>
+                <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>e</mi></mrow>
+                <mo>|</mo><mo>&hellip;</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>z</mi><mo>&in;</mo><mi>&Zopf;</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>e</mi><mo>&in;</mo><mi>Expr</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow><mi>v</mi><mo>|</mo><mi>x</mi><mo>|</mo>
+                <mrow>
+                  <msub><mi>e</mi><mn>1</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">fork</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">{</mo><mi>e</mi><mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">assert</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">ref</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi>!</mi><mo>&af;</mo><mi>e</mi></mrow>
+                <mo>|</mo>
+                <mrow>
+                  <msub><mi>e</mi><mn>1</mn></msub>
+                  <mo>&larr;</mo>
+                  <msub><mi>e</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">CAS</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>e</mi><mo>,</mo>
+                      <msub><mi>e</mi><mn>1</mn></msub>
+                      <mo>,</mo>
+                      <msub><mi>e</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo><mo>&hellip;</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>K</mi><mo>&in;</mo><mi>Ctx</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow><mo>&bull;</mo><mo>|</mo>
+                <mrow><mi>K</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi>v</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">assert</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">ref</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi>!</mi><mo>&af;</mo><mi>K</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>K</mi><mo>&larr;</mo><mi>e</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>v</mi><mo>&larr;</mo><mi>K</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">CAS</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>K</mi><mo>,</mo>
+                      <msub><mi>e</mi><mn>1</mn></msub>
+                      <mo>,</mo>
+                      <msub><mi>e</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">CAS</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>v</mi><mo>,</mo><mi>K</mi><mo>,</mo>
+                      <msub><mi>e</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">CAS</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>v</mi><mo>,</mo>
+                      <msub><mi>v</mi><mn>1</mn></msub>
+                      <mo>,</mo><mi>K</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo><mo>&hellip;</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      (我们省略了序对与和上的常规操作.)</p>
+    <p>该逻辑包含高阶分离逻辑中常见的联结词和规则, 其中一部分已在下面的语法中列出. (实际上, 该语法中给出的许多联结词在Iris中都是作为导出形式 (derived forms) 定义的, 这种灵活性是该逻辑的一个重要方面, 不过我们将这一点的进一步讨论留到第5-7章.)
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>P</mi><mo>,</mo><mi>Q</mi><mo>,</mo><mi>R</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">True</mi><mo>|</mo><mi mathvariant="sans-serif">False</mi><mo>|</mo>
+                <mrow><mi>P</mi><mo>&and;</mo><mi>Q</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>P</mi><mo>&or;</mo><mi>Q</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>P</mi><mo>&rArr;</mo><mi>Q</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mo>&exist;</mo><mi>x</mi><mo lspace="0">.</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>P</mi><mo>&#8270;</mo><mi>Q</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                <mo>|</mo>
+                <mrow><mo>&square;</mo><mo>&af;</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>t</mi><mo>=</mo><mi>u</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <msup>
+                  <menclose notation="box"><mi>P</mi></menclose>
+                  <mi mathvariant="script">N</mi></msup>
+                <mo>|</mo>
+                <msup>
+                  <mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow>
+                  <mi>&gamma;</mi></msup>
+                <mo>|</mo>
+                <mrow>
+                  <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <msub>
+                  <mrow>
+                    <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                    <mspace width="2ex"/><mi>e</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">{</mo>
+                      <mrow><mi>v</mi><mo lspace="0">.</mo><mi>Q</mi></mrow>
+                      <mo stretchy="false">}</mo></mrow>
+                  </mrow>
+                  <mi mathvariant="script">E</mi></msub>
+                <mo>|</mo>
+                <mrow><mi>P</mi>
+                  <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+                  <mi>Q</mi></mrow>
+                <mo>|</mo><mo>&hellip;</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>Iris的证明规则包含并发分离逻辑中关于Hoare三元组的常见规则, 如图1所示. 注意, <math><mtext class="small-caps">HOARE-BIND</mtext></math>是将常见的顺序规则推广到任意求值上下文的结果.</p>
+    <p>图1. Hoare三元组的基本规则.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <msub>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>e</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>w</mi><mo lspace="0">.</mo><mi>Q</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mi mathvariant="script">E</mi></msub>
+            <msub>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>P</mi><mo>&#8270;</mo><mi>R</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>e</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>w</mi><mo lspace="0">.</mo>
+                    <mrow><mi>Q</mi><mo>&#8270;</mo><mi>R</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mi mathvariant="script">E</mi></msub>
+          </mfrac>
+          <mtext class="small-caps">HOARE-FRAME</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <msub>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi mathvariant="sans-serif">True</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>v</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>w</mi><mo lspace="0">.</mo>
+                  <mrow><mi>w</mi><mo>=</mo><mi>v</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+            <mi mathvariant="script">E</mi></msub>
+          <mtext class="small-caps">HOARE-VAL</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <msub>
+                <mrow>
+                  <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                  <mspace width="2ex"/><mi>e</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow><mi>v</mi><mo lspace="0">.</mo><mi>Q</mi></mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mi mathvariant="script">E</mi></msub>
+              <mspace width="8ex"/>
+              <mrow><mo>&forall;</mo><mi>v</mi><mo lspace="0">.</mo>
+                <msub>
+                  <mrow>
+                    <mrow><mo stretchy="false">{</mo><mi>Q</mi><mo stretchy="false">}</mo></mrow>
+                    <mspace width="2ex"/>
+                    <mrow><mi>K</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mspace width="2ex"/>
+                    <mrow><mo stretchy="false">{</mo>
+                      <mrow><mi>w</mi><mo lspace="0">.</mo><mi>R</mi></mrow>
+                      <mo stretchy="false">}</mo></mrow>
+                  </mrow>
+                  <mi mathvariant="script">E</mi></msub>
+              </mrow>
+            </mrow>
+            <msub>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow><mi>K</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>w</mi><mo lspace="0">.</mo><mi>R</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mi mathvariant="script">E</mi></msub>
+          </mfrac>
+          <mtext class="small-caps">HOARE-BIND</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <msub>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow><mi>e</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow><mi>v</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>w</mi><mo lspace="0">.</mo><mi>Q</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mi mathvariant="script">E</mi></msub>
+            <msub>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>e</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/><mi>v</mi></mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>w</mi><mo lspace="0">.</mo><mi>Q</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mi mathvariant="script">E</mi></msub>
+          </mfrac>
+          <mtext class="small-caps">HOARE-&lambda;</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>e</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi mathvariant="sans-serif">True</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+            <msub>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow><mi mathvariant="monospace">fork</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">{</mo><mi>e</mi><mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi mathvariant="sans-serif">True</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mi mathvariant="script">E</mi></msub>
+          </mfrac>
+          <mtext class="small-caps">HOARE-FORK</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <msub>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi mathvariant="sans-serif">True</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi mathvariant="monospace">assert</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">true</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi mathvariant="sans-serif">True</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+            <mi mathvariant="script">E</mi></msub>
+          <mtext class="small-caps">HOARE-ASSERT</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <msub>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi mathvariant="sans-serif">True</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi mathvariant="monospace">ref</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>&ell;</mi><mo lspace="0">.</mo>
+                  <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+            <mi mathvariant="script">E</mi></msub>
+          <mtext class="small-caps">HOARE-ALLOC</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <msub>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi>!</mi><mo>&af;</mo><mi>&ell;</mi></mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>w</mi><mo lspace="0">.</mo>
+                  <mrow>
+                    <mrow><mi>w</mi><mo>=</mo><mi>v</mi></mrow>
+                    <mo>&#8270;</mo>
+                    <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+            <mi mathvariant="script">E</mi></msub>
+          <mtext class="small-caps">HOARE-LOAD</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <msub>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi>&ell;</mi><mo>&larr;</mo><mi>w</mi></mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>w</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+            <mi mathvariant="script">E</mi></msub>
+          <mtext class="small-caps">HOARE-STORE</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <msub>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow><mi mathvariant="monospace">CAS</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&ell;</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>w</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>b</mi><mo lspace="0">.</mo>
+                  <mrow>
+                    <mrow><mi>b</mi><mo>=</mo><mi mathvariant="monospace">true</mi></mrow>
+                    <mo>&#8270;</mo>
+                    <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>w</mi></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+            <mi mathvariant="script">E</mi></msub>
+          <mtext class="small-caps">HOARE-CAS-SUC</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow><mi>v</mi><mo>&ne;</mo>
+              <msup><mi>v</mi><mo>&prime;</mo></msup>
+            </mrow>
+            <msub>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <mrow><mi mathvariant="monospace">CAS</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&ell;</mi><mo>,</mo>
+                      <msup><mi>v</mi><mo>&prime;</mo></msup>
+                      <mo>,</mo><mi>w</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>b</mi><mo lspace="0">.</mo>
+                    <mrow>
+                      <mrow><mi>b</mi><mo>=</mo><mi mathvariant="monospace">false</mi></mrow>
+                      <mo>&#8270;</mo>
+                      <mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mi mathvariant="script">E</mi></msub>
+          </mfrac>
+          <mtext class="small-caps">HOARE-CAS-FAIL</mtext></mrow>
+      </math>
+    </p>
+    <p>使Iris成为高阶分离逻辑的原因在于, 全称量词和存在量词可以遍历任意类型, 包括命题和(高阶)谓词. 而且, 注意到Hoare三元组<math><msub><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi>v</mi><mo lspace="0">.</mo><mi>Q</mi></mrow><mo stretchy="false">}</mo></mrow></mrow><mi mathvariant="script">E</mi></msub></math>是命题逻辑 (经常也被称为断言逻辑) 的一部分而非独立的实体. 因此, 三元组可以像任何逻辑命题一样使用. 特别地, 它们可以嵌套使用, 以给出高阶函数的规约. 此外, Hoare三元组<math><msub><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mrow><mi>v</mi><mo lspace="0">.</mo><mi>Q</mi></mrow><mo stretchy="false">}</mo></mrow></mrow><mi mathvariant="script">E</mi></msub></math>还标注了一个掩码<math><mi mathvariant="script">E</mi></math>, 用于记录当前哪些不变式正在生效. 我们将在第2.2节再回到不变式和掩码的话题, 目前暂且将其省略.</p>
+    <p>图2. 示例代码和规约.<br/>代码:<pre><code>mk_oneshot := λ_.
+  let x = ref (inl 0) in
+  {
+    tryset = λn. CAS(x, inl 0, inr n),
+
+    check  = λ_.
+      let y = !x in
+      λ_.
+        match (y, !x) with
+        | (inl _, _)     => ()
+        | (inr n, inl _) => assert(false)
+        | (inr n, inr m) => assert(n = m)
+        end
+  }</code></pre>规约:<pre><code>{ True }
+  mk_oneshot ()
+{ c. ∀v.
+       { True } c.tryset(v) { w. w ∈ {true, false} }
+     *
+       { True } c.check()   { f. { True } f() { True } }
+}</code></pre></p>
+    <p><b>一个启发性的例子. </b>我们将通过验证图2中给出的一个简单高阶程序的安全性, 来展示Iris的高阶特性以及它的其他一些核心特性. 这个程序当然颇为刻意, 但它足以展示Iris的核心特性.</p>
+    <p>函数<code>mk_oneshot()</code>在<code>x</code>处分配一个oneshot位置, 并返回一个包含两个闭包的记录<code>c</code>. (形式上, 记录是二元组的语法糖.) 函数<code>c.tryset(n)</code>尝试将位置<code>x</code>设置为<code>n</code>, 如果该位置已经被设置过, 则会失败. 我们使用<code>CAS</code>来保证即使两个线程并发地尝试设置该位置, 检查也依然正确. 函数<code>c.check()</code>记录位置<code>x</code>的当前状态, 然后返回一个闭包; 如果位置<code>x</code>已经被初始化, 该闭包会检查它的值没有发生改变.</p>
+    <p>这个规范看起来有点奇怪, 因为大多数前置条件和后置条件都是<code>True</code>. 原因在于, 我们在这里想要证明的仅仅是代码是安全的, 也就是说, 断言会<q>成功</q>: 带有<code>assert(false)</code>的分支永远不会被执行, 并且在最后一个分支中, <code>n</code>总是等于<code>m</code>. 在Iris中, Hoare三元组可以推出安全性, 因此我们不需要再施加任何额外的条件.</p>
+    <p>与函数式程序的Hoare三元组的常见做法一样, 每个Hoare三元组的后条件都带有一个绑定子, 用于引用返回值. 如果结果总是unit, 我们将省略该绑定子.</p>
+    <p>我们使用嵌套的Hoare三元组来表达<code>mk_oneshot()</code>返回闭包这一事实: 由于Hoare三元组本身就是命题, 我们可以将它们放入<code>mk_oneshot()</code>的后条件中, 以描述客户端可以对<code>c</code>做出哪些假设. 此外, 由于Iris是一种并发程序逻辑, <code>mk_oneshot()</code>的规约实际上允许客户端从多个线程以任意组合并发地调用<code>c.tryset(n)</code>和<code>c.check()</code>, 以及由<code>c.check()</code>返回的闭包<code>f</code>.</p>
+    <p>值得指出的是, Iris是一种仿射分离逻辑, 这意味着它满足弱化规则<math><mrow><mrow><mi>P</mi><mo>&#8270;</mo><mi>Q</mi></mrow><mo>&rArr;</mo><mi>P</mi></mrow></math>. 直观地说, 这条规则允许人们丢弃资源; 例如, 在Hoare三元组的后置条件中, 人们可以丢弃对未使用内存位置的所有权. 由于Iris是仿射的, 它没有<math><mi mathvariant="sans-serif">Emp</mi></math>联结词 (该联结词断言不拥有任何资源 (O'Hearn et al., 2001)); 相反, Iris的<math><mi mathvariant="sans-serif">True</mi></math>联结词 (它描述对任意资源的所有权) 是分离合取的单位元 (即<math><mrow><mrow><mi>P</mi><mo>&#8270;</mo><mi mathvariant="sans-serif">True</mi></mrow><mo>&hArr;</mo><mi>P</mi></mrow></math>). 我们将在第9.5节中进一步讨论这一设计选择.</p>
+    <p><b>高层证明结构. </b>为了完成这个证明, 我们需要以某种方式编码这样一个事实: 我们对<code>x</code>只进行一次性 (oneshot) 更新. 为此, 我们将分配一个名为<math><mi>&gamma;</mi></math>, 值为<math><mi>a</mi></math>的幽灵位置 (ghost location) <math><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow><mi>&gamma;</mi></msup></math>, 它镜像<code>x</code>的当前状态. 乍一听这似乎毫无意义: 为什么要在幽灵状态中记录一个与某个物理位置中的值完全相同的值呢?</p>
+    <p>关键在于, 使用幽灵状态让我们能够选择该位置上可以进行何种共享. 对于物理位置<math><mi>&ell;</mi></math>, 命题<math><mrow><mi>&ell;</mi><mo>&mapsto;</mo><mi>v</mi></mrow></math>表示对<math><mi>&ell;</mi></math>的完全所有权 (因此也意味着它不存在任何共享). 与之相对, Iris允许我们为幽灵位置<math><mi>&gamma;</mi></math>选择任意我们想要的结构和所有权形式. 特别地, 我们可以这样定义它: 虽然<math><mi>&gamma;</mi></math>的内容镜像<code>x</code>的内容, 但一旦<math><mi>&gamma;</mi></math>被初始化 (通过调用<code>tryset</code>), 我们就可以自由地共享<math><mi>&gamma;</mi></math>的所有权. 这又使得<code>check</code>返回的闭包能够拥有<math><mi>&gamma;</mi></math>的一部分, 用以见证 (witness) 其初始化之后的值. 然后我们会有一个不变式 (见第2.2节), 将<math><mi>&gamma;</mi></math>的值与<code>x</code>的值联系起来. 这样我们就知道该闭包从<code>x</code>读取时将会看到哪个值, 并且知道该值将与<code>y</code>相匹配.</p>
+    <p>描述这一过程的另一种方式是: 我们正在应用虚构分离 (fictional separation) 的思想 (Dodds et al., 2009): <math><mi>&gamma;</mi></math>上的分离是<q>虚构的</q>, 其含义是多个线程可以拥有<math><mi>&gamma;</mi></math>的各个部分, 从而操作同一个共享变量<code>x</code>, 二者通过一个不变式联系在一起.</p>
+    <p>在理解了这一高层证明结构之后, 我们现在来解释幽灵状态的所有权与共享究竟是如何被控制的.</p>
+    <h3>第2.1节 Iris中的幽灵状态: 资源代数</h3>
+    <p>图3. 资源代数.<br/>一个资源代数 (RA) 是一个元组<math><mrow><mo stretchy="false">(</mo><mrow><mi>M</mi><mo>,</mo><mrow><mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover><mo>:</mo><mrow><mi>M</mi><mo>&rarr;</mo><mi>Prop</mi></mrow></mrow><mo>,</mo><mrow><mrow><mo stretchy="false">|</mo><mi>&minus;</mi><mo stretchy="false">|</mo></mrow><mo>:</mo><mrow><mi>M</mi><mo>&rarr;</mo><msup><mi>M</mi><mi>?</mi></msup></mrow></mrow><mo>,</mo><mrow><mrow><mo stretchy="false">(</mo><mo>&sdot;</mo><mo stretchy="false">)</mo></mrow><mo>:</mo><mrow><mrow><mi>M</mi><mo>&times;</mo><mi>M</mi></mrow><mo>&rarr;</mo><mi>M</mi></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>, 其满足:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(RA-ASSOC)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&sdot;</mo><mi>c</mi></mrow>
+                  <mo>=</mo>
+                  <mrow><mi>a</mi><mo>&sdot;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>b</mi><mo>&sdot;</mo><mi>c</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(RA-ASSOC)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(RA-COMM)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow>
+                  <mo>=</mo>
+                  <mrow><mi>b</mi><mo>&sdot;</mo><mi>a</mi></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(RA-COMM)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(RA-CORE-ID)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo><mi>a</mi><mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                    <mo>&in;</mo><mi>M</mi></mrow>
+                  <mo>&rArr;</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                      <mo>&sdot;</mo><mi>a</mi></mrow>
+                    <mo>=</mo><mi>a</mi></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(RA-CORE-ID)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(RA-CORE-IDEM)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo><mi>a</mi><mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                    <mo>&in;</mo><mi>M</mi></mrow>
+                  <mo>&rArr;</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">|</mo>
+                      <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                      <mo stretchy="false">|</mo></mrow>
+                    <mo>=</mo>
+                    <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(RA-CORE-IDEM)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(RA-CORE-MONO)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                      <mo>&in;</mo><mi>M</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow><mi>a</mi><mo>&prcue;</mo><mi>b</mi></mrow>
+                  </mrow>
+                  <mo>&rArr;</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">|</mo><mi>b</mi><mo stretchy="false">|</mo></mrow>
+                      <mo>&in;</mo><mi>M</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                      <mo>&prcue;</mo>
+                      <mrow><mo stretchy="false">|</mo><mi>b</mi><mo stretchy="false">|</mo></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(RA-CORE-MONO)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(RA-VALID-OP)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&rArr;</mo>
+                  <mrow>
+                    <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(RA-VALID-OP)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      其中<math><mrow><msup><mi>M</mi><mi>?</mi></msup><mover><mo>=</mo><mi>def</mi></mover><mrow><mi>M</mi><mo>⊎</mo><mrow><mo stretchy="false">{</mo><mi>&bottom;</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>而<math><mrow><mrow><msup><mi>a</mi><mi>?</mi></msup><mo>&sdot;</mo><mi>&bottom;</mi></mrow><mover><mo>=</mo><mi>def</mi></mover><mrow><mi>&bottom;</mi><mo>&sdot;</mo><msup><mi>a</mi><mi>?</mi></msup></mrow><mover><mo>=</mo><mi>def</mi></mover><msup><mi>a</mi><mi>?</mi></msup></mrow></math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(RA-INCL)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>a</mi><mo>&prcue;</mo><mi>b</mi></mrow>
+                <mover><mo>=</mo><mi>def</mi></mover>
+                <mrow><mo>&exist;</mo>
+                  <mrow><mi>c</mi><mo>&in;</mo><mi>M</mi></mrow>
+                  <mo lspace="0">.</mo>
+                  <mrow><mi>b</mi><mo>=</mo>
+                    <mrow><mi>a</mi><mo>&sdot;</mo><mi>c</mi></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(RA-INCL)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>一个单位资源代数 (uRA) 是一个资源代数<math><mi>M</mi></math>并带有一个元素<math><mi>&epsilon;</mi></math>满足:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>&epsilon;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow><mo>&forall;</mo>
+            <mrow><mi>a</mi><mo>&in;</mo><mi>M</mi></mrow>
+            <mo lspace="0">.</mo>
+            <mrow>
+              <mrow><mi>&epsilon;</mi><mo>&sdot;</mo><mi>a</mi></mrow>
+              <mo>=</mo><mi>a</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mrow><mo stretchy="false">|</mo><mi>&epsilon;</mi><mo stretchy="false">|</mo></mrow>
+            <mo>=</mo><mi>&epsilon;</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>Iris允许人们通过命题<math><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow><mi>&gamma;</mi></msup></math>使用幽灵状态, 其断言了幽灵位置<math><mi>&gamma;</mi></math>的一个部分<math><mi>a</mi></math>的所有权. Iris的灵活性是从以下事实中生发的: 对于每个幽灵位置<math><mi>&gamma;</mi></math>, 逻辑的使用者可以挑选其值<math><mi>a</mi></math>的类型<math><mi>M</mi></math>, 而非这个类型提前由逻辑固定. 然而, 为了能够以有趣的方式使用<math><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow><mi>&gamma;</mi></msup></math>, <math><mi>M</mi></math>不能只是任意的类型, 而应该具有某种额外的结构, 即
+      <ul>
+        <li>其应该能够对于不同线程的所有权进行复合. 为了使得这成为可能, 类型<math><mi>M</mi></math>应该具有一个运算<math><mrow><mo stretchy="false">(</mo><mo>&sdot;</mo><mo stretchy="false">)</mo></mrow></math>用于复合. 逻辑中这种运算的重要规则是<math><mrow><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow></mrow><mi>&gamma;</mi></msup><mo>&hArr;</mo><mrow><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow><mi>&gamma;</mi></msup><mo>&#8270;</mo><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>b</mi></mrow><mi>&gamma;</mi></msup></mrow></mrow></math> (见图4的<math><mtext class="small-caps">GHOST-OP</mtext></math>).</li>
+        <li>无意义的复合<math><mrow><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow><mi>&gamma;</mi></msup><mo>&#8270;</mo><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>b</mi></mrow><mi>&gamma;</mi></msup></mrow></math>应当被逻辑排除 (即它们应该蕴涵<math><mi mathvariant="sans-serif">False</mi></math>). 例如, 这发生于多个线程声称具有一个互斥资源的所有权. 为了使得这成为可能, 运算<math><mrow><mo stretchy="false">(</mo><mo>&sdot;</mo><mo stretchy="false">)</mo></mrow></math>应当是部分的 (partial).</li>
+      </ul>
+    </p>
+    <p>此外, 所有权的组合应当满足结合律和交换律, 以反映分离合取的结合性与交换性. 正因如此, 部分交换幺半群 (partial commutative monoids, PCMs) 已成为分离逻辑中表示幽灵状态的标准结构. 在Iris中, 我们对此略有偏离, 使用了我们自己的资源代数 (resource algebra, RA) 概念, 其定义见图3. 每个PCM都是一个RA, 但反之则不然&mdash;&mdash;正如我们将在例子中看到的, RA所提供的额外灵活性带来了额外的逻辑表达能力.</p>
+    <p>图4. 一些Iris证明规则.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mrow><mi mathvariant="sans-serif">True</mi>
+              <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+              <mrow><mo>&exist;</mo><mi>&gamma;</mi><mo lspace="0">.</mo>
+                <msup>
+                  <mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow>
+                  <mi>&gamma;</mi></msup>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mtext class="small-caps">GHOST-ALLOC</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msup>
+              <mrow style="border: 0.8px dashed black; padding: 0px 4px;">
+                <mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow>
+              </mrow>
+              <mi>&gamma;</mi></msup>
+            <mo>&hArr;</mo>
+            <mrow>
+              <msup>
+                <mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow>
+                <mi>&gamma;</mi></msup>
+              <mo>&#8270;</mo>
+              <msup>
+                <mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>b</mi></mrow>
+                <mi>&gamma;</mi></msup>
+            </mrow>
+          </mrow>
+          <mtext class="small-caps">GHOST-OP</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msup>
+              <mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow>
+              <mi>&gamma;</mi></msup>
+            <mo>&rArr;</mo>
+            <mrow>
+              <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mtext class="small-caps">GHOST-VALID</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>P</mi>
+                <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+                <msup><mi>P</mi><mo>&prime;</mo></msup>
+              </mrow>
+              <mspace width="8ex"/>
+              <msub>
+                <mrow>
+                  <mrow><mo stretchy="false">{</mo>
+                    <msup><mi>P</mi><mo>&prime;</mo></msup>
+                    <mo stretchy="false">}</mo></mrow>
+                  <mspace width="2ex"/><mi>e</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow><mi>v</mi><mo lspace="0">.</mo>
+                      <msup><mi>Q</mi><mo>&prime;</mo></msup>
+                    </mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mi mathvariant="script">E</mi></msub>
+              <mspace width="8ex"/>
+              <mrow><mo>&forall;</mo><mi>v</mi><mo lspace="0">.</mo>
+                <mrow>
+                  <msup><mi>Q</mi><mo>&prime;</mo></msup>
+                  <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+                  <mi>Q</mi></mrow>
+              </mrow>
+            </mrow>
+            <msub>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>e</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>v</mi><mo lspace="0">.</mo><mi>Q</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mi mathvariant="script">E</mi></msub>
+          </mfrac>
+          <mtext class="small-caps">HOARE-VS</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>P</mi>
+                <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+                <mi>Q</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow><mi>Q</mi>
+                <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+                <mi>R</mi></mrow>
+            </mrow>
+            <mrow><mi>P</mi>
+              <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+              <mi>R</mi></mrow>
+          </mfrac>
+          <mtext class="small-caps">VS-TRANS</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow><mi>P</mi>
+              <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+              <mi>Q</mi></mrow>
+            <mrow>
+              <mrow><mi>P</mi><mo>&#8270;</mo><mi>R</mi></mrow>
+              <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+              <mrow><mi>Q</mi><mo>&#8270;</mo><mi>R</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mtext class="small-caps">VS-FRAME</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mrow><mi>P</mi>
+            <msub><mo>⇛</mo><mi mathvariant="script">E</mi></msub>
+            <msup>
+              <menclose notation="box"><mi>P</mi></menclose>
+              <mi mathvariant="script">N</mi></msup>
+          </mrow>
+          <mtext class="small-caps">INV-ALLOC</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="sans-serif">persistent</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow><mi mathvariant="sans-serif">persistent</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>Q</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="sans-serif">persistent</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>P</mi><mo>&#8270;</mo><mi>Q</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mfrac>
+          <mtext class="small-caps">PERSISTENT-SEP</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+              <mo>=</mo><mi>a</mi></mrow>
+            <mrow><mi mathvariant="sans-serif">persistent</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msup>
+                  <mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow>
+                  <mi>&gamma;</mi></msup>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mfrac>
+          <mtext class="small-caps">PERSISTENT-GHOST</mtext></mrow>
+      </math>
+    </p>
+    <p>RA与PCM之间有两个关键区别:
+      <ol>
+        <li>没有使用部分性, RA使用合法性来排除非法的所有权组合. 具体而言, 存在一个谓词<math><mrow><mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover><mo>:</mo><mrow><mi>M</mi><mo>&rarr;</mo><mi>Prop</mi></mrow></mrow></math>可以识别出合法的元素. 合法性与复合运算是兼容的 (<math><mtext class="small-caps">RA-VALID-OP</mtext></math>). 我们在第4.3节将会看到合法性取代部分性对于定义<em>高阶幽灵状态</em>的结构而言是必要的, 即结构依赖于<math><mi>iProp</mi></math>的幽灵状态, 这是Iris逻辑的命题的类型.</li>
+        <li>RA并不具有一个对每个元素都是恒元的单一单位元<math><mi>&epsilon;</mi></math> (即对于任意的<math><mi>a</mi></math>都有<math><mrow><mrow><mi>&epsilon;</mi><mo>&sdot;</mo><mi>a</mi></mrow><mo>=</mo><mi>a</mi></mrow></math>), 而是具有一个部分函数<math><mrow><mo stretchy="false">|</mo><mi>&minus;</mi><mo stretchy="false">|</mo></mrow></math>为元素<math><mi>a</mi></math>指派其可复制的核<math><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></math>, 如<math><mtext class="small-caps">RA-CORE-ID</mtext></math>所要求的那样. 我们进一步要求<math><mrow><mo stretchy="false">|</mo><mi>&minus;</mi><mo stretchy="false">|</mo></mrow></math>是幂等的 (<math><mtext class="small-caps">RA-CORE-IDEM</mtext></math>) 和单调的 (<math><mtext class="small-caps">RA-CORE-MONO</mtext></math>), 相对于<em>扩展序</em>而言, 其定义类似于PCM的 (<math><mtext class="small-caps">RA-INCL</mtext></math>).<br/>一个元素可以没有核, 这是由<math><mrow><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo>=</mo><mi>&bottom;</mi></mrow></math>指示的. 为了方便地处理部分核, 我们使用元变量<math><msup><mi>a</mi><mi>?</mi></msup></math>遍历<math><mrow><msup><mi>M</mi><mi>?</mi></msup><mover><mo>=</mo><mi>def</mi></mover><mrow><mi>M</mi><mo>⊎</mo><mrow><mo stretchy="false">{</mo><mi>&bottom;</mi><mo stretchy="false">}</mo></mrow></mrow></mrow></math>的元素, 并将复合<math><mrow><mo stretchy="false">(</mo><mo>&sdot;</mo><mo stretchy="false">)</mo></mrow></math>提升至<math><msup><mi>M</mi><mi>?</mi></msup></math>. 我们将会在第3.1节看到, 部分核有助于我们从更小的原语构建有趣的复合RA.<br/>在RA的确有一个单位元<math><mi>&epsilon;</mi></math>的特殊情形下, 我们将其称为单位RA (uRA). 根据<math><mtext class="small-caps">RA-CORE-MONO</mtext></math>, 可以推出uRA的核是一个完全函数, 即<math><mrow><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo>&ne;</mo><mi>&bottom;</mi></mrow></math>.<br/>可复制核的想法并不新颖, 我们将在第9.3节讨论相关工作.</li>
+      </ol>
+    </p>
+    <div class="tcomment"><b>译者注记. </b>不仅需要使用<math><mtext class="small-caps">RA-CORE-MONO</mtext></math>, 还需要使用uRA的公理<math><mrow><mrow><mo stretchy="false">|</mo><mi>&epsilon;</mi><mo stretchy="false">|</mo></mrow><mo>=</mo><mi>&epsilon;</mi></mrow></math>.</div>
+    <p><b>我们例子的一个资源代数. </b>现在我们来定义可用于验证我们示例的RA, 我们称之为oneshot RA. 这个RA的目标是恰当地反映物理位置<math><mi>x</mi></math>. carrier的定义使用了如下的类数据类型记号.
+      <math display="block">
+        <mrow><mi>M</mi>
+          <mover><mo>=</mo><mi>def</mi></mover>
+          <mrow><mi mathvariant="sans-serif">pending</mi><mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">shot</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>n</mi><mo>:</mo><mi>&Zopf;</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>|</mo><mi>↯</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>幽灵位置的两种重要状态为: <math><mi mathvariant="sans-serif">pending</mi></math>, 代表单次更新尚未发生, 以及<math><mrow><mi mathvariant="sans-serif">shot</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 其是说位置已经被置为<math><mi>n</mi></math>. 我们需要额外的元素<math><mi>↯</mi></math>来表示部分性; 其是唯一的非法元素:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mover><mo>=</mo><mi>def</mi></mover>
+          <mrow><mi>a</mi><mo>&ne;</mo><mi>↯</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>当然了, 一个RA最有趣的地方在于其复合: 两个线程的所有权合并时会发生什么? (以下等式没有定义的复合自动映射至<math><mi>↯</mi></math>.)
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">shot</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&sdot;</mo>
+            <mrow><mi mathvariant="sans-serif">shot</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mover><mo>=</mo><mi>def</mi></mover>
+          <mrow><mo>{</mo>
+            <mtable displaystyle="true">
+              <mtr>
+                <mtd>
+                  <mrow><mi mathvariant="sans-serif">shot</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mtd>
+                <mtd columnalign="left"><mtext>, 如果</mtext>
+                  <mrow><mi>n</mi><mo>=</mo><mi>m</mi></mrow>
+                </mtd>
+              </mtr>
+              <mtr>
+                <mtd><mi>↯</mi></mtd>
+                <mtd columnalign="left"><mtext>, 否则的话</mtext></mtd>
+              </mtr>
+            </mtable>
+          </mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>这个定义具有三种重要性质:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(PENDING-EXCL)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="sans-serif">pending</mi><mo>&sdot;</mo><mi>a</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&rArr;</mo><mi mathvariant="sans-serif">False</mi></mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(PENDING-EXCL)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">(SHOT-AGREE)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="sans-serif">shot</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&sdot;</mo>
+                      <mrow><mi mathvariant="sans-serif">shot</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&rArr;</mo>
+                <mrow><mi>n</mi><mo>=</mo><mi>m</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">(SHOT-AGREE)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <h2>第3章 高级幽灵状态构造</h2>
+    <h2>第4章 一个Iris的模型</h2>
+    <h2>第5章 Iris基逻辑</h2>
+    <h2>第6章 最弱前条件</h2>
+  </body>
+</html>
