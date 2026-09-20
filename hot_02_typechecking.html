@@ -1,0 +1,2020 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>线性类型检查</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>线性类型检查</h1>
+    <p>Frank Pfenning. 原文标题为<q>Lecture Notes on Linear Typechecking</q>, 是CMU 15-417/817: HOT Compilation的第2讲讲义, 2025年1月16日 (星期四).</p>
+    <p>返回<a href="hot.html">HOT编译</a>的索引页面; 本文的译名见<a href="hot_glossary.html">术语翻译对照</a>.</p>
+    <h2 id="significance">第1章 线性的意义</h2>
+    <p>我们首先稍微探索一下线性定型的限制. 回想一下, 判断中的每个变量<math><mi>x</mi></math>和<math><msub><mi>y</mi><mi>i</mi></msub></math>在运行时都代表一个单元的地址.
+      <math display="block">
+        <mrow>
+          <munder>
+            <munder>
+              <mrow>
+                <mrow>
+                  <msub><mi>y</mi><mn>1</mn></msub>
+                  <mo>:</mo>
+                  <msub><mi>B</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <mrow>
+                  <msub><mi>y</mi><mi>n</mi></msub>
+                  <mo>:</mo>
+                  <msub><mi>B</mi><mi>n</mi></msub>
+                </mrow>
+              </mrow>
+              <mo>&UnderBrace;</mo></munder>
+            <mtext>从这里读取</mtext></munder>
+          <mo>&vdash;</mo>
+          <mrow><mi>P</mi><mo>::</mo>
+            <munder>
+              <munder>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&UnderBrace;</mo></munder>
+              <mtext>写入这里</mtext></munder>
+          </mrow>
+        </mrow>
+      </math>
+      线性保证了每个变量<math><msub><mi>y</mi><mi>i</mi></msub></math>都将被使用, 并且变量<math><mi>x</mi></math>将被写入, 假设<math><mi>P</mi></math>会终止. 执行的状态由多个语义对象<math><mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow></math> (其中所有的地址<math><mi>c</mi></math>都互不相同, 而<math><mi>v</mi></math>是一个小值) 以及一些代表正在运行的进程的<math><mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/><mi>P</mi></mrow></math>组成. 如果一个格局完全由内存单元组成, 我们就到达了一个终格局. 回想一下这些规则:
+      <math display="block">
+        <mtable columnalign="right center left left">
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>K</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>v</mi><mo>&triangleright;</mo><mi>K</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mspace width="2ex"/>
+                    <mrow><mi>P</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mspace width="2ex"/>
+                    <mrow><mi>Q</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                  <mrow><mi>P</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo>,</mo>
+                <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                  <mrow><mi>Q</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mtext> 新鲜</mtext></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>b</mi><mspace width="2ex"/><mi>v</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>b</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>v</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="bold">call</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi mathvariant="bold">b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mi>Q</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>a</mi><mo>,</mo><mi mathvariant="bold">b</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">proc</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="bold">y</mi></mrow>
+                    <mo>=</mo>
+                    <mrow><mi>Q</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi mathvariant="bold">y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>&in;</mo><mi mathvariant="normal">&Sigma;</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow/>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&triangleright;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow/>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&rArr;</mo><mi>Q</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>Q</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&triangleright;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&rArr;</mo>
+                  <mrow><mi>Q</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>Q</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mi>k</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&triangleright;</mo>
+                <msub>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow>
+                      <mrow><mi>&ell;</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>y</mi><mi>&ell;</mi></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&rArr;</mo>
+                      <mrow>
+                        <msub><mi>Q</mi><mi>&ell;</mi></msub>
+                        <mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>y</mi><mi>&ell;</mi></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                  <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                </msub>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>Q</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>多重集重写中的一步将格局 (它是无序的) 的一部分与规则的左侧相匹配, 并将其替换为规则的右侧. 因此, 在<code>read</code>和<code>id</code>的规则中, 左侧的单元从格局中消失了, 这对应于单元的<em>释放</em>. 由于线性定型, 这意味着在计算结束时, 只有从无参数过程的初始目的地可达的单元会在格局中保持分配状态. 换言之, 我们不需要传统的垃圾回收器.</p>
+    <p>一个有趣的观察是, 因为所有的类型都是正的, 我们实际上可以编写释放或复制值的过程. 在现场编写的文件<code>lec02.sax</code>中, 我们为一些类型编写了释放和复制函数. {译注: 原文此处写作<code>lex02.sax</code>, 应为笔误. 讲义中没有列出这个文件, 这里附上课程提供的<code>lec02.sax</code>.}<pre><code>/* Lecture 2 */
+/* 15-x17 Spring 2025 */
+/* Live code */
+
+type bool = +{'false : 1, 'true : 1}
+
+proc dealloc_bool (d : 1) (x : bool) =
+  read x {
+  | 'false(u) => id d u
+  | 'true(u) => read u ()
+                write d ()
+  }
+
+proc and (d : bool) (x : bool) (y : bool) =
+  read x {
+  | 'false(u) => cut w : 1
+                    call dealloc_bool w y
+                 read w ()
+                 write d 'false(u)
+  | 'true(u) => read y {
+                | 'false(w) => read u {
+                               | () => write d 'false(w)
+                               }
+                | 'true(w) => read u ()
+                              write d 'true(w)
+                }
+  }
+
+type bin = +{'b0 : bin, 'b1 : bin, 'e : 1}
+
+proc dealloc_bin (d : 1) (x : bin) =
+  read x {
+  | 'b0(x0) => call dealloc_bin d x0
+  | 'b1(x1) => call dealloc_bin d x1
+  | 'e(u) => id d u
+  }
+
+proc dup_bin (d : bin * bin) (x : bin) =
+  // write d (x, x)
+  read x {
+  | 'b0(x) => cut y : bin * bin
+                 call dup_bin y x
+              read y (y1, y2)
+              cut d1 : bin
+                write d1 'b0(y1)
+              cut d2 : bin
+                write d2 'b0(y2)
+              write d (d1, d2)
+  | 'b1(x) => cut y : bin * bin
+                 call dup_bin y x
+              read y (y1, y2)
+              cut d1 : bin
+                write d1 'b1(y1)
+              cut d2 : bin
+                write d2 'b1(y2)
+              write d (d1, d2)
+  | 'e(u) => cut d1 : bin
+                write d1 'e(u)
+             cut d2 : bin
+                cut w : 1
+                   write w ()
+                write d2 'e(w)
+             write d (d1, d2)
+  }</code></pre></p>
+    <h2 id="two-problems">第2章 定型的两个问题</h2>
+    <p>让我们只看其中两条规则, 并考察实现它们时的问题.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow>
+                <mrow><mi>y</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>y</mi></mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mi mathvariant="normal">id</mi></mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow><mi>P</mi><mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  </mrow>
+                  <mo>&vdash;</mo>
+                  <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                </mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="normal">&Delta;</mi></mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mi mathvariant="normal">cut</mi></mrow>
+        </mrow>
+      </math>
+      第一个问题在恒等规则中可见: 我们被给定了<math><mrow><mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow><mo>&vdash;</mo><mrow><mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>y</mi></mrow><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 并且如果<math><mrow><mi>B</mi><mo>=</mo><mi>A</mi></mrow></math>的话, 我们就应该接受这个恒等是良类型的. 但是两个类型何时相等呢? 在当今的许多函数式语言中, 递归类型定义是<em>生成性的</em>, 因此一个类型名称只等于其自身. 但是这里我们有等价递归的定义, 因此一个类型名称等于其定义项. 在存在递归的情况下, 这就产生了判定两个类型是否相等的问题.</p>
+    <p>第二个问题以切规则为例. 每个变量都应当恰好被使用一次, 但是一些变量会出现在<math><mi>P</mi></math>中, 另一些会出现在<math><mi>Q</mi></math>中, 那么我们如何<q>拆分</q>结论中的上下文呢?</p>
+    <p>我们将依次处理这两个问题.</p>
+    <h2 id="additive">第3章 加法式算法定型</h2>
+    <p>假设类型相等的问题可以解决, 以下是设计线性类型检查算法的一种方法. 因为我们不知道如何拆分上下文, 我们就直接把它传给切的两个前提. 对于进行检查的命令, 我们返回在其类型检查中实际用到的上下文. 然后我们将两者组合起来, 并且如果 (例如) 一个变量在两侧都被使用了, 就失败. 这个新的判断是<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mrow><mrow><mi>P</mi><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>/</mo><mi mathvariant="normal">&Xi;</mi></mrow></mrow></math>, 其中<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>P</mi><mo>,</mo><mi>x</mi></mrow></math>和<math><mi>A</mi></math>是输入, 而如果定型成功, <math><mi mathvariant="normal">&Xi;</mi></math>是输出. <math><mi mathvariant="normal">&Xi;</mi></math>包含了在<math><mi>P</mi></math>中实际用到的变量. 换言之:
+      <blockquote>
+        <p>如果<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mrow><mrow><mi>P</mi><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>/</mo><mi mathvariant="normal">&Xi;</mi></mrow></mrow></math>, 那么<math><mrow><mi mathvariant="normal">&Xi;</mi><mo>&vdash;</mo><mrow><mi>P</mi><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</p>
+      </blockquote>
+      反过来:
+      <blockquote>
+        <p>如果<math><mrow><mi mathvariant="normal">&Xi;</mi><mo>&vdash;</mo><mrow><mi>P</mi><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 那么对于所有与<math><mi mathvariant="normal">&Xi;</mi></math>不相交的<math><mi mathvariant="normal">&Gamma;</mi></math>, 都有<math><mrow><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="normal">&Xi;</mi></mrow><mo>&vdash;</mo><mrow><mrow><mi>P</mi><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>/</mo><mi mathvariant="normal">&Xi;</mi></mrow></mrow></math>.</p>
+      </blockquote>
+    </p>
+    <p>于是, 切规则的第一个版本可能是
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>P</mi><mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>/</mo>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                  <mo>/</mo>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+                <mo>/</mo>
+                <mrow>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                  <mo>;</mo>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">cut??</mi></mrow>
+      </math>
+      其中<math><mrow><msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub><mo>;</mo><msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub></mrow></math>合并两个不同的上下文, 并检查它们是不相交的 (见下面的定义). 然而, 这并不完全正确. 我们还需要确保<math><mi>x</mi></math>在<math><mi>Q</mi></math>的定型中真的被使用了, 并且它没有逃逸出其作用域. 因此我们得到
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>P</mi><mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>/</mo>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                  <mo>/</mo>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+                <mo>/</mo>
+                <mrow>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                  <mo>;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                      <mo>&setminus;</mo><mi>x</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">cut</mi></mrow>
+      </math>
+      这里, <math><mrow><msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub><mo>&setminus;</mo><mi>x</mi></mrow></math>从<math><msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub></math>中移除<math><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 并且也验证了这样的<math><mi>x</mi></math>确实在<math><msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub></math>中. {译注: 原文此处写作<q><math><mrow><mtext>从</mtext><mi mathvariant="normal">&Xi;</mi><mtext>中移除</mtext></mrow></math></q>, 应为笔误; 另外, 原文接下来的一句<q>This means,</q>没有写完.}</p>
+    <p>我们定义合并运算<math><mrow><msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub><mo>;</mo><msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub></mrow></math>:
+      <math display="block">
+        <mtable columnalign="right center left left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                    <mo>,</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>;</mo>
+                <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                    <mo>;</mo>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>前提是 </mtext>
+                <mrow><mi>x</mi><mo>&notin;</mo>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                <mo>;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                    <mo>,</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                    <mo>;</mo>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>前提是 </mtext>
+                <mrow><mi>x</mi><mo>&notin;</mo>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+                <mo>;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      在其他情况下, 合并失败. 以及减法运算:
+      <math display="block">
+        <mtable columnalign="right center left left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="normal">&Xi;</mi><mo>,</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&setminus;</mo><mi>x</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi mathvariant="normal">&Xi;</mi></mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="normal">&Xi;</mi><mo>,</mo>
+                    <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&setminus;</mo><mi>x</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="normal">&Xi;</mi><mo>&setminus;</mo><mi>x</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>,</mo>
+                <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mtext>前提是 </mtext>
+                <mrow><mi>y</mi><mo>&ne;</mo><mi>x</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      在剩下的情况下, 减法失败.</p>
+    <p>对于其余的规则, 我们只需要记住其定义性质: 输出上下文<math><mi mathvariant="normal">&Xi;</mi></math>包含了实际用到的变量. 有一点需要注意: 在<math><mrow><mi>&oplus;</mi><mi>L</mi></mrow></math>的规则中, 减法<math><mrow><msub><mi mathvariant="normal">&Xi;</mi><mi>&ell;</mi></msub><mo>&setminus;</mo><msub><mi>y</mi><mi>&ell;</mi></msub></mrow></math>必须在每个分支中产生相同的<math><mi mathvariant="normal">&Xi;</mi></math>.</p>
+    <p>
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi>y</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>y</mi></mrow>
+                    <mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>/</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>y</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mi mathvariant="normal">id</mi></mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow>
+                    <mrow><mi>P</mi><mo>::</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>/</mo>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                  </mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  </mrow>
+                  <mo>&vdash;</mo>
+                  <mrow>
+                    <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                    <mo>/</mo>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                    <mo>::</mo><mi>&delta;</mi></mrow>
+                  <mo>/</mo>
+                  <mrow>
+                    <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                    <mo>;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                        <mo>&setminus;</mo><mi>x</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mi mathvariant="normal">cut</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow/>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>/</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>X</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow>
+                  <mrow><mi>x</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                  <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+                <mspace width="8ex"/>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow>
+                    <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                    <mo>/</mo><mi mathvariant="normal">&Xi;</mi></mrow>
+                </mrow>
+              </mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                      <mrow>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow/>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mo>&rArr;</mo><mi>Q</mi></mrow>
+                    </mrow>
+                    <mo>::</mo><mi>&delta;</mi></mrow>
+                  <mo>/</mo>
+                  <mrow><mi mathvariant="normal">&Xi;</mi><mo>;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>L</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+              <mo>,</mo>
+              <mrow>
+                <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+                <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>z</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>z</mi><mo>:</mo>
+                      <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>/</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&otimes;</mi><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mrow><mi>z</mi><mo>:</mo>
+                  <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                </mrow>
+                <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  <mo>,</mo>
+                  <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                  <mo>/</mo><mi mathvariant="normal">&Xi;</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>z</mi><mspace width="2ex"/>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&rArr;</mo><mi>Q</mi></mrow>
+                  </mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+                <mo>/</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="normal">&Xi;</mi><mo>&setminus;</mo><mi>x</mi><mo>&setminus;</mo><mi>y</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>z</mi><mo>:</mo>
+                      <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&otimes;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>k</mi><mo>&in;</mo><mi>L</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow><mi>y</mi><mo>:</mo>
+                  <msub><mi>A</mi><mi>k</mi></msub>
+                </mrow>
+                <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                    <mrow><mi>k</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo>
+                      <msub>
+                        <mrow><mi>&oplus;</mi>
+                          <mrow><mo stretchy="false">{</mo>
+                            <mrow><mi>&ell;</mi><mo>:</mo>
+                              <msub><mi>A</mi><mi>&ell;</mi></msub>
+                            </mrow>
+                            <mo stretchy="false">}</mo></mrow>
+                        </mrow>
+                        <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                      </msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>/</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>y</mi><mo>:</mo>
+                    <msub><mi>A</mi><mi>k</mi></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mi>x</mi><mo>:</mo>
+                      <msub>
+                        <mrow><mi>&oplus;</mi>
+                          <mrow><mo stretchy="false">{</mo>
+                            <mrow><mi>&ell;</mi><mo>:</mo>
+                              <msub><mi>A</mi><mi>&ell;</mi></msub>
+                            </mrow>
+                            <mo stretchy="false">}</mo></mrow>
+                        </mrow>
+                        <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                      </msub>
+                    </mrow>
+                    <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+                  <mspace width="3ex"/>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow>
+                        <msub><mi>y</mi><mi>&ell;</mi></msub>
+                        <mo>:</mo>
+                        <msub><mi>A</mi><mi>&ell;</mi></msub>
+                      </mrow>
+                    </mrow>
+                    <mo>&vdash;</mo>
+                    <mrow>
+                      <mrow>
+                        <msub><mi>Q</mi><mi>&ell;</mi></msub>
+                        <mo>::</mo><mi>&delta;</mi></mrow>
+                      <mo>/</mo>
+                      <msub><mi mathvariant="normal">&Xi;</mi><mi>&ell;</mi></msub>
+                    </mrow>
+                  </mrow>
+                  <mspace width="3ex"/>
+                  <mrow><mi mathvariant="normal">&Xi;</mi><mo>=</mo>
+                    <mrow>
+                      <msub><mi mathvariant="normal">&Xi;</mi><mi>&ell;</mi></msub>
+                      <mo>&setminus;</mo>
+                      <msub><mi>y</mi><mi>&ell;</mi></msub>
+                    </mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mo>&forall;</mo>
+                  <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                    <msub>
+                      <mrow><mo stretchy="false">{</mo>
+                        <mrow>
+                          <mrow><mi>&ell;</mi><mo>&af;</mo>
+                            <mrow><mo stretchy="false">(</mo>
+                              <msub><mi>y</mi><mi>&ell;</mi></msub>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo>&rArr;</mo>
+                          <msub><mi>Q</mi><mi>&ell;</mi></msub>
+                        </mrow>
+                        <mo stretchy="false">}</mo></mrow>
+                      <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                    </msub>
+                  </mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+                <mo>/</mo>
+                <mrow><mi mathvariant="normal">&Xi;</mi><mo>;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo>
+                      <msub>
+                        <mrow><mi>&oplus;</mi>
+                          <mrow><mo stretchy="false">{</mo>
+                            <mrow><mi>&ell;</mi><mo>:</mo>
+                              <msub><mi>A</mi><mi>&ell;</mi></msub>
+                            </mrow>
+                            <mo stretchy="false">}</mo></mrow>
+                        </mrow>
+                        <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                      </msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">y</mi><mo>:</mo><mi mathvariant="bold">B</mi></mrow>
+                    <mo>&vdash;</mo>
+                    <mrow><mi>p</mi><mo>::</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&in;</mo><mi mathvariant="normal">&Sigma;</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="bold">b</mi><mo lspace="0" rspace="0">/</mo><mi mathvariant="bold">y</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="bold">y</mi><mo>:</mo><mi mathvariant="bold">B</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>/</mo><mi mathvariant="normal">&Xi;</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">call</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi mathvariant="bold">b</mi></mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>/</mo><mi mathvariant="normal">&Xi;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">call</mi></mrow>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>&eta;</mi><mn>1</mn></msub>
+                  <mo>::</mo>
+                  <msub><mi mathvariant="normal">&Delta;</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>/</mo>
+                <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+              </mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>&eta;</mi><mn>2</mn></msub>
+                  <mo>::</mo>
+                  <msub><mi mathvariant="normal">&Delta;</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>/</mo>
+                <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>&eta;</mi><mn>1</mn></msub>
+                    <mo>,</mo>
+                    <msub><mi>&eta;</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi mathvariant="normal">&Delta;</mi><mn>1</mn></msub>
+                    <mo>,</mo>
+                    <msub><mi mathvariant="normal">&Delta;</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>/</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>1</mn></msub>
+                  <mo>;</mo>
+                  <msub><mi mathvariant="normal">&Xi;</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>/</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>y</mi><mo>:</mo><mi>A</mi></mrow>
+              <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>y</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>/</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>y</mi><mo>:</mo><mi>A</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+        </mrow>
+      </math>
+    </p>
+    <p style="text-align: center">图1: 加法式算法定型</p>
+    <p>{译注: 原文图中<math><mrow><mi>&otimes;</mi><mi>L</mi></mrow></math>规则的名字写作<math><mrow><mi>&otimes;</mi><mi>R</mi></mrow></math>, <math><mrow><mi mathvariant="bold">1</mi><mi>L</mi></mrow></math>规则的前提中的<math><mi>Q</mi></math>写作<math><mi>P</mi></math>, 应为笔误, 这里都已改正.}</p>
+    <p><em>减法式</em>定型的想法是将判断改为
+      <math display="block">
+        <mrow>
+          <msub><mi mathvariant="normal">&Gamma;</mi><mi>I</mi></msub>
+          <mo>&vdash;</mo>
+          <mrow>
+            <mrow><mi>P</mi><mo>::</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>/</mo>
+            <msub><mi mathvariant="normal">&Gamma;</mi><mi>O</mi></msub>
+          </mrow>
+        </mrow>
+      </math>
+      其中<math><msub><mi mathvariant="normal">&Gamma;</mi><mi>I</mi></msub></math>是可用的输入, 而<math><msub><mi mathvariant="normal">&Gamma;</mi><mi>O</mi></msub></math>是在<math><mi>P</mi></math>中没有被用到的前件. 于是切规则变为
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mi>I</mi></msub>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>P</mi><mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>/</mo>
+                  <msub><mi mathvariant="normal">&Gamma;</mi><mi>M</mi></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow>
+                  <msub><mi mathvariant="normal">&Gamma;</mi><mi>M</mi></msub>
+                  <mo>,</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                  <mo>/</mo>
+                  <msub><mi mathvariant="normal">&Gamma;</mi><mi>O</mi></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow><mi>x</mi><mo>&notin;</mo>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mi>O</mi></msub>
+              </mrow>
+            </mrow>
+            <mrow>
+              <msub><mi mathvariant="normal">&Gamma;</mi><mi>I</mi></msub>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+                <mo>/</mo>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mi>O</mi></msub>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">cut</mi></mrow>
+      </math>
+      减法式定型的正确性定理更为复杂, 尽管在某些情况下它可能提供更好的错误信息, 因为错误一般在出现时就会被立即检测到. 换言之, 通过将<math><mi mathvariant="normal">&Gamma;</mi></math>传给切的两个前提, 我们丢失了减法式版本中存在的一些信息.
+      <blockquote>
+        <p>如果<math><mrow><msub><mi mathvariant="normal">&Gamma;</mi><mi>I</mi></msub><mo>&vdash;</mo><mrow><mrow><mi>P</mi><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>/</mo><msub><mi mathvariant="normal">&Gamma;</mi><mi>O</mi></msub></mrow></mrow></math>, 那么<math><mrow><mrow><msub><mi mathvariant="normal">&Gamma;</mi><mi>I</mi></msub><mo>&minus;</mo><msub><mi mathvariant="normal">&Gamma;</mi><mi>O</mi></msub></mrow><mo>&vdash;</mo><mrow><mi>P</mi><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</p>
+      </blockquote>
+    </p>
+    <h2 id="type-equality">第4章 类型相等</h2>
+    <p>考虑类型定义
+      <math display="block">
+        <mtable columnalign="left">
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="bold">type</mi><mspace width="2ex"/>
+                <mrow><mi mathvariant="sans-serif">nat</mi><mo>=</mo>
+                  <mrow><mi>&oplus;</mi>
+                    <mrow><mo stretchy="false">{</mo>
+                      <mrow>
+                        <mrow>
+                          <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                          <mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                        <mo>,</mo>
+                        <mrow>
+                          <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                          <mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+                      </mrow>
+                      <mo stretchy="false">}</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="bold">type</mi><mspace width="2ex"/>
+                <mrow><mi mathvariant="sans-serif">unary</mi><mo>=</mo>
+                  <mrow><mi>&oplus;</mi>
+                    <mrow><mo stretchy="false">{</mo>
+                      <mrow>
+                        <mrow>
+                          <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                          <mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                        <mo>,</mo>
+                        <mrow>
+                          <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                          <mo>:</mo><mi mathvariant="sans-serif">unary</mi></mrow>
+                      </mrow>
+                      <mo stretchy="false">}</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      那么<math><mi mathvariant="sans-serif">nat</mi></math>和<math><mi mathvariant="sans-serif">unary</mi></math>恰好寓居着相同的大值: <math><mrow><mrow><munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow/><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow/><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 等等. 因此, 这两个类型应该被视为相等的. 由于其定义中的递归, 我们使用这种相等的一个<em>余归纳</em>定义, 允许无穷推导.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi mathvariant="bold">1</mi><mo>=</mo><mi mathvariant="bold">1</mi></mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>S</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow>
+                  <msub><mi>A</mi><mn>1</mn></msub>
+                  <mo>=</mo>
+                  <msub><mi>B</mi><mn>1</mn></msub>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow>
+                  <msub><mi>A</mi><mn>2</mn></msub>
+                  <mo>=</mo>
+                  <msub><mi>B</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+              <mrow>
+                <mrow>
+                  <msub><mi>A</mi><mn>1</mn></msub>
+                  <mo form="infix" largeop="false">&otimes;</mo>
+                  <msub><mi>A</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>=</mo>
+                <mrow>
+                  <msub><mi>B</mi><mn>1</mn></msub>
+                  <mo form="infix" largeop="false">&otimes;</mo>
+                  <msub><mi>B</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&otimes;</mi><mi>S</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>L</mi><mo>=</mo><mi>K</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow>
+                  <msub><mi>A</mi><mi>&ell;</mi></msub>
+                  <mo>=</mo>
+                  <msub><mi>B</mi><mi>&ell;</mi></msub>
+                </mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mo>&forall;</mo>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mrow>
+              <msub>
+                <mrow><mi>&oplus;</mi>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow><mi>&ell;</mi><mo>:</mo>
+                      <msub><mi>A</mi><mi>&ell;</mi></msub>
+                    </mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+              </msub>
+              <mo>=</mo>
+              <msub>
+                <mrow><mi>&oplus;</mi>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow><mi>k</mi><mo>:</mo>
+                      <msub><mi>B</mi><mi>k</mi></msub>
+                    </mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mrow><mi>k</mi><mo>&in;</mo><mi>K</mi></mrow>
+              </msub>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>S</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>没有关于名称的显式规则, 因为我们可以隐式地将其替换为其定义项. 而这正是无穷推导的问题可能产生之处. 例如, 我们可以构造:
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow/>
+                  <mrow><mi mathvariant="bold">1</mi><mo>=</mo><mi mathvariant="bold">1</mi></mrow>
+                </mfrac>
+                <mrow><mi mathvariant="bold">1</mi><mi>S</mi></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow>
+                    <mrow>
+                      <mfrac displaystyle="true">
+                        <mrow/>
+                        <mrow><mi mathvariant="bold">1</mi><mo>=</mo><mi mathvariant="bold">1</mi></mrow>
+                      </mfrac>
+                      <mrow><mi mathvariant="bold">1</mi><mi>S</mi></mrow>
+                    </mrow>
+                    <mspace width="8ex"/>
+                    <mfrac linethickness="0" displaystyle="true"><mo>&vellip;</mo>
+                      <mrow><mi mathvariant="sans-serif">nat</mi><mo>=</mo><mi mathvariant="sans-serif">unary</mi></mrow>
+                    </mfrac>
+                  </mrow>
+                  <mrow><mi mathvariant="sans-serif">nat</mi><mo>=</mo><mi mathvariant="sans-serif">unary</mi></mrow>
+                </mfrac>
+                <mrow><mi>&oplus;</mi><mi>S</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="sans-serif">nat</mi><mo>=</mo><mi mathvariant="sans-serif">unary</mi></mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>S</mi></mrow>
+        </mrow>
+      </math>
+      那么, 既然我们无法产生无穷推导, 我们如何判定类型相等呢? 关键在于产生它们的有穷表示, 即<em>循环推导</em>. 如果一个程序中出现了<math><mi>n</mi></math>个类型, 那么在任何分支上至多会出现<math><msup><mi>n</mi><mn>2</mn></msup></math>个等式. 因此, 我们最终必然要么失败, 要么成功地以一条像<math><mrow><mi mathvariant="bold">1</mi><mi>S</mi></mrow></math>那样的公理或者一个环来封闭推导.</p>
+    <p>对于这些规则的这种解释是在说: 无论我们尝试多久去寻找反例, 都不存在反例.</p>
+    <h2 id="subtyping">第5章 子类型</h2>
+    <p>我们的等价递归定义的概念暗示了一个直接的推广. 例如, 如果我们定义
+      <math display="block">
+        <mrow><mi mathvariant="bold">type</mi><mspace width="2ex"/>
+          <mrow><mi mathvariant="sans-serif">pos</mi><mo>=</mo>
+            <mrow><mi>&oplus;</mi>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                  <mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      那么每个类型为<math><mi mathvariant="sans-serif">pos</mi></math>的(闭的, 大的)值也将具有类型<math><mi mathvariant="sans-serif">nat</mi></math>. 因此, 允许
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow>
+              <mrow><mi>y</mi><mo>:</mo><mi mathvariant="sans-serif">pos</mi></mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>y</mi></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">id</mi></mrow>
+      </math>
+      是完全没有问题的.</p>
+    <p>然而, 另一个方向是行不通的: 我们无法将一个类型为<math><mi mathvariant="sans-serif">nat</mi></math>的小值移入一个要求其内容具有类型<math><mi mathvariant="sans-serif">pos</mi></math>的单元. {译注: 原文此处写作<q>call</q>, 根据上下文应为<q>cell</q>.} 子类型的规则只是类型相等规则的一个小变体.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi mathvariant="bold">1</mi><mo>&le;</mo><mi mathvariant="bold">1</mi></mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>S</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow>
+                  <msub><mi>A</mi><mn>1</mn></msub>
+                  <mo>&le;</mo>
+                  <msub><mi>B</mi><mn>1</mn></msub>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow>
+                  <msub><mi>A</mi><mn>2</mn></msub>
+                  <mo>&le;</mo>
+                  <msub><mi>B</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+              <mrow>
+                <mrow>
+                  <msub><mi>A</mi><mn>1</mn></msub>
+                  <mo form="infix" largeop="false">&otimes;</mo>
+                  <msub><mi>A</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>&le;</mo>
+                <mrow>
+                  <msub><mi>B</mi><mn>1</mn></msub>
+                  <mo form="infix" largeop="false">&otimes;</mo>
+                  <msub><mi>B</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&otimes;</mi><mi>S</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>L</mi><mo>&sube;</mo><mi>K</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow>
+                  <msub><mi>A</mi><mi>&ell;</mi></msub>
+                  <mo>&le;</mo>
+                  <msub><mi>B</mi><mi>&ell;</mi></msub>
+                </mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mo>&forall;</mo>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mrow>
+              <msub>
+                <mrow><mi>&oplus;</mi>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow><mi>&ell;</mi><mo>:</mo>
+                      <msub><mi>A</mi><mi>&ell;</mi></msub>
+                    </mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+              </msub>
+              <mo>&le;</mo>
+              <msub>
+                <mrow><mi>&oplus;</mi>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow><mi>k</mi><mo>:</mo>
+                      <msub><mi>B</mi><mi>k</mi></msub>
+                    </mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                </mrow>
+                <mrow><mi>k</mi><mo>&in;</mo><mi>K</mi></mrow>
+              </msub>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>S</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>但是请记住, 这些规则是余归纳的, 允许无穷推导.</p>
+    <p>然后我们修改每一条最初的定型规则, 使得在我们之前检查两个类型相等的地方都允许子类型.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <msup><mi>A</mi><mo>&prime;</mo></msup>
+                <mo>&le;</mo><mi>A</mi></mrow>
+              <mrow>
+                <mrow><mi>y</mi><mo>:</mo>
+                  <msup><mi>A</mi><mo>&prime;</mo></msup>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>y</mi></mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mi mathvariant="normal">id</mi></mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow><mi>P</mi><mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  </mrow>
+                  <mo>&vdash;</mo>
+                  <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                </mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="normal">&Delta;</mi></mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mi mathvariant="normal">cut</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi>&middot;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow/>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>X</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow/>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&rArr;</mo><mi>Q</mi></mrow>
+                  </mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>L</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <msup><mi>A</mi><mo>&prime;</mo></msup>
+                <mo>&le;</mo><mi>A</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <msup><mi>B</mi><mo>&prime;</mo></msup>
+                <mo>&le;</mo><mi>B</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <mrow><mi>x</mi><mo>:</mo>
+                  <msup><mi>A</mi><mo>&prime;</mo></msup>
+                </mrow>
+                <mo>,</mo>
+                <mrow><mi>y</mi><mo>:</mo>
+                  <msup><mi>B</mi><mo>&prime;</mo></msup>
+                </mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>z</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>z</mi><mo>:</mo>
+                    <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&otimes;</mi><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>z</mi><mo>:</mo>
+                  <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                </mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>z</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&rArr;</mo><mi>Q</mi></mrow>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&otimes;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>k</mi><mo>&in;</mo><mi>L</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <msub>
+                  <msup><mi>A</mi><mo>&prime;</mo></msup>
+                  <mi>k</mi></msub>
+                <mo>&le;</mo>
+                <msub><mi>A</mi><mi>k</mi></msub>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi>y</mi><mo>:</mo>
+                <msub>
+                  <msup><mi>A</mi><mo>&prime;</mo></msup>
+                  <mi>k</mi></msub>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                  <mrow><mi>k</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>:</mo>
+                    <msub>
+                      <mrow><mi>&oplus;</mi>
+                        <mrow><mo stretchy="false">{</mo>
+                          <mrow><mi>&ell;</mi><mo>:</mo>
+                            <msub><mi>A</mi><mi>&ell;</mi></msub>
+                          </mrow>
+                          <mo stretchy="false">}</mo></mrow>
+                      </mrow>
+                      <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                    </msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                    <mrow><mi>y</mi><mo>:</mo>
+                      <msub><mi>A</mi><mi>&ell;</mi></msub>
+                    </mrow>
+                  </mrow>
+                  <mo>&vdash;</mo>
+                  <mrow>
+                    <msub><mi>Q</mi><mi>&ell;</mi></msub>
+                    <mo>::</mo><mi>&delta;</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mo>&forall;</mo>
+                  <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo>
+                  <msub>
+                    <mrow><mi>&oplus;</mi>
+                      <mrow><mo stretchy="false">{</mo>
+                        <mrow><mi>&ell;</mi><mo>:</mo>
+                          <msub><mi>A</mi><mi>&ell;</mi></msub>
+                        </mrow>
+                        <mo stretchy="false">}</mo></mrow>
+                    </mrow>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  </msub>
+                </mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                  <msub>
+                    <mrow><mo stretchy="false">{</mo>
+                      <mrow>
+                        <mrow><mi>&ell;</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msub><mi>y</mi><mi>&ell;</mi></msub>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo>&rArr;</mo>
+                        <msub><mi>Q</mi><mi>&ell;</mi></msub>
+                      </mrow>
+                      <mo stretchy="false">}</mo></mrow>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  </msub>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow>
+                      <msup><mi mathvariant="bold">y</mi><mo>&prime;</mo></msup>
+                      <mo>:</mo>
+                      <msup><mi mathvariant="bold">B</mi><mo>&prime;</mo></msup>
+                    </mrow>
+                    <mo>&vdash;</mo>
+                    <mrow><mi>p</mi><mo>::</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <msup><mi>x</mi><mo>&prime;</mo></msup>
+                          <mo>:</mo>
+                          <msup><mi>A</mi><mo>&prime;</mo></msup>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&in;</mo><mi mathvariant="normal">&Sigma;</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <msup><mi>A</mi><mo>&prime;</mo></msup>
+                <mo>&le;</mo><mi>A</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="bold">y</mi><mo lspace="0" rspace="0">/</mo>
+                      <msup><mi mathvariant="bold">y</mi><mo>&prime;</mo></msup>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msup><mi mathvariant="bold">y</mi><mo>&prime;</mo></msup>
+                      <mo>:</mo>
+                      <msup><mi mathvariant="bold">B</mi><mo>&prime;</mo></msup>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">call</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="bold">y</mi></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">call</mi></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mn>1</mn></msub>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <msub><mi>&sigma;</mi><mn>1</mn></msub>
+                  <mo>::</mo>
+                  <msub><mi mathvariant="normal">&Delta;</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mn>2</mn></msub>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <msub><mi>&sigma;</mi><mn>2</mn></msub>
+                  <mo>::</mo>
+                  <msub><mi mathvariant="normal">&Delta;</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mn>1</mn></msub>
+                <mo>;</mo>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mn>2</mn></msub>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>&sigma;</mi><mn>1</mn></msub>
+                    <mo>,</mo>
+                    <msub><mi>&sigma;</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi mathvariant="normal">&Delta;</mi><mn>1</mn></msub>
+                    <mo>,</mo>
+                    <msub><mi mathvariant="normal">&Delta;</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow><mi>&middot;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow><mi>A</mi><mo>&le;</mo>
+              <msup><mi>A</mi><mo>&prime;</mo></msup>
+            </mrow>
+            <mrow>
+              <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo lspace="0" rspace="0">/</mo>
+                    <msup><mi>x</mi><mo>&prime;</mo></msup>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msup><mi>x</mi><mo>&prime;</mo></msup>
+                    <mo>:</mo>
+                    <msup><mi>A</mi><mo>&prime;</mo></msup>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+        </mrow>
+      </math>
+      {译注: 原文中<math><mrow><mi>&otimes;</mi><mi>L</mi></mrow></math>规则的名字同样写作<math><mrow><mi>&otimes;</mi><mi>R</mi></mrow></math>, 这里已改正.}</p>
+    <p>我们将此留给你作为Lab 1的一部分: 以某种方式将子类型的能力与加法式算法定型的技术 (或者某种其他形式的算法定型) 结合起来.</p>
+  </body>
+</html>

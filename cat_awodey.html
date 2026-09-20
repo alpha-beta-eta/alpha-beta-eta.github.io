@@ -26,9 +26,33 @@
     <h3>第1.1节 引论</h3>
     <p><em>什么是范畴论?</em> 作为第一次近似, 我们可以说范畴论是对于<em>函数的代数</em>的研究. 正如群论是对于集合的置换或者几何对象的对称变换这一类系统的思想的抽象, 范畴论来源于一些对象之间的函数所构成的系统的理念.</p>
     <p>我们将复合<math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math>想成是某种函数<math><mi>f</mi></math>和<math><mi>g</mi></math>的<q>积</q>, 然后考虑由函数的合集所引申出的那种抽象<q>代数</q>. 一个范畴正是这样一种<q>代数</q>, 其由对象<math><mrow><mi>A</mi><mo>,</mo><mi>B</mi><mo>,</mo><mi>C</mi><mo>,</mo><mo>&hellip;</mo></mrow></math>和箭头<math><mrow><mrow><mi>f</mi><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow><mo>,</mo><mrow><mi>g</mi><mo>:</mo><mrow><mi>B</mi><mo>&rarr;</mo><mi>C</mi></mrow></mrow><mo>,</mo><mo>&hellip;</mo></mrow></math>构成, 而且箭头在函数复合之下封闭并满足一些对于函数复合而言十分典型的特定条件. 精确的定义在本章的之后给出.</p>
-    <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-      <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-      <text x="130" y="80">欠一张图</text>
+    <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+      <defs>
+        <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 2 L 6 5 L 0 8 z"/>
+        </marker>
+      </defs>
+      <foreignObject x="-20" y="25" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+      </foreignObject>
+      <foreignObject x="180" y="25" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+      </foreignObject>
+      <foreignObject x="180" y="185" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+      </foreignObject>
+      <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+      <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+      <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+      <foreignObject x="80" y="7" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+      </foreignObject>
+      <foreignObject x="196" y="105" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+      </foreignObject>
+      <foreignObject x="35" y="125" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+      </foreignObject>
     </svg>
     <p>作为抽象代数的分支, 范畴论的发明遵循着Felix Klein的<em>Erlanger纲领</em>的传统, 作为一种基于数学结构之间的<q>可容许 (admissible) 变换</q>来对于不同数学结构进行研究和刻画的方法. 范畴这种一般性的概念提供了对于<q>保持结构的变换</q>这一想法的刻画, 并由此提供了对于承载这样的变换的一类结构的刻画.</p>
     <p>这个学科的历史发展大致如下:
@@ -78,9 +102,33 @@
           <mo>&sube;</mo><mi>B</mi></mrow>
         <mtext>.</mtext></math>
       现在设我们也有一个函数<math><mrow><mi>g</mi><mo>:</mo><mrow><mi>B</mi><mo>&rarr;</mo><mi>C</mi></mrow></mrow></math>,
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="35" y="125" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+        </foreignObject>
       </svg>
       那么存在着一个作为复合的函数<math><mrow><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>C</mi></mrow></mrow></math>, 由
       <math display="block">
@@ -117,9 +165,44 @@
         </mtable>
       </math>
       给出. 现在这个函数复合的运算<q><math><mo>&compfn;</mo></math></q>是结合性的, 在于如果我们还有一个函数<math><mrow><mi>h</mi><mo>:</mo><mrow><mi>C</mi><mo>&rarr;</mo><mi>D</mi></mrow></mrow></math>
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="500" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <foreignObject x="380" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>D</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="256" y1="200" x2="424" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="255.62" y1="52.49" x2="424.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>h</mi></math></div>
+        </foreignObject>
+        <foreignObject x="35" y="125" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="80" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>h</mi><mo>&compfn;</mo><mi>g</mi></mrow></math></div>
+        </foreignObject>
       </svg>
       并构成<math><mrow><mi>h</mi><mo>&compfn;</mo><mi>g</mi></mrow></math>和<math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math>, 那么我们像以上图表所指示的那样比较<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>h</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&compfn;</mo><mi>f</mi></mrow></math>和<math><mrow><mi>h</mi><mo>&compfn;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 实际上, 这两个函数总是等同的,
       <math display="block">
@@ -211,9 +294,44 @@
         </mrow>
         <mtext>.</mtext></math>
     </p>
-    <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-      <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-      <text x="130" y="80">欠一张图</text>
+    <svg width="500" height="240" stroke="black" style="display: block; margin: auto;">
+      <defs>
+        <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 2 L 6 5 L 0 8 z"/>
+        </marker>
+      </defs>
+      <foreignObject x="-20" y="25" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+      </foreignObject>
+      <foreignObject x="180" y="25" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+      </foreignObject>
+      <foreignObject x="180" y="185" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+      </foreignObject>
+      <foreignObject x="380" y="185" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+      </foreignObject>
+      <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+      <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+      <line x1="256" y1="200" x2="424" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+      <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+      <line x1="255.62" y1="52.49" x2="424.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+      <foreignObject x="80" y="7" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mn>1</mn><mi>A</mi></msub></math></div>
+      </foreignObject>
+      <foreignObject x="196" y="105" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+      </foreignObject>
+      <foreignObject x="280" y="205" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mn>1</mn><mi>B</mi></msub></math></div>
+      </foreignObject>
+      <foreignObject x="35" y="125" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>f</mi><mo>&compfn;</mo><msub><mn>1</mn><mi>A</mi></msub></mrow></math></div>
+      </foreignObject>
+      <foreignObject x="320" y="80" width="120" height="30">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><msub><mn>1</mn><mi>B</mi></msub><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+      </foreignObject>
     </svg>
     <p>所有这些关于集合之间的函数的性质是我们想要对于函数的<em>抽象</em>概念所考虑的: 复合与恒元. 因此, 可以说现在我们想要<q>抽象掉</q>其他所有东西, 这正是由以下定义所完成的.</p>
     <h3>第1.3节 范畴的定义</h3>
@@ -431,9 +549,24 @@
               <mo>&Star;</mo></math>
             其有两个对象, 必要的恒等箭头, 以及恰好一个(不同)对象之间的箭头.</li>
           <li>范畴<math><mi mathvariant="bold">3</mi></math>模样如下:
-            <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-              <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-              <text x="130" y="80">欠一张图</text>
+            <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+              <defs>
+                <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 2 L 6 5 L 0 8 z"/>
+                </marker>
+              </defs>
+              <foreignObject x="-20" y="25" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mo>&#8270;</mo></math></div>
+              </foreignObject>
+              <foreignObject x="180" y="25" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mo>&Star;</mo></math></div>
+              </foreignObject>
+              <foreignObject x="180" y="185" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mo>&bull;</mo></math></div>
+              </foreignObject>
+              <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+              <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+              <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
             </svg>
             其有三个对象, 必要的恒等箭头, 恰好一个从第一个对象到第二个对象的箭头, 恰好一个从第二个对象到第三个对象的箭头, 以及恰好一个从第一个对象到第三个对象的箭头 (因而其为前两个箭头的复合).</li>
           <li>范畴<math><mi mathvariant="bold">0</mi></math>模样如下:
@@ -465,9 +598,64 @@
         <li><math><mrow><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&compfn;</mo><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>.</li>
       </ol>
       换言之, <math><mi>F</mi></math>保持定义域和陪域, 恒等箭头, 以及复合. 因此, 一个函子<math><mrow><mi>F</mi><mo>:</mo><mrow><mi mathvariant="bold">C</mi><mo>&rarr;</mo><mi mathvariant="bold">D</mi></mrow></mrow></math>给出了某种<math><mi mathvariant="bold">C</mi></math>于<math><mi mathvariant="bold">D</mi></math>中的(可能扭曲的)<q>图景(picture)</q>.
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="460" height="520" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="10" y="95" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi mathvariant="bold">C</mi></math></div>
+        </foreignObject>
+        <foreignObject x="10" y="405" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi mathvariant="bold">D</mi></math></div>
+        </foreignObject>
+        <line x1="70" y1="126" x2="70" y2="404" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="-20" y="250" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>F</mi></math></div>
+        </foreignObject>
+        <foreignObject x="160" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="175" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <line x1="236" y1="40" x2="364" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="380" y1="56" x2="380" y2="174" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="234.59" y1="53.68" x2="365.41" y2="176.32" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="240" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="336" y="100" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="195" y="120" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="160" y="465" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="315" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="465" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+        </foreignObject>
+        <line x1="240.43" y1="460.85" x2="359.57" y2="349.15" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="380" y1="348" x2="380" y2="462" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="254" y1="480" x2="346" y2="480" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="200" y="375" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="352" y="390" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="240" y="485" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+        </foreignObject>
       </svg>
       现在, 我们可以轻易地看出函子能够按照预期的方式复合, 而每个范畴<math><mi mathvariant="bold">C</mi></math>都拥有一个恒等函子<math><mrow><msub><mn>1</mn><mi mathvariant="bold">C</mi></msub><mo>:</mo><mrow><mi mathvariant="bold">C</mi><mo>&rarr;</mo><mi mathvariant="bold">C</mi></mrow></mrow></math>. 于是, 我们有了另一个范畴的例子, 叫做<math><mi mathvariant="bold">Cat</mi></math>, 其是由所有的范畴和函子构成的范畴.</div>
     <ol start="7">
@@ -682,9 +870,33 @@
             </mrow>
           </math>
           其定义于<math><mover><mi>C</mi><mo>&OverBar;</mo></mover></math>中的任意箭头<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>C</mi></mrow></mrow></math>之上, 由<math><mrow><mrow><mover><mi>g</mi><mo>&OverBar;</mo></mover><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></mrow></math>给出.
-          <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-            <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-            <text x="130" y="80">欠一张图</text>
+          <svg width="300" height="240" stroke="black" style="display: block; margin: auto;">
+            <defs>
+              <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 2 L 6 5 L 0 8 z"/>
+              </marker>
+            </defs>
+            <foreignObject x="0" y="25" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+            </foreignObject>
+            <foreignObject x="0" y="185" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+            </foreignObject>
+            <foreignObject x="180" y="185" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>D</mi></math></div>
+            </foreignObject>
+            <line x1="60" y1="56" x2="60" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="76" y1="200" x2="224" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="74.95" y1="53.29" x2="225.05" y2="186.71" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <foreignObject x="-16" y="105" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+            </foreignObject>
+            <foreignObject x="90" y="205" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+            </foreignObject>
+            <foreignObject x="130" y="85" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+            </foreignObject>
           </svg>
         </li>
       </ul>
@@ -824,20 +1036,99 @@
             </mrow>
           </math>
           因此, <math><mi mathvariant="bold">C</mi></math>中的一个图表
-          <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-            <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-            <text x="130" y="80">欠一张图</text>
+          <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+            <defs>
+              <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 2 L 6 5 L 0 8 z"/>
+              </marker>
+            </defs>
+            <foreignObject x="-20" y="25" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+            </foreignObject>
+            <foreignObject x="180" y="25" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+            </foreignObject>
+            <foreignObject x="180" y="185" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+            </foreignObject>
+            <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <foreignObject x="80" y="7" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+            </foreignObject>
+            <foreignObject x="196" y="105" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+            </foreignObject>
+            <foreignObject x="35" y="125" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+            </foreignObject>
           </svg>
           在<math><msup><mi mathvariant="bold">C</mi><mi>op</mi></msup></math>中看起来就像以下图表
-          <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-            <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-            <text x="130" y="80">欠一张图</text>
+          <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+            <defs>
+              <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 2 L 6 5 L 0 8 z"/>
+              </marker>
+            </defs>
+            <foreignObject x="-20" y="25" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>A</mi><mo>&#8270;</mo></msup></math></div>
+            </foreignObject>
+            <foreignObject x="180" y="25" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>B</mi><mo>&#8270;</mo></msup></math></div>
+            </foreignObject>
+            <foreignObject x="180" y="185" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>C</mi><mo>&#8270;</mo></msup></math></div>
+            </foreignObject>
+            <line x1="224" y1="40" x2="56" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="240" y1="184" x2="240" y2="56" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="224.38" y1="187.51" x2="55.62" y2="52.49" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <foreignObject x="80" y="7" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>f</mi><mo>&#8270;</mo></msup></math></div>
+            </foreignObject>
+            <foreignObject x="196" y="105" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>g</mi><mo>&#8270;</mo></msup></math></div>
+            </foreignObject>
+            <foreignObject x="35" y="125" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><msup><mi>f</mi><mo>&#8270;</mo></msup><mo>&compfn;</mo><msup><mi>g</mi><mo>&#8270;</mo></msup></mrow></math></div>
+            </foreignObject>
           </svg>
           诸多数学的<q>对偶性</q>定理不过是表达了一个范畴是另一个范畴的相反范畴(的一个子范畴). 这种定理的一个例子是我们之后要证明的<math><mi mathvariant="bold">Sets</mi></math>对偶于完备原子布尔代数的范畴.</li>
         <li>一个范畴<math><mi mathvariant="bold">C</mi></math>的<em>箭头范畴</em><math><msup><mi mathvariant="bold">C</mi><mo>&rarr;</mo></msup></math>以<math><mi mathvariant="bold">C</mi></math>的箭头为对象, 而<math><msup><mi mathvariant="bold">C</mi><mo>&rarr;</mo></msup></math>中一个从<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></math>到<math><mrow><msup><mi>f</mi><mo>&prime;</mo></msup><mo>:</mo><mrow><msup><mi>A</mi><mo>&prime;</mo></msup><mo>&rarr;</mo><msup><mi>B</mi><mo>&prime;</mo></msup></mrow></mrow></math>的箭头<math><mi>g</mi></math>是一个<q>交换方块</q>
-          <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-            <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-            <text x="130" y="80">欠一张图</text>
+          <svg width="300" height="240" stroke="black" style="display: block; margin: auto;">
+            <defs>
+              <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 2 L 6 5 L 0 8 z"/>
+              </marker>
+            </defs>
+            <foreignObject x="0" y="25" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+            </foreignObject>
+            <foreignObject x="180" y="25" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>A</mi><mo>&prime;</mo></msup></math></div>
+            </foreignObject>
+            <foreignObject x="0" y="185" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+            </foreignObject>
+            <foreignObject x="180" y="185" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>B</mi><mo>&prime;</mo></msup></math></div>
+            </foreignObject>
+            <line x1="76" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="60" y1="56" x2="60" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <line x1="76" y1="200" x2="224" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+            <foreignObject x="90" y="7" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>g</mi><mn>1</mn></msub></math></div>
+            </foreignObject>
+            <foreignObject x="-16" y="105" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+            </foreignObject>
+            <foreignObject x="196" y="105" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>f</mi><mo>&prime;</mo></msup></math></div>
+            </foreignObject>
+            <foreignObject x="90" y="205" width="120" height="30">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>g</mi><mn>2</mn></msub></math></div>
+            </foreignObject>
           </svg>
           其中的<math><msub><mi>g</mi><mn>1</mn></msub></math>和<math><msub><mi>g</mi><mn>2</mn></msub></math>是<math><mi mathvariant="bold">C</mi></math>中的箭头. 也就是说, 这样一个箭头是<math><mi mathvariant="bold">C</mi></math>中的一对箭头<math><mrow><mi>g</mi><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>g</mi><mn>1</mn></msub><mo>,</mo><msub><mi>g</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 其满足
           <math display="block">
@@ -906,9 +1197,33 @@
           <ul>
             <li>对象: 所有满足<math><mrow><mrow><mi>cod</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>C</mi></mrow></math>的箭头<math><mrow><mi>f</mi><mo>&in;</mo><mi mathvariant="bold">C</mi></mrow></math>;</li>
             <li>箭头: 从<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>C</mi></mrow></mrow></math>到<math><mrow><msup><mi>f</mi><mo>&prime;</mo></msup><mo>:</mo><mrow><msup><mi>X</mi><mo>&prime;</mo></msup><mo>&rarr;</mo><mi>C</mi></mrow></mrow></math>的一个箭头<math><mi>a</mi></math>是<math><mi mathvariant="bold">C</mi></math>中的一个箭头<math><mrow><mi>a</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><msup><mi>X</mi><mo>&prime;</mo></msup></mrow></mrow></math>, 其满足<math><mrow><mrow><msup><mi>f</mi><mo>&prime;</mo></msup><mo>&compfn;</mo><mi>a</mi></mrow><mo>=</mo><mi>f</mi></mrow></math>, 如下图所示
-              <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-                <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-                <text x="130" y="80">欠一张图</text>
+              <svg width="320" height="230" stroke="black" style="display: block; margin: auto;">
+                <defs>
+                  <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 2 L 6 5 L 0 8 z"/>
+                  </marker>
+                </defs>
+                <foreignObject x="-20" y="25" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+                </foreignObject>
+                <foreignObject x="220" y="25" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>X</mi><mo>&prime;</mo></msup></math></div>
+                </foreignObject>
+                <foreignObject x="100" y="175" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+                </foreignObject>
+                <line x1="56" y1="40" x2="264" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+                <line x1="52.49" y1="55.62" x2="147.51" y2="174.38" stroke-width="1px" marker-end="url(#arrow-head)"/>
+                <line x1="267.51" y1="55.62" x2="172.49" y2="174.38" stroke-width="1px" marker-end="url(#arrow-head)"/>
+                <foreignObject x="100" y="9" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>a</mi></math></div>
+                </foreignObject>
+                <foreignObject x="27.51" y="110" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+                </foreignObject>
+                <foreignObject x="172.49" y="110" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>f</mi><mo>&prime;</mo></msup></math></div>
+                </foreignObject>
               </svg>
               恒等箭头和复合继承自<math><mi mathvariant="bold">C</mi></math>, 这与箭头范畴的情况类似. 注意到存在着一个函子<math><mrow><mi>U</mi><mo>:</mo><mrow><mrow><mi mathvariant="bold">C</mi><mo lspace="0" rspace="0">/</mo><mi>C</mi></mrow><mo>&rarr;</mo><mi mathvariant="bold">C</mi></mrow></mrow></math>, 其<q>遗忘了基对象<math><mi>C</mi></math></q>.<br/>如果<math><mrow><mi>g</mi><mo>:</mo><mrow><mi>C</mi><mo>&rarr;</mo><mi>D</mi></mrow></mrow></math>是任意的箭头, 那么存在着一个复合函子
               <math display="block">
@@ -923,9 +1238,33 @@
                 </mrow>
               </math>
               其由<math><mrow><mrow><msub><mi>g</mi><mo>&#8270;</mo></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></mrow></math>定义
-              <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-                <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-                <text x="130" y="80">欠一张图</text>
+              <svg width="300" height="240" stroke="black" style="display: block; margin: auto;">
+                <defs>
+                  <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 2 L 6 5 L 0 8 z"/>
+                  </marker>
+                </defs>
+                <foreignObject x="0" y="25" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+                </foreignObject>
+                <foreignObject x="0" y="185" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+                </foreignObject>
+                <foreignObject x="180" y="185" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>D</mi></math></div>
+                </foreignObject>
+                <line x1="60" y1="56" x2="60" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+                <line x1="76" y1="200" x2="224" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+                <line x1="74.95" y1="53.29" x2="225.05" y2="186.71" stroke-width="1px" marker-end="url(#arrow-head)"/>
+                <foreignObject x="-16" y="105" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+                </foreignObject>
+                <foreignObject x="90" y="205" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+                </foreignObject>
+                <foreignObject x="130" y="85" width="120" height="30">
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+                </foreignObject>
               </svg>
               而对于<math><mrow><mi mathvariant="bold">C</mi><mo lspace="0" rspace="0">/</mo><mi>C</mi></mrow></math>中的箭头也是类似的. 显然, 整个构造是一个函子
               <math display="block">
@@ -961,9 +1300,33 @@
         </mrow>
       </math>
       其中<math><mn>1</mn></math>是任意的单元集<math><mrow><mo stretchy="false">{</mo><mi>&#8270;</mi><mo stretchy="false">}</mo></mrow></math>. 诚然如此, 函数<math><mrow><mi>a</mi><mo>:</mo><mrow><mn>1</mn><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>唯一地与元素<math><mrow><mrow><mi>a</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&#8270;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>a</mi><mo>&in;</mo><mi>A</mi></mrow></mrow></math>相对应, 而箭头<math><mrow><mi>f</mi><mo>:</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>,</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&rarr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>,</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>恰与交换三角形
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mn>1</mn></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>a</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="68" y="117" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>b</mi></math></div>
+        </foreignObject>
       </svg>
       相对应.</div>
     <h3>第1.7节 自由范畴</h3>
@@ -1265,18 +1628,103 @@
     <p>使用这个UMP, 我们可以很容易地表明自由幺半群<math><mrow><mi>M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow></math>在同构下唯一确定, 其含义如下:</p>
     <div class="proposition"><b>命题1.10. </b><em>给定幺半群<math><mi>M</mi></math>和<math><mi>N</mi></math>,以及附带的函数<math><mrow><mi>i</mi><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mrow><mo stretchy="false">|</mo><mi>M</mi><mo stretchy="false">|</mo></mrow></mrow></mrow></math>和<math><mrow><mi>j</mi><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mrow><mo stretchy="false">|</mo><mi>N</mi><mo stretchy="false">|</mo></mrow></mrow></mrow></math>,每个都满足<math><mi>A</mi></math>上的自由幺半群的UMP,那么存在一个(唯一的)幺半群同构<math><mrow><mi>h</mi><mo>:</mo><mrow><mi>M</mi><mo>&cong;</mo><mi>N</mi></mrow></mrow></math>满足<math><mrow><mrow><mrow><mo stretchy="false">|</mo><mi>h</mi><mo stretchy="false">|</mo></mrow><mo>&it;</mo><mi>i</mi></mrow><mo>=</mo><mi>j</mi></mrow></math>且<math><mrow><mrow><mrow><mo stretchy="false">|</mo><msup><mi>h</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo stretchy="false">|</mo></mrow><mo>&it;</mo><mi>j</mi></mrow><mo>=</mo><mi>i</mi></mrow></math>.</em></div>
     <div class="proof"><b>证明.</b> 根据<math><mi>j</mi></math>和<math><mi>M</mi></math>的UMP, 我们有<math><mrow><mover><mi>j</mi><mo>&OverBar;</mo></mover><mo>:</mo><mrow><mi>M</mi><mo>&rarr;</mo><mi>N</mi></mrow></mrow></math>, 其满足<math><mrow><mrow><mrow><mo stretchy="false">|</mo><mover><mi>j</mi><mo>&OverBar;</mo></mover><mo stretchy="false">|</mo></mrow><mo>&it;</mo><mi>i</mi></mrow><mo>=</mo><mi>j</mi></mrow></math>. 根据<math><mi>i</mi></math>和<math><mi>N</mi></math>的UMP, 我们有<math><mrow><mover><mi>i</mi><mo>&OverBar;</mo></mover><mo>:</mo><mrow><mi>N</mi><mo>&rarr;</mo><mi>M</mi></mrow></mrow></math>, 其满足<math><mrow><mrow><mrow><mo stretchy="false">|</mo><mover><mi>i</mi><mo>&OverBar;</mo></mover><mo stretchy="false">|</mo></mrow><mo>&it;</mo><mi>j</mi></mrow><mo>=</mo><mi>i</mi></mrow></math>. 复合给出了一个同态<math><mrow><mrow><mover><mi>i</mi><mo>&OverBar;</mo></mover><mo>&compfn;</mo><mover><mi>j</mi><mo>&OverBar;</mo></mover></mrow><mo>:</mo><mrow><mi>M</mi><mo>&rarr;</mo><mi>M</mi></mrow></mrow></math>, 其满足<math><mrow><mrow><mrow><mo stretchy="false">|</mo><mrow><mover><mi>i</mi><mo>&OverBar;</mo></mover><mo>&compfn;</mo><mover><mi>j</mi><mo>&OverBar;</mo></mover></mrow><mo stretchy="false">|</mo></mrow><mo>&it;</mo><mi>i</mi></mrow><mo>=</mo><mi>i</mi></mrow></math>. {译注: 遗忘是一个函子, 故保持复合.} 鉴于<math><mrow><msub><mn>1</mn><mi>M</mi></msub><mo>:</mo><mrow><mi>M</mi><mo>&rarr;</mo><mi>M</mi></mrow></mrow></math>也具有此性质, 根据<math><mi>M</mi></math>的UMP的唯一性部分, 我们有<math><mrow><mrow><mover><mi>i</mi><mo>&OverBar;</mo></mover><mo>&compfn;</mo><mover><mi>j</mi><mo>&OverBar;</mo></mover></mrow><mo>=</mo><msub><mn>1</mn><mi>M</mi></msub></mrow></math>. 交换<math><mi>M</mi></math>和<math><mi>N</mi></math>的角色可以表明<math><mrow><mrow><mover><mi>j</mi><mo>&OverBar;</mo></mover><mo>&compfn;</mo><mover><mi>i</mi><mo>&OverBar;</mo></mover></mrow><mo>=</mo><msub><mn>1</mn><mi>N</mi></msub></mrow></math> {译注: <math><mi>h</mi></math>的唯一性也可由自由幺半群的UMP的唯一性部分直接得到}:
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="480" height="300" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="0" y="0" width="120" height="30"><em>在<math><mi mathvariant="bold">Mon</mi></math>之中:</em></foreignObject>
+        <foreignObject x="80" y="45" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>M</mi></math></div>
+        </foreignObject>
+        <foreignObject x="200" y="45" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>N</mi></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="45" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>M</mi></math></div>
+        </foreignObject>
+        <line x1="160" y1="60" x2="240" y2="60" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <line x1="280" y1="60" x2="360" y2="60" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="140" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mover><mi>j</mi><mo>&OverBar;</mo></mover></math></div>
+        </foreignObject>
+        <foreignObject x="260" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mover><mi>i</mi><mo>&OverBar;</mo></mover></math></div>
+        </foreignObject>
+        <foreignObject x="0" y="95" width="120" height="30"><em>在<math><mi mathvariant="bold">Sets</mi></math>之中:</em></foreignObject>
+        <foreignObject x="80" y="145" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mo stretchy="false">|</mo><mi>M</mi><mo stretchy="false">|</mo></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="200" y="145" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mo stretchy="false">|</mo><mi>N</mi><mo stretchy="false">|</mo></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="145" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mo stretchy="false">|</mo><mi>M</mi><mo stretchy="false">|</mo></mrow></math></div>
+        </foreignObject>
+        <line x1="166" y1="160" x2="234" y2="160" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="286" y1="160" x2="354" y2="160" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="140" y="125" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mo stretchy="false">|</mo><mover><mi>j</mi><mo>&OverBar;</mo></mover><mo stretchy="false">|</mo></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="260" y="125" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mo stretchy="false">|</mo><mover><mi>i</mi><mo>&OverBar;</mo></mover><mo stretchy="false">|</mo></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="200" y="255" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <line x1="243.78" y1="255.13" x2="156.22" y2="174.87" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="260" y1="252" x2="260" y2="178" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="276.22" y1="255.13" x2="363.78" y2="174.87" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="130.54" y="210.32" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>i</mi></math></div>
+        </foreignObject>
+        <foreignObject x="188" y="200" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>j</mi></math></div>
+        </foreignObject>
+        <foreignObject x="269.46" y="210.32" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>i</mi></math></div>
+        </foreignObject>
       </svg>
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
     </div>
     <p>例如, 任意单元素集合上的自由幺半群很容易看出来与自然数集<math><mi>&Nopf;</mi></math>在加法下的幺半群同构 (其<q>生成元</q>是数字<math><mn>1</mn></math>). 因此, 作为一个幺半群, 根据自由幺半群的UMP, <math><mi>&Nopf;</mi></math>在同构下唯一确定. {译注: 和自由幺半群同构的幺半群是自由的.}</p>
     <p><b>自由范畴 (free category).</b> 现在, 我们想要对于一般的范畴 (而非仅是幺半群) 进行相同的事情. 范畴拥有的是潜在图 (underlying graph) 而不是潜在集合, 故让我们先回顾图论.</p>
     <p>一个<em>有向图(directed graph)</em>由顶点和边构成, 其中每条边都是有向的, 也就是每条边都有一个<q>源头 (source)</q>和一个<q>目标 (target)</q>顶点. {译注: 在范畴论中, domain有时也被称为source, codomain有时也被称为target.}
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="300" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="0" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="0" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>D</mi></math></div>
+        </foreignObject>
+        <line x1="76" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="60" y1="184" x2="60" y2="56" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="184" x2="240" y2="56" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="74.95" y1="53.29" x2="225.05" y2="186.71" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="90" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>z</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-16" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>x</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>y</mi></math></div>
+        </foreignObject>
+        <foreignObject x="80.7" y="115.46" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>u</mi></math></div>
+        </foreignObject>
       </svg>
       我们就像绘制范畴一样绘制图, 但是这里没有边的复合, 也没有恒等边 (identity). {译注: 绘制范畴的图表时, 我们会默认每个对象上都有一个恒等箭头而不画出来. 在图 (graph) 中, 我们没有与之对应的恒等边的概念. 不过, 就像一个范畴可以有从某个对象到其自身的非恒等的箭头, 一个图里也可以存在着从某个顶点到其自身的边 (即自环, loop). 另外, 虽然边和边不能复合为新的边, 但是两个由边构成的路径可以复合为新的路径, 这也是下文就要提到的.}</p>
     <p>因此, 一个图由两个集合<math><mi>E</mi></math> (边) 和<math><mi>V</mi></math> (顶点), 以及两个函数<math><mrow><mi>s</mi><mo>:</mo><mrow><mi>E</mi><mo>&rarr;</mo><mi>V</mi></mrow></mrow></math> (源头) 和<math><mrow><mi>t</mi><mo>:</mo><mrow><mi>E</mi><mo>&rarr;</mo><mi>V</mi></mrow></mrow></math> (目标) 构成. 于是, 在<math><mi mathvariant="bold">Sets</mi></math>中, 一个图不过是具有形式
@@ -2173,9 +2621,49 @@
     <p>我们应该注意到, 从代数的角度来看, 一个态射<math><mi>e</mi></math>是满态射当且仅当<math><mi>e</mi></math>可以从右侧消去: <math><mrow><mrow><mi>x</mi><mo>&it;</mo><mi>e</mi></mrow><mo>=</mo><mrow><mi>y</mi><mo>&it;</mo><mi>e</mi></mrow></mrow></math>能够推出<math><mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>. 对偶地, <math><mi>m</mi></math>是单态射当且仅当<math><mi>m</mi></math>可以从左侧消去: <math><mrow><mrow><mi>m</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>m</mi><mo>&it;</mo><mi>y</mi></mrow></mrow></math>能够推出<math><mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>.</p>
     <div class="proposition"><b>命题2.6. </b><em>每个同构既是单态射又是满态射.</em></div>
     <div class="proof"><b>证明.</b> 考虑以下图表:
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="500" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="110" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="270" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <foreignObject x="270" y="175" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="400" y="175" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>D</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="35" x2="154" y2="35" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="56" y1="45" x2="154" y2="45" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="186" y1="40" x2="314" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="330" y1="56" x2="330" y2="174" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="184.59" y1="53.68" x2="315.41" y2="176.32" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="346" y1="185" x2="444" y2="185" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="346" y1="195" x2="444" y2="195" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="45" y="3" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>x</mi></math></div>
+        </foreignObject>
+        <foreignObject x="45" y="47" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>y</mi></math></div>
+        </foreignObject>
+        <foreignObject x="190" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>m</mi></math></div>
+        </foreignObject>
+        <foreignObject x="286" y="100" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>e</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180.42" y="110.21" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mn>1</mn></math></div>
+        </foreignObject>
       </svg>
       如果<math><mi>m</mi></math>是一个同构并且其逆为<math><mi>e</mi></math>, 那么<math><mrow><mrow><mi>m</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>m</mi><mo>&it;</mo><mi>y</mi></mrow></mrow></math>可以推出<math><mrow><mi>x</mi><mo>=</mo><mrow><mi>e</mi><mo>&it;</mo><mi>m</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>e</mi><mo>&it;</mo><mi>m</mi><mo>&it;</mo><mi>y</mi></mrow><mo>=</mo><mi>y</mi></mrow></math>. 因此, <math><mi>m</mi></math>是一个单态射. 类似地, <math><mi>e</mi></math>可以从右侧消去, 因而也是一个满态射.
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
@@ -2248,9 +2736,36 @@
       取<math><mrow><mi>E</mi><mo>=</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow><mo>|</mo><mrow><mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow><mo>,</mo><mrow><mi>y</mi><mo>&in;</mo><msub><mi>E</mi><mi>x</mi></msub></mrow></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></math>并定义满态射<math><mrow><mi>e</mi><mo>:</mo><mrow><mi>E</mi><mo>&Rarr;</mo><mi>X</mi></mrow></mrow></math>为<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&mapsto;</mo><mi>x</mi></mrow></math>. 那么, <math><mi>e</mi></math>的一个splitting <math><mi>s</mi></math>确定了这个族的一个选择函数. {译注: 从某种意义上说, <math><mi>E</mi></math>是由<q>依赖序对</q>构成的.}</div>
     <p><q>对象的族</q><math><msub><mrow><mo stretchy="false">(</mo><msub><mi>E</mi><mi>x</mi></msub><mo stretchy="false">)</mo></mrow><mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow></msub></math>可以藉由一个单独的箭头<math><mrow><mi>e</mi><mo>:</mo><mrow><mi>E</mi><mo>&rarr;</mo><mi>X</mi></mrow></mrow></math>通过<q>纤维</q><math><mrow><msup><mi>e</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">{</mo><mi>x</mi><mo stretchy="false">}</mo></mrow></mrow></math>表示的想法有着远比这里广泛的应用, 我们将于第7.10节进一步考虑这个东西.</p>
     <p>与<q>选择函数</q>的存在性有关的一个概念是<q>投影性 (projective)</q>: 一个对象<math><mi>P</mi></math>被称为是<em>投影性</em>的, 如果对于任意的满态射<math><mrow><mi>e</mi><mo>:</mo><mrow><mi>E</mi><mo>&Rarr;</mo><mi>X</mi></mrow></mrow></math>和箭头<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>X</mi></mrow></mrow></math>, 存在某个(未必唯一的)箭头<math><mrow><mover><mi>f</mi><mo>&OverBar;</mo></mover><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>E</mi></mrow></mrow></math>满足<math><mrow><mrow><mi>e</mi><mo>&compfn;</mo><mover><mi>f</mi><mo>&OverBar;</mo></mover></mrow><mo>=</mo><mi>f</mi></mrow></math>, 如以下图表所示:
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="300" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>E</mi></math></div>
+        </foreignObject>
+        <foreignObject x="0" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>P</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <line x1="74.95" y1="186.71" x2="225.05" y2="53.29" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <g>
+          <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+          <line x1="240" y1="177" x2="240" y2="178" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        </g>
+        <line x1="76" y1="200" x2="224" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80.7" y="94.54" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mover><mi>f</mi><mo>&OverBar;</mo></mover></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>e</mi></math></div>
+        </foreignObject>
+        <foreignObject x="90" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
       </svg>
       我们称<em><math><mi>f</mi></math> lifts across <math><mi>e</mi></math></em>. 任意进入某个投影对象的满态射都显然可以split. {译注: 进入的意思是以该对象为陪域.} 投影对象或许可以被认为是拥有一种更为<q>自由</q>的结构, 因而允许<q>更多的箭头</q>.</p>
     <p>选择公理可以推出所有的集合都是投影性的, 因而在许多(但并非全部!)的代数范畴之中自由对象也是投影性的. 读者应该能够证明, 在任意的范畴之中, 一个投影对象的任何retract也都是投影性的.</p>
@@ -2349,9 +2864,44 @@
     <p>首先, 观察到始对象和终对象的概念是简单的UMP, 这样的对象在同构下是唯一确定的, 就像之前的自由幺半群.</p>
     <div class="proposition"><b>命题2.10. </b><em>始对象(终对象)在同构意义下是唯一确定的.</em></div>
     <div class="proof"><b>证明.</b> 实际上, 如果<math><mi>C</mi></math>和<math><msup><mi>C</mi><mo>&prime;</mo></msup></math>都是同一范畴中的始对象(或者终对象), 那么存在<em>唯一</em>的同构<math><mrow><mi>C</mi><mo>&rarr;</mo><msup><mi>C</mi><mo>&prime;</mo></msup></mrow></math>. 的确如此, 设<math><mn>0</mn></math>和<math><msup><mn>0</mn><mo>&prime;</mo></msup></math>都是某个范畴<math><mi mathvariant="bold">C</mi></math>之中的始对象; 那么, 以下的图表使得<math><mn>0</mn></math>和<math><msup><mn>0</mn><mo>&prime;</mo></msup></math>是唯一同构的这一事实变得清晰起来:
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="500" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mn>0</mn></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mn>0</mn><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mn>0</mn></math></div>
+        </foreignObject>
+        <foreignObject x="380" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mn>0</mn><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="256" y1="200" x2="424" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="255.62" y1="52.49" x2="424.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>u</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>v</mi></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>u</mi></math></div>
+        </foreignObject>
+        <foreignObject x="35" y="125" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mn>1</mn><mn>0</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="80" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mn>1</mn><msup><mn>0</mn><mo>&prime;</mo></msup></msub></math></div>
+        </foreignObject>
       </svg>
       至于终对象, 应用前述论证于<math><msup><mi mathvariant="bold">C</mi><mi>op</mi></msup></math>.
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
@@ -2533,9 +3083,40 @@
         <mi>B</mi></math>
       箭头<math><mi>f</mi></math>是单态射当且仅当<math><mrow><mi>x</mi><mo>&ne;</mo><msup><mi>x</mi><mo>&prime;</mo></msup></mrow></math>可以推出<math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>f</mi><mo>&it;</mo><msup><mi>x</mi><mo>&prime;</mo></msup></mrow></mrow></math>, 也就是说, 恰当<math><mi>f</mi></math><q>在广义元素上是单射</q>.</p>
     <p>类似地, 在任意的范畴<math><mi mathvariant="bold">C</mi></math>之中, 为了测试一个方块是否交换,
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="300" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="0" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="0" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>D</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <line x1="76" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="60" y1="56" x2="60" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="76" y1="200" x2="224" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="90" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-16" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>&alpha;</mi></math></div>
+        </foreignObject>
+        <foreignObject x="90" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>&beta;</mi></math></div>
+        </foreignObject>
       </svg>
       我们将有<math><mrow><mrow><mi>&alpha;</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><mrow><mi>&beta;</mi><mo>&it;</mo><mi>g</mi></mrow></mrow></math>, 恰当对于所有的广义元素<math><mrow><mi>x</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>都有<math><mrow><mrow><mi>&alpha;</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>&beta;</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>x</mi></mrow></mrow></math> (仅取<math><mrow><mi>x</mi><mo>=</mo><mrow><msub><mn>1</mn><mi>A</mi></msub><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></mrow></math>即可看出).</p>
     <div class="example"><b>例子2.13. </b>广义元素和常量元素相比可以用来<q>揭示更多的结构</q>. 例如, 考虑以下的偏序集<math><mi>X</mi></math>和<math><mi>A</mi></math>:
@@ -2864,9 +3445,59 @@
         </mover>
         <mi>B</mi></math>
       是<math><mi>A</mi></math>和<math><mi>B</mi></math>之积, 那么既然<math><mi>Q</mi></math>是一个积, 存在着唯一的<math><mrow><mi>i</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>使得<math><mrow><mrow><msub><mi>q</mi><mn>1</mn></msub><mo>&compfn;</mo><mi>i</mi></mrow><mo>=</mo><msub><mi>p</mi><mn>1</mn></msub></mrow></math>而<math><mrow><mrow><msub><mi>q</mi><mn>2</mn></msub><mo>&compfn;</mo><mi>i</mi></mrow><mo>=</mo><msub><mi>p</mi><mn>2</mn></msub></mrow></math>. 类似地, 既然<math><mi>P</mi></math>是一个积, 那么存在着唯一的<math><mrow><mi>j</mi><mo>:</mo><mrow><mi>Q</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>使得<math><mrow><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>&compfn;</mo><mi>j</mi></mrow><mo>=</mo><msub><mi>q</mi><mn>1</mn></msub></mrow></math>而<math><mrow><mrow><msub><mi>p</mi><mn>2</mn></msub><mo>&compfn;</mo><mi>j</mi></mrow><mo>=</mo><msub><mi>q</mi><mn>2</mn></msub></mrow></math>.
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="400" height="360" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="140" y="15" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>P</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-20" y="165" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="140" y="165" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Q</mi></math></div>
+        </foreignObject>
+        <foreignObject x="300" y="165" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="140" y="315" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>P</mi></math></div>
+        </foreignObject>
+        <line x1="185.41" y1="43.68" x2="54.59" y2="166.32" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="214.59" y1="43.68" x2="345.41" y2="166.32" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="185.41" y1="316.32" x2="54.59" y2="193.68" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="214.59" y1="316.32" x2="345.41" y2="193.68" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="184" y1="180" x2="56" y2="180" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="216" y1="180" x2="344" y2="180" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="200" y1="46" x2="200" y2="164" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <line x1="200" y1="196" x2="200" y2="314" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="50.42" y="79.79" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="229.58" y="79.79" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="50.42" y="250.21" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="229.58" y="250.21" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="60" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>q</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="220" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>q</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="154" y="90" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>i</mi></math></div>
+        </foreignObject>
+        <foreignObject x="154" y="240" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>j</mi></math></div>
+        </foreignObject>
       </svg>
       通过复合, 我们得到<math><mrow><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>&compfn;</mo><mi>j</mi><mo>&compfn;</mo><mi>i</mi></mrow><mo>=</mo><msub><mi>p</mi><mn>1</mn></msub></mrow></math>而<math><mrow><mrow><msub><mi>p</mi><mn>2</mn></msub><mo>&compfn;</mo><mi>j</mi><mo>&compfn;</mo><mi>i</mi></mrow><mo>=</mo><msub><mi>p</mi><mn>2</mn></msub></mrow></math>. 既然也有<math><mrow><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>&compfn;</mo><msub><mn>1</mn><mi>P</mi></msub></mrow><mo>=</mo><msub><mi>p</mi><mn>1</mn></msub></mrow></math>而<math><mrow><mrow><msub><mi>p</mi><mn>2</mn></msub><mo>&compfn;</mo><msub><mn>1</mn><mi>P</mi></msub></mrow><mo>=</mo><msub><mi>p</mi><mn>2</mn></msub></mrow></math>, 根据唯一性条件可知<math><mrow><mrow><mi>j</mi><mo>&compfn;</mo><mi>i</mi></mrow><mo>=</mo><msub><mn>1</mn><mi>P</mi></msub></mrow></math>. 类似地, 我们可以证明<math><mrow><mrow><mi>i</mi><mo>&compfn;</mo><mi>j</mi></mrow><mo>=</mo><msub><mn>1</mn><mi>Q</mi></msub></mrow></math>. 因此, <math><mrow><mi>i</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>是一个同构.
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
@@ -3616,9 +4247,44 @@
               </mtable>
             </math>
             鉴于<math><msub><mi>f</mi><mn>1</mn></msub></math>和<math><msub><mi>f</mi><mn>2</mn></msub></math>都是连续函数, <math><mrow><msubsup><mi>f</mi><mn>1</mn><mrow><mo>&minus;</mo><mn>1</mn></mrow></msubsup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>U</mi><mo stretchy="false">)</mo></mrow></mrow></math>和<math><mrow><msubsup><mi>f</mi><mn>2</mn><mrow><mo>&minus;</mo><mn>1</mn></mrow></msubsup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>V</mi><mo stretchy="false">)</mo></mrow></mrow></math>都是开集. {译注: 其实更严谨地说, 还需要论证<math><mi>f</mi></math>的唯一性, 只不过这是显然的.}<br/>以下的图表精确地捕获了我们手头上的情况:
-            <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-              <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-              <text x="130" y="80">欠一张图</text>
+            <svg width="480" height="260" stroke="black" style="display: block; margin: auto;">
+              <defs>
+                <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 2 L 6 5 L 0 8 z"/>
+                </marker>
+              </defs>
+              <foreignObject x="180" y="25" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi mathvariant="script">O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Z</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+              </foreignObject>
+              <foreignObject x="0" y="205" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi mathvariant="script">O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+              </foreignObject>
+              <foreignObject x="180" y="205" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi mathvariant="script">O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>X</mi><mo>&times;</mo><mi>Y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+              </foreignObject>
+              <foreignObject x="360" y="205" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi mathvariant="script">O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+              </foreignObject>
+              <line x1="81.21" y1="198.79" x2="218.79" y2="61.21" stroke-width="1px" marker-end="url(#arrow-head)"/>
+              <line x1="398.79" y1="198.79" x2="261.21" y2="61.21" stroke-width="1px" marker-end="url(#arrow-head)"/>
+              <line x1="240" y1="198" x2="240" y2="62" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+              <line x1="94" y1="220" x2="186" y2="220" stroke-width="1px" marker-end="url(#arrow-head)"/>
+              <line x1="386" y1="220" x2="294" y2="220" stroke-width="1px" marker-end="url(#arrow-head)"/>
+              <foreignObject x="75.86" y="100.86" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msubsup><mi>f</mi><mn>1</mn><mrow><mo>&minus;</mo><mn>1</mn></mrow></msubsup></math></div>
+              </foreignObject>
+              <foreignObject x="284.14" y="100.86" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msubsup><mi>f</mi><mn>2</mn><mrow><mo>&minus;</mo><mn>1</mn></mrow></msubsup></math></div>
+              </foreignObject>
+              <foreignObject x="202" y="115" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>f</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup></math></div>
+              </foreignObject>
+              <foreignObject x="80" y="227" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msubsup><mi>p</mi><mn>1</mn><mrow><mo>&minus;</mo><mn>1</mn></mrow></msubsup></math></div>
+              </foreignObject>
+              <foreignObject x="280" y="227" width="120" height="30">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msubsup><mi>p</mi><mn>2</mn><mrow><mo>&minus;</mo><mn>1</mn></mrow></msubsup></math></div>
+              </foreignObject>
             </svg>
           </li>
         </ul>
@@ -4064,9 +4730,44 @@
             <mo stretchy="false">)</mo></mrow>
           <mtext>.</mtext></math>
         然后, 给出<math><mi>a</mi></math>和<math><mi>b</mi></math>如图
-        <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-          <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-          <text x="130" y="80">欠一张图</text>
+        <svg width="400" height="240" stroke="black" style="display: block; margin: auto;">
+          <defs>
+            <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 2 L 6 5 L 0 8 z"/>
+            </marker>
+          </defs>
+          <foreignObject x="140" y="25" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+          </foreignObject>
+          <foreignObject x="-20" y="185" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+          </foreignObject>
+          <foreignObject x="140" y="185" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow></math></div>
+          </foreignObject>
+          <foreignObject x="300" y="185" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+          </foreignObject>
+          <line x1="185.86" y1="54.14" x2="54.14" y2="185.86" stroke-width="1px" marker-end="url(#arrow-head)"/>
+          <line x1="214.14" y1="54.14" x2="345.86" y2="185.86" stroke-width="1px" marker-end="url(#arrow-head)"/>
+          <line x1="200" y1="56" x2="200" y2="184" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+          <line x1="164" y1="200" x2="56" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+          <line x1="236" y1="200" x2="344" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+          <foreignObject x="50.1" y="95.1" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>a</mi></math></div>
+          </foreignObject>
+          <foreignObject x="229.9" y="95.1" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>b</mi></math></div>
+          </foreignObject>
+          <foreignObject x="168" y="105" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+          </foreignObject>
+          <foreignObject x="60" y="205" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+          </foreignObject>
+          <foreignObject x="220" y="205" width="120" height="30">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+          </foreignObject>
         </svg>
         令
         <math display="block">
@@ -4532,9 +5233,54 @@
       最终的<q>证明项</q><math><mrow><mi>&lambda;</mi><mi>x</mi><mrow><mi>&lambda;</mi><mi>y</mi><mo lspace="0" rspace="0">.</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></mrow></math>因而记录了对于<q>命题</q><math><mrow><mi>A</mi><mo>&rarr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>&rarr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的一个特定证明, 而对于相同命题的不同证明将会给出一个不同的项.<br/>尽管人们总是谈论由之而来的逻辑和类型论之间的<q>同构</q>, 但是实际上我们这里所拥有的仅仅是一个从带有合取与implication的命题演算中的证明的范畴 (如在<cite>第<a href="#examples-of-categories">1.4</a>节</cite>的例子10里定义的那样) 到<math><mi>&lambda;</mi></math>演算的类型的范畴的一个函子. 这个函子一般并非同构, 除非我们强加 (impose) 一些更进一步的证明之间的等式.</div>
     <h3>第2.6节 带有积的范畴</h3>
     <p>令<math><mi mathvariant="bold">C</mi></math>是一个范畴, 其对于每对对象都有一个积图表. 设我们有对象和箭头
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="460" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-10" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="170" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>A</mi><mo>&times;</mo><msup><mi>A</mi><mo>&prime;</mo></msup></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="350" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>A</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="-10" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="170" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>B</mi><mo>&times;</mo><msup><mi>B</mi><mo>&prime;</mo></msup></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="350" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>B</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <line x1="190" y1="40" x2="66" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="270" y1="40" x2="394" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="190" y1="200" x2="66" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="270" y1="200" x2="394" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="50" y1="56" x2="50" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="410" y1="56" x2="410" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="260" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="80" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>q</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="260" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>q</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="-26" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="366" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>f</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
       </svg>
       带有如图所示的积. 然后, 对于
       <math display="block">
@@ -4577,9 +5323,58 @@
         </mrow>
       </math>
       {译注: 译者对于这句话的表达感到相当困惑, 不过或许只是一个定义而已.} 那么, 以下图表中的两个方块都是交换的:
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="460" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-10" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="170" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>A</mi><mo>&times;</mo><msup><mi>A</mi><mo>&prime;</mo></msup></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="350" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>A</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="-10" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="170" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>B</mi><mo>&times;</mo><msup><mi>B</mi><mo>&prime;</mo></msup></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="350" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>B</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <line x1="190" y1="40" x2="66" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="270" y1="40" x2="394" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="190" y1="200" x2="66" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="270" y1="200" x2="394" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="50" y1="56" x2="50" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="410" y1="56" x2="410" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="260" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="80" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>q</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="260" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>q</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="-26" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="366" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>f</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <line x1="230" y1="56" x2="230" y2="184" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="202" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>f</mi><mo>&times;</mo><msup><mi>f</mi><mo>&prime;</mo></msup></mrow></math></div>
+        </foreignObject>
       </svg>
       以这种方式, 如果我们对于每对对象选择一个积, 那么我们就得到了一个函子
       <math display="block">
@@ -4951,9 +5746,44 @@
         </mrow>
       </math>
       将其与<math><msub><mi>p</mi><mn>1</mn></msub></math>和<math><msub><mi>p</mi><mn>2</mn></msub></math>进行复合给出了一对箭头<math><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mrow><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>&compfn;</mo><mi>x</mi></mrow><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></mrow></math>和<math><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mrow><mrow><msub><mi>p</mi><mn>2</mn></msub><mo>&compfn;</mo><mi>x</mi></mrow><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></mrow></math>, 如以下图表所示:
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="400" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="140" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-20" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="140" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>P</mi></math></div>
+        </foreignObject>
+        <foreignObject x="300" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <line x1="185.86" y1="54.14" x2="54.14" y2="185.86" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="214.14" y1="54.14" x2="345.86" y2="185.86" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="200" y1="56" x2="200" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="184" y1="200" x2="56" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="216" y1="200" x2="344" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="50.1" y="95.1" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>x</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="229.9" y="95.1" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>x</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="154" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>x</mi></math></div>
+        </foreignObject>
+        <foreignObject x="60" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="220" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
       </svg>
       以这种方式, 我们有了一个函数
       <math display="block">
@@ -5450,14 +6280,62 @@
       因此, 我们有如下<em>对偶原理</em>.</p>
     <div class="proposition"><b>命题3.1. </b><b>(形式对偶性). </b><em>对于范畴论语言之中的任意句子<math><mi mathvariant="normal">&Sigma;</mi></math>,如果<math><mi mathvariant="normal">&Sigma;</mi></math>由范畴论的公理推出,那么其对偶<math><msup><mi mathvariant="normal">&Sigma;</mi><mo>&#8270;</mo></msup></math>亦可由范畴论的公理推出:<math display="block"><mrow><mi>CT</mi><mo>&rArr;</mo><mi mathvariant="normal">&Sigma;</mi></mrow><mtext>可以推出</mtext><mrow><mi>CT</mi><mo>&rArr;</mo><msup><mi mathvariant="normal">&Sigma;</mi><mo>&#8270;</mo></msup></mrow><mtext>.</mtext></math></em></div>
     <p>从更加概念化的角度来看, 注意到如果一个陈述牵涉某个由对象和箭头构成的图表
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="35" y="125" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math></div>
+        </foreignObject>
       </svg>
       那么其对偶陈述则牵涉由该图表反转箭头方向和复合顺序所得到的新图表
-      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
-        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
-        <text x="130" y="80">欠一张图</text>
+      <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <line x1="224" y1="40" x2="56" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="184" x2="240" y2="56" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="224.38" y1="187.51" x2="55.62" y2="52.49" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="35" y="125" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow></math></div>
+        </foreignObject>
       </svg>
       回忆一下一个范畴<math><mi mathvariant="bold">C</mi></math>的相反范畴<math><msup><mi mathvariant="bold">C</mi><mi>op</mi></msup></math>, 我们看到对于<math><mi mathvariant="bold">C</mi></math>中的一个陈述<math><mi mathvariant="normal">&Sigma;</mi></math>的一个解释将自动给出对于<math><msup><mi mathvariant="bold">C</mi><mi>op</mi></msup></math>中的<math><msup><mi mathvariant="normal">&Sigma;</mi><mo>&#8270;</mo></msup></math>的一个解释.</p>
     <p>现在设一个陈述<math><mi mathvariant="normal">&Sigma;</mi></math>对于所有的范畴<math><mi mathvariant="bold">C</mi></math>都成立, 那么其也在所有的范畴<math><msup><mi mathvariant="bold">C</mi><mi>op</mi></msup></math>中成立, 于是<math><msup><mi mathvariant="normal">&Sigma;</mi><mo>&#8270;</mo></msup></math>也在所有的范畴<math><msup><mrow><mo stretchy="false">(</mo><msup><mi mathvariant="bold">C</mi><mi>op</mi></msup><mo stretchy="false">)</mo></mrow><mi>op</mi></msup></math>中成立. 但是既然对于每个范畴<math><mi mathvariant="bold">C</mi></math>, 都有
@@ -5485,7 +6363,815 @@
     <p>似乎只有非常简单或者平凡的陈述, 例如<q>终对象在同构意义下唯一</q>服从于这种对偶性, 但是实际上远非如此. 我们将会看到, 范畴对偶性实际上是极其强大且影响深远的现象. 就像射影几何里点和线的对偶一样, 它有效地对于每个证明产生两个定理, 真是<q>物超所值 (bang for the buck)</q>.</p>
     <h3>第3.2节 余积</h3>
     <h3>第3.3节 等化子</h3>
+    <p>本节我们将考虑另一抽象刻画; 这次是同态的核与等式定义<q>簇</q>的共同泛化, 像是实值函数的零点集合, 也像是集合论的分离公理.</p>
+    <div class="definition"><b>定义3.3. </b>在任意的范畴<math><mi mathvariant="bold">C</mi></math>中, 给定平行箭头
+      <math display="block"><mi>A</mi>
+        <munderover><mo>&rrarr;</mo>
+          <mrow><mspace width="2em"/><mi>g</mi><mspace width="2em"/></mrow>
+          <mrow><mspace width="2em"/><mi>f</mi><mspace width="2em"/></mrow>
+        </munderover>
+        <mi>B</mi></math>
+      <math><mi>f</mi></math>和<math><mi>g</mi></math>的一个<em>等化子(equalizer)</em>由一个对象<math><mi>E</mi></math>和一个箭头<math><mrow><mi>e</mi><mo>:</mo><mrow><mi>E</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>构成, 其相对于
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&compfn;</mo><mi>e</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi>g</mi><mo>&compfn;</mo><mi>e</mi></mrow>
+        </mrow>
+      </math>
+      是泛的 (universal). 也就是说, 对于任何<math><mrow><mi>z</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>满足<math><mrow><mrow><mi>f</mi><mo>&compfn;</mo><mi>z</mi></mrow><mo>=</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>z</mi></mrow></mrow></math>, 存在<em>唯一</em>的<math><mrow><mi>u</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>E</mi></mrow></mrow></math>满足<math><mrow><mrow><mi>e</mi><mo>&compfn;</mo><mi>u</mi></mrow><mo>=</mo><mi>z</mi></mrow></math>, 如以下图表所示
+      <svg width="380" height="210" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>E</mi></math></div>
+        </foreignObject>
+        <foreignObject x="140" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-20" y="165" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Z</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="184" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="216" y1="35" x2="324" y2="35" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="216" y1="45" x2="324" y2="45" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="53.55" y1="168.15" x2="186.45" y2="51.85" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="40" y1="164" x2="40" y2="56" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="60" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>e</mi></math></div>
+        </foreignObject>
+        <foreignObject x="210" y="3" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="210" y="47" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="72" y="107" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>z</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-34" y="95" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>u</mi></math></div>
+        </foreignObject>
+      </svg>
+    </div>
+    <p>让我们考虑一些简单的例子.</p>
+    <div class="example"><b>例子3.4. </b>设我们有函数<math><mrow><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo>:</mo><mrow><msup><mi>&Ropf;</mi><mn>2</mn></msup><mo>&rrarr;</mo><mi>&Ropf;</mi></mrow></mrow></math>, 其中
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>f</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msup><mi>x</mi><mn>2</mn></msup>
+                <mo>+</mo>
+                <msup><mi>y</mi><mn>2</mn></msup>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>g</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mn>1</mn></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      然后我们要取等化子, 比如说在<math><mi mathvariant="bold">Top</mi></math>之中. 这是子空间
+      <math display="block">
+        <mrow>
+          <mrow><mi>S</mi><mo>=</mo>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&in;</mo>
+                  <msup><mi>&Ropf;</mi><mn>2</mn></msup>
+                </mrow>
+                <mo>|</mo>
+                <mrow>
+                  <mrow>
+                    <msup><mi>x</mi><mn>2</mn></msup>
+                    <mo>+</mo>
+                    <msup><mi>y</mi><mn>2</mn></msup>
+                  </mrow>
+                  <mo>=</mo><mn>1</mn></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+          <mo>&rarrhk;</mo>
+          <msup><mi>&Ropf;</mi><mn>2</mn></msup>
+        </mrow>
+      </math>
+      即平面中的单位圆. 这是因为, 对于任意的<q>广义元素</q><math><mrow><mi>z</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><msup><mi>&Ropf;</mi><mn>2</mn></msup></mrow></mrow></math>, 我们可以得到一对这样的<q>元素</q><math><mrow><mrow><msub><mi>z</mi><mn>1</mn></msub><mo>,</mo><msub><mi>z</mi><mn>2</mn></msub></mrow><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>&Ropf;</mi></mrow></mrow></math>, 仅需将其与两个投影复合, <math><mrow><mi>z</mi><mo>=</mo><mrow><mo stretchy="false">&lang;</mo><mrow><msub><mi>z</mi><mn>1</mn></msub><mo>,</mo><msub><mi>z</mi><mn>2</mn></msub></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>, 而对于这些元素, 我们有
+      <math display="block">
+        <mtable displaystyle="true" columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mi>f</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>=</mo>
+                <mrow><mi>g</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>当且仅当</mtext></mtd>
+            <mtd>
+              <mrow>
+                <mrow>
+                  <msubsup><mi>z</mi><mn>1</mn><mn>2</mn></msubsup>
+                  <mo>+</mo>
+                  <msubsup><mi>z</mi><mn>2</mn><mn>2</mn></msubsup>
+                </mrow>
+                <mo>=</mo><mn>1</mn></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mtext>当且仅当</mtext></mtd>
+            <mtd>
+              <mrow><mo>&quot;</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mo stretchy="false">&lang;</mo>
+                      <mrow>
+                        <msub><mi>z</mi><mn>1</mn></msub>
+                        <mo>,</mo>
+                        <msub><mi>z</mi><mn>2</mn></msub>
+                      </mrow>
+                      <mo stretchy="false">&rang;</mo></mrow>
+                    <mo>=</mo><mi>z</mi></mrow>
+                  <mo>&in;</mo><mi>S</mi></mrow>
+                <mo>&quot;</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      这最后一行的真实含义是存在<math><mi>z</mi></math>经由嵌入<math><mrow><mi>i</mi><mo>:</mo><mrow><mi>S</mi><mo>&rarrhk;</mo><msup><mi>&Ropf;</mi><mn>2</mn></msup></mrow></mrow></math>的分解<math><mrow><mi>z</mi><mo>=</mo><mrow><mi>i</mi><mo>&compfn;</mo><mover><mi>z</mi><mo>&OverBar;</mo></mover></mrow></mrow></math> {译注: 原文顺序写反了}, 如以下图表所示:
+      <svg width="380" height="210" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>S</mi></math></div>
+        </foreignObject>
+        <foreignObject x="140" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>&Ropf;</mi><mn>2</mn></msup></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>&Ropf;</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-20" y="165" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Z</mi></math></div>
+        </foreignObject>
+        <g>
+          <line x1="56" y1="40" x2="184" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+          <path d="M 56 40 A 3 3 0 0 1 56 34" fill="none"/>
+        </g>
+        <line x1="216" y1="35" x2="324" y2="35" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="216" y1="45" x2="324" y2="45" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="53.55" y1="168.15" x2="186.45" y2="51.85" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="40" y1="164" x2="40" y2="56" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="60" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>i</mi></math></div>
+        </foreignObject>
+        <foreignObject x="210" y="3" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="210" y="47" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mn>1</mn></math></div>
+        </foreignObject>
+        <foreignObject x="72" y="107" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>z</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-34" y="95" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mover><mi>z</mi><mo>&OverBar;</mo></mover></math></div>
+        </foreignObject>
+      </svg>
+      鉴于嵌入<math><mi>i</mi></math>是单态射, 这样一种分解若是存在则必然唯一, 因而<math><mrow><mi>S</mi><mo>&rarrhk;</mo><msup><mi>&Ropf;</mi><mn>2</mn></msup></mrow></math>的确是<math><mi>f</mi></math>和<math><mi>g</mi></math>的等化子.</div>
+    <div class="example"><b>例子3.5. </b>类似地, 在<math><mi mathvariant="bold">Sets</mi></math>之中, 对于任意的函数<math><mrow><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>A</mi><mo>&rrarr;</mo><mi>B</mi></mrow></mrow></math>, 其等化子是等式定义子集到<math><mi>A</mi></math>的嵌入
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow>
+              <mo>|</mo>
+              <mrow>
+                <mrow><mi>f</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>=</mo>
+                <mrow><mi>g</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+          <mo>&rarrhk;</mo><mi>A</mi></mrow>
+        <mtext>.</mtext></math>
+      这里的论证本质上和刚才给出的相同.</div>
+    <p>让我们暂停脚步, 注意到实际上每个子集<math><mrow><mi>U</mi><mo>&sube;</mo><mi>A</mi></mrow></math>都具有这种<q>等式</q>形式. 也就是说, 每个子集都对于某对函数是一个等化子. 诚然如此, 而且我们可以用非常canonical的方式达成. 首先, 让我们置
+      <math display="block">
+        <mrow><mn>2</mn><mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow><mi>&top;</mi><mo>,</mo><mi>&bottom;</mi></mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      将其想成<q>真值</q>的集合, 然后考虑<em>特征函数</em>
+      <math display="block">
+        <mrow>
+          <msub><mi>&chi;</mi><mi>U</mi></msub>
+          <mo>:</mo>
+          <mrow><mi>A</mi><mo>&rarr;</mo><mn>2</mn></mrow>
+        </mrow>
+      </math>
+      其定义为
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>&chi;</mi><mi>U</mi></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mo>{</mo>
+            <mtable displaystyle="true">
+              <mtr>
+                <mtd><mi>&top;</mi></mtd>
+                <mtd columnalign="left"><mtext>, 如果</mtext>
+                  <mrow><mi>x</mi><mo>&in;</mo><mi>U</mi></mrow>
+                </mtd>
+              </mtr>
+              <mtr>
+                <mtd><mi>&bottom;</mi></mtd>
+                <mtd columnalign="left"><mtext>, 如果</mtext>
+                  <mrow><mi>x</mi><mo>&notin;</mo><mi>U</mi></mrow>
+                </mtd>
+              </mtr>
+            </mtable>
+          </mrow>
+        </mrow>
+      </math>
+      那么, 我们有
+      <math display="block">
+        <mrow><mi>U</mi><mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow>
+              <mo>|</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>&chi;</mi><mi>U</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>=</mo><mi>&top;</mi></mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      于是, 以下是一个等化子:
+      <math display="block"><mi>U</mi>
+        <mover><mo>&rarr;</mo>
+          <mrow><mspace width="2em"/>
+            <mrow/>
+            <mspace width="2em"/></mrow>
+        </mover>
+        <mi>A</mi>
+        <munderover><mo>&rrarr;</mo>
+          <mrow><mspace width="2em"/>
+            <msub><mi>&chi;</mi><mi>U</mi></msub>
+            <mspace width="2em"/></mrow>
+          <mrow><mspace width="2em"/>
+            <mrow><mi>&top;</mi><mo>&it;</mo><mi>!</mi></mrow>
+            <mspace width="2em"/></mrow>
+        </munderover>
+        <mn>2</mn></math>
+      其中<math><mrow><mrow><mi>&top;</mi><mo>&it;</mo><mi>!</mi></mrow><mo>=</mo><mrow><mrow><mi>&top;</mi><mo>&compfn;</mo><mi>!</mi></mrow><mo>:</mo><mrow><mi>U</mi><mover><mo>&rarr;</mo><mi>!</mi></mover><mn>1</mn><mover><mo>&rarr;</mo><mi>&top;</mi></mover><mn>2</mn></mrow></mrow></mrow></math>.</p>
+    <p>而且, 对于每个函数
+      <math display="block">
+        <mrow><mi>&phi;</mi><mo>:</mo>
+          <mrow><mi>A</mi><mo>&rarr;</mo><mn>2</mn></mrow>
+        </mrow>
+      </math>
+      我们可以构成<q>簇 (variety)</q>, 即等式子集, 如下
+      <math display="block">
+        <mrow>
+          <msub><mi>V</mi><mi>&phi;</mi></msub>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow>
+              <mo>|</mo>
+              <mrow>
+                <mrow><mi>&phi;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>=</mo><mi>&top;</mi></mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      作为一个等化子, 以同样的方式. (将<math><mi>&phi;</mi></math>想成是一个定义在<math><mi>A</mi></math>上的<q>命题函数</q>, 子集<math><mrow><msub><mi>V</mi><mi>&phi;</mi></msub><mo>&sube;</mo><mi>A</mi></mrow></math>是由分离公理所提供的<math><mi>&phi;</mi></math>的<q>外延</q>.)</p>
+    <p>现在很容易看出来运算<math><msub><mi>&chi;</mi><mi>U</mi></msub></math>和<math><msub><mi>V</mi><mi>&phi;</mi></msub></math>是互逆的: 对于任意的<math><mrow><mi>U</mi><mo>&sube;</mo><mi>A</mi></mrow></math>, 我们有
+      <math display="block">
+        <mtable displaystyle="true" columnalign="right center left">
+          <mtr>
+            <mtd>
+              <msub><mi>V</mi>
+                <msub><mi>&chi;</mi><mi>U</mi></msub>
+              </msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow>
+                  <mo>|</mo>
+                  <mrow>
+                    <mrow>
+                      <msub><mi>&chi;</mi><mi>U</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>=</mo><mi>&top;</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow>
+                  <mo>|</mo>
+                  <mrow><mi>x</mi><mo>&in;</mo><mi>U</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>U</mi></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      对于任意的<math><mrow><mi>&phi;</mi><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mn>2</mn></mrow></mrow></math>, 我们有
+      <math display="block">
+        <mtable displaystyle="true" columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>&chi;</mi>
+                  <msub><mi>V</mi><mi>&phi;</mi></msub>
+                </msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo>{</mo>
+                <mtable displaystyle="true">
+                  <mtr>
+                    <mtd><mi>&top;</mi></mtd>
+                    <mtd columnalign="left"><mtext>, 如果</mtext>
+                      <mrow><mi>x</mi><mo>&in;</mo>
+                        <msub><mi>V</mi><mi>&phi;</mi></msub>
+                      </mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mi>&bottom;</mi></mtd>
+                    <mtd columnalign="left"><mtext>, 如果</mtext>
+                      <mrow><mi>x</mi><mo>&notin;</mo>
+                        <msub><mi>V</mi><mi>&phi;</mi></msub>
+                      </mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo>{</mo>
+                <mtable displaystyle="true">
+                  <mtr>
+                    <mtd><mi>&top;</mi></mtd>
+                    <mtd columnalign="left"><mtext>, 如果</mtext>
+                      <mrow>
+                        <mrow><mi>&phi;</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo>=</mo><mi>&top;</mi></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mi>&bottom;</mi></mtd>
+                    <mtd columnalign="left"><mtext>, 如果</mtext>
+                      <mrow>
+                        <mrow><mi>&phi;</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo>=</mo><mi>&bottom;</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&phi;</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      因此, 我们有以下令人熟悉的同构
+      <math display="block">
+        <mrow>
+          <mrow><mi>Hom</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>A</mi><mo>,</mo><mn>2</mn></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&cong;</mo>
+          <mrow><mi>&Pscr;</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      由等化子所弥合调解.</p>
+    <p>函数的等化子可以取为子集这一事实是某种更为一般的现象的特殊情形.</p>
+    <div class="proposition"><b>命题3.6. </b>在任意的范畴之中, 如果<math><mrow><mi>e</mi><mo>:</mo><mrow><mi>E</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>是某对箭头的一个等化子, 那么<math><mi>e</mi></math>是一个单态射.</div>
+    <div class="proof"><b>证明.</b> 考虑以下图表
+      <svg width="380" height="210" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>E</mi></math></div>
+        </foreignObject>
+        <foreignObject x="140" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-20" y="165" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Z</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="184" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="216" y1="35" x2="324" y2="35" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="216" y1="45" x2="324" y2="45" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="34" y1="164" x2="34" y2="56" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="46" y1="164" x2="46" y2="56" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="53.55" y1="168.15" x2="186.45" y2="51.85" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="60" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>e</mi></math></div>
+        </foreignObject>
+        <foreignObject x="210" y="3" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="210" y="47" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-40" y="95" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>x</mi></math></div>
+        </foreignObject>
+        <foreignObject x="0" y="95" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>y</mi></math></div>
+        </foreignObject>
+        <foreignObject x="72" y="107" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>z</mi></math></div>
+        </foreignObject>
+      </svg>
+      其中我们假定<math><mi>e</mi></math>是<math><mi>f</mi></math>和<math><mi>g</mi></math>的等化子. 设<math><mrow><mrow><mi>e</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>e</mi><mo>&it;</mo><mi>y</mi></mrow></mrow></math>, 我们想要表明<math><mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>. 置<math><mrow><mi>z</mi><mo>=</mo><mrow><mi>e</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>e</mi><mo>&it;</mo><mi>y</mi></mrow></mrow></math>, 那么<math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>z</mi></mrow><mo>=</mo><mrow><mi>f</mi><mo>&it;</mo><mi>e</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>g</mi><mo>&it;</mo><mi>e</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mi>g</mi><mo>&it;</mo><mi>z</mi></mrow></mrow></math>, 于是存在唯一的<math><mrow><mi>u</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>E</mi></mrow></mrow></math>使得<math><mrow><mrow><mi>e</mi><mo>&it;</mo><mi>u</mi></mrow><mo>=</mo><mi>z</mi></mrow></math>. 最后, 根据<math><mrow><mrow><mi>e</mi><mo>&it;</mo><mi>x</mi></mrow><mo>=</mo><mi>z</mi></mrow></math>和<math><mrow><mrow><mi>e</mi><mo>&it;</mo><mi>y</mi></mrow><mo>=</mo><mi>z</mi></mrow></math>, 可以推出<math><mrow><mi>x</mi><mo>=</mo><mi>u</mi><mo>=</mo><mi>y</mi></mrow></math>.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="example"><b>例子3.7. </b>在诸多其他范畴之中, 例如偏序集(的范畴)和幺半群(的范畴), 一对平行箭头<math><mrow><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>A</mi><mo>&rrarr;</mo><mi>B</mi></mrow></mrow></math>的等化子可以通过取其潜在函数的等化子构造而成. 换言之, 也就是取子集<math><mrow><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>=</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&sube;</mo><mi>A</mi></mrow></math>, 其是由<math><mi>f</mi></math>和<math><mi>g</mi></math>相合的元素<math><mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow></math>构成的, 即<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 然后将<math><mi>A</mi></math>的结构限制在<math><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>=</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的结构之上. 例如, 在偏序集中我们取<math><mi>A</mi></math>限制于该子集<math><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>=</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>上的序关系, 而在拓扑空间里我们取子空间拓扑.<br/>在幺半群之中, 子集<math><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>=</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>在来源于<math><mi>A</mi></math>的运算下仍然是一个幺半群. 因此, 这个嵌入会是一个同态. 之所以如此, 是因为<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>u</mi><mi>A</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><msub><mi>u</mi><mi>B</mi></msub><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>u</mi><mi>A</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 并且如果<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 且<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>a</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>a</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 那么<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&sdot;</mo><msup><mi>a</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&sdot;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>a</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>=</mo><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&sdot;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>a</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&sdot;</mo><msup><mi>a</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 因此, <math><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>=</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>包含单位元且在乘积运算下封闭.<br/>比如说在abel群里, 我们对于等化子可以有着另外一种描述方式, 通过使用以下事实
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>g</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>当且仅当</mtext>
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>f</mi><mo>&minus;</mo><mi>g</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo><mn>0</mn></mrow>
+        <mtext>.</mtext></math>
+      因此, <math><mi>f</mi></math>和<math><mi>g</mi></math>的等化子与同态<math><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&minus;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></math>和零同态<math><mrow><mn>0</mn><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></math>的等化子是相同的. 于是, 考虑特殊形式的等化子<math><mrow><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>h</mi><mo>,</mo><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&rarrtl;</mo><mi>A</mi></mrow></math>就足够了 {译注: 似乎也可以写成<math><mrow><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>h</mi><mo>,</mo><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&rarrhk;</mo><mi>A</mi></mrow></math>, 表示inclusion}, 其中<math><mrow><mi>h</mi><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></math>是任意的态射. 这个<math><mi>A</mi></math>的子群称为<math><mi>h</mi></math>的<em>核 (kernel)</em>, 记作<math><mrow><mi>ker</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow></mrow></math>. 因此, 我们有以下等化子
+      <math display="block">
+        <mrow><mi>ker</mi><mo>&af;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>f</mi><mo>&minus;</mo><mi>g</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mover><mo>&rarrhk;</mo>
+          <mrow><mspace width="2em"/>
+            <mrow/>
+            <mspace width="2em"/></mrow>
+        </mover>
+        <mi>A</mi>
+        <munderover><mo>&rrarr;</mo>
+          <mrow><mspace width="2em"/><mi>g</mi><mspace width="2em"/></mrow>
+          <mrow><mspace width="2em"/><mi>f</mi><mspace width="2em"/></mrow>
+        </munderover>
+        <mi>B</mi></math>
+      同态的核对于群的研究具有根本的重要性, 我们会在第4章中进一步考虑.</div>
     <h3>第3.4节 余等化子</h3>
+    <p>余等化子是以等价关系作商的泛化, 所以先让我们回顾一下这个概念, 实际上我们已经用过许多次了. 首先, 回忆一下集合<math><mi>X</mi></math>上的一个<em>等价关系</em>是一个二元关系<math><mrow><mi>x</mi><mo>&Tilde;</mo><mi>y</mi></mrow></math>, 其满足
+      <ul>
+        <li>自反性: <math><mrow><mi>x</mi><mo>&Tilde;</mo><mi>x</mi></mrow></math>;</li>
+        <li>对称性: <math><mrow><mi>x</mi><mo>&Tilde;</mo><mi>y</mi></mrow></math>可以推出<math><mrow><mi>y</mi><mo>&Tilde;</mo><mi>x</mi></mrow></math>;</li>
+        <li>传递性: <math><mrow><mi>x</mi><mo>&Tilde;</mo><mi>y</mi></mrow></math>和<math><mrow><mi>y</mi><mo>&Tilde;</mo><mi>z</mi></mrow></math>可以推出<math><mrow><mi>x</mi><mo>&Tilde;</mo><mi>z</mi></mrow></math>.</li>
+      </ul>
+      给定这样一种关系, 定义一个元素<math><mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow></math>的<em>等价类</em><math><mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math>为
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mi>y</mi><mo>&in;</mo><mi>X</mi></mrow>
+              <mo>|</mo>
+              <mrow><mi>x</mi><mo>&Tilde;</mo><mi>y</mi></mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      各个不同的等价类<math><mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math>然后构成了<math><mi>X</mi></math>的一个<em>划分</em>, 意即每个元素<math><mi>y</mi></math>都恰处于其中一个等价类, 即<math><mrow><mo stretchy="false">[</mo><mi>y</mi><mo stretchy="false">]</mo></mrow></math> (证明一下!).</p>
+    <p>我们有时将等价关系想成是由具有某种共同性质的等价元素产生的, 比如说具有相同的颜色. 然后, 我们可以将等价类<math><mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math>当成性质, 在这种意义下将其视为<q>抽象对象</q> (颜色红色, 蓝色等等, 它们本身). 这有时称为<q>由抽象进行定义</q>, 例如其描述了由有理数的Cauchy序列构造实数的方式, 或者是由有限集合构造有限基数的方式.</p>
+    <p>所有的等价类之集合
+      <math display="block">
+        <mrow>
+          <mrow><mi>X</mi><mo lspace="0" rspace="0">/</mo><mo>&Tilde;</mo></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow>
+              <mo>|</mo>
+              <mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      或可以称为<math><mi>X</mi></math>除以<math><mo>&Tilde;</mo></math>的<em>商 (quotient)</em>. 当我们希望将等价元素<math><mrow><mi>x</mi><mo>&Tilde;</mo><mi>y</mi></mrow></math>之间的差异<q>抽象掉</q>的时候, 我们就会用它来代替<math><mi>X</mi></math>, 即这样的元素 (而且仅是这样的元素) 在<math><mrow><mi>X</mi><mo lspace="0" rspace="0">/</mo><mo>&Tilde;</mo></mrow></math>会被等同起来, 鉴于
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">[</mo><mi>y</mi><mo stretchy="false">]</mo></mrow>
+        </mrow>
+        <mtext>当且仅当</mtext>
+        <mrow><mi>x</mi><mo>&Tilde;</mo><mi>y</mi></mrow>
+        <mtext>.</mtext></math>
+      观察到<em>商映射 (quotient mapping)</em>
+      <math display="block">
+        <mrow><mi>q</mi><mo>:</mo>
+          <mrow><mi>X</mi><mo>&rarr;</mo>
+            <mrow><mi>X</mi><mo lspace="0" rspace="0">/</mo><mo>&Tilde;</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其将<math><mi>x</mi></math>带至<math><mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></math>, 具有如下性质: 一个映射<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow></mrow></math>可以沿着<math><mi>q</mi></math>扩展
+      <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>X</mi><mo lspace="0" rspace="0">/</mo><mo>&Tilde;</mo></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Y</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="206" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="72" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>q</mi></math></div>
+        </foreignObject>
+        <foreignObject x="66" y="119" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+      </svg>
+      只要<math><mi>f</mi></math>尊重等价关系, 即<math><mrow><mi>x</mi><mo>&Tilde;</mo><mi>y</mi></mrow></math>可以推出<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</p>
+    <p>现在让我们来考虑等化子的对偶概念, 即余等化子的概念.</p>
+    <div class="definition"><b>定义3.8. </b>对于范畴<math><mi mathvariant="bold">C</mi></math>中的平行箭头<math><mrow><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>A</mi><mo>&rrarr;</mo><mi>B</mi></mrow></mrow></math>, 一个<em>余等化子 (coequalizer)</em>由<math><mi>Q</mi></math>和<math><mrow><mi>q</mi><mo>:</mo><mrow><mi>B</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>构成, 其在性质<math><mrow><mrow><mi>q</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><mrow><mi>q</mi><mo>&it;</mo><mi>g</mi></mrow></mrow></math>下是泛的 (universal), 如以下图表所示
+      <svg width="380" height="220" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="120" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Q</mi></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="175" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Z</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="35" x2="164" y2="35" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="56" y1="45" x2="164" y2="45" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="196" y1="40" x2="324" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="193.13" y1="52.31" x2="326.87" y2="177.69" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="340" y1="56" x2="340" y2="174" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="50" y="3" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="50" y="47" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="200" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>q</mi></math></div>
+        </foreignObject>
+        <foreignObject x="188" y="112" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>z</mi></math></div>
+        </foreignObject>
+        <foreignObject x="294" y="100" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>u</mi></math></div>
+        </foreignObject>
+      </svg>
+      换言之, 对于任意的<math><mi>Z</mi></math>以及<math><mrow><mi>z</mi><mo>:</mo><mrow><mi>B</mi><mo>&rarr;</mo><mi>Z</mi></mrow></mrow></math>, 如果<math><mrow><mrow><mi>z</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><mrow><mi>z</mi><mo>&it;</mo><mi>g</mi></mrow></mrow></math>, 那么存在唯一的<math><mrow><mi>u</mi><mo>:</mo><mrow><mi>Q</mi><mo>&rarr;</mo><mi>Z</mi></mrow></mrow></math>满足<math><mrow><mrow><mi>u</mi><mo>&it;</mo><mi>q</mi></mrow><mo>=</mo><mi>z</mi></mrow></math>.</div>
+    <p>首先, 根据对偶观察到, 既然我们已经知道范畴<math><mi mathvariant="bold">C</mi></math>中的余等化子<math><mi>q</mi></math>是<math><msup><mi mathvariant="bold">C</mi><mi>op</mi></msup></math>中的等化子, 那么根据命题3.16其在<math><msup><mi mathvariant="bold">C</mi><mi>op</mi></msup></math>是单态射, 于是在<math><mi mathvariant="bold">C</mi></math>中则为满态射.</p>
+    <div class="proposition"><b>命题3.9. </b>如果<math><mrow><mi>q</mi><mo>:</mo><mrow><mi>B</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>是某对箭头的余等化子, 那么<math><mi>q</mi></math>是满态射.</div>
+    <p>我们可以将余等化子<math><mrow><mi>q</mi><mo>:</mo><mrow><mi>B</mi><mo>&Rarr;</mo><mi>Q</mi></mrow></mrow></math>想成是<math><mi>B</mi></math>的<q>坍缩 (collapse)</q>, 通过将所有序对<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math><q>视为等同</q> (说的就好像这样的<q>元素</q><math><mrow><mi>a</mi><mo>&in;</mo><mi>A</mi></mrow></math>的确存在一样). 而且, 我们以<q>极小</q>的方式完成此事, 也就是尽可能小地扰动<math><mi>B</mi></math>, 即我们总是可以将<math><mi>Q</mi></math>映射到别的什么<math><mi>Z</mi></math>, 只要<math><mi>Z</mi></math>中这样的等同也都成立.</p>
+    <div class="example"><b>例子3.10. </b>令<math><mrow><mi>R</mi><mo>&sube;</mo><mrow><mi>X</mi><mo>&times;</mo><mi>X</mi></mrow></mrow></math>是<math><mi>X</mi></math>上的一个等价关系, 并考虑图表
+      <math display="block"><mi>R</mi>
+        <munderover><mo>&rrarr;</mo>
+          <mrow><mspace width="2em"/>
+            <msub><mi>r</mi><mn>2</mn></msub>
+            <mspace width="2em"/></mrow>
+          <mrow><mspace width="2em"/>
+            <msub><mi>r</mi><mn>1</mn></msub>
+            <mspace width="2em"/></mrow>
+        </munderover>
+        <mi>X</mi></math>
+      其中<math><msub><mi>r</mi><mn>1</mn></msub></math>和<math><msub><mi>r</mi><mn>2</mn></msub></math>是嵌入<math><mrow><mi>R</mi><mo>&sube;</mo><mrow><mi>X</mi><mo>&times;</mo><mi>X</mi></mrow></mrow></math>的两个投影:
+      <svg width="400" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="140" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>R</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-20" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <foreignObject x="140" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>X</mi><mo>&times;</mo><mi>X</mi></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="300" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <line x1="185.86" y1="54.14" x2="54.14" y2="185.86" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="214.14" y1="54.14" x2="345.86" y2="185.86" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <g>
+          <line x1="200" y1="56" x2="200" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+          <path d="M 200 56 A 3 3 0 0 1 206 56" fill="none"/>
+        </g>
+        <line x1="164" y1="200" x2="56" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="236" y1="200" x2="344" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="50.1" y="95.1" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>r</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="229.9" y="95.1" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>r</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="60" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="220" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+      </svg>
+      然后, 由<math><mrow><mi>x</mi><mo>&mapsto;</mo><mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></mrow></math>定义的商投影
+      <math display="block">
+        <mrow><mi>&pi;</mi><mo>:</mo>
+          <mrow><mi>X</mi><mo>&rarr;</mo>
+            <mrow><mi>X</mi><mo lspace="0" rspace="0">/</mo><mi>R</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      是<math><msub><mi>r</mi><mn>1</mn></msub></math>和<math><msub><mi>r</mi><mn>2</mn></msub></math>的一个等化子. 这是因为, 对于一个<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow></mrow></math>, 如以下图表所示
+      <svg width="380" height="220" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>R</mi></math></div>
+        </foreignObject>
+        <foreignObject x="120" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mrow><mi>X</mi><mo lspace="0" rspace="0">/</mo><mi>R</mi></mrow></math></div>
+        </foreignObject>
+        <foreignObject x="280" y="175" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Y</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="35" x2="164" y2="35" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="56" y1="45" x2="164" y2="45" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="196" y1="40" x2="314" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="193.13" y1="52.31" x2="326.87" y2="177.69" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="340" y1="56" x2="340" y2="174" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="50" y="3" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>r</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="50" y="47" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>r</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>&pi;</mi></math></div>
+        </foreignObject>
+        <foreignObject x="188" y="112" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="294" y="100" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mover><mi>f</mi><mo>&OverBar;</mo></mover></math></div>
+        </foreignObject>
+      </svg>
+      存在一个函数<math><mover><mi>f</mi><mo>&OverBar;</mo></mover></math>满足
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mover><mi>f</mi><mo>&OverBar;</mo></mover>
+            <mo>&compfn;</mo><mi>&pi;</mi></mrow>
+          <mo>=</mo><mi>f</mi></mrow>
+      </math>
+      只要<math><mi>f</mi></math>尊重<math><mi>R</mi></math>, 即<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><msup><mi>x</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mi>R</mi></mrow></math>可以推出<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>x</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 这是我们之前就已经注意到了的事实. 但是, 这个条件不过就是在说<math><mrow><mrow><mi>f</mi><mo>&compfn;</mo><msub><mi>r</mi><mn>1</mn></msub></mrow><mo>=</mo><mrow><mi>f</mi><mo>&compfn;</mo><msub><mi>r</mi><mn>2</mn></msub></mrow></mrow></math>, 因为对于任意的<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><msup><mi>x</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mi>R</mi></mrow></math>, 我们有<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&compfn;</mo><msub><mi>r</mi><mn>1</mn></msub></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><msup><mi>x</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>和<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&compfn;</mo><msub><mi>r</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><msup><mi>x</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>x</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 而且, 如果这样一个函数<math><mover><mi>f</mi><mo>&OverBar;</mo></mover></math>存在, 那么它就必然是唯一的, 因为<math><mi>&pi;</mi></math>本身是一个满态射.</div>
     <h3>第3.5节 练习</h3>
     <h2>第4章 群和范畴</h2>
     <p>本章致力于群和范畴的各种各样的联系的其中一些. 如果你已经了解了这里所讲述的基本的群论, 那么本章将会为你提供一些关于你已经学到了的范畴构造的洞察; 如果你还不知道群论, 那么你现在会将群论当作范畴论的应用进行学习. 我们聚焦于范畴和群之间的关系的三个不同方面:
@@ -5540,8 +7226,378 @@
     <h2>第5章 极限和余极限</h2>
     <p>在本章中, 我们首先简要讨论一些与已有定义相关的主题, 即子对象和拉回. 这样做一方面是为了了解它们如何被使用, 另一方面也是因为我们很快就需要用到这些材料. 然后我们以更系统的方式展开, 定义极限的一般概念, 它涵摄了我们迄今所遇到的许多特定的抽象刻画. 当然, 还有一个对偶概念即余极限, 它同样有许多有趣的应用. 在第6章简要考察另一个基本概念之后, 我们将进入可以称为<q>高阶范畴论</q>的领域.</p>
     <h3>第5.1节 子对象</h3>
-    <p>我们已经看到一个集合<math><mi>X</mi></math>的每个子集<math><mrow><mi>U</mi><mo>&sube;</mo><mi>X</mi></mrow></math>都作为一个等化子而出现, 而等化子总是单态射. </p>
+    <p>我们已经看到一个集合<math><mi>X</mi></math>的每个子集<math><mrow><mi>U</mi><mo>&sube;</mo><mi>X</mi></mrow></math>都作为一个等化子而出现, 而等化子总是单态射. 因此, 将单态射视为广义的子集是自然的. 也就是说, <math><mi mathvariant="bold">Groups</mi></math>中的单态射可以视为子群, <math><mi mathvariant="bold">Top</mi></math>中的单态射可以视为子空间, 诸如此类.</p>
+    <p>大致的想法如下: 给定某个范畴<math><mi mathvariant="bold">G</mi></math>中的一个单态射
+      <math display="block">
+        <mrow><mi>m</mi><mo>:</mo>
+          <mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      这个范畴应该是某种结构化集合的范畴, 我们将其对象称为<q>gadget</q>. 像子集
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mi>m</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>|</mo>
+              <mrow><mi>y</mi><mo>&in;</mo><mi>M</mi></mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+          <mo>&sube;</mo><mi>X</mi></mrow>
+      </math>
+      或可以写成<math><mrow><mi>m</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 其往往是<math><mi>X</mi></math>的一个sub-gadget, 而<math><mi>M</mi></math>藉由<math><mi>m</mi></math>同构于它.
+      <math display="block">
+        <mrow><mi>m</mi><mo>:</mo>
+          <mrow><mi>M</mi>
+            <mover><mo>&rarr;</mo><mo>&Tilde;</mo></mover>
+            <mrow>
+              <mrow><mi>m</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&sube;</mo><mi>X</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      更一般地, 我们可以将单态射<math><mrow><mi>m</mi><mo>:</mo><mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow></mrow></math>想成是确定了<math><mi>X</mi></math>的一个<q>部分</q>, 即便是在那些没有潜在函数可用之取像的范畴.</p>
+    <div class="definition"><b>定义5.1. </b>某个范畴<math><mi mathvariant="bold">C</mi></math>中的一个对象<math><mi>X</mi></math>的一个<em>子对象(subobject)</em>是一个单态射
+      <math display="block">
+        <mrow><mi>m</mi><mo>:</mo>
+          <mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      对于<math><mi>X</mi></math>的子对象<math><mi>m</mi></math>和<math><msup><mi>m</mi><mo>&prime;</mo></msup></math>, 一个态射<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>m</mi><mo>&rarr;</mo><msup><mi>m</mi><mo>&prime;</mo></msup></mrow></mrow></math>是<math><mrow><mi mathvariant="bold">C</mi><mo lspace="0" rspace="0">/</mo><mi>X</mi></mrow></math>中的一个箭头, 如下图所示:
+      <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>M</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>M</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>m</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="66" y="119" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>m</mi></math></div>
+        </foreignObject>
+      </svg>
+      因此, 我们有了一个范畴
+      <math display="block">
+        <mrow>
+          <msub><mi>Sub</mi><mi mathvariant="bold">C</mi></msub>
+          <mo>&af;</mo>
+          <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      其由<math><mi mathvariant="bold">C</mi></math>中<math><mi>X</mi></math>的子对象构成.</div>
+    <p>在此定义之中, 既然<math><msup><mi>m</mi><mo>&prime;</mo></msup></math>是单态射, 那么在上图中至多只有一个这样的<math><mi>f</mi></math>, 于是<math><mrow><msub><mi>Sub</mi><mi mathvariant="bold">C</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></math>是一个预序范畴. 我们定义子对象的<em>包含(inclusion)</em>关系如下:
+      <math display="block">
+        <mrow><mi>m</mi><mo>&sube;</mo>
+          <msup><mi>m</mi><mo>&prime;</mo></msup>
+        </mrow>
+        <mtext>当且仅当存在某个</mtext>
+        <mrow><mi>f</mi><mo>:</mo>
+          <mrow><mi>m</mi><mo>&rarr;</mo>
+            <msup><mi>m</mi><mo>&prime;</mo></msup>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </p>
+    <p>最后, 我们称<math><mi>m</mi></math>和<math><msup><mi>m</mi><mo>&prime;</mo></msup></math>是<em>等价的</em>, 记作<math><mrow><mi>m</mi><mo>&equiv;</mo><msup><mi>m</mi><mo>&prime;</mo></msup></mrow></math>, 当且仅当它们作为子对象是同构的, 即<math><mrow><mi>m</mi><mo>&sube;</mo><msup><mi>m</mi><mo>&prime;</mo></msup></mrow></math>且<math><mrow><msup><mi>m</mi><mo>&prime;</mo></msup><mo>&sube;</mo><mi>m</mi></mrow></math>. 这个成立仅当存在<math><mi>f</mi></math>和<math><msup><mi>f</mi><mo>&prime;</mo></msup></math>使得下面两个三角形都是交换的:
+      <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>M</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>M</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="45" x2="224" y2="45" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="224" y1="35" x2="56" y2="35" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="47" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="80" y="3" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>f</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>m</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="66" y="119" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>m</mi></math></div>
+        </foreignObject>
+      </svg>
+    </p>
+    <p>观察到在以上图表之中, <math><mrow><mi>m</mi><mo>=</mo><mrow><msup><mi>m</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><mrow><mi>m</mi><mo>&it;</mo><msup><mi>f</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi></mrow></mrow></math>. 既然<math><mi>m</mi></math>是单态射, 那么<math><mrow><mrow><msup><mi>f</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><msub><mn>1</mn><mi>M</mi></msub></mrow></math>. 类似地, 我们有<math><mrow><mrow><mi>f</mi><mo>&it;</mo><msup><mi>f</mi><mo>&prime;</mo></msup></mrow><mo>=</mo><msub><mn>1</mn><msup><mi>M</mi><mo>&prime;</mo></msup></msub></mrow></math>. 因此, 藉由<math><mi>f</mi></math>有<math><mrow><mi>M</mi><mo>&cong;</mo><msup><mi>M</mi><mo>&prime;</mo></msup></mrow></math>. 也就是说, 我们看到<em>等价的子对象有着同构的定义域</em>. 有时我们滥用记号和语言, 在单态射<math><mrow><mi>m</mi><mo>:</mo><mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow></mrow></math>明确时称<math><mi>M</mi></math>为子对象.</p>
+    <div class="remark"><b>评注5.2. </b>往往通过商掉等价关系<q><math><mo>&equiv;</mo></math></q>以从预序
+      <math display="block">
+        <mrow>
+          <msub><mi>Sub</mi><mi mathvariant="bold">C</mi></msub>
+          <mo>&af;</mo>
+          <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      过渡到偏序是比较方便的. 那么, 一个子对象就是互包含关系下的单态射的等价类.</div>
+    <p>在<math><mi mathvariant="bold">Sets</mi></math>之中, 在此子对象概念之下, 我们有一个同构
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>Sub</mi><mi mathvariant="bold">Sets</mi></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&cong;</mo>
+          <mrow><mi>&Pscr;</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      换言之, 每个子对象都由唯一一个子集所表示. 两种子对象的概念我们都会使用, 并且会明确何时意在使用单态射, 何时意在使用单态射的等价类.</p>
+    <p>注意到如果<math><mrow><mi>M</mi><mo>&sube;</mo><msup><mi>M</mi><mo>&prime;</mo></msup></mrow></math>, 那么作见证的箭头<math><mi>f</mi></math>, 见下图
+      <svg width="300" height="230" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="-20" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>M</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>M</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>X</mi></math></div>
+        </foreignObject>
+        <line x1="56" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="55.62" y1="52.49" x2="224.38" y2="187.51" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="80" y="7" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msup><mi>m</mi><mo>&prime;</mo></msup></math></div>
+        </foreignObject>
+        <foreignObject x="66" y="119" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>m</mi></math></div>
+        </foreignObject>
+      </svg>
+      也是单态射, 于是<math><mi>M</mi></math>也是<math><msup><mi>M</mi><mo>&prime;</mo></msup></math>的一个子对象. 因此, 我们有一个函子
+      <math display="block">
+        <mrow>
+          <mrow><mi>Sub</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <msup><mi>M</mi><mo>&prime;</mo></msup>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&rarr;</mo>
+          <mrow><mi>Sub</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其由与<math><msup><mi>m</mi><mo>&prime;</mo></msup></math>的复合定义, 鉴于单态射之复合仍是单态射. {译注: 原文这段本来不太对.}</p>
+    <div class="tcomment"><b>译者注记. </b>作一简单注记, 关于<math><mi>f</mi></math>为何是单态射. 对于<math><mrow><mrow><mi>g</mi><mo>,</mo><mi>h</mi></mrow><mo>:</mo><mrow><mi>Y</mi><mo>&rarr;</mo><mi>M</mi></mrow></mrow></math>, 如果<math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><mrow><mi>f</mi><mo>&it;</mo><mi>h</mi></mrow></mrow></math>, 那么<math><mrow><mrow><msup><mi>m</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><mrow><msup><mi>m</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>h</mi></mrow></mrow></math>, 于是<math><mrow><mrow><mi>m</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><mrow><mi>m</mi><mo>&it;</mo><mi>h</mi></mrow></mrow></math>. 鉴于<math><mi>m</mi></math>是单态射, 那么<math><mrow><mi>g</mi><mo>=</mo><mi>h</mi></mrow></math>, 即<math><mi>f</mi></math>是单态射.</div>
+    <p>基于某个对象<math><mi>X</mi></math>的广义元素
+      <math display="block">
+        <mrow><mi>z</mi><mo>:</mo>
+          <mrow><mi>Z</mi><mo>&rarr;</mo><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      我们可以定义这样的元素和子对象<math><mrow><mi>m</mi><mo>:</mo><mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow></mrow></math>之间的<em>局部成员关系</em>
+      <math display="block">
+        <mrow><mi>z</mi>
+          <msub><mo>&in;</mo><mi>X</mi></msub>
+          <mi>M</mi></mrow>
+      </math>
+      为存在<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>M</mi></mrow></mrow></math>使得<math><mrow><mi>z</mi><mo>=</mo><mrow><mi>m</mi><mo>&it;</mo><mi>f</mi></mrow></mrow></math>. 既然<math><mi>m</mi></math>是单态射, 如果<math><mi>z</mi></math>能够藉此分解, 那么分解的方式就是唯一的.</p>
+    <div class="example"><b>例子5.3. </b>一个等化子
+      <math display="block"><mi>E</mi>
+        <mover><mo>&rarr;</mo>
+          <mrow><mspace width="2em"/>
+            <mrow/>
+            <mspace width="2em"/></mrow>
+        </mover>
+        <mi>A</mi>
+        <munderover><mo>&rrarr;</mo>
+          <mrow><mspace width="2em"/><mi>g</mi><mspace width="2em"/></mrow>
+          <mrow><mspace width="2em"/><mi>f</mi><mspace width="2em"/></mrow>
+        </munderover>
+        <mi>B</mi></math>
+      是<math><mi>A</mi></math>的一个子对象, 其具有性质
+      <math display="block">
+        <mrow><mi>z</mi>
+          <msub><mo>&in;</mo><mi>A</mi></msub>
+          <mi>E</mi></mrow>
+        <mtext>当且仅当</mtext>
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>g</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      因此, 我们可以将<math><mi>E</mi></math>视为由满足<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>的广义元素<math><mrow><mi>z</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>构成的子对象, 其暗示了以下记号
+      <math display="block">
+        <mrow>
+          <mrow><mi>E</mi><mo>=</mo>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi>z</mi><mo>&in;</mo><mi>Z</mi></mrow>
+                <mo>|</mo>
+                <mrow>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>=</mo>
+                  <mrow><mi>g</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+          <mo>&sube;</mo><mi>A</mi></mrow>
+      </math>
+      在范畴逻辑中, 我们会建立一种方法, 通过给出一种关于这样的子对象的演算以使得这种直觉精确化.</div>
     <h3>第5.2节 拉回</h3>
+    <p>拉回的概念, 如同积, 在数学和逻辑中经常出现. 其是交与逆像的泛化.</p>
+    <p>我们从以下定义开始.</p>
+    <div class="definition"><b>定义5.4. </b>在任何范畴<math><mi mathvariant="bold">C</mi></math>只在, 给定箭头<math><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow></math>满足<math><mrow><mrow><mi>cod</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>cod</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>:
+      <svg width="300" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="0" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <line x1="76" y1="200" x2="224" y2="200" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="240" y1="56" x2="240" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="90" y="205" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="196" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+      </svg>
+      <math><mi>f</mi></math>和<math><mi>g</mi></math>的<em>拉回(pullback)</em>由以下箭头构成
+      <svg width="300" height="240" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="0" y="185" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="180" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="0" y="25" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>P</mi></math></div>
+        </foreignObject>
+        <line x1="76" y1="40" x2="224" y2="40" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="60" y1="56" x2="60" y2="184" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="90" y="45" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="16" y="105" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+      </svg>
+      其满足<math><mrow><mrow><mi>f</mi><mo>&it;</mo><msub><mi>p</mi><mn>1</mn></msub></mrow><mo>=</mo><mrow><mi>g</mi><mo>&it;</mo><msub><mi>p</mi><mn>2</mn></msub></mrow></mrow></math>, 并在此性质下是泛的 (universal). 换言之, 对于任意的<math><mrow><msub><mi>z</mi><mn>1</mn></msub><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>和<math><mrow><msub><mi>z</mi><mn>2</mn></msub><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></math>满足<math><mrow><mrow><mi>f</mi><mo>&it;</mo><msub><mi>z</mi><mn>1</mn></msub></mrow><mo>=</mo><mrow><mi>g</mi><mo>&it;</mo><msub><mi>z</mi><mn>2</mn></msub></mrow></mrow></math>, 存在唯一的<math><mrow><mi>u</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>使得<math><mrow><msub><mi>z</mi><mn>1</mn></msub><mo>=</mo><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>&it;</mo><mi>u</mi></mrow></mrow></math>且<math><mrow><msub><mi>z</mi><mn>2</mn></msub><mo>=</mo><mrow><msub><mi>p</mi><mn>2</mn></msub><mo>&it;</mo><mi>u</mi></mrow></mrow></math>. 这种情况在下列图表中指明:
+      <svg width="420" height="350" stroke="black" style="display: block; margin: auto;">
+        <defs>
+          <marker id="arrow-head" viewbox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 6 5 L 0 8 z"/>
+          </marker>
+        </defs>
+        <foreignObject x="140" y="295" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>A</mi></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="135" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>B</mi></math></div>
+        </foreignObject>
+        <foreignObject x="140" y="135" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>P</mi></math></div>
+        </foreignObject>
+        <line x1="216" y1="150" x2="364" y2="150" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="200" y1="166" x2="200" y2="294" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="230" y="155" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="156" y="215" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>p</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="320" y="295" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>C</mi></math></div>
+        </foreignObject>
+        <line x1="216" y1="310" x2="364" y2="310" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="380" y1="166" x2="380" y2="294" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <foreignObject x="230" y="315" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>f</mi></math></div>
+        </foreignObject>
+        <foreignObject x="336" y="215" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>g</mi></math></div>
+        </foreignObject>
+        <foreignObject x="-20" y="15" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>Z</mi></math></div>
+        </foreignObject>
+        <line x1="49.92" y1="47.36" x2="190.08" y2="292.64" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="58.86" y1="36.66" x2="361.14" y2="143.34" stroke-width="1px" marker-end="url(#arrow-head)"/>
+        <line x1="56" y1="42" x2="184" y2="138" stroke-width="1px" marker-end="url(#arrow-head)" stroke-dasharray="2 2"/>
+        <foreignObject x="47.84" y="161.95" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>z</mi><mn>1</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="154.66" y="61.8" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><msub><mi>z</mi><mn>2</mn></msub></math></div>
+        </foreignObject>
+        <foreignObject x="52.8" y="84.6" width="120" height="30">
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;"><math><mi>u</mi></math></div>
+        </foreignObject>
+      </svg>
+    </div>
+    <p>有时我们对于拉回使用积风格的记号.
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+    </p>
     <h3>第5.3节 拉回的性质</h3>
     <h3>第5.4节 极限</h3>
     <h3>第5.5节 极限的保持</h3>

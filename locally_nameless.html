@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>局部无名表示</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>局部无名表示</h1>
+    <h2>摘要</h2>
+    <p>本文介绍用于表示带变量绑定的句法的局部无名 (locally nameless) 方法, 特别关注该技术在形式化证明中的使用. 首先, 我们解释用de Bruijn索引表示绑定变量, 同时保留名字表示自由变量的好处. 然后, 我们解释如何以这种形式描述和操作句法, 并展示如何在局部无名项上定义判断并对其进行推理.</p>
+    <h2>第1章 引论</h2>
+    <p>大多数编程语言, 类型系统和逻辑系统都使用变量. 在给定的编程语言或给定的形式理论中, 有许多不同的技术可用来表示带变量绑定的句法. 本文关注一种特定的绑定表示, 称为局部无名表示 (locally nameless representation). 它已被成功地用于机械化类型系统的可靠性证明, <math><mi>&lambda;</mi></math>演算语义的性质, 以及程序变换的正确性证明 [Leroy, 2007, Aydemir et al., 2008, Charguéraud, 2009]. 这种表示也已被证明在类型检查器和证明检查器的实现中是有用的, 其中包括Coq [Coq Development Team, 2009], Lego [Luo and Pollack, 1992], Isabelle [Nipkow et al., 2002], HOL 4 [Norrish and Slind, 2007] 和Epigram [Altenkirch et al., 2005].</p>
+    <p>局部无名表示依赖de Bruijn索引来表示绑定变量, 但使用名字来表示自由变量. 这样一种混合句法使得替换和<math><mi>&beta;</mi></math>归约的实现非常简单. 通过具有项的唯一表示, 它避免了与<math><mi>&alpha;</mi></math>变换相关的传统问题. 同时, 它容许一种相当接近于纸笔证明通常进行的风格的推理风格. 本文的目的是对局部无名表示提供一个全面的介绍, 解释它如何工作, 为什么它能工作, 以及如何在形式推理中使用它.</p>
+    <p>局部无名表示的引入并不是本文的贡献. 将de Bruijn索引与名字结合的可能性实际上已由de Bruijn [1972] 在他的奠基性论文中提到. 它在证明助手的早期实现中就已被使用, 始于Huet的Constructive Engine [1989] 和Paulson的Isabelle证明系统 [1986]. 在形式化证明的语境下, Gordon [1993] 似乎是第一个使用局部无名表示的人, 尽管他只是将其用作构建与有名<math><mi>&lambda;</mi></math>项之间接口的基础, 而不是直接在局部无名句法上进行推理. Gordon和Melham [1996] 后来的工作也将局部无名项用作有名项的一种抽象公理化表示的模型.</p>
+    <p>Pollack [2006] 较近期在POPLMark挑战 [Aydemir et al., 2005] 的语境下强调了局部无名表示的好处, 这建立在他用一种具有区分的绑定有名变量和自由有名变量的表示来形式化纯类型系统 (Pure Type System) 的经验之上 [McKinna and Pollack, 1993]. 局部无名表示最先由Leroy [2007] 在POPLMark挑战上进行了实验. 随后, Aydemir et al. [2008] 进行了使用这种表示的进一步研究和更大规模的案例研究.</p>
+    <p>本文的第一个贡献是对局部无名表示的一个全面而完整的描述. 我们首先通过分析表示绑定的相关方法的优点和缺点来引出这一技术. 然后我们给出操作局部无名句法所涉及的运算, 并讨论它们的实现. 我们还给出这些运算所满足的关键性质的形式陈述, 并解释在形式推理中何时需要利用这些性质.</p>
+    <p>本文的第二个贡献是对以局部无名风格描述的编程语言和类型系统进行形式推理的详细介绍. 我们首先回顾如何使用由作者及其合作者引入的余有限量化 (cofinite quantification) 技术 [Aydemir et al., 2008] 在<math><mi>&lambda;</mi></math>项上定义判断. 然后我们展示如何形式地证明关于这些判断的标准性质, 例如类型可靠性, 合流性的证明以及语义保持.</p>
+    <p>本文的第三个贡献在于将局部无名表示推广到高级形式的绑定结构. 我们解释如何支持多重绑定子, 递归绑定子, 互递归绑定子以及模式匹配结构, 对线性模式和非线性模式都予以支持. 支持这些要素对于形式化真实编程语言的句法和语义是必不可少的.</p>
+    <h2>第2章 局部无名表示</h2>
+    <p>表示变量绑定存在许多种可能性. 我们的目标不是涵盖所有这些表示, 而只是讨论与局部无名表示密切相关的表示. (Aydemir et al. [2008] 的论文包含了一个绑定技术的综述.) 大多数与变量绑定相关的问题都可以在一个像纯<math><mi>&lambda;</mi></math>演算这样简单的语言上研究. 因此, 在本文的核心部分中只考虑<math><mi>&lambda;</mi></math>项的句法. 对更高级的绑定结构的支持在之后进行研究 (§7).</p>
+    <h3>第2.1节 有名表示: 原始项与商项</h3>
+    <p><math><mi>&lambda;</mi></math>项最常见的表示依赖于名字的使用: 每个抽象和每个变量都带有一个名字. 原始有名项 (raw named term) 的句法由下面的文法描述.
+      <math display="block">
+        <mrow><mi>t</mi><mo>&Colone;</mo>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">var</mi><mspace width="2ex"/><mi>x</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>t</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">app</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi>t</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      这个文法中的对象被称为原始项, 因为它们与<math><mi>&lambda;</mi></math>项不同构. 例如, 两个原始项<q><math><mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="sans-serif">var</mi><mspace width="2ex"/><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></q>和<q><math><mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mi>y</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="sans-serif">var</mi><mspace width="2ex"/><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></q>是两个不同的对象, 尽管两个<math><mi>&lambda;</mi></math>项<q><math><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>x</mi></mrow></math></q>和<q><math><mrow><mi>&lambda;</mi><mi>y</mi><mo lspace="0">.</mo><mi>y</mi></mrow></math></q>应被视为相等, 因为<math><mi>&lambda;</mi></math>演算的理论将<math><mi>&alpha;</mi></math>等价的项等同起来. 由于原始项与<math><mi>&lambda;</mi></math>项之间的不匹配, <math><mi>&lambda;</mi></math>演算教科书中有一些推理无法用原始项来形式化.</p>
+    <p>为了得到一个真正与<math><mi>&lambda;</mi></math>项同构的项的表示, 我们需要构造一个商结构, 将原始项的集合关于<math><mi>&alpha;</mi></math>等价取商. 这种基于商的构造与<math><mi>&lambda;</mi></math>演算标准教科书中的表述非常紧密地对应.</p>
+    <p>然而在实践中, 形式化地使用商结构工作并不那么直接. 为了在<math><mi>&lambda;</mi></math>项上定义一个函数或一个关系, 我们需要先在原始项上定义它, 然后证明它与<math><mi>&alpha;</mi></math>等价相容, 最后将它提升到商结构上. 例如, 若<math><mi>f</mi></math>是有名表示中项上的一个幺元函数, 那么为了使<math><mi>f</mi></math>被接受为<math><mi>&lambda;</mi></math>项上的一个定义, 我们必须证明, 对于任意两个<math><mi>&alpha;</mi></math>等价的项<math><msub><mi>t</mi><mn>1</mn></msub></math>和<math><msub><mi>t</mi><mn>2</mn></msub></math>, 两个应用<math><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>t</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>和<math><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>t</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>产生<math><mi>&alpha;</mi></math>等价的结果. 将定义提升到商结构上通常是冗长而乏味的. 幸运的是, 这些工作中的很多都可以自动化. 例如, Urban的nominal包 [2008] 旨在对涉及绑定子的数据类型的定义和证明进行因子分解和自动化. 然而, 目前仍有一些高级绑定结构不被nominal包支持.</p>
+    <h3>第2.2节 局部有名表示</h3>
+    <p>局部无名表示与局部有名表示 (locally named representation) 密切相关, 后者已由McKinna和Pollack [1993] 广泛发展. 这种表示在句法上区分绑定变量和自由变量. 绑定变量用一个名字表示, 记作<math><mi>x</mi></math>. 自由变量, 也称为参数 (parameter), 用另一种名字表示, 记作<math><mi>p</mi></math>. 抽象总是绑定<q>绑定变量</q>, 带有一个绑定变量名. 因此, 局部有名项的文法可以描述如下.
+      <math display="block">
+        <mrow><mi>t</mi><mo>&Colone;</mo>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">bvar</mi><mspace width="2ex"/><mi>x</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">fvar</mi><mspace width="2ex"/><mi>p</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>t</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">app</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi>t</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>局部有名表示的主要好处在于, 绑定名和自由名永远不会被混淆. 特别地, 人们永远不需要对绑定名进行<math><mi>&alpha;</mi></math>重命名来避免与自由变量名冲突. 此外, 绑定变量与自由变量的分离使得避免捕获的替换的实现显著地更简单.</p>
+    <p>关于局部有名表示仍然存在的一个缺点是, 它严格来说并不与<math><mi>&lambda;</mi></math>项同构. 这里同样, 两个项可能是<math><mi>&alpha;</mi></math>等价的, 但在句法上不相等. 即使许多结果可以用未取商的局部有名表示来形式化, 为了形式化的充分性 (adequacy), 在某个时刻仍需要构造一个商结构.</p>
+    <h3>第2.3节 de Bruijn表示</h3>
+    <p>表示<math><mi>&lambda;</mi></math>项还存在另一种标准方法. 使用de Bruijn索引 [1972], 可以构建一个与<math><mi>&lambda;</mi></math>项集合同构的数据类型. 在这种表示中, 抽象不提及任何名字 (它们是<q>无名的</q>), 并且每个变量带有一个自然数, 该自然数指示在到达该变量被绑定的抽象之前要经过的抽象的数目. 更确切地说, 一个标有索引<math><mi>i</mi></math>的变量指向<q>第<math><mrow><mo stretchy="false">(</mo><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>个</q>外围抽象. de Bruijn句法中项的文法如下所示, 它包括基于索引构建的变量和无名抽象.
+      <math display="block">
+        <mrow><mi>t</mi><mo>&Colone;</mo>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">var</mi><mspace width="2ex"/><mi>i</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mi>t</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">app</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi>t</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      例如, <math><mi>&lambda;</mi></math>项<q><math><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>x</mi></mrow></math></q>表示为<q><math><mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="sans-serif">var</mi><mspace width="2ex"/><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math></q>, 也可以写作<q><math><mrow><mi>&lambda;</mi><mo lspace="0">.</mo><mn>0</mn></mrow></math></q>. 类似地, 项<q><math><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mi>y</mi><mo lspace="0">.</mo><mrow><mi>y</mi><mspace width="2ex"/><mi>x</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></q>表示为<q><math><mrow><mi>&lambda;</mi><mo lspace="0">.</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mo lspace="0">.</mo><mrow><mn>0</mn><mspace width="2ex"/><mn>1</mn></mrow></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math></q>.</p>
+    <p>使用索引的关键优点在于不需要商结构. 此外, 在<math><mi>&lambda;</mi></math>项上推理时永远不需要<math><mi>&alpha;</mi></math>重命名操作. 然而, de Bruijn表示有一个主要缺点: 索引对它们所在的项的变化非常敏感. 特别地, de Bruijn项涉及一个移位 (shifting) 操作, 该操作在于在一个项中将所有大于给定界限的索引的值加一. 常规的纸面证明经常需要经过非平凡的调整才能适应移位. 例如, 在一个带依赖类型的系统的类型可靠性证明中, 弱化引理的陈述和证明会变得显著地更复杂, 因为移位需要被应用于类型上下文中的一些值.</p>
+    <p>de Bruijn表示已在复杂定理的证明中显示出其有效性, 例如Barras和Werner用Coq对Coq的形式化 [1997]. 尽管如此, 一些研究者认为同一理论的非形式表述与形式的de Bruijn表述之间的差距太大 [Aydemir et al., 2005].</p>
+    <h3>第2.4节 局部无名表示</h3>
+    <p>局部无名表示结合了局部有名表示的好处与de Bruijn表示的好处. 通过使用de Bruijn索引来表示绑定变量, 它避免了引入<math><mi>&alpha;</mi></math>等价类. 同时, 通过使用名字来表示自由变量, 它避免了对de Bruijn索引进行移位的需要.</p>
+    <p>因此, 局部无名项的文法涉及一个用于绑定变量的构造子, 基于一个de Bruijn索引构建, 以及一个用于自由变量的构造子, 基于一个名字构建. 抽象, 像在de Bruijn句法中一样, 是无名的: 它们不带有任何名字.
+      <math display="block">
+        <mrow><mi>t</mi><mo>&Colone;</mo>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">bvar</mi><mspace width="2ex"/><mi>i</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">fvar</mi><mspace width="2ex"/><mi>x</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mi>t</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi mathvariant="sans-serif">app</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi>t</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      例如, <math><mi>&lambda;</mi></math>项<q><math><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mrow><mi>x</mi><mspace width="2ex"/><mi>y</mi></mrow></mrow></math></q>包含一个绑定变量<math><mi>x</mi></math>和一个自由变量<math><mi>y</mi></math>, 它在局部无名句法中表示为<q><math><mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="sans-serif">app</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="sans-serif">bvar</mi><mspace width="2ex"/><mn>0</mn></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="sans-serif">fvar</mi><mspace width="2ex"/><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></q>, 也可以写作<q><math><mrow><mi>&lambda;</mi><mo lspace="0">.</mo><mrow><mn>0</mn><mspace width="2ex"/><mi>y</mi></mrow></mrow></math></q>. 注意, 并非所有句法项都对应于一个真正的<math><mi>&lambda;</mi></math>项. 例如, <q><math><mrow><mi mathvariant="sans-serif">abs</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="sans-serif">bvar</mi><mspace width="2ex"/><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math></q>不是一个有效的局部无名项, 因为索引为<math><mn>1</mn></math>的绑定变量不指向其所在项中的任何抽象. 这个不当项 (improper term) 的问题在之后处理 (§3.3).</p>
+    <p>自由变量用名字表示, 名字也称为原子 (atom). 原子可以用任何支持一个比较函数和一个新鲜名字生成器的数据类型来实现. 比较函数用于测试两个原子是否相等 (即, 原子上的相等需要是可判定的). 新鲜名字生成器记作<q><math><mi mathvariant="sans-serif">fresh</mi></math></q>, 用于根据任意给定的有限原子集合选取一个新鲜的原子 (特别地, 应该有无穷多个原子). {译注: 这句话有点绕, 新鲜的意思其实就是不在该集合之中.} 在实践中, 我们通常用自然数来实现原子.</p>
+    <h2>第3章 局部无名项上的操作</h2>
+    <p>本节描述用于操作局部无名项的操作. 特别地, 有两个操作是这种表示的核心. 变量打开 (variable opening) 将某些绑定变量变为自由变量. 它用于考察一个抽象的体. 变量关闭 (variable closing) 将某些自由变量变为绑定变量. 它用于在给定一个抽象的体的表示的情况下构建该抽象. 在本节中, 我们还解释了如何排除局部无名句法所允许的不良形式的项.</p>
+    <p>请注意, 本节中给出的定义和引理并不十分新颖. 它们中的大多数已经出现在Gordon早期关于局部无名句法 (locally nameless syntax) 的工作 (1993) 中, 或出现在McKinna和Pollack关于局部有名表示的工作 (1993) 中, 而局部有名表示与局部无名表示有许多共同之处.</p>
+    <h3>第3.1节 变量打开</h3>
+  </body>
+</html>

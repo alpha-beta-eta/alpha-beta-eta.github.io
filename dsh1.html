@@ -1,0 +1,2347 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>deepseek harness笔记1</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>deepseek harness笔记1</h1>
+    <p>本文重新组织论文<i>A Programming Paradigm for Spatiotemporal Composability</i>的第3章和第4章, 并以插件运行时Cordis及其在dsh中的使用为背景. 这不是翻译: 定义和定理的形状按本文的需要重新安排, 论文的说法只在对照时提到. 目标是验证插件的生命周期性质, 插件的业务逻辑不在范围之内.</p>
+    <p>重构遵循以下几条原则.</p>
+    <ol>
+      <li>论文和Cordis都不是权威. 每个设计点都选合理, 直接, 简单的方案; Cordis的做法若体现了局部的最佳实践就跟着它.</li>
+      <li>所有跨组件共享的可变状态都是某个服务的状态, 不设另外的环境部分.</li>
+      <li>程序是归纳类型, 看不到状态, 只能通过操作的结果决定下一步. 所以组件只碰自己声明过的东西, 这是由构造保证的.</li>
+      <li>服务状态从一开始就配备等价关系<math><mo>&simeq;</mo></math>, 控制部分 (生命周期, 名字, 绑定的身份) 用严格相等.</li>
+      <li>定理的最终形状是: 若每个服务满足它的规格, 每个插件满足它的义务, 则整个系统满足生命周期性质.</li>
+    </ol>
+    <p>第1章讲效应怎样撤销, 第2章到第5章讲组件怎样通过服务相互依赖, 第6章到第9章给出生命周期演算及其元理论, 第10章逐条对照论文.</p>
+    <h2 id="sec-effects">第1章 可撤销效应</h2>
+    <p>这一章对应论文的3.1节. 本章用严格相等和全函数, 与论文的陈述一致. 出发点是: 插件卸载时, 它对共享状态做过的每件事都必须撤掉, 所以每个效应都要带着它的逆. 下面固定一个类型<math><mi mathvariant="normal">&Gamma;</mi></math>, 作为世界的状态, 并记<math><mrow><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&colone;</mo><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&rarr;</mo><mi mathvariant="normal">&Gamma;</mi></mrow></mrow></math>.</p>
+    <h3>第1.1节 效应上下文</h3>
+    <div class="definition"><b>定义1.1.1. </b>定义<math><mrow><msub><mi mathvariant="fraktur">T</mi><mi mathvariant="normal">&Gamma;</mi></msub><mo>&colone;</mo><mrow><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&times;</mo><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>, 其中的元素<math><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></math>由前进函数<math><mi>f</mi></math>和撤销函数<math><mi>g</mi></math>组成. 复合定义为
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>f</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi>g</mi><mn>1</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&compfn;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>f</mi><mn>2</mn></msub>
+                <mo>,</mo>
+                <msub><mi>g</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&colone;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow>
+                <msub><mi>f</mi><mn>1</mn></msub>
+                <mo>&compfn;</mo>
+                <msub><mi>f</mi><mn>2</mn></msub>
+              </mrow>
+              <mo>,</mo>
+              <mrow>
+                <msub><mi>g</mi><mn>2</mn></msub>
+                <mo>&compfn;</mo>
+                <msub><mi>g</mi><mn>1</mn></msub>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      前进部分按通常的顺序复合, 撤销部分倒过来: 后做的事先撤. </div>
+    <div class="proposition"><b>命题1.1.2. </b><math><msub><mi mathvariant="fraktur">T</mi><mi mathvariant="normal">&Gamma;</mi></msub></math>在上述复合下是幺半群, 单位元是<math><mrow><mo stretchy="false">(</mo><mrow><mi>id</mi><mo>,</mo><mi>id</mi></mrow><mo stretchy="false">)</mo></mrow></math>. </div>
+    <div class="definition"><b>定义1.1.3. </b>定义效应上下文<math><mrow><mrow><mo lspace="0" rspace="0">&part;</mo><mo>&af;</mo><mi mathvariant="normal">&Gamma;</mi></mrow><mo>&colone;</mo><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&times;</mo><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>. 其中的元素<math><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></math>由当前状态<math><mi>&gamma;</mi></math>和累加器<math><mi>&phi;</mi></math>组成, <math><mi>&phi;</mi></math>的用意是把一切撤回到起点. 定义<math><mrow><mi>track</mi><mo>:</mo><mrow><msub><mi mathvariant="fraktur">T</mi><mi mathvariant="normal">&Gamma;</mi></msub><mo>&rarr;</mo><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo lspace="0" rspace="0">&part;</mo><mo>&af;</mo><mi mathvariant="normal">&Gamma;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>为
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>track</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&colone;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow><mi>f</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>,</mo>
+              <mrow><mi>&phi;</mi><mo>&compfn;</mo><mi>g</mi></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      定义<math><mrow><mi>recover</mi><mo>:</mo><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo lspace="0" rspace="0">&part;</mo><mo>&af;</mo><mi mathvariant="normal">&Gamma;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>为
+      <math display="block">
+        <mrow>
+          <mrow><mi>recover</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&colone;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow><mi>&phi;</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>,</mo><mi>id</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      <math><mi>track</mi></math>在前进的同时把<math><mi>g</mi></math>接到累加器的内侧, <math><mi>recover</mi></math>一次用掉累加器. </div>
+    <div class="proposition"><b>命题1.1.4. </b><math><mi>track</mi></math>是幺半群同态, 并且<math><mrow><mrow><msub><mi>pr</mi><mn>1</mn></msub><mo>&compfn;</mo><mrow><mi>track</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&compfn;</mo><msub><mi>pr</mi><mn>1</mn></msub></mrow></mrow></math>. </div>
+    <div class="theorem" id="thm-recover-track"><b>定理1.1.5. </b>若<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>&gamma;</mi></mrow></math>, 则<math><mrow><mrow><mi>recover</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>track</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>recover</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 特别地, 若<math><mrow><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>=</mo><mi>id</mi></mrow></math>, 则<math><mrow><mrow><mi>recover</mi><mo>&compfn;</mo><mrow><mi>track</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>=</mo><mi>recover</mi></mrow></math>. </div>
+    <div class="proof"><b>证明.</b> 直接计算:
+      <math display="block">
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow><mi>recover</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi>track</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>recover</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi>f</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo>
+                      <mrow><mi>&phi;</mi><mo>&compfn;</mo><mi>g</mi></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>&phi;</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>g</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow><mi>f</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>,</mo><mi>id</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>&phi;</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>,</mo><mi>id</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>recover</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </math>
+      第三个等号用到了前提. 若<math><mrow><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>=</mo><mi>id</mi></mrow></math>, 则前提对每个<math><mi>&gamma;</mi></math>都成立.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>注意前提只要求<math><mi>g</mi></math>在<math><mi>f</mi></math>被应用的那一点撤销它, 不要求<math><mi>g</mi></math>是全局的左逆.</p>
+    <div class="theorem" id="thm-recover-tracks"><b>定理1.1.6. </b>设<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><msub><mi>g</mi><mn>1</mn></msub></mrow><mo stretchy="false">)</mo></mrow><mo>,</mo><mo>&hellip;</mo><mo>,</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>f</mi><mi>n</mi></msub><mo>,</mo><msub><mi>g</mi><mi>n</mi></msub></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&in;</mo><msub><mi mathvariant="fraktur">T</mi><mi mathvariant="normal">&Gamma;</mi></msub></mrow></math>, 从<math><msub><mi>&gamma;</mi><mn>0</mn></msub></math>出发令<math><mrow><msub><mi>&gamma;</mi><mi>i</mi></msub><mo>&colone;</mo><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>&gamma;</mi><mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 并设每个<math><mrow><mrow><msub><mi>g</mi><mi>i</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>&gamma;</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><msub><mi>&gamma;</mi><mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow></msub></mrow></math>. 则对任意<math><mi>&phi;</mi></math>
+      <math display="block">
+        <mrow>
+          <mrow><mi>recover</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>track</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <msub><mi>f</mi><mi>n</mi></msub>
+                          <mo>,</mo>
+                          <msub><mi>g</mi><mi>n</mi></msub>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>&compfn;</mo><mo>&ctdot;</mo><mo>&compfn;</mo>
+                    <mrow><mi>track</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <msub><mi>f</mi><mn>1</mn></msub>
+                          <mo>,</mo>
+                          <msub><mi>g</mi><mn>1</mn></msub>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>&gamma;</mi><mn>0</mn></msub>
+                    <mo>,</mo><mi>&phi;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>recover</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>&gamma;</mi><mn>0</mn></msub>
+                <mo>,</mo><mi>&phi;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      特别地, 取<math><mrow><mi>&phi;</mi><mo>=</mo><mi>id</mi></mrow></math>时右边就是<math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><mo>,</mo><mi>id</mi></mrow><mo stretchy="false">)</mo></mrow></math>. 这是论文的式(11). </div>
+    <div class="proof"><b>证明.</b> 对<math><mi>n</mi></math>归纳. <math><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math>时没有什么要证明的. 设结论对<math><mrow><mi>n</mi><mo>&minus;</mo><mn>1</mn></mrow></math>个对子成立. 第一个对子把<math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></math>送到<math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mn>1</mn></msub><mo>,</mo><mrow><mi>&phi;</mi><mo>&compfn;</mo><msub><mi>g</mi><mn>1</mn></msub></mrow></mrow><mo stretchy="false">)</mo></mrow></math>, 剩下的<math><mrow><mi>n</mi><mo>&minus;</mo><mn>1</mn></mrow></math>个对子从<math><msub><mi>&gamma;</mi><mn>1</mn></msub></math>出发同样满足前提, 由归纳假设, 依次track它们再recover的结果是<math><mrow><mi>recover</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mn>1</mn></msub><mo>,</mo><mrow><mi>&phi;</mi><mo>&compfn;</mo><msub><mi>g</mi><mn>1</mn></msub></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 再由<cite>定理<a href="#thm-recover-track">1.1.5</a></cite>, 它等于<math><mrow><mi>recover</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="definition"><b>定义1.1.7. </b>称<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mrow><mo lspace="0" rspace="0">&part;</mo><mo>&af;</mo><mi mathvariant="normal">&Gamma;</mi></mrow></mrow></math>相对<math><msub><mi>&gamma;</mi><mn>0</mn></msub></math>健全, 如果<math><mrow><mrow><mi>&phi;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><msub><mi>&gamma;</mi><mn>0</mn></msub></mrow></math>. 健全等价于<math><mrow><mrow><mi>recover</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><mo>,</mo><mi>id</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>; 并且若<math><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></math>健全且<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>&gamma;</mi></mrow></math>, 则<math><mrow><mrow><mi>track</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>也健全. </div>
+    <h3>第1.2节 带见证的效应函数</h3>
+    <p>对子<math><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></math>的撤销函数是固定的. 但很多效应的逆依赖于起点: <q>把<math><mi>x</mi></math>设为5</q>的逆是<q>把<math><mi>x</mi></math>改回原来的值</q>, 原来的值要看效应作用前的状态. 所以逆应该作为效应的输出.</p>
+    <div class="definition"><b>定义1.2.1. </b>定义<math><mrow><msub><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi></msub><mo>&colone;</mo><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&rarr;</mo><mrow><mo lspace="0" rspace="0">&part;</mo><mo>&af;</mo><mi mathvariant="normal">&Gamma;</mi></mrow></mrow></mrow></math>, 其中的元素称为效应函数: <math><mrow><mrow><mi>e</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&delta;</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>给出新状态<math><mi>&delta;</mi></math>和这一步的逆<math><mi>g</mi></math>. 带见证的效应函数构成
+      <math display="block">
+        <mrow>
+          <msubsup><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi><mo>&#8270;</mo></msubsup>
+          <mo>&colone;</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mi>e</mi><mo>&in;</mo>
+                <msub><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi></msub>
+              </mrow>
+              <mo>|</mo>
+              <mrow><mo>&forall;</mo><mi>&gamma;</mi><mo lspace="0">.</mo>
+                <mrow><mi mathvariant="bold">let</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>&delta;</mi><mo>,</mo><mi>g</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&colone;</mo>
+                    <mrow><mi>e</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mspace width="2ex"/><mi mathvariant="bold">in</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mi>g</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>=</mo><mi>&gamma;</mi></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      每个<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><msub><mi mathvariant="fraktur">T</mi><mi mathvariant="normal">&Gamma;</mi></msub></mrow></math>导出<math><mrow><mrow><mo stretchy="false" lspace="0" rspace="0">&ulcorner;</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false" lspace="0" rspace="0">&urcorner;</mo></mrow><mo>&colone;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>&mapsto;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>; 若<math><mrow><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>=</mo><mi>id</mi></mrow></math>, 则<math><mrow><mrow><mo stretchy="false" lspace="0" rspace="0">&ulcorner;</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false" lspace="0" rspace="0">&urcorner;</mo></mrow><mo>&in;</mo><msubsup><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi><mo>&#8270;</mo></msubsup></mrow></math>. </div>
+    <div class="definition"><b>定义1.2.2. </b>对于<math><mrow><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>,</mo><msub><mi>e</mi><mn>2</mn></msub></mrow><mo>&in;</mo><msub><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi></msub></mrow></math>, 定义先<math><msub><mi>e</mi><mn>2</mn></msub></math>后<math><msub><mi>e</mi><mn>1</mn></msub></math>的复合
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>e</mi><mn>1</mn></msub>
+                <mo>&diamond;</mo>
+                <msub><mi>e</mi><mn>2</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&colone;</mo>
+          <mrow><mi mathvariant="bold">let</mi><mspace width="2ex"/>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>&delta;</mi><mo>,</mo><mi>s</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>&colone;</mo>
+              <mrow>
+                <msub><mi>e</mi><mn>2</mn></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="2ex"/><mi mathvariant="bold">in</mi><mspace width="2ex"/>
+            <mrow><mi mathvariant="bold">let</mi><mspace width="2ex"/>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&epsilon;</mi><mo>,</mo><mi>t</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&colone;</mo>
+                <mrow>
+                  <msub><mi>e</mi><mn>1</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mspace width="2ex"/><mi mathvariant="bold">in</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>&epsilon;</mi><mo>,</mo>
+                  <mrow><mi>s</mi><mo>&compfn;</mo><mi>t</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      以及<math><mrow><mrow><msub><mi>&eta;</mi><mi mathvariant="normal">&Gamma;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&colone;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>id</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 这就是幺半群<math><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mo>&compfn;</mo></mrow><mo stretchy="false">)</mo></mrow></math>上的writer monad的Kleisli复合: 日志是函数, 新的一项接在右边, 也就是最先被施加. </div>
+    <div class="theorem"><b>定理1.2.3. </b><math><msub><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi></msub></math>在<math><mo>&diamond;</mo></math>下是幺半群, 单位元是<math><msub><mi>&eta;</mi><mi mathvariant="normal">&Gamma;</mi></msub></math>; <math><mrow><mrow><mo stretchy="false" lspace="0" rspace="0">&ulcorner;</mo><mrow><mi>&minus;</mi><mo>,</mo><mi>&minus;</mi></mrow><mo stretchy="false" lspace="0" rspace="0">&urcorner;</mo></mrow><mo>:</mo><mrow><msub><mi mathvariant="fraktur">T</mi><mi mathvariant="normal">&Gamma;</mi></msub><mo>&rarr;</mo><msub><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi></msub></mrow></mrow></math>是幺半群同态; <math><msubsup><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi><mo>&#8270;</mo></msubsup></math>是子幺半群. 这是论文的定理10, 11. </div>
+    <div class="proof"><b>证明.</b> 结合律和单位律逐点展开定义即可. 对同态, <math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false" lspace="0" rspace="0">&ulcorner;</mo><mrow><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><msub><mi>g</mi><mn>1</mn></msub></mrow><mo stretchy="false" lspace="0" rspace="0">&urcorner;</mo></mrow><mo>&diamond;</mo><mrow><mo stretchy="false" lspace="0" rspace="0">&ulcorner;</mo><mrow><msub><mi>f</mi><mn>2</mn></msub><mo>,</mo><msub><mi>g</mi><mn>2</mn></msub></mrow><mo stretchy="false" lspace="0" rspace="0">&urcorner;</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><msub><mi>f</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>f</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><msub><mi>g</mi><mn>2</mn></msub><mo>&compfn;</mo><msub><mi>g</mi><mn>1</mn></msub></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 正好是扭曲复合. 对子幺半群, <math><msub><mi>&eta;</mi><mi mathvariant="normal">&Gamma;</mi></msub></math>显然带见证. 设<math><msub><mi>e</mi><mn>1</mn></msub></math>和<math><msub><mi>e</mi><mn>2</mn></msub></math>带见证, 令<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&delta;</mi><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow><mo>=</mo><mrow><msub><mi>e</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&epsilon;</mi><mo>,</mo><mi>t</mi></mrow><mo stretchy="false">)</mo></mrow><mo>=</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 则
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>s</mi><mo>&compfn;</mo><mi>t</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>&epsilon;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>s</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>t</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&epsilon;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>s</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo><mi>&gamma;</mi></mrow>
+        <mtext>,</mtext></math>
+      所以<math><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&diamond;</mo><msub><mi>e</mi><mn>2</mn></msub></mrow></math>也带见证.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="definition"><b>定义1.2.4. </b>定义提升<math><mrow><mi>effect</mi><mo>:</mo><mrow><msub><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi></msub><mo>&rarr;</mo><msub><mi mathvariant="fraktur">E</mi><mrow><mo lspace="0" rspace="0">&part;</mo><mo>&af;</mo><mi mathvariant="normal">&Gamma;</mi></mrow></msub></mrow></mrow></math>为
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>effect</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&colone;</mo>
+          <mrow><mi mathvariant="bold">let</mi><mspace width="2ex"/>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>&delta;</mi><mo>,</mo><mi>g</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>&colone;</mo>
+              <mrow><mi>e</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="2ex"/><mi mathvariant="bold">in</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&delta;</mi><mo>,</mo>
+                    <mrow><mi>&phi;</mi><mo>&compfn;</mo><mi>g</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>,</mo>
+                <mrow><mi>track</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>g</mi><mo>,</mo>
+                      <mrow>
+                        <msub><mi>pr</mi><mn>1</mn></msub>
+                        <mo>&compfn;</mo><mi>e</mi></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      它把效应搬到带累加器的世界上: 状态前进, 累加器接上这一步的逆, 同时给出提升后的逆. </div>
+    <div class="theorem"><b>定理1.2.5. </b><math><mi>effect</mi></math>是幺半群同态:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>effect</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <msub><mi>e</mi><mn>1</mn></msub>
+                  <mo>&diamond;</mo>
+                  <msub><mi>e</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>=</mo>
+            <mrow>
+              <mrow><mi>effect</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>e</mi><mn>1</mn></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&diamond;</mo>
+              <mrow><mi>effect</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>e</mi><mn>2</mn></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mo>,</mo>
+          <mrow>
+            <mrow><mi>effect</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>&eta;</mi><mi mathvariant="normal">&Gamma;</mi></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>=</mo>
+            <msub><mi>&eta;</mi>
+              <mrow><mo lspace="0" rspace="0">&part;</mo><mo>&af;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+            </msub>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      并且记<math><mrow><mi>f</mi><mo>&colone;</mo><mrow><msub><mi>pr</mi><mn>1</mn></msub><mo>&compfn;</mo><mi>e</mi></mrow></mrow></math>, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&delta;</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&colone;</mo><mrow><mi>e</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo><mi>G</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&colone;</mo><mrow><mrow><mi>effect</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 有
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow>
+              <msub><mi>pr</mi><mn>1</mn></msub>
+              <mo>&compfn;</mo>
+              <msub><mi>pr</mi><mn>1</mn></msub>
+              <mo>&compfn;</mo>
+              <mrow><mi>effect</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo>=</mo>
+            <mrow><mi>f</mi><mo>&compfn;</mo>
+              <msub><mi>pr</mi><mn>1</mn></msub>
+            </mrow>
+          </mrow>
+          <mo>,</mo>
+          <mrow>
+            <mrow>
+              <msub><mi>pr</mi><mn>1</mn></msub>
+              <mo>&compfn;</mo><mi>G</mi></mrow>
+            <mo>=</mo>
+            <mrow><mi>g</mi><mo>&compfn;</mo>
+              <msub><mi>pr</mi><mn>1</mn></msub>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      即提升后的前进函数和逆在第一个分量上分别就是<math><mi>f</mi></math>和<math><mi>g</mi></math>. 这是论文的定理13, 14. </div>
+    <div class="theorem"><b>定理1.2.6. </b>设<math><mrow><mi>e</mi><mo>&in;</mo><msubsup><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi><mo>&#8270;</mo></msubsup></mrow></math>, <math><mrow><mi>f</mi><mo>&colone;</mo><mrow><msub><mi>pr</mi><mn>1</mn></msub><mo>&compfn;</mo><mi>e</mi></mrow></mrow></math>, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&delta;</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&colone;</mo><mrow><mi>e</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo><mi>G</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&colone;</mo><mrow><mrow><mi>effect</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mo>,</mo><mi>&phi;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 则
+      <math display="block">
+        <mrow>
+          <mrow><mi>G</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Delta;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>&gamma;</mi><mo>,</mo>
+              <mrow><mi>&phi;</mi><mo>&compfn;</mo><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      此外
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>effect</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&in;</mo>
+            <msubsup><mi mathvariant="fraktur">E</mi>
+              <mrow><mo lspace="0" rspace="0">&part;</mo><mo>&af;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+              <mo>&#8270;</mo></msubsup>
+          </mrow>
+          <mo>&hArr;</mo>
+          <mrow><mo>&forall;</mo><mi>&gamma;</mi><mo lspace="0">.</mo>
+            <mrow>
+              <mrow>
+                <mrow>
+                  <msub><mi>pr</mi><mn>2</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>e</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&compfn;</mo><mi>f</mi></mrow>
+              <mo>=</mo><mi>id</mi></mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      即<math><mi>e</mi></math>在每一点给出的逆都是<math><mi>f</mi></math>的全局左逆. 这是论文的定理15. </div>
+    <div class="proof"><b>证明.</b> 按定义, <math><mrow><mi>G</mi><mo>=</mo><mrow><mi>track</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>,</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math><mrow><mi mathvariant="normal">&Delta;</mi><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&delta;</mi><mo>,</mo><mrow><mi>&phi;</mi><mo>&compfn;</mo><mi>g</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 所以
+      <math display="block">
+        <mrow>
+          <mrow><mi>G</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Delta;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow><mi>g</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>,</mo>
+              <mrow><mi>&phi;</mi><mo>&compfn;</mo><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>&gamma;</mi><mo>,</mo>
+              <mrow><mi>&phi;</mi><mo>&compfn;</mo><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      最后一步用到<math><mi>e</mi></math>带见证. 于是<math><mrow><mi>effect</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></math>带见证当且仅当对所有<math><mi>&gamma;</mi></math>和<math><mi>&phi;</mi></math>有<math><mrow><mrow><mi>&phi;</mi><mo>&compfn;</mo><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>=</mo><mi>&phi;</mi></mrow></math>. 取<math><mrow><mi>&phi;</mi><mo>=</mo><mi>id</mi></mrow></math>即得<math><mrow><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>=</mo><mi>id</mi></mrow></math>; 反过来, 这个等式显然推出前者.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem" id="thm-lifo"><b>定理1.2.7. </b>设<math><mrow><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>e</mi><mi>n</mi></msub></mrow><mo>&in;</mo><msubsup><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi><mo>&#8270;</mo></msubsup></mrow></math>, 记<math><mrow><mi>E</mi><mo>&colone;</mo><mrow><msub><mi>e</mi><mi>n</mi></msub><mo>&diamond;</mo><mo>&ctdot;</mo><mo>&diamond;</mo><msub><mi>e</mi><mn>1</mn></msub></mrow></mrow></math>, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mi>n</mi></msub><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&colone;</mo><mrow><mi>E</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>&gamma;</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 从<math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><mo>,</mo><mi>id</mi></mrow><mo stretchy="false">)</mo></mrow></math>出发依次运行<math><mrow><mi>effect</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>, <math><mo>&hellip;</mo></math>, <math><mrow><mi>effect</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow></math>, 则
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow>
+              <msub><mi>pr</mi><mn>1</mn></msub>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi>effect</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>e</mi><mi>n</mi></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&diamond;</mo><mo>&ctdot;</mo><mo>&diamond;</mo>
+                      <mrow><mi>effect</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>&gamma;</mi><mn>0</mn></msub>
+                      <mo>,</mo><mi>id</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>=</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>&gamma;</mi><mi>n</mi></msub>
+                <mo>,</mo><mi>s</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>,</mo>
+          <mrow>
+            <mrow><mi>s</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>&gamma;</mi><mi>n</mi></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>=</mo>
+            <msub><mi>&gamma;</mi><mn>0</mn></msub>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      并且途中每一步都相对<math><msub><mi>&gamma;</mi><mn>0</mn></msub></math>健全. 其中<math><mrow><mi>s</mi><mo>=</mo><mrow><msub><mi>g</mi><mn>1</mn></msub><mo>&compfn;</mo><mo>&ctdot;</mo><mo>&compfn;</mo><msub><mi>g</mi><mi>n</mi></msub></mrow></mrow></math>, <math><msub><mi>g</mi><mi>i</mi></msub></math>是<math><msub><mi>e</mi><mi>i</mi></msub></math>在第<math><mi>i</mi></math>步给出的逆. 换言之, 按LIFO顺序撤销是精确的, 不需要任何关于效应之间关系的假设. 这是论文的定理16. </div>
+    <div class="proof"><b>证明.</b> 因为<math><mi>effect</mi></math>是同态, 依次运行<math><mrow><mi>effect</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>, <math><mo>&hellip;</mo></math>, <math><mrow><mi>effect</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow></math>就是运行<math><mrow><mi>effect</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>E</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 其中<math><mrow><mi>E</mi><mo>&colone;</mo><mrow><msub><mi>e</mi><mi>n</mi></msub><mo>&diamond;</mo><mo>&ctdot;</mo><mo>&diamond;</mo><msub><mi>e</mi><mn>1</mn></msub></mrow></mrow></math>. 由封闭性, <math><mi>E</mi></math>带见证. 记<math><mrow><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mi>n</mi></msub><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow><mo>=</mo><mrow><mi>E</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>&gamma;</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 按<math><mi>effect</mi></math>的定义, 到达的状态是<math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&gamma;</mi><mi>n</mi></msub><mo>,</mo><mrow><mi>id</mi><mo>&compfn;</mo><mi>s</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math>, 而<math><mrow><mrow><mi>s</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>&gamma;</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><msub><mi>&gamma;</mi><mn>0</mn></msub></mrow></math>正是<math><mi>E</mi></math>的见证条件. 对每个前缀<math><mrow><msub><mi>e</mi><mi>i</mi></msub><mo>&diamond;</mo><mo>&ctdot;</mo><mo>&diamond;</mo><msub><mi>e</mi><mn>1</mn></msub></mrow></math>做同样的论证, 就得到每一步都健全. 注意整个论证只用到了每个<math><msub><mi>e</mi><mi>i</mi></msub></math>各自带见证.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <h3>第1.3节 效应的独立性</h3>
+    <p>LIFO总是可行的, 但组件的卸载顺序由系统决定, 不一定是加载顺序的逆. 要按别的顺序撤销, 效应之间必须互不干扰.</p>
+    <div class="definition"><b>定义1.3.1. </b>对于<math><mrow><mi>e</mi><mo>&in;</mo><msub><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi></msub></mrow></math>, 定义生成元集合
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="fraktur">G</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&colone;</mo>
+          <mrow>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <msub><mi>pr</mi><mn>1</mn></msub>
+                <mo>&compfn;</mo><mi>e</mi></mrow>
+              <mo stretchy="false">}</mo></mrow>
+            <mo>&cup;</mo>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>pr</mi><mn>2</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>e</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi>&gamma;</mi><mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      以及变换幺半群<math><mrow><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&colone;</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mi mathvariant="fraktur">G</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>, 即<math><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></math>中由<math><mrow><mi mathvariant="fraktur">G</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></math>生成的子幺半群. 对<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><msub><mi mathvariant="fraktur">T</mi><mi mathvariant="normal">&Gamma;</mi></msub></mrow></math>有<math><mrow><mrow><mi mathvariant="fraktur">G</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false" lspace="0" rspace="0">&ulcorner;</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false" lspace="0" rspace="0">&urcorner;</mo></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">{</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">}</mo></mrow></mrow></math>. </div>
+    <div class="lemma"><b>引理1.3.2. </b>
+      <ol>
+        <li>对<math><mrow><mrow><mi>S</mi><mo>,</mo><mi>T</mi></mrow><mo>&sube;</mo><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 若<math><mrow><mo>&forall;</mo><mrow><mi>a</mi><mo>&in;</mo><mi>S</mi></mrow><mo lspace="0">.</mo><mrow><mo>&forall;</mo><mrow><mi>b</mi><mo>&in;</mo><mi>T</mi></mrow><mo lspace="0">.</mo><mrow><mrow><mi>a</mi><mo>&compfn;</mo><mi>b</mi></mrow><mo>=</mo><mrow><mi>b</mi><mo>&compfn;</mo><mi>a</mi></mrow></mrow></mrow></mrow></math>, 则<math><mrow><mo>&forall;</mo><mrow><mi>a</mi><mo>&in;</mo><mrow><mo stretchy="false">&lang;</mo><mi>S</mi><mo stretchy="false">&rang;</mo></mrow></mrow><mo lspace="0">.</mo><mrow><mo>&forall;</mo><mrow><mi>b</mi><mo>&in;</mo><mrow><mo stretchy="false">&lang;</mo><mi>T</mi><mo stretchy="false">&rang;</mo></mrow></mrow><mo lspace="0">.</mo><mrow><mrow><mi>a</mi><mo>&compfn;</mo><mi>b</mi></mrow><mo>=</mo><mrow><mi>b</mi><mo>&compfn;</mo><mi>a</mi></mrow></mrow></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&diamond;</mo><msub><mi>e</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&sube;</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mrow><mi mathvariant="fraktur">G</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow><mo>&cup;</mo><mrow><mi mathvariant="fraktur">G</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>.</li>
+      </ol>
+      这是论文的引理18. </div>
+    <div class="proof"><b>证明.</b> (1) 对固定的<math><mi>b</mi></math>, 与<math><mi>b</mi></math>交换的元素之集合包含<math><mi>id</mi></math>且对复合封闭, 是一个子幺半群. 所以若它包含一个生成元集合, 就包含其生成的子幺半群. 把这个论证对两边各用一次即可. (2) <math><mrow><msub><mi>pr</mi><mn>1</mn></msub><mo>&compfn;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&diamond;</mo><msub><mi>e</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></math>等于<math><mrow><msub><mi>pr</mi><mn>1</mn></msub><mo>&compfn;</mo><msub><mi>e</mi><mn>1</mn></msub></mrow></math>与<math><mrow><msub><mi>pr</mi><mn>1</mn></msub><mo>&compfn;</mo><msub><mi>e</mi><mn>2</mn></msub></mrow></math>的复合; <math><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&diamond;</mo><msub><mi>e</mi><mn>2</mn></msub></mrow></math>在<math><mi>&gamma;</mi></math>处给出的逆是<math><msub><mi>e</mi><mn>2</mn></msub></math>在<math><mi>&gamma;</mi></math>处和<math><msub><mi>e</mi><mn>1</mn></msub></math>在某点处给出的逆的复合. 所以<math><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&diamond;</mo><msub><mi>e</mi><mn>2</mn></msub></mrow></math>的生成元都落在右边的子幺半群里, 由它们生成的<math><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&diamond;</mo><msub><mi>e</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></math>也是.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="definition" id="def-independent"><b>定义1.3.3. </b><math><msub><mi>e</mi><mn>1</mn></msub></math>和<math><msub><mi>e</mi><mn>2</mn></msub></math>独立, 如果
+      <ol>
+        <li><math><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>与<math><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>的元素两两交换;</li>
+        <li>对每个<math><mrow><mi>h</mi><mo>&in;</mo><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>和<math><mi>&gamma;</mi></math>, <math><mrow><mrow><msub><mi>pr</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>h</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><msub><mi>pr</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即<math><msub><mi>e</mi><mn>2</mn></msub></math>的变换不改变<math><msub><mi>e</mi><mn>1</mn></msub></math>给出的逆; 反之亦然.</li>
+      </ol>
+      对<math><mrow><mo stretchy="false" lspace="0" rspace="0">&ulcorner;</mo><mrow><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><msub><mi>g</mi><mn>1</mn></msub></mrow><mo stretchy="false" lspace="0" rspace="0">&urcorner;</mo></mrow></math>和<math><mrow><mo stretchy="false" lspace="0" rspace="0">&ulcorner;</mo><mrow><msub><mi>f</mi><mn>2</mn></msub><mo>,</mo><msub><mi>g</mi><mn>2</mn></msub></mrow><mo stretchy="false" lspace="0" rspace="0">&urcorner;</mo></mrow></math>, 第一条就是四对函数两两交换, 第二条自动成立. 这是论文的定义19. </div>
+    <div class="theorem"><b>定理1.3.4. </b>设<math><mrow><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>e</mi><mi>n</mi></msub></mrow><mo>&in;</mo><msubsup><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi><mo>&#8270;</mo></msubsup></mrow></math>两两独立, <math><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow></math>. 记
+      <math display="block">
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <msub><mi>f</mi><mi>i</mi></msub>
+              </mtd>
+              <mtd><mo>&colone;</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>pr</mi><mn>1</mn></msub>
+                  <mo>&compfn;</mo>
+                  <msub><mi>e</mi><mi>i</mi></msub>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <msub><mi>&gamma;</mi><mi>i</mi></msub>
+              </mtd>
+              <mtd><mo>&colone;</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>f</mi><mi>i</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>&gamma;</mi>
+                      <mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow>
+                    </msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <msub><mi>g</mi><mi>i</mi></msub>
+              </mtd>
+              <mtd><mo>&colone;</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>pr</mi><mn>2</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>e</mi><mi>i</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <msub><mi>&gamma;</mi>
+                          <mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow>
+                        </msub>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </math>
+      固定<math><mrow><mi>j</mi><mo>&in;</mo><mrow><mo stretchy="false">{</mo><mrow><mn>1</mn><mo>,</mo><mo>&hellip;</mo><mo>,</mo><mi>n</mi></mrow><mo stretchy="false">}</mo></mrow></mrow></math>, 用<math><msubsup><mi>&gamma;</mi><mi>i</mi><mo>&prime;</mo></msubsup></math>表示从序列中略去<math><msub><mi>e</mi><mi>j</mi></msub></math>后的状态: <math><mrow><msubsup><mi>&gamma;</mi><mi>j</mi><mo>&prime;</mo></msubsup><mo>&colone;</mo><msub><mi>&gamma;</mi><mrow><mi>j</mi><mo>&minus;</mo><mn>1</mn></mrow></msub></mrow></math>, 对<math><mrow><mi>j</mi><mo>&lt;</mo><mi>i</mi></mrow></math>令<math><mrow><msubsup><mi>&gamma;</mi><mi>i</mi><mo>&prime;</mo></msubsup><mo>&colone;</mo><mrow><msub><mi>f</mi><mi>i</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msubsup><mi>&gamma;</mi><mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow><mo>&prime;</mo></msubsup><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 那么对<math><mrow><mi>j</mi><mo>&le;</mo><mi>i</mi><mo>&le;</mo><mi>n</mi></mrow></math>有
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>&gamma;</mi><mi>i</mi></msub>
+            <mo>=</mo>
+            <mrow>
+              <msub><mi>f</mi><mi>j</mi></msub>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msubsup><mi>&gamma;</mi><mi>i</mi><mo>&prime;</mo></msubsup>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>,</mo>
+          <mrow>
+            <mrow>
+              <msub><mi>g</mi><mi>j</mi></msub>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>&gamma;</mi><mi>i</mi></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>=</mo>
+            <msubsup><mi>&gamma;</mi><mi>i</mi><mo>&prime;</mo></msubsup>
+          </mrow>
+        </mrow>
+      </math>
+      并且对<math><mrow><mi>j</mi><mo>&lt;</mo><mi>i</mi><mo>&le;</mo><mi>n</mi></mrow></math>有
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>pr</mi><mn>2</mn></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>e</mi><mi>i</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <msubsup><mi>&gamma;</mi>
+                    <mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow>
+                    <mo>&prime;</mo></msubsup>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <msub><mi>g</mi><mi>i</mi></msub>
+        </mrow>
+        <mtext>.</mtext></math>
+      换言之, 略去<math><msub><mi>e</mi><mi>j</mi></msub></math>后, 每一步施加<math><msub><mi>f</mi><mi>j</mi></msub></math>就回到原序列的状态, 施加<math><msub><mi>g</mi><mi>j</mi></msub></math>就回到略去后的状态, 而之后每个效应给出的逆不变. 这是论文的定理20. </div>
+    <div class="proof"><b>证明.</b> 对<math><mi>i</mi></math>归纳. <math><mrow><mi>i</mi><mo>=</mo><mi>j</mi></mrow></math>时, <math><mrow><msub><mi>&gamma;</mi><mi>j</mi></msub><mo>=</mo><mrow><msub><mi>f</mi><mi>j</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>&gamma;</mi><mrow><mi>j</mi><mo>&minus;</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>是定义, <math><mrow><mrow><msub><mi>g</mi><mi>j</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>&gamma;</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><msub><mi>&gamma;</mi><mrow><mi>j</mi><mo>&minus;</mo><mn>1</mn></mrow></msub></mrow></math>是<math><msub><mi>e</mi><mi>j</mi></msub></math>的见证条件. 归纳步:
+      <math display="block">
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <msub><mi>&gamma;</mi>
+                  <mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow>
+                </msub>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>f</mi>
+                    <mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow>
+                  </msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>f</mi><mi>j</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <msubsup><mi>&gamma;</mi><mi>i</mi><mo>&prime;</mo></msubsup>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>f</mi><mi>j</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>f</mi>
+                        <mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow>
+                      </msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <msubsup><mi>&gamma;</mi><mi>i</mi><mo>&prime;</mo></msubsup>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>f</mi><mi>j</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msubsup><mi>&gamma;</mi>
+                      <mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow>
+                      <mo>&prime;</mo></msubsup>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </math>
+      第二个等号用到<math><mrow><msub><mi>f</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>&in;</mo><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>与<math><mrow><msub><mi>f</mi><mi>j</mi></msub><mo>&in;</mo><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>交换; 同理, <math><mrow><msub><mi>g</mi><mi>j</mi></msub><mo>&in;</mo><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>与<math><msub><mi>f</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub></math>交换给出第二式. 至于逆不变:
+      <math display="block">
+        <mrow>
+          <msub><mi>g</mi><mi>i</mi></msub>
+          <mo>=</mo>
+          <mrow>
+            <msub><mi>pr</mi><mn>2</mn></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>e</mi><mi>i</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>&gamma;</mi>
+                    <mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow>
+                  </msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <msub><mi>pr</mi><mn>2</mn></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>e</mi><mi>i</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>f</mi><mi>j</mi></msub>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msubsup><mi>&gamma;</mi>
+                        <mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow>
+                        <mo>&prime;</mo></msubsup>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <msub><mi>pr</mi><mn>2</mn></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>e</mi><mi>i</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <msubsup><mi>&gamma;</mi>
+                    <mrow><mi>i</mi><mo>&minus;</mo><mn>1</mn></mrow>
+                    <mo>&prime;</mo></msubsup>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      最后一步正是独立性的第二条, 取<math><mrow><mrow><mi>h</mi><mo>=</mo><msub><mi>f</mi><mi>j</mi></msub></mrow><mo>&in;</mo><mrow><mi mathvariant="fraktur">M</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>e</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="corollary"><b>推论1.3.5. </b>在同样的假设下, 对<math><mrow><mo stretchy="false">{</mo><mrow><mn>1</mn><mo>,</mo><mo>&hellip;</mo><mo>,</mo><mi>n</mi></mrow><mo stretchy="false">}</mo></mrow></math>的任意排列<math><mi>&pi;</mi></math>, 
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>g</mi>
+                  <mrow><mi>&pi;</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </msub>
+                <mo>&compfn;</mo><mo>&ctdot;</mo><mo>&compfn;</mo>
+                <msub><mi>g</mi>
+                  <mrow><mi>&pi;</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <msub><mi>&gamma;</mi><mi>n</mi></msub>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <msub><mi>&gamma;</mi><mn>0</mn></msub>
+        </mrow>
+        <mtext>,</mtext></math>
+      即在终点按任意顺序施加这<math><mi>n</mi></math>个逆都回到<math><msub><mi>&gamma;</mi><mn>0</mn></msub></math>. 这是论文的推论21. </div>
+    <div class="proof"><b>证明.</b> 把上述定理从略去一个效应推广到略去任意一个集合<math><mi>R</mi></math>中的效应, 证明相同. 于是在略去<math><mi>R</mi></math>的终点施加<math><msub><mi>e</mi><mi>j</mi></msub></math>的逆 (<math><mrow><mi>j</mi><mo>&notin;</mo><mi>R</mi></mrow></math>), 得到的是略去<math><mrow><mi>R</mi><mo>&cup;</mo><mrow><mo stretchy="false">{</mo><mi>j</mi><mo stretchy="false">}</mo></mrow></mrow></math>的终点. 按排列依次施加, 最后得到略去全部<math><mi>n</mi></math>个效应的终点, 也就是<math><msub><mi>&gamma;</mi><mn>0</mn></msub></math>.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>演算并不直接使用这条推论. 它假设了效应的前进函数也两两交换, 而恢复精确性需要的比这少, 只要求撤销独立; 见<cite>第<a href="#sec-service">3</a>章</cite>和<cite>第<a href="#sec-recovery">9.3</a>节</cite>.</p>
+    <h2 id="sec-partial">第2章 在等价意义下, 部分地读</h2>
+    <p>论文3.3.2节指出, 3.1节中的<q>恢复到原状态</q>是理想化的: free不会恢复malloc之前的堆布局, 被撤销的新鲜名字下次也不会再用. 所以等式都要读成某个等价关系. 另外, set这类操作带有前条件, 效应函数应该是部分的. 这一章把两件事一起做.</p>
+    <div class="definition"><b>定义2.1. </b>设<math><mi mathvariant="normal">&Gamma;</mi></math>带有等价关系<math><mo>&approx;</mo></math>. 定义
+      <math display="block">
+        <mrow>
+          <mrow><mi>PEff</mi><mspace width="2ex"/><mi mathvariant="normal">&Gamma;</mi></mrow>
+          <mo>&colone;</mo>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&rarr;</mo>
+            <mrow><mi>Maybe</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&times;</mo>
+                  <mrow><mi>End</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      两个结果相关, 当且仅当都是<math><mi mathvariant="normal">None</mi></math>, 或者状态相关且逆逐点相关. 一个映射<math><mi>g</mi></math>尊重<math><mo>&approx;</mo></math>, 当且仅当<math><mrow><mrow><mi>x</mi><mo>&approx;</mo><mi>y</mi></mrow><mo>&rArr;</mo><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&approx;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>. </div>
+    <div class="definition" id="def-pwitnessed"><b>定义2.2. </b><math><mrow><mi>e</mi><mo>&in;</mo><mrow><mi>PEff</mi><mspace width="2ex"/><mi mathvariant="normal">&Gamma;</mi></mrow></mrow></math>带见证, 当且仅当
+      <ol>
+        <li>若<math><mrow><mrow><mi>e</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&delta;</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 则<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&approx;</mo><mi>&gamma;</mi></mrow></math>;</li>
+        <li>上述<math><mi>g</mi></math>尊重<math><mo>&approx;</mo></math>;</li>
+        <li><math><mi>e</mi></math>本身尊重<math><mo>&approx;</mo></math>: 相关的输入给出相关的结果.</li>
+      </ol>
+      这是论文定义37在<math><mi>Maybe</mi></math>中的读法. </div>
+    <div class="definition"><b>定义2.3. </b>部分的<math><mo>&diamond;</mo></math>与全函数版本相同, 只是任一步为<math><mi mathvariant="normal">None</mi></math>时结果为<math><mi mathvariant="normal">None</mi></math>. 对<math><mrow><mi>a</mi><mo>:</mo><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&rarr;</mo><mrow><mi>Maybe</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&times;</mo><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&times;</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>和<math><mrow><mi>&kappa;</mi><mo>:</mo><mrow><mi>B</mi><mo>&rarr;</mo><mrow><mi>PEff</mi><mspace width="2ex"/><mi mathvariant="normal">&Gamma;</mi></mrow></mrow></mrow></math>, 按结果绑定为
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>bind</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>&kappa;</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&colone;</mo>
+          <mrow><mi mathvariant="bold">let</mi><mspace width="2ex"/>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>&delta;</mi><mo>,</mo><mi>g</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>&colone;</mo>
+              <mrow><mi>a</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mspace width="2ex"/><mi mathvariant="bold">in</mi><mspace width="2ex"/>
+            <mrow><mi mathvariant="bold">let</mi><mspace width="2ex"/>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&epsilon;</mi><mo>,</mo><mi>h</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&colone;</mo>
+                <mrow><mi>&kappa;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>b</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mspace width="2ex"/><mi mathvariant="bold">in</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>&epsilon;</mi><mo>,</mo>
+                  <mrow><mi>g</mi><mo>&compfn;</mo><mi>h</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      这是论文的式(36): 每一段执行一个操作, 再根据结果选择后续. </div>
+    <div class="theorem"><b>定理2.4. </b>若<math><msub><mi>e</mi><mn>1</mn></msub></math>, <math><msub><mi>e</mi><mn>2</mn></msub></math>带见证, 则<math><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&diamond;</mo><msub><mi>e</mi><mn>2</mn></msub></mrow></math>带见证; 若<math><mi>a</mi></math>的前两个分量带见证, <math><mi>a</mi></math>在相关的输入上给出相同的结果<math><mi>b</mi></math>, 且每个<math><mrow><mi>&kappa;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></math>带见证, 则<math><mrow><mi>bind</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>&kappa;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>带见证. 取<math><mo>&approx;</mo></math>为相等且效应为全函数时, <cite>定义<a href="#def-pwitnessed">2.2</a></cite>恰好退回<math><msubsup><mi mathvariant="fraktur">E</mi><mi mathvariant="normal">&Gamma;</mi><mo>&#8270;</mo></msubsup></math>. </div>
+    <div class="proof"><b>证明.</b> 与全函数的情形相同, 只是每一处等式换成<math><mo>&approx;</mo></math>. 见证条件: 若<math><mrow><mrow><msub><mi>e</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&delta;</mi><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math><mrow><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&epsilon;</mi><mo>,</mo><mi>t</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 则<math><mrow><mrow><mi>s</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>t</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&epsilon;</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&approx;</mo><mrow><mi>s</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&approx;</mo><mi>&gamma;</mi></mrow></math>, 第一步要求<math><mi>s</mi></math>尊重<math><mo>&approx;</mo></math>, 这正是定义中的第二条. 复合的逆是尊重<math><mo>&approx;</mo></math>的映射的复合, 仍然尊重<math><mo>&approx;</mo></math>; 复合本身尊重<math><mo>&approx;</mo></math>是因为相关的输入在每一段都给出相关的结果. 按结果绑定时, 相关的输入给出相同的结果, 所以选择的是同一个后续, 论证不变.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>论文的引理38断言3.1节的全部等式都可以读到<math><mo>&approx;</mo></math>下. 这里只给出演算用得到的部分 (上面两条封闭性). 定理20和推论21的<math><mo>&approx;</mo></math>版本本文不讨论: 演算的恢复和合流不经过它们, 而是直接以操作级的假设证明.</p>
+    <h2 id="sec-service">第3章 服务</h2>
+    <p>论文的定义24把键<math><mi>k</mi></math>上的余效应定义为三元组, 包含值类型, 等价关系和操作集合. 我们把它整理成一个记录, 称为服务.</p>
+    <div class="definition"><b>定义3.1. </b>一个服务<math><mi mathvariant="normal">&Sigma;</mi></math>由以下资料组成: 状态类型<math><mi>S</mi></math>, 其上的等价关系<math><mo>&simeq;</mo></math>, 操作类型<math><mi>Op</mi></math> (参数已经放进操作里), 结果类型<math><mi>Out</mi></math>, 以及
+      <math display="block">
+        <mrow><mi>run</mi><mo>:</mo>
+          <mrow><mi>Op</mi><mo>&rarr;</mo><mi>Tok</mi><mo>&rarr;</mo><mi>S</mi><mo>&rarr;</mo>
+            <mrow><mi>Maybe</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>S</mi><mo>&times;</mo>
+                  <mrow><mi>End</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&times;</mo><mi>Out</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      其中<math><mrow><mi>Tok</mi><mo>=</mo><mi>&Nopf;</mi></mrow></math>是运行时交给这次操作的新鲜令牌, 用于事件钩子这类生成出来的身份 (JS中由对象身份充当). </div>
+    <p>与论文相比有两处不同. 第一, 多了令牌参数. 第二, 全系统只有一个服务<math><mi mathvariant="normal">&Sigma;</mi></math>, 不是每个键一个; 需要多种服务时先取它们的和, 这样避开了依赖类型的映射. 除去<math><mi>Maybe</mi></math>和令牌, 操作的形状<math><mrow><mi>S</mi><mo>&rarr;</mo><mrow><mi>S</mi><mo>&times;</mo><mrow><mi>End</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&times;</mo><mi>Out</mi></mrow></mrow></math>与论文的式(22)相同: 前两个分量是值上的效应函数, 第三个分量是结果. 结果是程序获得信息的唯一途径, 也是观察者区分状态的依据, 见<cite>第<a href="#sec-observe">4</a>章</cite>.</p>
+    <div class="definition"><b>定义3.2. </b>操作<math><mi>a</mi></math>在令牌<math><mi>t</mi></math>下良好, 当且仅当
+      <ol>
+        <li>带见证: 若<math><mrow><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi>s</mi></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>s</mi><mo>&prime;</mo></msup><mo>,</mo><mi>g</mi><mo>,</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 则<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>s</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mi>s</mi></mrow></math>;</li>
+        <li>尊重<math><mo>&simeq;</mo></math>: 若<math><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>&simeq;</mo><msub><mi>s</mi><mn>2</mn></msub></mrow></math>, 则<math><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><msub><mi>s</mi><mn>1</mn></msub></mrow></math>与<math><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><msub><mi>s</mi><mn>2</mn></msub></mrow></math>都是<math><mi mathvariant="normal">None</mi></math>, 或分别是<math><mrow><mo stretchy="false">(</mo><mrow><msubsup><mi>s</mi><mn>1</mn><mo>&prime;</mo></msubsup><mo>,</mo><msub><mi>g</mi><mn>1</mn></msub><mo>,</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></math>和<math><mrow><mo stretchy="false">(</mo><mrow><msubsup><mi>s</mi><mn>2</mn><mo>&prime;</mo></msubsup><mo>,</mo><msub><mi>g</mi><mn>2</mn></msub><mo>,</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 其中<math><mrow><msubsup><mi>s</mi><mn>1</mn><mo>&prime;</mo></msubsup><mo>&simeq;</mo><msubsup><mi>s</mi><mn>2</mn><mo>&prime;</mo></msubsup></mrow></math>且<math><mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mrow><mrow><msub><mi>g</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mrow><msub><mi>g</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>;</li>
+        <li>给出的逆尊重<math><mo>&simeq;</mo></math>: 若<math><mrow><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi>s</mi></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>s</mi><mo>&prime;</mo></msup><mo>,</mo><mi>g</mi><mo>,</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 则<math><mrow><mo>&forall;</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo lspace="0">.</mo><mrow><mrow><mi>x</mi><mo>&simeq;</mo><mi>y</mi></mrow><mo>&rArr;</mo><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math>.</li>
+      </ol>
+    </div>
+    <div class="definition" id="def-revert-indep"><b>定义3.3. </b>称<math><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><msub><mi>t</mi><mi>a</mi></msub></mrow><mo stretchy="false">)</mo></mrow></math>对<math><mrow><mo stretchy="false">(</mo><mrow><mi>b</mi><mo>,</mo><msub><mi>t</mi><mi>b</mi></msub></mrow><mo stretchy="false">)</mo></mrow></math>撤销独立, 如果对<math><mi>a</mi></math>可能给出的每个逆<math><mi>g</mi></math>
+      <ol>
+        <li>对每个<math><mi>x</mi></math>, <math><mrow><mi>run</mi><mspace width="2ex"/><mi>b</mi><mspace width="2ex"/><msub><mi>t</mi><mi>b</mi></msub><mspace width="2ex"/><mi>x</mi></mrow></math>与<math><mrow><mi>run</mi><mspace width="2ex"/><mi>b</mi><mspace width="2ex"/><msub><mi>t</mi><mi>b</mi></msub><mspace width="2ex"/><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>都是<math><mi mathvariant="normal">None</mi></math>; 或者<math><mrow><mrow><mi>run</mi><mspace width="2ex"/><mi>b</mi><mspace width="2ex"/><msub><mi>t</mi><mi>b</mi></msub><mspace width="2ex"/><mi>x</mi></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>h</mi><mn>1</mn></msub><mo>,</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math><mrow><mrow><mi>run</mi><mspace width="2ex"/><mi>b</mi><mspace width="2ex"/><msub><mi>t</mi><mi>b</mi></msub><mspace width="2ex"/><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><msub><mi>h</mi><mn>2</mn></msub><mo>,</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 其中<math><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>&simeq;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mo>&forall;</mo><mi>y</mi><mo lspace="0">.</mo><mrow><mrow><msub><mi>h</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mrow><msub><mi>h</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>;</li>
+        <li>对<math><mi>b</mi></math>可能给出的每个逆<math><mi>h</mi></math>, <math><mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>h</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mrow><mi>h</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>.</li>
+      </ol>
+      第一条说<math><mi>b</mi></math>不在乎<math><mi>a</mi></math>的效应是否已被撤掉, 第二条说两者的逆可以交换. 称它们可交换, 如果对每个<math><mi>s</mi></math>, 先<math><mi>a</mi></math>后<math><mi>b</mi></math>与先<math><mi>b</mi></math>后<math><mi>a</mi></math>都失败, 或都成功并给出<math><mo>&simeq;</mo></math>相关的终态, 且<math><mi>a</mi></math>和<math><mi>b</mi></math>各自的结果相同. </div>
+    <p>撤销独立正是<q>撤掉<math><mi>a</mi></math>的效应而让<math><mi>b</mi></math>的效应留着</q>所需要的条件; 它不要求<math><mi>a</mi></math>和<math><mi>b</mi></math>的前进函数交换. 恢复精确性只需要撤销独立, 合流还需要可交换.</p>
+    <div class="theorem" id="thm-omission"><b>定理3.4. </b>设<math><mi>a</mi></math>带见证且<math><mrow><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><msub><mi>s</mi><mn>0</mn></msub></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>,</mo><mi>g</mi><mo>,</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 设<math><mi>&tau;</mi></math>是一串他人的步骤 (他人的操作, 以及他人的逆), 每一步都与<math><mi>g</mi></math>相容 (即满足<cite>定义<a href="#def-revert-indep">3.3</a></cite>中相应的一条), 记<math><mrow><mi>exec</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&tau;</mi><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>为从<math><mi>s</mi></math>出发执行<math><mi>&tau;</mi></math>所到达的状态. 那么
+      <math display="block">
+        <mrow>
+          <mrow><mi>g</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>exec</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&tau;</mi><mo>,</mo>
+                    <msub><mi>s</mi><mn>1</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&simeq;</mo>
+          <mrow><mi>exec</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&tau;</mi><mo>,</mo>
+                <msub><mi>s</mi><mn>0</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      并且<math><mi>&tau;</mi></math>中他人的操作在两次执行中得到相同的结果. 换言之, 在终点撤销<math><mi>a</mi></math>, 等于<math><mi>a</mi></math>从来没有执行过. </div>
+    <div class="proof"><b>证明.</b> 记实际执行的状态为<math><mi>x</mi></math>, 不执行<math><mi>a</mi></math>的执行的状态为<math><mi>y</mi></math>, 对步骤归纳证明<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mi>y</mi></mrow></math>并且两边他人的操作看到相同的结果. 起点处<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><msub><mi>s</mi><mn>0</mn></msub></mrow></math>是<math><mi>a</mi></math>的见证条件. 对他人的操作<math><mi>b</mi></math>: 相容性说<math><mi>b</mi></math>在<math><mi>x</mi></math>和<math><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>上同时失败或同时成功, 后者的后继<math><mo>&simeq;</mo></math>前者的后继再施<math><mi>g</mi></math>, 结果相同; 再由<math><mi>b</mi></math>尊重<math><mo>&simeq;</mo></math>, 把<math><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>换成<math><mi>y</mi></math>也一样. 对他人的逆<math><mi>h</mi></math>: <math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>h</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mrow><mi>h</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mrow><mi>h</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 第一步是相容性, 第二步是<math><mi>h</mi></math>尊重<math><mo>&simeq;</mo></math>.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="example"><b>例子3.5. </b>按名字索引的注册表 (如<code>ctx.tools</code>): 状态是名字到可选值的映射, 逐点比较. <math><mrow><mi>Register</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>v</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>在<math><mi>x</mi></math>已被占用时失败, 逆是删去<math><mi>x</mi></math>; <math><mrow><mi>Lookup</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>读出<math><mi>x</mi></math>处的值, 逆是恒等. 每个操作都良好. 名字不同的登记, 以及不会遇到同名登记的查询, 满足合流所需的全部假设. </div>
+    <div class="example" id="ex-bus"><b>例子3.6. </b>有序事件总线 (如<code>ctx.on</code>): 状态是带令牌的钩子列表. 两次注册不可交换; 按回调注销 (Cordis的旧做法) 也不是精确的逆. 若启动模型中没有分发操作, 并且忽略顺序 (比较多重集), 监听器注册满足全部假设. </div>
+    <h2 id="sec-observe">第4章 观察等价</h2>
+    <p>服务的<math><mo>&simeq;</mo></math>应该取什么? 论文的回答是: 观察者只能运行操作并读取结果, 两个状态相关当且仅当没有观察者能区分它们.</p>
+    <div class="definition"><b>定义4.1. </b>一个测试是字母的有限序列. 字母或者是<math><mrow><mi>LF</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>t</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 运行操作并记录结果 (操作失败则整个测试无定义); 或者是<math><mrow><mi>LI</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 施加某个操作可能给出的逆<math><mi>g</mi></math>. 记<math><mrow><mi>runTest</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>w</mi><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>为测试<math><mi>w</mi></math>在<math><mi>s</mi></math>上记录的结果序列 (无定义时为<math><mi mathvariant="normal">None</mi></math>). 定义不可区分
+      <math display="block">
+        <mrow>
+          <mrow><mi>s</mi><mo>&sim;</mo>
+            <msup><mi>s</mi><mo>&prime;</mo></msup>
+          </mrow>
+          <mo>:&hArr;</mo>
+          <mrow><mo>&forall;</mo><mi>w</mi><mo lspace="0">.</mo>
+            <mrow>
+              <mrow><mi>runTest</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>w</mi><mo>,</mo><mi>s</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow><mi>runTest</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>w</mi><mo>,</mo>
+                    <msup><mi>s</mi><mo>&prime;</mo></msup>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      一个等价关系<math><mi>R</mi></math>可容许, 当且仅当每个操作都尊重它 (即<math><mrow><mi>R</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>s</mi><mo>,</mo><msup><mi>s</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math>时, <math><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi>s</mi></mrow></math>与<math><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><msup><mi>s</mi><mo>&prime;</mo></msup></mrow></math>同为<math><mi mathvariant="normal">None</mi></math>, 或给出<math><mi>R</mi></math>相关的后继和相同的结果), 并且每个可能给出的逆<math><mi>g</mi></math>都满足<math><mrow><mrow><mi>R</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&rArr;</mo><mrow><mi>R</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. </div>
+    <div class="theorem"><b>定理4.2. </b><math><mo>&sim;</mo></math>是可容许的, 并且对每个可容许的<math><mi>R</mi></math>有<math><mrow><mi>R</mi><mo>&sube;</mo><mo>&sim;</mo></mrow></math>. 换言之, <math><mo>&sim;</mo></math>是操作所尊重的最粗的等价关系. 特别地, 操作良好的服务有<math><mrow><mo>&simeq;</mo><mo>&sube;</mo><mo>&sim;</mo></mrow></math>. </div>
+    <div class="proof"><b>证明.</b> 可容许: 设<math><mi>s</mi></math>与<math><msup><mi>s</mi><mo>&prime;</mo></msup></math>不可区分. 只有一个字母<math><mrow><mi>LF</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>t</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的测试说明<math><mi>a</mi></math>在两者上同时失败或同时成功, 且结果相同; 在一个测试前面加上这个字母仍是测试, 所以两个后继也不可区分. 逆字母同理. 包含: 设<math><mi>R</mi></math>可容许, <math><mrow><mi>R</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>s</mi><mo>,</mo><msup><mi>s</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 对测试的长度归纳: 每个字母都把<math><mi>R</mi></math>相关的状态送到<math><mi>R</mi></math>相关的状态, 并给出相同的结果, 所以整个测试在两边的结果相同.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>这就是最大互模拟: 测试每走一个字母, 两边同时走一步, 比较定义性与结果.</p>
+    <div class="theorem"><b>定理4.3. </b>在带分发的有序事件总线上, 设<math><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>&ne;</mo><msub><mi>c</mi><mn>2</mn></msub></mrow></math>是两个回调, 分别用令牌<math><mrow><msub><mi>t</mi><mn>1</mn></msub><mo>&ne;</mo><msub><mi>t</mi><mn>2</mn></msub></mrow></math>注册; 从同一状态出发, 记<math><msub><mi>s</mi><mn>12</mn></msub></math>为先注册<math><msub><mi>c</mi><mn>1</mn></msub></math>再注册<math><msub><mi>c</mi><mn>2</mn></msub></math>所得的状态, <math><msub><mi>s</mi><mn>21</mn></msub></math>为相反顺序所得的状态. 则对每个可容许的<math><mi>R</mi></math>, <math><mrow><mo>&not;</mo><mrow><mi>R</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>s</mi><mn>12</mn></msub><mo>,</mo><msub><mi>s</mi><mn>21</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 换言之, 不论取哪个可容许的等价关系, 两次注册都不可交换. </div>
+    <div class="proof"><b>证明.</b> 设两种顺序得到的状态被某个可容许的等价关系联系起来. 由上一个定理, 它们不可区分. 但只含一个分发字母的测试按注册顺序返回回调的列表, 两种顺序给出的列表不同, 矛盾.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>分发会暴露注册的顺序. 所以<cite>例子<a href="#ex-bus">3.6</a></cite>中把分发排除在启动模型之外是被迫的, 而不是随意的选择.</p>
+    <h2 id="sec-programs">第5章 程序及其解释</h2>
+    <p>论文的定义41把组件的效应函数刻画为: 每一段执行一个操作, 再根据结果选择后续. 我们把这个闭包直接做成一个归纳类型, 并把它解释回<cite>第<a href="#sec-partial">2</a>章</cite>的部分效应.</p>
+    <div class="definition"><b>定义5.1. </b>程序由以下文法生成:
+      <math display="block">
+        <mrow><mi>P</mi><mo>&Colone;</mo>
+          <mrow><mi>Done</mi><mo>|</mo><mi>Fail</mi><mo>|</mo>
+            <mrow><mi>Op</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>k</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>&kappa;</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>|</mo>
+            <mrow><mi>Provide</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>k</mi><mo>,</mo><mi>s</mi><mo>,</mo><mi>P</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>|</mo>
+            <mrow><mi>Spawn</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>c</mi><mo>,</mo><mi>P</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      其中<math><mrow><mi>&kappa;</mi><mo>:</mo><mrow><mi>Out</mi><mo>&rarr;</mo><mi>Prog</mi></mrow></mrow></math>. <math><mrow><mi>Op</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>&kappa;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>在键<math><mi>k</mi></math>的服务状态上执行<math><mi>a</mi></math>, 把结果交给<math><mi>&kappa;</mi></math>; <math><mrow><mi>Provide</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>s</mi><mo>,</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>以初始状态<math><mi>s</mi></math>提供键<math><mi>k</mi></math>; <math><mrow><mi>Spawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>c</mi><mo>,</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>注册子组件<math><mi>c</mi></math>. </div>
+    <p>这就是一个free monad, <math><mi>&kappa;</mi></math>是续延. 程序是良基的 (每条路径都有限, 但<math><mi>&kappa;</mi></math>可以无穷分叉, 所以路径长度未必有界), 看不到状态, 能得到的信息只有操作的结果. 名字和provision编号由规则层分配, 程序不接触.</p>
+    <div class="definition"><b>定义5.2. </b>存储是<math><mrow><mi>Store</mi><mo>&colone;</mo><mrow><mi>K</mi><mo>&rharu;</mo><mi>S</mi></mrow></mrow></math>, 两个存储相关当且仅当定义域相同且逐键<math><mo>&simeq;</mo></math> (论文的定义33). 定义
+      <math display="block">
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi>set</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>k</mi><mo>,</mo><mi>s</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>&sigma;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&colone;</mo></mtd>
+              <mtd>
+                <mrow><mo>{</mo>
+                  <mtable displaystyle="true">
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow>
+                            <mrow><mi>&sigma;</mi>
+                              <mrow><mo stretchy="false">[</mo>
+                                <mrow><mi>k</mi><mo>&mapsto;</mo><mi>s</mi></mrow>
+                                <mo stretchy="false">]</mo></mrow>
+                            </mrow>
+                            <mo>,</mo>
+                            <mrow><mi>&lambda;</mi>
+                              <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                              <mo lspace="0">.</mo>
+                              <mrow>
+                                <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                                <mo>&setminus;</mo><mi>k</mi></mrow>
+                            </mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mtd>
+                      <mtd columnalign="left"><mtext>, 若</mtext>
+                        <mrow><mi>k</mi><mo>&notin;</mo>
+                          <mrow><mi>dom</mi><mo>&af;</mo>
+                            <mrow><mo stretchy="false">(</mo><mi>&sigma;</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd><mi mathvariant="normal">None</mi></mtd>
+                      <mtd columnalign="left"><mtext>, 否则</mtext></mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>lift</mi><mi>k</mi></msub>
+                      <mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>&sigma;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&colone;</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="bold">let</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <msup><mi>s</mi><mo>&prime;</mo></msup>
+                        <mo>,</mo><mi>g</mi><mo>,</mo><mi>o</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&colone;</mo>
+                    <mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/>
+                      <mrow><mi>&sigma;</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                  <mspace width="2ex"/><mi mathvariant="bold">in</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi>&sigma;</mi>
+                        <mrow><mo stretchy="false">[</mo>
+                          <mrow><mi>k</mi><mo>&mapsto;</mo>
+                            <msup><mi>s</mi><mo>&prime;</mo></msup>
+                          </mrow>
+                          <mo stretchy="false">]</mo></mrow>
+                      </mrow>
+                      <mo>,</mo>
+                      <mrow><mi>&lambda;</mi>
+                        <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                        <mo lspace="0">.</mo>
+                        <mrow>
+                          <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                          <mrow><mo stretchy="false">[</mo>
+                            <mrow><mi>k</mi><mo>&mapsto;</mo>
+                              <mrow><mi>g</mi><mo>&af;</mo>
+                                <mrow><mo stretchy="false">(</mo>
+                                  <mrow>
+                                    <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                                    <mo>&af;</mo>
+                                    <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                                  </mrow>
+                                  <mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                            </mrow>
+                            <mo stretchy="false">]</mo></mrow>
+                        </mrow>
+                      </mrow>
+                      <mo>,</mo><mi>o</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </math>
+      后者在<math><mrow><mi>k</mi><mo>&notin;</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&sigma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>或<math><mi>run</mi></math>失败时为<math><mi mathvariant="normal">None</mi></math>. 提升后的逆在<math><mrow><mi>k</mi><mo>&notin;</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>&sigma;</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></mrow></math>时保持<math><msup><mi>&sigma;</mi><mo>&prime;</mo></msup></math>不变, 所以它是全函数. 第一个是论文定义23的set, 第二个是式(23)的提升. 提升后的逆作用在<em>撤销时</em>的存储上, 只改动键<math><mi>k</mi></math>, 所以别的组件在中间做过的事会保留下来. </div>
+    <div class="definition"><b>定义5.3. </b>程序的解释<math><mrow><msub><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>P</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow><mi>t</mi></msub><mo>:</mo><mrow><mi>PEff</mi><mspace width="2ex"/><mi>Store</mi></mrow></mrow></math> (<math><mi>t</mi></math>是起始令牌) 定义为
+      <math display="block">
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <msub>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>Done</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  <mi>t</mi></msub>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd><mi>&eta;</mi></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <msub>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>Fail</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  <mi>t</mi></msub>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>&lambda;</mi><mi>&sigma;</mi><mo lspace="0">.</mo><mi mathvariant="normal">None</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <msub>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <mrow><mi>Op</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>k</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>&kappa;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  <mi>t</mi></msub>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>bind</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow>
+                        <msub><mi>lift</mi><mi>k</mi></msub>
+                        <mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi></mrow>
+                      <mo>,</mo>
+                      <mrow><mi>&lambda;</mi><mi>o</mi><mo lspace="0">.</mo>
+                        <msub>
+                          <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                            <mrow><mi>&kappa;</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">(</mo><mi>o</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                          <mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow>
+                        </msub>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <msub>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <mrow><mi>Provide</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>k</mi><mo>,</mo><mi>s</mi><mo>,</mo><mi>P</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  <mi>t</mi></msub>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>P</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    <mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow>
+                  </msub>
+                  <mo>&diamond;</mo>
+                  <mrow><mi>set</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>k</mi><mo>,</mo><mi>s</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <msub>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <mrow><mi>Spawn</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>c</mi><mo>,</mo><mi>P</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  <mi>t</mi></msub>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <msub>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>P</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  <mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow>
+                </msub>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </math>
+      spawn不是存储上的效应, 所以解释为恒等. </div>
+    <div class="theorem" id="thm-denote"><b>定理5.4. </b>若服务的操作都良好, 则每个程序的解释都是带见证的部分效应; 特别地,
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow>
+              <msub>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>P</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                <mi>t</mi></msub>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>&sigma;</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>=</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                <mo>,</mo><mi>g</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&rArr;</mo>
+          <mrow>
+            <mrow><mi>g</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msup><mi>&sigma;</mi><mo>&prime;</mo></msup>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&simeq;</mo><mi>&sigma;</mi></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      换言之, 一个组件单独卸载时, 存储在<math><mo>&simeq;</mo></math>意义下复原. </div>
+    <div class="proof"><b>证明.</b> 对<math><mi>P</mi></math>的结构归纳. <math><mi>Done</mi></math>和<math><mi>Fail</mi></math>的情形是平凡的. <math><mrow><mi>set</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>带见证: 在<math><mrow><mi>k</mi><mo>&notin;</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&sigma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>时, <math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&sigma;</mi><mrow><mo stretchy="false">[</mo><mrow><mi>k</mi><mo>&mapsto;</mo><mi>s</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>&setminus;</mo><mi>k</mi></mrow><mo>=</mo><mi>&sigma;</mi></mrow></math>; 它的逆尊重存储的等价, 因为存储是逐键比较的. <math><mrow><msub><mi>lift</mi><mi>k</mi></msub><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi></mrow></math>带见证: 它的逆只改动键<math><mi>k</mi></math>, 在该键上就是操作<math><mi>a</mi></math>的逆, 由<math><mi>a</mi></math>良好即得. 于是<math><mi>Op</mi></math>的情形由按结果绑定的封闭性得到, <math><mi>Provide</mi></math>的情形由<math><mo>&diamond;</mo></math>的封闭性得到, <math><mi>Spawn</mi></math>的情形就是归纳假设.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem"><b>定理5.5. </b>解释与演算的步骤一致: 一个操作步或provide步恰好是解释的一段, 它的撤销项施加这一段的逆. 特别地, 设组件<math><mi>c</mi></math>的fiber从存储<math><mi>&sigma;</mi></math>出发单独 (没有其他fiber走步) 加载到Active, 开始时计数器为<math><mi>t</mi></math>, 则<math><mrow><mrow><msub><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mrow><mi>body</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">&RightDoubleBracket;</mo></mrow><mi>t</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&sigma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>&sigma;</mi><mo>&prime;</mo></msup><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>有定义, 结束时的存储<math><mo>&simeq;</mo></math><math><msup><mi>&sigma;</mi><mo>&prime;</mo></msup></math>, 并且它累加器中新增的撤销项按LIFO复合起来逐点<math><mo>&simeq;</mo></math><math><mi>g</mi></math>. </div>
+    <div class="definition" id="def-pindep"><b>定义5.6. </b>独立性在<math><mi>Maybe</mi></math>中的读法: 两个部分效应 (或两个操作在各自令牌下) 独立, 如果它们的生成元在部分函数的意义下两两交换, 并且一方的生成元既不改变另一方的定义域, 也不扰动另一方给出的逆和结果. 只在生成元上要求. 用于操作时, 这就是论文的定义39(键可交换)的读法. </div>
+    <div class="theorem"><b>定理5.7. </b>若<math><mrow><mi>k</mi><mo>&ne;</mo><msup><mi>k</mi><mo>&prime;</mo></msup></mrow></math>, 则<math><mrow><msub><mi>lift</mi><mi>k</mi></msub><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><msub><mi>t</mi><mi>a</mi></msub></mrow></math>与<math><mrow><msub><mi>lift</mi><msup><mi>k</mi><mo>&prime;</mo></msup></msub><mspace width="2ex"/><mi>b</mi><mspace width="2ex"/><msub><mi>t</mi><mi>b</mi></msub></mrow></math>在<cite>定义<a href="#def-pindep">5.6</a></cite>的意义下独立. 这是论文的定理40. </div>
+    <div class="proof"><b>证明.</b> <math><mrow><msub><mi>lift</mi><mi>k</mi></msub><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi></mrow></math>的前进函数和它给出的逆都只读写键<math><mi>k</mi></math>, 其余键原样保留. 两个分别只读写<math><mi>k</mi></math>和<math><msup><mi>k</mi><mo>&prime;</mo></msup></math>的映射, 在<math><mrow><mi>k</mi><mo>&ne;</mo><msup><mi>k</mi><mo>&prime;</mo></msup></mrow></math>时逐点交换, 再由<cite>第<a href="#sec-effects">1</a>章</cite>中的引理, 生成的子幺半群也交换. 另外, 操作在<math><mi>&sigma;</mi></math>处是否有定义, 给出的逆和结果都只依赖于<math><mrow><mi>&sigma;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 而另一方的生成元不改变它.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem" id="thm-paper-hyps"><b>定理5.8. </b>定义39蕴涵撤销独立和可交换; 因此论文自己的假设推出合流所需的服务假设 (见<cite>定理<a href="#thm-compose">9.5.5</a></cite>), 以及恢复精确性所需的假设 (见<cite>定理<a href="#thm-recovery">9.3.2</a></cite>). </div>
+    <p>反过来不成立: 演算要求得更少, 只对两个fiber可能在同一个键上相遇的操作对, 并且只在令牌不同时要求. 论文的定理42(相遇处键可交换则效应独立)因此不必经过效应函数的独立性, 而是直接推出了演算的操作级假设.</p>
+    <h2 id="sec-state">第6章 组件, fiber与状态</h2>
+    <p>从这里开始对应论文的第4章. 论文的演算先假设迁移是原子的, 瞬时的, 不会失败的 (4.2节), 再在4.3节逐一去掉这些假设. 我们直接给出去掉之后的版本: 每个服务操作是一个原子步, 步与步之间都可以放弃.</p>
+    <div class="definition"><b>定义6.1. </b>一个组件是四元组
+      <math display="block">
+        <mrow><mo stretchy="false">&lang;</mo>
+          <mrow>
+            <mrow><mi>d</mi><mo>&sube;</mo><mi>K</mi></mrow>
+            <mo>,</mo>
+            <mrow><mi>p</mi><mo>&sube;</mo><mi>K</mi></mrow>
+            <mo>,</mo>
+            <mrow><mi>body</mi><mo>&in;</mo><mi>Prog</mi></mrow>
+            <mo>,</mo><mi>reacts</mi></mrow>
+          <mo stretchy="false">&rang;</mo></mrow>
+        <mtext>,</mtext></math>
+      分别是依赖, 可能提供的键, 启动程序, 以及事件处理器 (组件编号的列表). 组件放在状态之外的程序表<math><mrow><mi>prog</mi><mo>:</mo><mrow><mi>C</mi><mo>&rarr;</mo><mi>Component</mi></mrow></mrow></math>里. </div>
+    <div class="definition" id="def-obligation"><b>定义6.2. </b>组件的义务 (静态, 可机械检查): <math><mi>body</mi></math>中每个<math><mrow><mi>Op</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>&kappa;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>满足<math><mrow><mi>k</mi><mo>&in;</mo><mrow><mi>d</mi><mo>&cup;</mo><mi>p</mi></mrow></mrow></math>, 每个<math><mrow><mi>Provide</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>s</mi><mo>,</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>满足<math><mrow><mi>k</mi><mo>&in;</mo><mi>p</mi></mrow></math>.</div>
+    <p>与Cordis不同, 提供的键是静态声明的. 这使得不同fiber的<math><mi>p</mi></math>两两不相交可以在插入时检查, 依赖关系是否无环也可以静态判定; 进展和合流都需要无环.</p>
+    <div class="definition"><b>定义6.3. </b>状态是<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>next</mi><mo>,</mo><mi>F</mi><mo>,</mo><mi>B</mi></mrow><mo stretchy="false">&rang;</mo></mrow></math>, 其中<math><mi>next</mi></math>是新鲜名字, provision编号和令牌共用的计数器, <math><mrow><mi>F</mi><mo>:</mo><mrow><mi>&Nopf;</mi><mo>&rharu;</mo><mi>Fiber</mi></mrow></mrow></math>是注册表, <math><mrow><mi>B</mi><mo>:</mo><mrow><mi>K</mi><mo>&rharu;</mo><mi>Binding</mi></mrow></mrow></math>是当前的服务绑定:
+      <math display="block">
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd><mi>Fiber</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow>
+                    <mrow><mi>c</mi><mo>&in;</mo><mi>C</mi></mrow>
+                    <mo>,</mo>
+                    <mrow><mi>&pi;</mi><mo>&in;</mo>
+                      <mrow><mi>&Nopf;</mi><mo>+</mo>
+                        <mrow><mo stretchy="false">{</mo><mi mathvariant="normal">root</mi><mo stretchy="false">}</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo>,</mo>
+                    <mrow><mi>&tau;</mi><mo>&in;</mo><mi>&Bopf;</mi></mrow>
+                    <mo>,</mo>
+                    <mrow><mi>&theta;</mi><mo>&in;</mo><mi>&Theta;</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>Binding</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>pid</mi><mo>,</mo><mi>owner</mi><mo>,</mo>
+                    <mrow><mi>s</mi><mo>&in;</mo><mi>S</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>&theta;</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi>Inactive</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>&zeta;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>|</mo>
+                  <mrow><mi>Loading</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>P</mi><mo>,</mo><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>|</mo>
+                  <mrow><mi>Active</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>|</mo>
+                  <mrow><mi>Unloading</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&zeta;</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>u</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi>UOp</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>k</mi><mo>,</mo><mi>pid</mi><mo>,</mo><mi>tok</mi><mo>,</mo><mi>g</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>|</mo>
+                  <mrow><mi>UProv</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>k</mi><mo>,</mo><mi>pid</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>|</mo>
+                  <mrow><mi>USpawn</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </math>
+      这里<math><mi>&pi;</mi></math>是父fiber, <math><mi>&tau;</mi></math>是<q>已请求移除</q>标记, <math><mi>&zeta;</mi></math>是可选的错误 (<math><mrow><mi>&zeta;</mi><mo>=</mo><mi>&bottom;</mi></mrow></math>表示没有错误, 非<math><mi>&bottom;</mi></math>的错误记作<math><mi>&xi;</mi></math>), 累加器<math><mi>acc</mi></math>是撤销项<math><mi>u</mi></math>的列表, 表头是最近的一项; <math><mrow><mi>&omega;</mi><mo>:</mo><mrow><mi>K</mi><mo>&rharu;</mo><mi>&Nopf;</mi></mrow></mrow></math>是视图, 定义域恰为该fiber的组件的<math><mi>d</mi></math>, 记录每个依赖解析到的provision编号. </div>
+    <p>几点说明.</p>
+    <ul>
+      <li>四个生命周期状态代替Cordis的六个: FAILED就是<math><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&xi;</mi><mo stretchy="false">)</mo></mrow></mrow></math>, DISPOSED就是条目不存在.</li>
+      <li>累加器就是<cite>第<a href="#sec-effects">1</a>章</cite>的<math><mi>&phi;</mi></math>, 只是拆成撤销项的列表, 以便逐项撤销, 逐项设守卫. <math><mi>UOp</mi></math>项记下操作用的令牌, 这是恢复精确性的证明所需要的.</li>
+      <li>以provision编号作为提供的身份. 提供者撤掉再重新提供时编号改变, 依赖它的fiber会重新加载, 绝不会拿着过期的绑定继续运行.</li>
+      <li>绑定中的服务状态被提供者和所有依赖者共同操作, 是共享且可变的.</li>
+    </ul>
+    <h2 id="sec-derived">第7章 派生概念</h2>
+    <div class="definition"><b>定义7.1. </b>以下记<math><mrow><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">&lang;</mo><mrow><msub><mi>c</mi><mi>n</mi></msub><mo>,</mo><msub><mi>&pi;</mi><mi>n</mi></msub><mo>,</mo><msub><mi>&tau;</mi><mi>n</mi></msub><mo>,</mo><msub><mi>&theta;</mi><mi>n</mi></msub></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>.
+      <math display="block">
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow><mi>installed</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>:&hArr;</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>&theta;</mi><mi>n</mi></msub>
+                  <mo>&ne;</mo>
+                  <mrow><mi>Inactive</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>_</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>visible</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&colone;</mo></mtd>
+              <mtd>
+                <mrow><mo>{</mo>
+                  <mtable displaystyle="true">
+                    <mtr>
+                      <mtd><mi>p</mi></mtd>
+                      <mtd columnalign="left"><mtext>, 若</mtext>
+                        <mrow>
+                          <mrow><mi>B</mi><mo>&af;</mo>
+                            <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo>=</mo>
+                          <mrow><mo stretchy="false">&lang;</mo>
+                            <mrow><mi>p</mi><mo>,</mo><mi>o</mi><mo>,</mo><mi>_</mi></mrow>
+                            <mo stretchy="false">&rang;</mo></mrow>
+                        </mrow>
+                        <mtext>且</mtext>
+                        <mrow>
+                          <msub><mi>&theta;</mi><mi>o</mi></msub>
+                          <mo>=</mo>
+                          <mrow><mi>Active</mi><mo>&af;</mo>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi>_</mi><mo>,</mo><mi>_</mi></mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd><mi>&bottom;</mi></mtd>
+                      <mtd columnalign="left"><mtext>, 否则</mtext></mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>target</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&colone;</mo></mtd>
+              <mtd>
+                <mrow><mo>{</mo>
+                  <mtable displaystyle="true">
+                    <mtr>
+                      <mtd><mi>&bottom;</mi></mtd>
+                      <mtd columnalign="left"><mtext>, 若</mtext>
+                        <msub><mi>&tau;</mi><mi>n</mi></msub>
+                        <mtext>或</mtext>
+                        <mrow><mo>&exist;</mo>
+                          <mrow><mi>k</mi><mo>&in;</mo>
+                            <mrow><mi>d</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">(</mo>
+                                <msub><mi>c</mi><mi>n</mi></msub>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mrow>
+                          <mo lspace="0">.</mo>
+                          <mrow>
+                            <mrow><mi>visible</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mo>=</mo><mi>&bottom;</mi></mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi>k</mi><mo>&in;</mo>
+                            <mrow><mi>d</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">(</mo>
+                                <msub><mi>c</mi><mi>n</mi></msub>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mrow>
+                          <mo>&mapsto;</mo>
+                          <mrow><mi>visible</mi><mo>&af;</mo>
+                            <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                      <mtd columnalign="left"><mtext>, 否则</mtext></mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>resolves</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>m</mi><mo>,</mo><mi>p</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>:&hArr;</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi>installed</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mo>&exist;</mo><mi>k</mi><mo lspace="0">.</mo>
+                    <mrow>
+                      <mrow>
+                        <msub><mi>&omega;</mi><mi>m</mi></msub>
+                        <mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>=</mo><mi>p</mi></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>quiet</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>:&hArr;</mo></mtd>
+              <mtd>
+                <mrow><mo>&forall;</mo><mi>n</mi><mo lspace="0">.</mo>
+                  <mrow><mo>&forall;</mo>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo>
+                      <mrow><mi>L</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo lspace="0">.</mo>
+                    <mrow>
+                      <mrow><mi>step</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>&gamma;</mi><mo>,</mo><mi>&ell;</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>=</mo><mi mathvariant="normal">None</mi></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </math>
+      其中<math><mrow><mi>L</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow></math>是<math><mi>n</mi></math>上的八种生命周期标签 (见<cite>第<a href="#sec-rules">8</a>章</cite>), 所以<math><mrow><mi>quiet</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></math>说的是没有生命周期规则可用. </div>
+    <p><math><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow></math>是整个演算的驱动力: 生命周期规则不断让每个fiber的实际状态追赶它的<math><mi>target</mi></math>. 这是论文定义25, 26(满足谓词与notify)的操作化. 论文对每次迁移分类为activating, deactivating, neutral; 我们不单独定义notify, 而是让规则以<math><mi>target</mi></math>的变化为前提. <math><mi>visible</mi></math>只计入Active的提供者, 所以提供者一进入Unloading, 它的服务就对新的解析不可见; 已经解析到它的依赖者仍持有视图, 可以继续读写, 直到自己卸载完毕.</p>
+    <h2 id="sec-rules">第8章 规则</h2>
+    <p>规则写作<math><mrow><mi>&gamma;</mi><mover><mo>&xrarr;</mo><mi>&ell;</mi></mover><msup><mi>&gamma;</mi><mo>&prime;</mo></msup></mrow></math>, 标签<math><mi>&ell;</mi></math>决定唯一的后继 (若存在), 所以演算就是一个确定性的函数<math><mrow><mi>step</mi><mo>:</mo><mrow><mi>State</mi><mo>&rarr;</mo><mi>Label</mi><mo>&rarr;</mo><mrow><mi>Maybe</mi><mspace width="2ex"/><mi>State</mi></mrow></mrow></mrow></math>. 选择哪个标签是调度的事, 不在演算之内. 凡是从<math><mi>next</mi></math>取名字, 编号或令牌的规则, 都随后把<math><mi>next</mi></math>加一. </p>
+    <h3>第8.1节 编排规则</h3>
+    <p>编排规则是外部输入.</p>
+    <ul>
+      <li><b><math><mrow><mi>O-Insert</mi><mspace width="2ex"/><mi>c</mi></mrow></math></b>: 若<math><mrow><mi>p</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>与所有现存fiber的<math><mi>p</mi></math>不相交, 则以<math><mrow><mi>m</mi><mo>&colone;</mo><mi>next</mi></mrow></math>为名插入<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>c</mi><mo>,</mo><mi mathvariant="normal">root</mi><mo>,</mo><mi>false</mi><mo>,</mo><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&bottom;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">&rang;</mo></mrow></math>, <math><mi>next</mi></math>加一.</li>
+      <li><b><math><mrow><mi>O-Dispose</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><mi>n</mi><mo>&in;</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>F</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 则<math><mrow><msub><mi>&tau;</mi><mi>n</mi></msub><mo>&colone;</mo><mi>true</mi></mrow></math>.</li>
+      <li><b><math><mrow><mi>O-Reset</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&xi;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 则<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&bottom;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      <li><b><math><mrow><mi>O-Restart</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><msub><mi>&theta;</mi><mi>n</mi></msub></math>为<math><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>_</mi><mo>,</mo><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>或<math><mrow><mi>Active</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 且<math><mrow><mo>&not;</mo><msub><mi>&tau;</mi><mi>n</mi></msub></mrow></math>, 则<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&bottom;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      <li><b><math><mrow><mi>O-React</mi><mspace width="2ex"/><mi>n</mi><mspace width="2ex"/><mi>i</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Active</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math><mrow><mo>&not;</mo><msub><mi>&tau;</mi><mi>n</mi></msub></mrow></math>, <math><mrow><mi>reacts</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>c</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow></math>的第<math><mi>i</mi></math>项为<math><mi>c</mi></math>, 且<math><mrow><mi>p</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>不冲突, 则插入子fiber<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>c</mi><mo>,</mo><mi>n</mi><mo>,</mo><mi>false</mi><mo>,</mo><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&bottom;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">&rang;</mo></mrow></math>, 名为<math><mrow><mi>m</mi><mo>&colone;</mo><mi>next</mi></mrow></math>, 并令<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Active</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mi>USpawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow><mo>::</mo><mi>acc</mi></mrow><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+    </ul>
+    <p><math><mi>O-Reset</mi></math>对应Cordis在失败后用<code>update</code>重试; <math><mi>O-Restart</mi></math>对应<code>restart</code>, 卸载后由<math><mi>L-Begin</mi></math>重新加载; <math><mi>O-React</mi></math>把一次事件反应建模为子fiber, 反应的操作就是子fiber的操作, 构成一个运行期效应, 单独撤销就是对子fiber执行<math><mi>O-Dispose</mi></math>.</p>
+    <h3>第8.2节 加载</h3>
+    <ul>
+      <li><b><math><mrow><mi>L-Begin</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&bottom;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>&omega;</mi><mo>&ne;</mo><mi>&bottom;</mi></mrow></mrow></math>, 则<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>body</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>c</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mo>[]</mo><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      <li><b><math><mrow><mi>L-Divert</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>,</mo><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&ne;</mo><mi>&omega;</mi></mrow></math>, 则<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&bottom;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      <li><b><math><mrow><mi>L-Step</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>,</mo><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>&omega;</mi></mrow></math>, 则按<math><mi>P</mi></math>分情况:
+        <ul>
+          <li><math><mi>Done</mi></math>: <math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Active</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>;</li>
+          <li><math><mi>Fail</mi></math>: <math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi mathvariant="normal">EUser</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>;</li>
+          <li><math><mrow><mi>Op</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>&kappa;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>: 依赖键查视图<math><mi>&omega;</mi></math>, 自己提供的键查<math><mi>B</mi></math> (owner必须是<math><mi>n</mi></math>), 得到编号<math><mi>p</mi></math>; 取令牌<math><mrow><mi>t</mi><mo>&colone;</mo><mi>next</mi></mrow></math>, 在该绑定的状态<math><mi>s</mi></math>上运行<math><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi>s</mi></mrow></math>. 失败则进入Unloading并带错误; 成功得到<math><mrow><mo stretchy="false">(</mo><mrow><msup><mi>s</mi><mo>&prime;</mo></msup><mo>,</mo><mi>g</mi><mo>,</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></math>时写回<math><msup><mi>s</mi><mo>&prime;</mo></msup></math>, 并令<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>&kappa;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>o</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mrow><mi>UOp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>p</mi><mo>,</mo><mi>t</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>::</mo><mi>acc</mi></mrow><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 解析失败视为失败;</li>
+          <li><math><mrow><mi>Provide</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>s</mi><mo>,</mo><msup><mi>P</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math>: 要求<math><mrow><mi>k</mi><mo>&in;</mo><mrow><mi>p</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>c</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>未定义; 以<math><mrow><mi>p</mi><mo>&colone;</mo><mi>next</mi></mrow></math>为编号令<math><mrow><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&colone;</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mi>p</mi><mo>,</mo><mi>n</mi><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>, <math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>P</mi><mo>&prime;</mo></msup><mo>,</mo><mrow><mrow><mi>UProv</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>::</mo><mi>acc</mi></mrow><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 要求不满足时进入Unloading并带错误<math><mi mathvariant="normal">EConflict</mi></math>;</li>
+          <li><math><mrow><mi>Spawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>c</mi><mo>,</mo><msup><mi>P</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math>: 要求<math><mrow><mi>p</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>不冲突; 插入子fiber<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>c</mi><mo>,</mo><mi>n</mi><mo>,</mo><mi>false</mi><mo>,</mo><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&bottom;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">&rang;</mo></mrow></math>, 名为<math><mrow><mi>m</mi><mo>&colone;</mo><mi>next</mi></mrow></math>, 并令<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>P</mi><mo>&prime;</mo></msup><mo>,</mo><mrow><mrow><mi>USpawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow><mo>::</mo><mi>acc</mi></mrow><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 冲突时进入Unloading并带错误<math><mi mathvariant="normal">EConflict</mi></math>.</li>
+        </ul>
+      </li>
+    </ul>
+    <p>所以<math><mi>L-Step</mi></math>在<math><mrow><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>&omega;</mi></mrow></math>时总是适用的, Loading的fiber不会卡住.</p>
+    <h3>第8.3节 卸载</h3>
+    <ul>
+      <li><b><math><mrow><mi>L-Leave</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Active</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&ne;</mo><mi>&omega;</mi></mrow></math>, 则<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&bottom;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      <li><b><math><mrow><mi>L-Undo</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>u</mi><mo>::</mo><mi>acc</mi></mrow><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&zeta;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且下面按<math><mi>u</mi></math>分的前提成立, 则<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>acc</mi><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&zeta;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 并且:
+        <ul>
+          <li><math><mrow><mi>UOp</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>p</mi><mo>,</mo><mi>t</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>: 若绑定<math><mi>p</mi></math>仍在, 把它的状态<math><mi>s</mi></math>改为<math><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow></mrow></math>;</li>
+          <li><math><mrow><mi>UProv</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>: <b>守卫</b>, 没有<math><mrow><mi>m</mi><mo>&ne;</mo><mi>n</mi></mrow></math>满足<math><mrow><mi>resolves</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>m</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>; 删除<math><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>;</li>
+          <li><math><mrow><mi>USpawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow></math>: 要求<math><mrow><mi>m</mi><mo>&notin;</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>F</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即子fiber已被移除.</li>
+        </ul>
+      </li>
+      <li><b><math><mrow><mi>L-RetireChild</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mi>USpawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow><mo>::</mo><mi>_</mi></mrow><mo>,</mo><mi>_</mi><mo>,</mo><mi>_</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math><mrow><mi>m</mi><mo>&in;</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>F</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mo>&not;</mo><msub><mi>&tau;</mi><mi>m</mi></msub></mrow></math>, 则<math><mrow><msub><mi>&tau;</mi><mi>m</mi></msub><mo>&colone;</mo><mi>true</mi></mrow></math>.</li>
+      <li><b><math><mrow><mi>L-Unloaded</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>[]</mo><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&zeta;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 则<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>&colone;</mo><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&zeta;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      <li><b><math><mrow><mi>L-Remove</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><msub><mi>&tau;</mi><mi>n</mi></msub></math>, <math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>_</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 且没有<math><mi>m</mi></math>满足<math><mrow><msub><mi>&pi;</mi><mi>m</mi></msub><mo>=</mo><mi>n</mi></mrow></math>, 则删除<math><mrow><mi>F</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow></math>.</li>
+    </ul>
+    <p>于是父fiber按LIFO撤到<math><mrow><mi>USpawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow></math>时, 先请求子fiber退出, 然后等它卸载并被移除, 再继续撤销更早的项; 在spawn之后登记的效应此时已经撤销完毕. 提供者撤到<math><mrow><mi>UProv</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>时, 要等所有解析到<math><mi>p</mi></math>的依赖者先卸载. 这两处是演算中仅有的等待.</p>
+    <h3>第8.4节 设计决定</h3>
+    <p>与论文和Cordis相比, 主要的决定如下.</p>
+    <ul>
+      <li><b>移除</b>: 只有一个外部请求<math><mi>O-Dispose</mi></math>, 条目在<q>已请求移除, 已Inactive, 没有子fiber</q>时由<math><mi>L-Remove</mi></math>自动删除. 比论文的Retire加Remove简单, 也不会因为过早删除而泄漏.</li>
+      <li><b>卸载逐项进行</b>: 论文一步应用整个累加器; 我们逐项撤销, 守卫才能精确到每个provision, <math><mi>USpawn</mi></math>才能等待子fiber.</li>
+      <li><b>LIFO串行</b>: Cordis用<code>Promise.all</code>并发执行disposer. 后登记的效应往往依赖先登记的, LIFO不需要任何额外假设就是对的.</li>
+      <li><b>放弃加载</b>: 每个服务操作是原子步, 步与步之间都可以<math><mi>L-Divert</mi></math>. 不保留论文中<q>让在途迭代落地</q>的分支, 因为JS的await只出现在操作之间.</li>
+      <li><b>失败之后</b>: 增加<math><mi>O-Reset</mi></math>, 由外部决定是否重试, 比论文的永不重入实用.</li>
+      <li><b>运行期效应</b>: 不把累加器改成树, 而是用<math><mi>O-React</mi></math>把反应编码为子fiber. 子fiber本身就是一棵子效应树.</li>
+      <li><b>隔离与可用性检查</b>: 不加规则. 键是服务名加作用域标签, 隔离就是对组件表做键重命名, 见<cite>第<a href="#sec-meta-derived">9.6</a>节</cite>; 在提供时求值的检查是程序自己就能做的判断.</li>
+    </ul>
+    <h2 id="sec-meta">第9章 元理论</h2>
+    <p>这一章陈述演算的性质: 良构性被保持, 依赖顺序被遵守, 卸载精确地撤销效应, 系统不会死锁且会终止, 以及终态与执行顺序无关.</p>
+    <h3>第9.1节 保持性</h3>
+    <div class="theorem" id="thm-preservation"><b>定理9.1.1. </b>不变式<math><mi>WF</mi></math>在初始状态成立, 并被每条规则保持. 它由以下几条组成:
+      <ul>
+        <li>现存名字, 编号, <math><mi>USpawn</mi></math>中的子名字都小于<math><mi>next</mi></math>;</li>
+        <li>子fiber的父fiber存在, 已安装, 且累加器中有对应的<math><mi>USpawn</mi></math>;</li>
+        <li>现存fiber的<math><mi>p</mi></math>两两不相交;</li>
+        <li>已解析的每个依赖都有绑定, 编号与视图一致, owner不是自己;</li>
+        <li>已安装fiber的视图的键序列恰为<math><mi>d</mi></math>;</li>
+        <li>每个绑定的owner存在, 已安装, <math><mrow><mi>k</mi><mo>&in;</mo><mrow><mi>p</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>owner</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 且owner的累加器中有对应的<math><mi>UProv</mi></math>;</li>
+        <li>累加器中的每个<math><mrow><mi>UProv</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>都对应一个现存绑定, 编号为<math><mi>p</mi></math>, owner为自己;</li>
+        <li>一个累加器中每个键至多有一个<math><mi>UProv</mi></math>.</li>
+      </ul>
+    </div>
+    <div class="proof"><b>证明.</b> 对规则逐条检查. 有意思的情形如下. <math><mi>O-Insert</mi></math>, <math><mi>O-React</mi></math>和<math><mi>Spawn</mi></math>步都检查新组件的<math><mi>p</mi></math>与现存fiber不冲突, 所以不相交性保持. <math><mi>Provide</mi></math>步要求<math><mrow><mi>k</mi><mo>&in;</mo><mrow><mi>p</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>c</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>未定义, 并同时在累加器里压入<math><mi>UProv</mi></math>, 所以绑定与累加器的对应保持. 撤销<math><mi>UProv</mi></math>时守卫保证没有其他已安装fiber解析到这个编号, 所以删除绑定不会破坏<q>已解析的依赖都有绑定</q>. <math><mi>L-Remove</mi></math>要求没有子fiber, 所以父fiber存在的条件保持. <math><mi>L-Begin</mi></math>取的视图就是<math><mi>target</mi></math>, 它的键序列恰为<math><mi>d</mi></math>, 并且只解析到Active的提供者.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>推论: 有子fiber或绑定的fiber一定已安装; 一个fiber卸载完毕时, 它的子fiber和绑定都已经不存在了. 论文的保持性只有4条不变式.</p>
+    <h3>第9.2节 顺序</h3>
+    <div class="theorem" id="thm-ordering"><b>定理9.2.1. </b>设<math><mrow><mi>&gamma;</mi><mover><mo>&xrarr;</mo><mi>&ell;</mi></mover><msup><mi>&gamma;</mi><mo>&prime;</mo></msup></mrow></math>, 并且<math><mi>&gamma;</mi></math>满足不变式.
+      <ol>
+        <li>若<math><mrow><mi>&ell;</mi><mo>=</mo><mrow><mi>L-Begin</mi><mspace width="2ex"/><mi>n</mi></mrow></mrow></math>, 则<math><mrow><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>&omega;</mi></mrow></math>, 对每个<math><mrow><mrow><mi>&omega;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>p</mi></mrow></math>有<math><mrow><mo>&exist;</mo><mi>o</mi><mo lspace="0">.</mo><mrow><mrow><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mi>p</mi><mo>,</mo><mi>o</mi><mo>,</mo><mi>_</mi></mrow><mo stretchy="false">&rang;</mo></mrow></mrow><mo>&and;</mo><mrow><msub><mi>&theta;</mi><mi>o</mi></msub><mo>=</mo><mrow><mi>Active</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>_</mi><mo>,</mo><mi>_</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math>, 并且在<math><msup><mi>&gamma;</mi><mo>&prime;</mo></msup></math>中<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>body</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>c</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mo>[]</mo><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 即<math><mi>n</mi></math>的全部依赖都由Active的提供者绑定, <math><mi>n</mi></math>针对恰好这些provision开始加载.</li>
+        <li><b>提供者比依赖者活得久</b>: 对每个状态, 若<math><mrow><mi>installed</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow></math>且<math><mrow><mrow><msub><mi>&omega;</mi><mi>m</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>p</mi></mrow></math>, 则<math><mrow><mo>&exist;</mo><mrow><mi>o</mi><mo>&ne;</mo><mi>m</mi></mrow><mo lspace="0">.</mo><mrow><mrow><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mi>p</mi><mo>,</mo><mi>o</mi><mo>,</mo><mi>_</mi></mrow><mo stretchy="false">&rang;</mo></mrow></mrow><mo>&and;</mo><mrow><mi>installed</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>o</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>.</li>
+        <li>若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mi>UProv</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>::</mo><mi>acc</mi></mrow><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&zeta;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mi>&ell;</mi><mo>=</mo><mrow><mi>L-Undo</mi><mspace width="2ex"/><mi>n</mi></mrow></mrow></math>, 则<math><mrow><mo>&forall;</mo><mrow><mi>m</mi><mo>&ne;</mo><mi>n</mi></mrow><mo lspace="0">.</mo><mrow><mo>&not;</mo><mrow><mi>resolves</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>m</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>; 反过来, 只要还有这样的<math><mi>m</mi></math>, 这一步就不适用.</li>
+        <li>若<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Unloading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mi>USpawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow><mo>::</mo><mi>acc</mi></mrow><mo>,</mo><mi>&omega;</mi><mo>,</mo><mi>&zeta;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mi>&ell;</mi><mo>=</mo><mrow><mi>L-Undo</mi><mspace width="2ex"/><mi>n</mi></mrow></mrow></math>, 则<math><mrow><mi>m</mi><mo>&notin;</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>F</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+        <li>若<math><mrow><mi>&ell;</mi><mo>=</mo><mrow><mi>L-Step</mi><mspace width="2ex"/><mi>n</mi></mrow></mrow></math>, 则<math><mrow><msub><mi>&theta;</mi><mi>n</mi></msub><mo>=</mo><mrow><mi>Loading</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>,</mo><mi>acc</mi><mo>,</mo><mi>&omega;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>且<math><mrow><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>&omega;</mi></mrow></math>; <math><mi>target</mi></math>变化后只能<math><mi>L-Divert</mi></math>或<math><mi>L-Leave</mi></math>, 反之, 只有<math><mi>target</mi></math>变化时才能这样做.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 第1条: <math><mi>L-Begin</mi></math>的前提是<math><mrow><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>&omega;</mi></mrow></math>, 而<math><mi>visible</mi></math>只在owner为Active时给出编号. 第2条由不变式中<q>已解析的依赖都有绑定, 编号一致, owner不是自己</q>和<q>绑定的owner已安装</q>两条得到. 第3条是撤销<math><mi>UProv</mi></math>的守卫. 第4条是撤销<math><mi>USpawn</mi></math>的前提. 第5条是<math><mi>L-Step</mi></math>, <math><mi>L-Divert</mi></math>, <math><mi>L-Leave</mi></math>的前提.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>论文定理63的第3条(依赖者读到的值不变)被有意去掉: 服务状态按设计是共享且可变的, 固定的是provision的身份.</p>
+    <h3 id="sec-recovery">第9.3节 恢复精确性</h3>
+    <p>选定fiber <math><mi>n</mi></math>, 沿执行维护一个影子存储: 其他fiber的操作与撤销, 所有绑定的创建与删除都照常进行, 只跳过<math><mi>n</mi></math>自己的操作与撤销. 不变式是: 对每个键, 把<math><mi>n</mi></math>在该绑定上尚未撤销的逆按LIFO依次作用于实际状态, 结果<math><mo>&simeq;</mo></math>影子状态.</p>
+    <div class="definition"><b>定义9.3.1. </b>称<math><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></math>在键<math><mi>k</mi></math>上可能相遇, 如果存在组件<math><mi>c</mi></math>和<math><msup><mi>c</mi><mo>&prime;</mo></msup></math>, 使得<math><mi>a</mi></math>作为对<math><mi>k</mi></math>的操作出现在<math><mrow><mi>body</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>中, <math><mi>b</mi></math>出现在<math><mrow><mi>body</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>c</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></math>中, 并且当<math><mrow><mi>c</mi><mo>=</mo><msup><mi>c</mi><mo>&prime;</mo></msup></mrow></math>时<math><mi>c</mi></math>不提供任何键:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>meet</mi><mi>k</mi></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>:&hArr;</mo>
+          <mrow><mo>&exist;</mo>
+            <mrow><mi>c</mi><mo>,</mo>
+              <msup><mi>c</mi><mo>&prime;</mo></msup>
+            </mrow>
+            <mo lspace="0">.</mo>
+            <mrow>
+              <mrow><mi>a</mi><mo>&in;</mo>
+                <mrow>
+                  <msub><mi>ops</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>body</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>&and;</mo>
+              <mrow><mi>b</mi><mo>&in;</mo>
+                <mrow>
+                  <msub><mi>ops</mi><mi>k</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>body</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <msup><mi>c</mi><mo>&prime;</mo></msup>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>&and;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow><mi>c</mi><mo>=</mo>
+                    <msup><mi>c</mi><mo>&prime;</mo></msup>
+                  </mrow>
+                  <mo>&rArr;</mo>
+                  <mrow>
+                    <mrow><mi>p</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>=</mo><mi>&empty;</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      假设(H)是: 可能相遇的操作对在不同令牌下撤销独立,
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow>
+              <msub><mi>meet</mi><mi>k</mi></msub>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&and;</mo>
+            <mrow>
+              <msub><mi>t</mi><mi>a</mi></msub>
+              <mo>&ne;</mo>
+              <msub><mi>t</mi><mi>b</mi></msub>
+            </mrow>
+          </mrow>
+          <mo>&rArr;</mo>
+          <mrow><mi>RevertIndep</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>a</mi><mo>,</mo>
+                <msub><mi>t</mi><mi>a</mi></msub>
+                <mo>,</mo><mi>b</mi><mo>,</mo>
+                <msub><mi>t</mi><mi>b</mi></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      定义中的蕴涵是说: 同一组件的两个操作, 只在该组件不提供任何键时才算可能相遇. 提供键的组件同时至多有一个实例 (各fiber的<math><mi>p</mi></math>两两不相交), 它的两个操作来自同一个fiber, 按LIFO撤销, 不需要假设.</div>
+    <div class="theorem" id="thm-recovery"><b>定理9.3.2. </b>设所有服务操作良好, 且(H)成立. 设<math><msub><mi>&gamma;</mi><mn>0</mn></msub></math>满足不变式且<math><mi>n</mi></math>在其中没有待撤销操作, <math><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><msup><mo>&xrarr;</mo><mo>&#8270;</mo></msup><mi>&gamma;</mi></mrow></math>是一次执行, <math><mover><mi>&sigma;</mi><mo>&Hat;</mo></mover></math>是沿这次执行得到的影子存储, 并且<math><mi>n</mi></math>在<math><mi>&gamma;</mi></math>中也没有待撤销操作 (比如卸载完毕). 那么对每个键<math><mi>k</mi></math>, <math><mrow><mrow><mi>store</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>与<math><mrow><mover><mi>&sigma;</mi><mo>&Hat;</mo></mover><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>同时无定义, 或者
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>store</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&simeq;</mo>
+          <mrow>
+            <mover><mi>&sigma;</mi><mo>&Hat;</mo></mover>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      其中<math><mrow><mrow><mrow><mi>store</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>s</mi></mrow></math>当<math><mrow><mrow><mi>B</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mi>_</mi><mo>,</mo><mi>_</mi><mo>,</mo><mi>s</mi></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>. 换言之, 卸载<math><mi>n</mi></math>的结果, 就是同一次执行中略去<math><mi>n</mi></math>全部操作所得的结果, 不论其他fiber同时做了什么. </div>
+    <div class="proof"><b>证明.</b> 沿执行维护本节开头的不变式. 逐类检查步骤: <math><mi>n</mi></math>自己的操作把状态从<math><mi>s</mi></math>改为<math><msup><mi>s</mi><mo>&prime;</mo></msup></math>, 并压入逆<math><mi>g</mi></math>; 因为<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>s</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mi>s</mi></mrow></math>, 先施新压入的逆就回到原来的情形, 而影子不动. <math><mi>n</mi></math>撤销一项时, 实际状态施加了这个逆, 待撤销的列表少了这一项, 两边的作用抵消. 其他fiber在同一绑定上执行操作<math><mi>b</mi></math>时, 影子也执行<math><mi>b</mi></math>; 需要把<math><mi>n</mi></math>的待撤销逆移到<math><mi>b</mi></math>之后, 这正是撤销独立的第一条, 而(H)保证<math><mi>n</mi></math>的操作与<math><mi>b</mi></math>可能相遇时满足它 (令牌不同, 因为令牌各自新鲜). 其他fiber的撤销项<math><mi>h</mi></math>需要与<math><mi>n</mi></math>的逆交换, 这是撤销独立的第二条. 绑定的创建与删除在两边同时发生; <math><mi>n</mi></math>仍有待撤销操作的绑定不会被删除, 这由守卫保证. 最后<math><mi>n</mi></math>没有待撤销操作时, 不变式说的就是实际存储<math><mo>&simeq;</mo></math>影子存储.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem"><b>定理9.3.3. </b>运行期效应的撤销也是精确的: 从效应出现之前到它的子fiber被移除之后, 每个绑定的状态都<math><mo>&simeq;</mo></math>略去该效应全部操作所得的状态. </div>
+    <p>与论文的定理61相比, 这里只要求可能相遇的操作对撤销独立, 不要求前进函数交换, 同一fiber内部不需要任何假设 (LIFO); 并且覆盖运行期效应.</p>
+    <h3>第9.4节 进展与终止</h3>
+    <div class="definition"><b>定义9.4.1. </b>称<math><msup><mi>c</mi><mo>&prime;</mo></msup></math>在<math><mi>c</mi></math>之上, 记作<math><mrow><mi>c</mi><mo>&prec;</mo><msup><mi>c</mi><mo>&prime;</mo></msup></mrow></math>, 如果
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>p</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&cap;</mo>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msup><mi>c</mi><mo>&prime;</mo></msup>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>&ne;</mo><mi>&empty;</mi></mrow>
+        <mtext>,</mtext></math>
+      或者<math><mi>c</mi></math>可能spawn <math><msup><mi>c</mi><mo>&prime;</mo></msup></math>, 即<math><msup><mi>c</mi><mo>&prime;</mo></msup></math>出现在<math><mi>c</mi></math>的程序的某个spawn中, 或是<math><mi>c</mi></math>的事件处理器. 一个状态是稳定的, 如果每个fiber <math><mi>n</mi></math>满足下列之一:
+      <math display="block">
+        <mrow><mo>{</mo>
+          <mtable displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow>
+                    <msub><mi>&theta;</mi><mi>n</mi></msub>
+                    <mo>=</mo>
+                    <mrow><mi>Inactive</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>&xi;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mo>&not;</mo>
+                    <msub><mi>&tau;</mi><mi>n</mi></msub>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd columnalign="left"><mtext>, 失败并停下</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow>
+                    <msub><mi>&theta;</mi><mi>n</mi></msub>
+                    <mo>=</mo>
+                    <mrow><mi>Inactive</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>&bottom;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow><mo>&not;</mo>
+                    <msub><mi>&tau;</mi><mi>n</mi></msub>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow>
+                    <mrow><mi>target</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>=</mo><mi>&bottom;</mi></mrow>
+                </mrow>
+              </mtd>
+              <mtd columnalign="left"><mtext>, 不该运行</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow>
+                    <msub><mi>&theta;</mi><mi>n</mi></msub>
+                    <mo>=</mo>
+                    <mrow><mi>Active</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>_</mi><mo>,</mo><mi>&omega;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>&and;</mo>
+                  <mrow>
+                    <mrow><mi>target</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>=</mo><mi>&omega;</mi></mrow>
+                </mrow>
+              </mtd>
+              <mtd columnalign="left"><mtext>, 该运行且视图正确</mtext></mtd>
+            </mtr>
+          </mtable>
+        </mrow>
+      </math>
+      特别地, 稳定状态中没有Loading或Unloading的fiber. </div>
+    <div class="theorem" id="thm-progress"><b>定理9.4.2. </b>设<math><mo>&prec;</mo></math>没有无限上升链<math><mrow><msub><mi>c</mi><mn>0</mn></msub><mo>&prec;</mo><msub><mi>c</mi><mn>1</mn></msub><mo>&prec;</mo><mo>&ctdot;</mo></mrow></math>. 对满足不变式的<math><mi>&gamma;</mi></math>,
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>quiet</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&rArr;</mo>
+            <mrow><mi>settled</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>,</mo>
+          <mrow>
+            <mrow><mi>settled</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&or;</mo>
+            <mrow><mo>&exist;</mo>
+              <mrow><mi>n</mi><mo>,</mo>
+                <mrow><mi>&ell;</mi><mo>&in;</mo>
+                  <mrow><mi>L</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo>,</mo>
+                <msup><mi>&gamma;</mi><mo>&prime;</mo></msup>
+              </mrow>
+              <mo lspace="0">.</mo>
+              <mrow><mi>&gamma;</mi>
+                <mover><mo>&xrarr;</mo><mi>&ell;</mi></mover>
+                <msup><mi>&gamma;</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      即没有生命周期规则可用的状态一定是稳定的, 不稳定的状态总有生命周期规则可走. </div>
+    <div class="proof"><b>证明.</b> 设没有生命周期规则可用, 但状态不稳定. 检查每种生命周期状态可以发现, 不稳定的fiber只可能处于Unloading, 并且卡在两处之一: 撤销<math><mrow><mi>UProv</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>p</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>时还有已安装的<math><mi>m</mi></math>解析到<math><mi>p</mi></math>; 或撤销<math><mrow><mi>USpawn</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow></math>时子fiber <math><mi>m</mi></math>还在. 前一种情形, <math><mi>n</mi></math>提供了<math><mi>m</mi></math>声明的键, 后一种情形, <math><mi>n</mi></math>可能spawn <math><mi>m</mi></math>, 两种情形下<math><mi>m</mi></math>的组件都在<math><mi>n</mi></math>的组件之上. 并且<math><mi>m</mi></math>也不稳定: 前一种情形<math><mi>n</mi></math>已经不是Active, <math><mi>p</mi></math>不再可见, 所以<math><mrow><mi>target</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow></math>与<math><mi>m</mi></math>的视图不同; 后一种情形<math><mi>m</mi></math>已被请求移除 (否则<math><mi>L-RetireChild</mi></math>可用), 稳定的fiber不会带着这个标记. 于是<math><mi>m</mi></math>也卡在Unloading, 如此得到一条无限上升链, 与假设矛盾. 形式上, 这是沿<math><mo>&prec;</mo></math>的良基归纳.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem" id="thm-termination"><b>定理9.4.3. </b>设有<math><mrow><mi>r</mi><mo>:</mo><mrow><mi>C</mi><mo>&rarr;</mo><mi>&Nopf;</mi></mrow></mrow></math>和常数<math><mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow></math>, 使得
+      <math display="block">
+        <mrow>
+          <mrow><mi>c</mi><mo>&prec;</mo>
+            <msup><mi>c</mi><mo>&prime;</mo></msup>
+          </mrow>
+          <mo>&rArr;</mo>
+          <mrow>
+            <mrow><mi>r</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&lt;</mo>
+            <mrow><mi>r</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <msup><mi>c</mi><mo>&prime;</mo></msup>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&lt;</mo><mi>M</mi></mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      并且每个程序的任一路径长度都不超过<math><mi>N</mi></math>. 那么从满足不变式的状态出发, 不存在无限的执行
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>&gamma;</mi><mn>0</mn></msub>
+            <mover><mo>&xrarr;</mo>
+              <msub><mi>&ell;</mi><mn>0</mn></msub>
+            </mover>
+            <msub><mi>&gamma;</mi><mn>1</mn></msub>
+          </mrow>
+          <mover><mo>&xrarr;</mo>
+            <msub><mi>&ell;</mi><mn>1</mn></msub>
+          </mover>
+          <mo>&ctdot;</mo></mrow>
+        <mtext>,</mtext></math>
+      其中每个<math><msub><mi>&ell;</mi><mi>i</mi></msub></math>都是生命周期标签. </div>
+    <div class="proof"><b>证明.</b> 给每个fiber一个度量 (在<math><mi>target</mi></math>不变时它还能走的步数的上界), 状态的度量是按秩分层求和得到的向量, 低秩的分量在字典序中优先, 每一步生命周期规则都使它按字典序严格下降. 关键事实是: 一个fiber的步骤可能使秩更低的fiber的某条规则变得可用 (依赖者卸载后提供者才能撤销provision, 子fiber移除后父fiber才能撤销spawn), 但不会增加它们的度量; 它可能增加的只有秩更高的fiber的度量, 比如新spawn的子fiber.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>与论文的定理66相比, 没有定量的界.</p>
+    <h3>第9.5节 合流</h3>
+    <p>合流分五层证明, 每层在前一层之上.</p>
+    <div class="theorem" id="thm-control"><b>定理9.5.1. </b><b>[控制层, 无spawn]: </b>设组件都不spawn, 有<cite>定理<a href="#thm-termination">9.4.3</a></cite>中的秩<math><mi>r</mi></math>和界<math><mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow></math>, 并且每个组件的程序的每条到达<math><mi>Done</mi></math>的路径都提供了它可能提供的所有键 (论文的定义69). 设<math><msub><mi>&gamma;</mi><mn>0</mn></msub></math>满足不变式, <math><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><msup><mo>&xrarr;</mo><mo>&#8270;</mo></msup><msub><mi>&gamma;</mi><mn>1</mn></msub></mrow></math>和<math><mrow><msub><mi>&gamma;</mi><mn>0</mn></msub><msup><mo>&xrarr;</mo><mo>&#8270;</mo></msup><msub><mi>&gamma;</mi><mn>2</mn></msub></mrow></math>只走生命周期规则, <math><msub><mi>&gamma;</mi><mn>1</mn></msub></math>和<math><msub><mi>&gamma;</mi><mn>2</mn></msub></math>都quiet且没有失败的fiber. 用<math><msub><mi>F</mi><mi>i</mi></msub></math>, <math><msub><mi>B</mi><mi>i</mi></msub></math>表示<math><msub><mi>&gamma;</mi><mi>i</mi></msub></math>的注册表和绑定, <math><msub><mi>c</mi><mrow><mi>n</mi><mo>,</mo><mi>i</mi></mrow></msub></math>, <math><msub><mi>&theta;</mi><mrow><mi>n</mi><mo>,</mo><mi>i</mi></mrow></msub></math>表示<math><mrow><msub><mi>F</mi><mi>i</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow></math>的组件和生命周期状态, 则
+      <math display="block">
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow><mi>dom</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>F</mi><mn>1</mn></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>dom</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>F</mi><mn>2</mn></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <msub><mi>c</mi>
+                  <mrow><mi>n</mi><mo>,</mo><mn>1</mn></mrow>
+                </msub>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <msub><mi>c</mi>
+                  <mrow><mi>n</mi><mo>,</mo><mn>2</mn></mrow>
+                </msub>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <msub><mi>&theta;</mi>
+                    <mrow><mi>n</mi><mo>,</mo><mn>1</mn></mrow>
+                  </msub>
+                  <mo>=</mo>
+                  <mrow><mi>Active</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>_</mi><mo>,</mo><mi>_</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&hArr;</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>&theta;</mi>
+                    <mrow><mi>n</mi><mo>,</mo><mn>2</mn></mrow>
+                  </msub>
+                  <mo>=</mo>
+                  <mrow><mi>Active</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>_</mi><mo>,</mo><mi>_</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>owner</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>B</mi><mn>1</mn></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>owner</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>B</mi><mn>2</mn></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </math>
+      第二, 三式对所有<math><mrow><mi>n</mi><mo>&in;</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>F</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow></mrow></math>成立, 第四式对所有<math><mi>k</mi></math>成立. </div>
+    <div class="proof"><b>证明.</b> 论证不比较两次执行的过程, 而是刻画终态. 在没有失败fiber的quiet状态中, 一个fiber是Active当且仅当它没有被请求移除, 且它声明的每个键都由一个Active的fiber提供. 这里用到了关于<math><mi>Done</mi></math>路径的前提: Active的fiber提供了它可能提供的所有键. 这样, Active的fiber之集合是一个不动点方程的解, 方程只依赖起点. 沿秩归纳可知这个方程只有一个解. 秩的前提不能去掉: 若<math><mi>c</mi></math>提供<math><msub><mi>k</mi><mn>1</mn></msub></math>而依赖<math><msub><mi>k</mi><mn>2</mn></msub></math>, <math><msup><mi>c</mi><mo>&prime;</mo></msup></math>提供<math><msub><mi>k</mi><mn>2</mn></msub></math>而依赖<math><msub><mi>k</mi><mn>1</mn></msub></math>, 则两者都Active和两者都不Active都是这个方程的解.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem" id="thm-state"><b>定理9.5.2. </b><b>[服务状态, 无spawn]: </b>在上一个定理的设定下, 再设服务满足合流假设 (见<cite>定理<a href="#thm-compose">9.5.5</a></cite>). 则对每个键<math><mi>k</mi></math>, 若<math><mrow><mrow><msub><mi>B</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mi>_</mi><mo>,</mo><mi>_</mi><mo>,</mo><msub><mi>s</mi><mn>1</mn></msub></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>且<math><mrow><mrow><msub><mi>B</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">&lang;</mo><mrow><mi>_</mi><mo>,</mo><mi>_</mi><mo>,</mo><msub><mi>s</mi><mn>2</mn></msub></mrow><mo stretchy="false">&rang;</mo></mrow></mrow></math>, 则<math><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>&simeq;</mo><msub><mi>s</mi><mn>2</mn></msub></mrow></math>. </div>
+    <div class="proof"><b>证明.</b> 分三步. 第一, 在一次执行中, 每个绑定的状态<math><mo>&simeq;</mo></math>它的初始状态再依令牌顺序执行它上面尚未撤销的操作. 第二, 每个已加载的fiber的累加器对应一条理想轨迹: 单独运行它的程序, 每个操作的回答都在它解析到的provision的初始状态上依次执行这个fiber自己在该键上先前的操作得到, 不计其他fiber的操作. 可能相遇的操作可交换, 所以其他fiber穿插进来的操作不改变这里看到的结果, 所以理想轨迹只由程序和初始状态决定; 沿秩归纳, 两个终态中对应的Active fiber有相同的轨迹. 第三, 于是每个键上待撤销的操作在两个终态中是同一组, 只是顺序可能不同; 由可交换性, 重排不改变终态的<math><mo>&simeq;</mo></math>类.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem" id="thm-spawn"><b>定理9.5.3. </b><b>[带spawn]: </b>设定同上, 但允许组件spawn, 并且启动时spawn的子fiber不被直接dispose. 则两个终态在重命名的意义下一致: 存在规范名, 使得fiber, 组件, 是否Active, 绑定都一一对应. 不论两个终态如何到达, 只要根fiber对应, 它们就一致. </div>
+    <div class="proof"><b>证明.</b> 名字依赖于调度, 所以先给每个fiber一个规范名: 根fiber保留自己的名字, 子fiber由父fiber的规范名和它在父fiber的spawn中的位置命名. 父fiber是否spawn, spawn什么, 取决于它的操作的结果, 所以对应关系要沿秩归纳建立: 对应的fiber有相同的组件和理想轨迹, 因而spawn出对应的子fiber. 其余部分与无spawn的情形相同. 这里还需要一个不变式: Loading和Active的fiber的子fiber都还活着; 直接dispose启动时spawn的子fiber会破坏它, 见下文.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem" id="thm-dynamic"><b>定理9.5.4. </b><b>[编排与生命周期交错]: </b>从初始状态出发, 接受相同编排输入 (以插入次序而不是名字指称根fiber), 并以任意方式穿插生命周期步的两次执行, 若都到达quiet且没有失败fiber, 则在重命名意义下一致. 特别地, 终态与静态组装(先全部插入再运行)的结果一致. </div>
+    <div class="proof"><b>证明.</b> 插入得到的名字依赖于调度, 所以输入以插入次序指称根fiber. 沿执行记录一本账: 对每个插入次序, 若它没有被dispose, 终态中恰有一个根fiber, 组件就是插入的那个. 早先的插入, dispose, 重启, 重置除了留下的根fiber之外不留痕迹. 于是两个终态的根fiber按插入次序一一对应, 再用上一个定理中<q>不论终态如何到达, 只要根fiber对应就一致</q>的那一半即可.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem" id="thm-compose"><b>定理9.5.5. </b><b>[服务的组合]: </b>称服务满足合流假设, 如果
+      <ol>
+        <li>每个操作都良好;</li>
+        <li>操作给出的逆与所在的状态无关: 若<math><mrow><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><msub><mi>s</mi><mn>1</mn></msub></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>_</mi><mo>,</mo><msub><mi>g</mi><mn>1</mn></msub><mo>,</mo><mi>_</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math><mrow><mrow><mi>run</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><msub><mi>s</mi><mn>2</mn></msub></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>_</mi><mo>,</mo><msub><mi>g</mi><mn>2</mn></msub><mo>,</mo><mi>_</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 则<math><mrow><mo>&forall;</mo><mi>x</mi><mo lspace="0">.</mo><mrow><mrow><msub><mi>g</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&simeq;</mo><mrow><msub><mi>g</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>;</li>
+        <li>令牌不影响后继(在<math><mo>&simeq;</mo></math>意义下)和结果;</li>
+        <li>可能相遇的操作在不同令牌下可交换, 并且满足撤销独立的第一条 (只需在<math><mi>a</mi></math>之后可能出现的状态上).</li>
+      </ol>
+      则上面三个定理对任何满足合流假设的服务成立; 两个满足合流假设的服务之和也满足它. </div>
+    <p>合流不覆盖<math><mi>O-React</mi></math>, 也只允许dispose根fiber. 原因是: 启动时spawn的子fiber若被直接dispose, 父fiber在一次执行里保留原生命期, 在另一次执行里重新加载并重新spawn, 两次的终态确实不同; 这在Cordis中同样成立, 不是模型的人为限制. 保持性, 顺序, 恢复精确性, 进展, 终止都覆盖<math><mi>O-React</mi></math>.</p>
+    <p>论文的定理73(1)构造了按依赖顺序排列episode的规范执行; 我们只断言终态与静态组装一致, 并把静态组装能否无失败地到达quiet作为前提. 引理68, 70(支持集)只在无spawn的控制层有对应, 有spawn时由规范名对应.</p>
+    <h3 id="sec-meta-derived">第9.6节 派生形式</h3>
+    <div class="theorem"><b>定理9.6.1. </b>隔离是对组件表的键重命名: 键取为服务名加作用域标签, 被隔离的子树换一个标签. 重命名保持各定理对组件的假设: 程序有界, 每条到达<math><mi>Done</mi></math>的路径提供组件可能提供的所有键, 秩的单调性, 以及独立性 (此时要对同一服务名上任意两个组件的操作成立, 因为同一组件可以在多个作用域中同时运行). </div>
+    <p>所以对任意组件表陈述的定理都直接适用于隔离, 不需要论文定义28的领域表. 论文的拦截 (定义30, 31) 视为传给服务的数据, 不影响生命周期, 本文不讨论.</p>
+    <h2>第10章 与论文的对照</h2>
+    <p>关系一栏: 忠实指与论文的陈述一致; 改写指对应物形式不同; 更强, 更弱指结论或假设比论文强或弱; 无对应指本文的论证路线用不到它们.</p>
+    <table align="center" border="1" style="border-collapse: collapse;">
+      <tr>
+        <th>论文</th>
+        <th>本文</th>
+        <th>关系</th>
+      </tr>
+      <tr>
+        <td>定义1–推论21</td>
+        <td><cite>第<a href="#sec-effects">1</a>章</cite></td>
+        <td>忠实</td>
+      </tr>
+      <tr>
+        <td>定义22–23</td>
+        <td><span><cite>第<a href="#sec-programs">5</a>章</cite>, <cite>第<a href="#sec-state">6</a>章</cite></span></td>
+        <td>改写: 由绑定承载</td>
+      </tr>
+      <tr>
+        <td>定义24</td>
+        <td><cite>第<a href="#sec-service">3</a>章</cite></td>
+        <td>改写: 单一服务, 多一个令牌</td>
+      </tr>
+      <tr>
+        <td>定义25–26</td>
+        <td><cite>第<a href="#sec-derived">7</a>章</cite></td>
+        <td>改写: 不单独定义notify</td>
+      </tr>
+      <tr>
+        <td>定义27, 30–32</td>
+        <td>&mdash;&mdash;</td>
+        <td>未讨论</td>
+      </tr>
+      <tr>
+        <td>定义28–29</td>
+        <td><cite>第<a href="#sec-meta-derived">9.6</a>节</cite></td>
+        <td>改写: 键重命名</td>
+      </tr>
+      <tr>
+        <td>定义33</td>
+        <td><cite>第<a href="#sec-programs">5</a>章</cite></td>
+        <td>忠实</td>
+      </tr>
+      <tr>
+        <td>定义34, 引理35</td>
+        <td><cite>第<a href="#sec-observe">4</a>章</cite></td>
+        <td>忠实</td>
+      </tr>
+      <tr>
+        <td>定义36–37, 引理38</td>
+        <td><cite>第<a href="#sec-partial">2</a>章</cite></td>
+        <td>部分</td>
+      </tr>
+      <tr>
+        <td>定义39</td>
+        <td><cite>第<a href="#sec-programs">5</a>章</cite></td>
+        <td>改写: Maybe读法, 只在生成元上</td>
+      </tr>
+      <tr>
+        <td>定理40</td>
+        <td><cite>第<a href="#sec-programs">5</a>章</cite></td>
+        <td>忠实</td>
+      </tr>
+      <tr>
+        <td>定义41, 定理42</td>
+        <td><cite>第<a href="#sec-programs">5</a>章</cite></td>
+        <td>改写</td>
+      </tr>
+      <tr>
+        <td>4.1–4.3节</td>
+        <td><span><cite>第<a href="#sec-state">6</a>章</cite>, <cite>第<a href="#sec-rules">8</a>章</cite></span></td>
+        <td>改写</td>
+      </tr>
+      <tr>
+        <td>定理59</td>
+        <td><cite>定理<a href="#thm-preservation">9.1.1</a></cite></td>
+        <td>更强: 不变式更多</td>
+      </tr>
+      <tr>
+        <td>定理61, 推论62</td>
+        <td><cite>定理<a href="#thm-recovery">9.3.2</a></cite></td>
+        <td>更强</td>
+      </tr>
+      <tr>
+        <td>定理63</td>
+        <td><cite>定理<a href="#thm-ordering">9.2.1</a></cite></td>
+        <td>更弱: 去掉第3条</td>
+      </tr>
+      <tr>
+        <td>定理64</td>
+        <td><cite>定理<a href="#thm-ordering">9.2.1</a></cite></td>
+        <td>忠实</td>
+      </tr>
+      <tr>
+        <td>定理66</td>
+        <td><span><cite>定理<a href="#thm-progress">9.4.2</a></cite>, <cite>定理<a href="#thm-termination">9.4.3</a></cite></span></td>
+        <td>更弱: 没有定量界</td>
+      </tr>
+      <tr>
+        <td>引理54–57, 71, 72</td>
+        <td>&mdash;&mdash;</td>
+        <td>无对应</td>
+      </tr>
+      <tr>
+        <td>定理73(1)</td>
+        <td><cite>定理<a href="#thm-dynamic">9.5.4</a></cite></td>
+        <td>更弱</td>
+      </tr>
+      <tr>
+        <td>定理73(2)</td>
+        <td><cite>定理<a href="#thm-dynamic">9.5.4</a></cite></td>
+        <td>部分: 不含O-React</td>
+      </tr>
+      <tr>
+        <td>&mdash;&mdash;</td>
+        <td><cite>第<a href="#sec-rules">8</a>章</cite></td>
+        <td>新增: O-Reset, O-Restart, O-React</td>
+      </tr>
+    </table>
+  </body>
+</html>

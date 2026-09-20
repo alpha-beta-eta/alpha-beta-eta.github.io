@@ -1,0 +1,841 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>类型论和范畴论之间的关系</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>类型论和范畴论之间的关系</h1>
+    <p>nLab词条<q><a href="https://ncatlab.org/nlab/show/relationship+between+type+theory+and+category+theory">relationship between type theory and category theory</a></q>的翻译, 原页面最后修订于2025年10月4日. {译注: 原页面侧栏的导航目录没有翻译.}</p>
+    <h2>第1章 想法</h2>
+    <p><a href="https://ncatlab.org/nlab/show/type+theory">类型论</a>和某些种类的<a href="https://ncatlab.org/nlab/show/category+theory">范畴论</a>是紧密相关的. 通过一种<a href="https://ncatlab.org/nlab/show/syntax-semantics+duality">句法-语义对偶</a>, 我们可以将类型论视为范畴论的一种形式<a href="https://ncatlab.org/nlab/show/syntax">句法</a>语言, 或者说<em>演算</em>; 反过来, 我们可以认为范畴论为类型论提供了<a href="https://ncatlab.org/nlab/show/semantics">语义</a>. 所使用的范畴论的种类依赖于类型论的种类. 例如, <a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>和某些种类的<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-category+theory"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴论</a>就具有这种关系.</p>
+    <h2>第2章 概览</h2>
+    <table width="100%" border="1" style="border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>内逻辑/类型论 (句法)</th>
+          <th>等价于</th>
+          <th>语境范畴 (语义)</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/propositional+logic">命题逻辑</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/Lindenbaum-Tarski+algebra">Lindenbaum-Tarski代数</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/intuitionistic+logic">直觉主义</a><a href="https://ncatlab.org/nlab/show/propositional+logic">命题逻辑</a></span></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/Heyting+algebra">Heyting代数</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/classical+logic">经典</a><a href="https://ncatlab.org/nlab/show/propositional+logic">命题逻辑</a></span></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/Boolean+algebra">Boole代数</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/dual+intuitionistic+logic">对偶直觉主义</a><a href="https://ncatlab.org/nlab/show/propositional+logic">命题逻辑</a></span></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/co-Heyting+algebra">余Heyting代数</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/first-order+logic">一阶逻辑</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/hyperdoctrine">hyperdoctrine</a></td>
+          <td><a href="#SeelyA">Seely 1984a</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/regular+logic">正则逻辑</a></td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/regular+hyperdoctrine">正则hyperdoctrine</a>/<a href="https://ncatlab.org/nlab/show/regular+category">正则范畴</a></span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/coherent+logic">连贯逻辑</a></td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/coherent+hyperdoctrine">连贯hyperdoctrine</a>/<a href="https://ncatlab.org/nlab/show/coherent+category">连贯范畴</a></span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/intuitionistic+logic">直觉主义</a><a href="https://ncatlab.org/nlab/show/predicate+logic">谓词逻辑</a></span></td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/first-order+hyperdoctrine">一阶hyperdoctrine</a>/<a href="https://ncatlab.org/nlab/show/Heyting+category">Heyting范畴</a></span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/classical+logic">经典</a><a href="https://ncatlab.org/nlab/show/predicate+logic">谓词逻辑</a></span></td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/Boolean+hyperdoctrine">Boole hyperdoctrine</a>/<a href="https://ncatlab.org/nlab/show/Boolean+category">Boole范畴</a></span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/modal+logic">模态逻辑</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/modal+hyperdoctrine">模态hyperdoctrine</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/linear+logic">线性逻辑</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/linear+hyperdoctrine">线性hyperdoctrine</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/simply-typed+lambda+calculus">简单类型lambda演算</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/cartesian+closed+category">笛卡尔闭范畴</a></td>
+          <td><a href="#LambekScott86">Lambek &amp; Scott 1986, 第I部分</a></td>
+        </tr>
+        <tr>
+          <td><span>外延<a href="https://ncatlab.org/nlab/show/dependent+type+theory">依赖类型论</a></span></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+category">局部笛卡尔闭范畴</a></td>
+          <td><a href="#Seely84b">Seely 1984b</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/bunched+logic">束逻辑 (bunched logic)</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/doubly+closed+monoidal+category">双重闭幺半范畴</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/bunched+logic#O'HearnPym99">O&rsquo;Hearn &amp; Pym 1999</a></td>
+        </tr>
+        <tr>
+          <td><span>没有<a href="https://ncatlab.org/nlab/show/univalence">泛等</a>的<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a> (内涵M-L依赖类型论)</span></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+%28%E2%88%9E%2C1%29-category">局部笛卡尔闭<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+%28infinity%2C1%29-category#Presentations">Cisinski 2012</a> &amp; <a href="#Shulman12">Shulman 2012</a></span></td>
+        </tr>
+        <tr>
+          <td><span>带有<a href="https://ncatlab.org/nlab/show/higher+inductive+types">高阶归纳类型</a>和<a href="https://ncatlab.org/nlab/show/univalence">泛等</a>的<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a></span></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/elementary+%28%E2%88%9E%2C1%29-topos">初等<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a></td>
+          <td><span>见<a href="https://ncatlab.org/homotopytypetheory/show/model+of+type+theory+in+an+%28infinity%2C1%29-topos">这里</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/multiplicative+intuitionistic+linear+logic">乘性直觉主义线性逻辑</a></td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/symmetric+monoidal+category">对称</a><a href="https://ncatlab.org/nlab/show/closed+monoidal+category">闭幺半范畴</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/linear%20type%20theory#HistoryCategoricalSemantics">自约68年以来的诸多作者</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/classical+linear+logic">经典线性逻辑</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/star-autonomous+category">星自治范畴 (star-autonomous category)</a></td>
+          <td><a href="#Seely89">Seely 1989</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/dependent+linear+type+theory">依赖线性类型论</a></td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/indexed+monoidal+category">索引幺半范畴</a> (带有概括 (comprehension))</span></td>
+          <td><a href="#Riley22Thesis">Riley 2022</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <p><b><a href="https://ncatlab.org/nlab/show/computational+trinitarianism">计算三位一体</a></b> = <br/><b><a href="https://ncatlab.org/nlab/show/propositions+as+types">命题即类型</a></b> + <b><a href="https://ncatlab.org/nlab/show/programs+as+proofs">程序即证明</a></b> + <b><a href="https://ncatlab.org/nlab/show/relation+between+type+theory+and+category+theory">类型论/范畴论关系</a></b></p>
+    <table width="100%" border="1" style="border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th><a href="https://ncatlab.org/nlab/show/logic">逻辑</a></th>
+          <th><span><a href="https://ncatlab.org/nlab/show/set+theory">集合论</a>(的<a href="https://ncatlab.org/nlab/show/internal+logic+of+set+theory">内逻辑</a>)</span></th>
+          <th><a href="https://ncatlab.org/nlab/show/category+theory">范畴论</a></th>
+          <th><a href="https://ncatlab.org/nlab/show/type+theory">类型论</a></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/proposition">命题</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/set">集合</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/object">对象</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/type">类型</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/predicate">谓词</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/family+of+sets">集合族</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/display+morphism">显示态射</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/dependent+type">依赖类型</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/proof">证明</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/element">元素</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/generalized+element">广义元素</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/term">项</a>/<a href="https://ncatlab.org/nlab/show/program">程序</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/cut+rule">切规则</a></td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/classifying+morphisms">分类态射</a>的<a href="https://ncatlab.org/nlab/show/composition">复合</a>/<a href="https://ncatlab.org/nlab/show/display+maps">显示映射</a>的<a href="https://ncatlab.org/nlab/show/pullback">拉回</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/substitution">代换</a></td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/implication">推出</a>的<a href="https://ncatlab.org/nlab/show/introduction+rule">引入规则</a></span></td>
+          <td></td>
+          <td><span>hom-张量伴随的<a href="https://ncatlab.org/nlab/show/counit">余单位</a></span></td>
+          <td>lambda</td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/implication">推出</a>的<a href="https://ncatlab.org/nlab/show/elimination+rule">消去规则</a></span></td>
+          <td></td>
+          <td><span>hom-张量伴随的<a href="https://ncatlab.org/nlab/show/unit">单位</a></span></td>
+          <td>应用</td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/implication">推出</a>的<a href="https://ncatlab.org/nlab/show/cut+elimination">切消去</a></span></td>
+          <td></td>
+          <td><span>hom-张量伴随的<a href="https://ncatlab.org/nlab/show/zigzag+identities">之字形恒等式</a>之一</span></td>
+          <td><a href="https://ncatlab.org/nlab/show/beta+reduction">&beta;归约</a></td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/implication">推出</a>的恒等消去</span></td>
+          <td></td>
+          <td><span>hom-张量伴随的另一个<a href="https://ncatlab.org/nlab/show/zigzag+identity">之字形恒等式</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/eta+conversion">&eta;转换</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/true">真</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/singleton">单元集</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/terminal+object">终对象</a>/<a href="https://ncatlab.org/nlab/show/%28-2%29-truncated+object">(-2)-截断对象</a></span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/h-level+0">h-层次0</a>-<a href="https://ncatlab.org/nlab/show/type">类型</a>/<a href="https://ncatlab.org/nlab/show/unit+type">单位类型</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/false">假</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/empty+set">空集</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/initial+object">始对象</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/empty+type">空类型</a></td>
+        </tr>
+        <tr>
+          <td><span><a href="https://ncatlab.org/nlab/show/proposition">命题</a>, <a href="https://ncatlab.org/nlab/show/truth+value">真值</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/subsingleton">子单元集</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/subterminal+object">子终对象</a>/<a href="https://ncatlab.org/nlab/show/%28-1%29-truncated+object">(-1)-截断对象</a></span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/h-proposition">h-命题</a>, <a href="https://ncatlab.org/nlab/show/mere+proposition">纯命题</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/logical+conjunction">逻辑合取</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/cartesian+product">笛卡尔积</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/product">积</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/product+type">积类型</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/disjunction">析取</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/disjoint+union">不交并</a>(的<a href="https://ncatlab.org/nlab/show/support">支撑</a>)</span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/coproduct">余积</a>(的<a href="https://ncatlab.org/nlab/show/%28-1%29-truncation">(-1)-截断</a>)</span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/sum+type">和类型</a>(的<a href="https://ncatlab.org/nlab/show/bracket+type">括号类型</a>)</span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/implication">推出</a></td>
+          <td><span>(到<a href="https://ncatlab.org/nlab/show/subsingleton">子单元集</a>中的)<a href="https://ncatlab.org/nlab/show/function+set">函数集</a></span></td>
+          <td><span>(到<a href="https://ncatlab.org/nlab/show/subterminal+object">子终对象</a>中的)<a href="https://ncatlab.org/nlab/show/internal+hom">内hom</a></span></td>
+          <td><span>(到<a href="https://ncatlab.org/nlab/show/h-proposition">h-命题</a>中的)<a href="https://ncatlab.org/nlab/show/function+type">函数类型</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/negation">否定</a></td>
+          <td><span>到<a href="https://ncatlab.org/nlab/show/empty+set">空集</a>中的<a href="https://ncatlab.org/nlab/show/function+set">函数集</a></span></td>
+          <td><span>到<a href="https://ncatlab.org/nlab/show/initial+object">始对象</a>中的<a href="https://ncatlab.org/nlab/show/internal+hom">内hom</a></span></td>
+          <td><span>到<a href="https://ncatlab.org/nlab/show/empty+type">空类型</a>中的<a href="https://ncatlab.org/nlab/show/function+type">函数类型</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/universal+quantification">全称量化</a></td>
+          <td><span>(<a href="https://ncatlab.org/nlab/show/subsingletons">子单元集</a>族的)索引<a href="https://ncatlab.org/nlab/show/cartesian+product">笛卡尔积</a></span></td>
+          <td><span>(<a href="https://ncatlab.org/nlab/show/subterminal+objects">子终对象</a>族的)<a href="https://ncatlab.org/nlab/show/dependent+product">依赖积</a></span></td>
+          <td><span>(<a href="https://ncatlab.org/nlab/show/h-propositions">h-命题</a>族的)<a href="https://ncatlab.org/nlab/show/dependent+product+type">依赖积类型</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/existential+quantification">存在量化</a></td>
+          <td><span>索引<a href="https://ncatlab.org/nlab/show/disjoint+union">不交并</a>(的<a href="https://ncatlab.org/nlab/show/support">支撑</a>)</span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/dependent+sum">依赖和</a>(的<a href="https://ncatlab.org/nlab/show/%28-1%29-truncation">(-1)-截断</a>)</span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/dependent+sum+type">依赖和类型</a>(的<a href="https://ncatlab.org/nlab/show/bracket+type">括号类型</a>)</span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/logical+equivalence">逻辑等价</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/bijection+set">双射集</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/object+of+isomorphisms">同构对象</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/equivalence+type">等价类型</a></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/support+set">支撑集</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/support+object">支撑对象</a>/<a href="https://ncatlab.org/nlab/show/%28-1%29-truncation">(-1)-截断</a></span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/propositional+truncation">命题截断</a>/<a href="https://ncatlab.org/nlab/show/bracket+type">括号类型</a></span></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td><span>到<a href="https://ncatlab.org/nlab/show/terminal+object">终对象</a>中的<a href="https://ncatlab.org/nlab/show/morphism">态射</a>的<a href="https://ncatlab.org/nlab/show/n-image">n-像</a>/<a href="https://ncatlab.org/nlab/show/n-truncation">n-截断</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/n-truncation+modality">n-截断模态</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/propositional+equality">命题等式</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/diagonal+function">对角函数</a>/<a href="https://ncatlab.org/nlab/show/diagonal+subset">对角子集</a>/<a href="https://ncatlab.org/nlab/show/diagonal+relation">对角关系</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/path+space+object">道路空间对象</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/identity+type">恒等类型</a>/<a href="https://ncatlab.org/nlab/show/path+type">道路类型</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/completely+presented+set">完全表示的集合</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/set">集合</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/discrete+object">离散对象</a>/<a href="https://ncatlab.org/nlab/show/0-truncated+object">0-截断对象</a></span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/h-level+2">h-层次2</a>-<a href="https://ncatlab.org/nlab/show/type">类型</a>/<a href="https://ncatlab.org/nlab/show/set">集合</a>/<a href="https://ncatlab.org/nlab/show/h-set">h-集合</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/set">集合</a></td>
+          <td><span>带有<a href="https://ncatlab.org/nlab/show/equivalence+relation">等价关系</a>的<a href="https://ncatlab.org/nlab/show/set">集合</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/groupoid+object+in+an+%28infinity%2C1%29-category">内0-广群</a></td>
+          <td><span>其<a href="https://ncatlab.org/nlab/show/pseudo-equivalence+relation">伪等价关系</a>是真正的<a href="https://ncatlab.org/nlab/show/equivalence+relation">等价关系</a>的<a href="https://ncatlab.org/nlab/show/Bishop+set">Bishop集合</a>/<a href="https://ncatlab.org/nlab/show/setoid">setoid</a></span></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/equivalence+class">等价类</a>/<a href="https://ncatlab.org/nlab/show/quotient+set">商集</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/quotient">商</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/quotient+type">商类型</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/induction">归纳</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/colimit">余极限</a></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/inductive+type">归纳类型</a>, <a href="https://ncatlab.org/nlab/show/W-type">W-类型</a>, <a href="https://ncatlab.org/nlab/show/M-type">M-类型</a></span></td>
+        </tr>
+        <tr>
+          <td><span>高阶<a href="https://ncatlab.org/nlab/show/induction">归纳</a></span></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/%28infinity%2C1%29-colimit">高阶余极限</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/higher+inductive+type">高阶归纳类型</a></td>
+        </tr>
+        <tr>
+          <td>-</td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/0-truncated">0-截断</a><a href="https://ncatlab.org/nlab/show/%28infinity%2C1%29-colimit">高阶余极限</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/quotient+inductive+type">商归纳类型</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/coinduction">余归纳</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/limit">极限</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/coinductive+type">余归纳类型</a></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/preset">预集合</a></td>
+          <td></td>
+          <td><span>没有<a href="https://ncatlab.org/nlab/show/identity+types">恒等类型</a>的<a href="https://ncatlab.org/nlab/show/type">类型</a></span></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/truth+values">真值</a>的<a href="https://ncatlab.org/nlab/show/set">集合</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/subobject+classifier">子对象分类子</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/type+of+propositions">命题的类型</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/domain+of+discourse">论域</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/universe">宇宙</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/object+classifier">对象分类子</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/type+universe">类型宇宙</a></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/modality">模态</a></td>
+          <td></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/closure+operator">闭包算子</a>, (<a href="https://ncatlab.org/nlab/show/idempotent+monad">幂等</a>)<a href="https://ncatlab.org/nlab/show/monad">单子</a></span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/modal+type+theory">模态类型论</a>, <a href="https://ncatlab.org/nlab/show/monad+%28in+computer+science%29">单子 (计算机科学中的)</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/linear+logic">线性逻辑</a></td>
+          <td></td>
+          <td><span>(<a href="https://ncatlab.org/nlab/show/symmetric+monoidal+category">对称</a>, <a href="https://ncatlab.org/nlab/show/closed+monoidal+category">闭</a>)<a href="https://ncatlab.org/nlab/show/monoidal+category">幺半范畴</a></span></td>
+          <td><span><a href="https://ncatlab.org/nlab/show/linear+type+theory">线性类型论</a>/<a href="https://ncatlab.org/nlab/show/quantum+computation">量子计算</a></span></td>
+        </tr>
+        <tr>
+          <td><a href="https://ncatlab.org/nlab/show/proof+net">证明网</a></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/string+diagram">弦图</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/quantum+circuit">量子线路</a></td>
+        </tr>
+        <tr>
+          <td><span>(缺少)<a href="https://ncatlab.org/nlab/show/contraction+rule">收缩规则</a></span></td>
+          <td></td>
+          <td><span>(缺少)<a href="https://ncatlab.org/nlab/show/diagonal">对角</a></span></td>
+          <td><a href="https://ncatlab.org/nlab/show/no-cloning+theorem">不可克隆定理</a></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td><a href="https://ncatlab.org/nlab/show/synthetic+mathematics">综合数学</a></td>
+          <td><a href="https://ncatlab.org/nlab/show/domain+specific+embedded+programming+language">领域特定的嵌入式编程语言</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>第3章 定理</h2>
+    <p>我们在此讨论各种风味的类型论和相应风味的范畴之间的关系/等价的形式化和证明.
+      <ul>
+        <li><a href="#FirstOrderLogic">一阶逻辑和hyperdoctrine</a></li>
+        <li><a href="#DependentTypeTheory">依赖类型论和局部笛卡尔闭范畴</a></li>
+        <li><a href="#HomotopyTypeTheory">同伦类型论和局部笛卡尔闭<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴</a></li>
+        <li><a href="#HomotopyWithUnivalence">泛等同伦类型论和初等<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a></li>
+      </ul>
+    </p>
+    <h3 id="FirstOrderLogic">第3.1节 一阶逻辑和hyperdoctrine</h3>
+    <div class="theorem"><b>定理3.1.1. </b><a href="https://ncatlab.org/nlab/show/functors">函子</a>
+      <ul>
+        <li><math><mi>Cont</mi></math>, 其构成一个<a href="https://ncatlab.org/nlab/show/first-order+logic">一阶理论</a>的<a href="https://ncatlab.org/nlab/show/category+of+contexts">语境范畴</a>;</li>
+        <li><math><mi>Lang</mi></math>, 其构成一个<a href="https://ncatlab.org/nlab/show/hyperdoctrine">hyperdoctrine</a>的<a href="https://ncatlab.org/nlab/show/internal+language">内语言</a></li>
+      </ul>
+      构成一个<a href="https://ncatlab.org/nlab/show/equivalence+of+categories">范畴等价</a>
+      <math display="block">
+        <mrow><mi>FirstOrderTheories</mi>
+          <mfrac linethickness="0">
+            <mover><mo>&larr;</mo><mi>Lang</mi></mover>
+            <munder><mo>&rarr;</mo><mi>Cont</mi></munder>
+          </mfrac>
+          <mi>Hyperdoctrines</mi></mrow>
+        <mtext>.</mtext></math>
+    </div>
+    <p>(<a href="#SeelyA">Seely, 1984a</a>)</p>
+    <h3 id="DependentTypeTheory">第3.2节 依赖类型论和局部笛卡尔闭范畴</h3>
+    <p>我们在此讨论<a href="https://ncatlab.org/nlab/show/dependent+type+theory">依赖类型论</a>如何是<a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+categories">局部笛卡尔闭范畴</a>为其提供<a href="https://ncatlab.org/nlab/show/semantics">语义</a>的句法. 关于这一点 (以及所涉及的微妙的<a href="https://ncatlab.org/nlab/show/coherence">融贯性</a> (coherence) 问题) 的专门讨论, 另见<em><a href="https://ncatlab.org/nlab/show/categorical+model+of+dependent+types">依赖类型的范畴模型 (categorical model of dependent types)</a></em>.</p>
+    <div class="theorem" id="SeelyEquivalence"><b>定理3.2.1. </b>存在<a href="https://ncatlab.org/nlab/show/2-functors">2-函子</a>
+      <ul>
+        <li><math><mi>Cont</mi></math>, 其构成一个<a href="https://ncatlab.org/nlab/show/Martin-L%C3%B6f+dependent+type+theory">Martin-Löf依赖类型论</a>的<a href="https://ncatlab.org/nlab/show/category+of+contexts">语境范畴</a>;</li>
+        <li><math><mi>Lang</mi></math>, 其构成一个<a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+category">局部笛卡尔闭范畴</a>的<a href="https://ncatlab.org/nlab/show/internal+language">内语言</a></li>
+      </ul>
+      其构成一个<a href="https://ncatlab.org/nlab/show/equivalence+of+2-categories">2-范畴等价</a>
+      <math display="block">
+        <mrow><mi>MLDependentTypeTheories</mi>
+          <munderover><mo>&simeq;</mo>
+            <munder><mo>&xrarr;</mo><mi>Cont</mi></munder>
+            <mover><mo>&xlarr;</mo><mi>Lang</mi></mover>
+          </munderover>
+          <mi>LocallyCartesianClosedCategories</mi></mrow>
+        <mtext>.</mtext></math>
+    </div>
+    <p>这原本是作为一个<a href="https://ncatlab.org/nlab/show/equivalence+of+categories">范畴等价</a>而被声称的 <a href="#Seely84b">Seely 1974, 定理6.3</a>. {译注: 应为Seely 1984.} 然而, 该论证没有恰当地处理一个对于整个主题而言是核心的微妙之处: <a href="https://ncatlab.org/nlab/show/terms">项</a>对于<a href="https://ncatlab.org/nlab/show/variables">变量</a>的<a href="https://ncatlab.org/nlab/show/substitution">代换</a>是严格地复合的, 而其通过<a href="https://ncatlab.org/nlab/show/pullback">拉回</a>给出的<a href="https://ncatlab.org/nlab/show/categorical+semantics">范畴语义</a>, 按照拉回的<a href="https://ncatlab.org/nlab/show/universal+construction">本性</a>, 只是在<a href="https://ncatlab.org/nlab/show/isomorphism">同构</a>的意义下定义的. 这个问题由<a href="#Curien">Curien</a>和<a href="#Hofmann">Hofmann</a>指出并给出了修复的方法; 关于后者见<em><a href="https://ncatlab.org/nlab/show/categorical+model+of+dependent+types">依赖类型的范畴模型</a></em>. 然而, 完整的范畴等价直到<a href="#ClairambaultDybjer">Clairambault &amp; Dybjer</a>通过将陈述提升为一个<a href="https://ncatlab.org/nlab/show/equivalence+of+2-categories">2-范畴等价</a>解决了这两个问题才得以恢复, 另见<a href="#CurienGarnerHofmann">Curien, Garner &amp; Hofmann</a>. 另一种也适用于<a href="https://ncatlab.org/nlab/show/intensional+identity+types">内涵恒等类型</a>并因而适用于<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>的处理方式见于<a href="#LumsdaineWarren13">Lumsdaine &amp; Warren 2013</a>.</p>
+    <p>我们现在指出一些细节.</p>
+    <h4 id="TypeTheories">第3.2.1小节 类型论</h4>
+    <p>为了明确性, 自足性以及为了下面的引用, 我们按照 (<a href="#Seely84b">Seely, 定义1.1</a>) 说明一个<a href="https://ncatlab.org/nlab/show/dependent+type+theory">依赖类型论</a>是什么.</p>
+    <div class="definition"><b>定义3.2.1.1. </b>一个<b>Martin-Löf<a href="https://ncatlab.org/nlab/show/dependent+type+theory">依赖类型论</a></b><math><mi>T</mi></math>是一个带有某个由取值于类型和项中的依赖函数符号构成的<a href="https://ncatlab.org/nlab/show/signature+%28in+logic%29">签名</a> (...) 的<em><a href="https://ncatlab.org/nlab/show/theory">理论</a></em>, 服从以下规则
+      <ol>
+        <li><b>类型形成规则</b>
+          <ol>
+            <li><math><mn>1</mn></math>是一个类型 (<a href="https://ncatlab.org/nlab/show/unit+type">单位类型</a>);</li>
+            <li>如果<math><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow></math>是类型<math><mi>A</mi></math>的项, 那么<math><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>=</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></math>是一个类型 (<a href="https://ncatlab.org/nlab/show/equality+type">等式类型</a>);</li>
+            <li>如果<math><mi>A</mi></math>和<math><mrow><mi>B</mi><mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></mrow></math>是类型, <math><mi>B</mi></math>依赖于一个类型为<math><mi>A</mi></math>的<a href="https://ncatlab.org/nlab/show/free+variable">自由变量</a>, 那么以下符号是类型
+              <ol>
+                <li><math><mrow><munder><mo>&prod;</mo><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow></munder><mrow><mi>B</mi><mrow><mo stretchy="false">[</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></mrow></mrow></math> (<a href="https://ncatlab.org/nlab/show/dependent+product">依赖积</a>), 如果<math><mrow><mi>B</mi><mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></mrow></math>实际上不依赖于<math><mi>x</mi></math>, 也写成<math><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></math>;</li>
+                <li><math><mrow><munder><mo>&sum;</mo><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow></munder><mrow><mi>B</mi><mrow><mo stretchy="false">[</mo><mi>a</mi><mo stretchy="false">]</mo></mrow></mrow></mrow></math> (<a href="https://ncatlab.org/nlab/show/dependent+sum">依赖和</a>), 如果<math><mrow><mi>B</mi><mrow><mo stretchy="false">[</mo><mi>x</mi><mo stretchy="false">]</mo></mrow></mrow></math>实际上不依赖于<math><mi>x</mi></math>, 也写成<math><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow></math>;</li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li><b>项形成规则</b>
+          <ol>
+            <li><math><mrow><mo>&lowast;</mo><mo>&in;</mo><mn>1</mn></mrow></math>是<a href="https://ncatlab.org/nlab/show/unit+type">单位类型</a>的一个项;</li>
+            <li>(...)</li>
+          </ol>
+        </li>
+        <li><b>等式规则</b>
+          <ol>
+            <li>(...)</li>
+          </ol>
+        </li>
+      </ol>
+    </div>
+    <h4 id="category_of_contexts">第3.2.2小节 语境范畴</h4>
+    <div class="definition"><b>定义3.2.2.1. </b>给定一个<a href="https://ncatlab.org/nlab/show/dependent+type+theory">依赖类型论</a><math><mi>T</mi></math>, 其<b><a href="https://ncatlab.org/nlab/show/category+of+contexts">语境范畴</a></b><math><mrow><mi>Con</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow></math>是这样的范畴, 其
+      <ul>
+        <li><a href="https://ncatlab.org/nlab/show/objects">对象</a>是<math><mi>T</mi></math>的<a href="https://ncatlab.org/nlab/show/types">类型</a>;</li>
+        <li><a href="https://ncatlab.org/nlab/show/morphisms">态射</a><math><mrow><mi>f</mi><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></math>是<a href="https://ncatlab.org/nlab/show/function+type">函数类型</a><math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math>的<a href="https://ncatlab.org/nlab/show/terms">项</a><math><mi>f</mi></math>.</li>
+      </ul>
+      复合以显然的方式给出.</div>
+    <div class="proposition"><b>命题3.2.2.2. </b><math><mrow><mi>Con</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow></math>具有<a href="https://ncatlab.org/nlab/show/finite+limits">有限极限</a>并且是一个<a href="https://ncatlab.org/nlab/show/cartesian+closed+category">笛卡尔闭范畴</a>.</div>
+    <p>(<a href="#Seely84b">Seely, 命题3.1</a>)</p>
+    <div class="proof"><b>证明.</b> 构造是直接的. 我们指出了其中一些.
+      <p>注意到一旦存在所有<a href="https://ncatlab.org/nlab/show/pullbacks">拉回</a>和<a href="https://ncatlab.org/nlab/show/equalizers">等化子</a>, 所有<a href="https://ncatlab.org/nlab/show/finite+limits">有限极限</a> (如那里所讨论的) 就都被诱导出来了. <math><mrow><mi>Con</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow></math>中的一个<a href="https://ncatlab.org/nlab/show/pullback">拉回</a>
+        <math display="block">
+          <mtable>
+            <mtr>
+              <mtd><mi>P</mi></mtd>
+              <mtd><mo>&rarr;</mo></mtd>
+              <mtd><mi>A</mi></mtd>
+            </mtr>
+            <mtr>
+              <mtd><mo>&darr;</mo></mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <msup><mo>&darr;</mo><mi>f</mi></msup>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>B</mi></mtd>
+              <mtd>
+                <mover><mo>&rarr;</mo><mi>g</mi></mover>
+              </mtd>
+              <mtd><mi>C</mi></mtd>
+            </mtr>
+          </mtable>
+        </math>
+        由
+        <math display="block">
+          <mrow><mi>P</mi><mo>&simeq;</mo>
+            <mrow>
+              <munder><mo>&sum;</mo>
+                <mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow>
+              </munder>
+              <mrow>
+                <munder><mo>&sum;</mo>
+                  <mrow><mi>b</mi><mo>&in;</mo><mi>B</mi></mrow>
+                </munder>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>f</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>=</mo>
+                    <mrow><mi>g</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mtext>.</mtext></math>
+        给出. <a href="https://ncatlab.org/nlab/show/equalizer">等化子</a>
+        <math display="block">
+          <mrow><mi>P</mi><mo>&rarr;</mo><mi>A</mi>
+            <mfrac linethickness="0">
+              <mover><mo>&rarr;</mo><mi>f</mi></mover>
+              <munder><mo>&rarr;</mo><mi>g</mi></munder>
+            </mfrac>
+            <mi>B</mi></mrow>
+        </math>
+        由
+        <math display="block">
+          <mrow><mi>P</mi><mo>=</mo>
+            <mrow>
+              <munder><mo>&sum;</mo>
+                <mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow>
+              </munder>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>=</mo>
+                  <mrow><mi>g</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mtext>.</mtext></math>
+        给出. 接着, <a href="https://ncatlab.org/nlab/show/internal+hom">内hom</a>/<a href="https://ncatlab.org/nlab/show/exponential+object">指数对象</a>由<a href="https://ncatlab.org/nlab/show/function+type">函数类型</a>
+        <math display="block">
+          <mrow>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow><mi>A</mi><mo>,</mo><mi>B</mi></mrow>
+              <mo stretchy="false">]</mo></mrow>
+            <mo>&simeq;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mtext>.</mtext></math>
+        给出.</p>
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="proposition"><b>命题3.2.2.3. </b><math><mrow><mi>Con</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow></math>是一个<a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+category">局部笛卡尔闭范畴</a>.</div>
+    <p>(<a href="#Seely84b">Seely, 定理3.2</a>)</p>
+    <div class="proof"><b>证明.</b> 定义<math><mrow><mi>Con</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow></math>-<a href="https://ncatlab.org/nlab/show/indexed+category">索引的</a><a href="https://ncatlab.org/nlab/show/hyperdoctrine">hyperdoctrine</a><math><mrow><mi>P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 其方式是对于<math><mrow><mi>A</mi><mo>&in;</mo><mrow><mi>Con</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 取范畴<math><mrow><mrow><mi>P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow></math>以<math><mi>A</mi></math>-<a href="https://ncatlab.org/nlab/show/dependent+types">依赖类型</a>为对象, 并以依赖函数类型的项<math><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow><mo>&vdash;</mo><mrow><mi>t</mi><mo>:</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>X</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>Y</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>为态射<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow><mo>&vdash;</mo><mrow><mrow><mi>X</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>:</mo><mi>type</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>&rarr;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow><mo>&vdash;</mo><mrow><mrow><mi>Y</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>:</mo><mi>type</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>.
+      <p>这是笛卡尔闭的, 论证与前一个证明中的同类. 现在只需展示一个与<a href="https://ncatlab.org/nlab/show/slice+category">切片范畴</a><math><msub><mrow><mi>Con</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow><mrow><mo lspace="0" rspace="0">/</mo><mi>A</mi></mrow></msub></math>之间的相容的<a href="https://ncatlab.org/nlab/show/equivalence+of+categories">范畴等价</a>.
+        <math display="block">
+          <mrow>
+            <msub>
+              <mrow><mi>Con</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mrow><mo lspace="0" rspace="0">/</mo><mi>A</mi></mrow>
+            </msub>
+            <mo>&simeq;</mo>
+            <mrow>
+              <mrow><mi>P</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mtext>.</mtext></math>
+        在一个方向上, 将一个态射<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>送至依赖类型
+        <math display="block">
+          <mrow>
+            <mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow>
+                <msup><mi>f</mi>
+                  <mrow><mo>&minus;</mo><mn>1</mn></mrow>
+                </msup>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&colone;</mo>
+              <mrow>
+                <munder><mo>&sum;</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>X</mi></mrow>
+                </munder>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>=</mo>
+                    <mrow><mi>f</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mtext>.</mtext></math>
+        反过来, 对于一个依赖类型<math><mrow><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow><mo>&vdash;</mo><mrow><mi>X</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 将其送至投影<math><mrow><mrow><munder><mo>&sum;</mo><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow></munder><mrow><mi>X</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>&rarr;</mo><mi>A</mi></mrow></math>.</p>
+      <p>可以表明这确实给出了一个与基变换相容的范畴等价 (<a href="#Seely84b">Seely, 命题3.2.4</a>).</p>
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="definition"><b>定义3.2.2.4. </b>对于依赖类型论<math><mi>T</mi></math>和局部笛卡尔闭范畴<math><mi>C</mi></math>, <math><mi>T</mi></math>在<math><mi>C</mi></math>中的一个<b><a href="https://ncatlab.org/nlab/show/categorical+semantics">解释</a></b>是局部笛卡尔闭范畴之间的一个态射
+      <math display="block">
+        <mrow>
+          <mrow><mi>Con</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&rarr;</mo><mi>C</mi></mrow>
+        <mtext>.</mtext></math>
+      <math><mi>T</mi></math>在另一个依赖类型论<math><msup><mi>T</mi><mo>&prime;</mo></msup></math>中的一个解释是局部笛卡尔闭范畴之间的一个态射
+      <math display="block">
+        <mrow>
+          <mrow><mi>Con</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>T</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&rarr;</mo>
+          <mrow><mi>Con</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <msup><mi>T</mi><mo>&prime;</mo></msup>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </div>
+    <h4 id="internal_language">第3.2.3小节 内语言</h4>
+    <div class="proposition"><b>命题3.2.3.1. </b>给定一个<a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+category">局部笛卡尔闭范畴</a><math><mi>C</mi></math>, 如下定义相应的<a href="https://ncatlab.org/nlab/show/dependent+type+theory">依赖类型论</a><math><mrow><mi>Lang</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mrow></math>
+      <ul>
+        <li><math><mrow><mi>Lang</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mrow></math>的非依赖类型是<math><mi>C</mi></math>的<a href="https://ncatlab.org/nlab/show/objects">对象</a>;</li>
+        <li><math><mi>A</mi></math>-依赖类型是态射<math><mrow><mi>B</mi><mo>&rarr;</mo><mi>A</mi></mrow></math>;</li>
+        <li>一个语境<math><mrow><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>:</mo><msub><mi>X</mi><mn>1</mn></msub></mrow><mo>,</mo><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>:</mo><msub><mi>X</mi><mn>2</mn></msub></mrow><mo>,</mo><mo>&ctdot;</mo><mo>,</mo><mrow><msub><mi>x</mi><mi>n</mi></msub><mo>:</mo><msub><mi>X</mi><mi>n</mi></msub></mrow></mrow></math>是一个态射的塔
+          <math display="block">
+            <mtable>
+              <mtr>
+                <mtd>
+                  <msub><mi>X</mi><mi>n</mi></msub>
+                </mtd>
+              </mtr>
+              <mtr>
+                <mtd><mo>&darr;</mo></mtd>
+              </mtr>
+              <mtr>
+                <mtd><mo>&ctdot;</mo></mtd>
+              </mtr>
+              <mtr>
+                <mtd><mo>&darr;</mo></mtd>
+              </mtr>
+              <mtr>
+                <mtd>
+                  <msub><mi>X</mi><mn>2</mn></msub>
+                </mtd>
+              </mtr>
+              <mtr>
+                <mtd><mo>&darr;</mo></mtd>
+              </mtr>
+              <mtr>
+                <mtd>
+                  <msub><mi>X</mi><mn>1</mn></msub>
+                </mtd>
+              </mtr>
+            </mtable>
+          </math>
+        </li>
+        <li>项<math><mrow><mrow><mi>t</mi><mrow><mo stretchy="false">[</mo><msub><mi>x</mi><mi>A</mi></msub><mo stretchy="false">]</mo></mrow></mrow><mo>:</mo><mrow><mi>B</mi><mrow><mo stretchy="false">[</mo><msub><mi>x</mi><mi>A</mi></msub><mo stretchy="false">]</mo></mrow></mrow></mrow></math>是<math><msub><mi>C</mi><mrow><mo lspace="0" rspace="0">/</mo><mi>A</mi></mrow></msub></math>中的<a href="https://ncatlab.org/nlab/show/sections">截面</a><math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math></li>
+        <li><a href="https://ncatlab.org/nlab/show/equality+type">等式类型</a><math><mrow><mo stretchy="false">(</mo><mrow><msub><mi>x</mi><mi>A</mi></msub><mo>=</mo><msub><mi>y</mi><mi>A</mi></msub></mrow><mo stretchy="false">)</mo></mrow></math>是<a href="https://ncatlab.org/nlab/show/diagonal">对角</a><math><mrow><mi>A</mi><mo>&rarr;</mo><mrow><mi>A</mi><mo>&times;</mo><mi>A</mi></mrow></mrow></math></li>
+        <li>...</li>
+      </ul>
+    </div>
+    <h3 id="HomotopyTypeTheory">第3.3节 同伦类型论和局部笛卡尔闭<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴</h3>
+    <p>以上所有内容在<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-category+theory"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴论</a>和<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>中都有一个类比.</p>
+    <div class="proposition"><b>命题3.3.1. </b>每个<a href="https://ncatlab.org/nlab/show/presentable+%28%E2%88%9E%2C1%29-category">可表现</a>且<a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+%28%E2%88%9E%2C1%29-category">局部笛卡尔闭的<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴</a>都有一个由<a href="https://ncatlab.org/nlab/show/type-theoretic+model+category">类型论模型范畴</a>给出的表现. 这为<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>提供了<a href="https://ncatlab.org/nlab/show/categorical+semantics">范畴语义</a> (可能不带<a href="https://ncatlab.org/nlab/show/univalence">泛等</a><a href="https://ncatlab.org/nlab/show/axiom">公理</a>).
+      <p>这特别地包括所有(<a href="https://ncatlab.org/nlab/show/%E2%88%9E-stack"><math><mi>&infin;</mi></math>-栈</a>)<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-toposes"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a> (其还应该满足<a href="https://ncatlab.org/nlab/show/univalence">泛等</a>). 另见<em><a href="https://ncatlab.org/nlab/show/internal+logic+of+an+%28%E2%88%9E%2C1%29-topos"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos的内逻辑</a></em>.</p>
+    </div>
+    <p>这一陈述的某种形式最初是在 (<a href="#Joyal11">Joyal 11</a>) 中被形式化地猜想的, 继 (<a href="#Awodey10">Awodey 10</a>) 之后. 更多细节见<em><a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+%28infinity%2C1%29-category#InternalLogic">局部笛卡尔闭<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴</a></em>.</p>
+    <h3 id="HomotopyWithUnivalence">第3.4节 泛等同伦类型论和初等<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</h3>
+    <blockquote>
+      <p>更多细节见<em><a href="https://ncatlab.org/nlab/show/model+of+type+theory+in+an+%28infinity%2C1%29-topos"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos中的类型论模型</a></em>.</p>
+    </blockquote>
+    <p>一个额外具有一个<a href="https://ncatlab.org/nlab/show/object+classifiers">对象分类子</a>系统的(<a href="https://ncatlab.org/nlab/show/locally+presentable+%28%E2%88%9E%2C1%29-category">局部可表现的</a>)<a href="https://ncatlab.org/nlab/show/locally+Cartesian+closed+%28%E2%88%9E%2C1%29-category">局部笛卡尔闭<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴</a> (如<a href="#HomotopyTypeTheory">上</a>) 是一个(<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-category+of+%28%E2%88%9E%2C1%29-sheaves"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-层</a>)<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-topos"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a>.</p>
+    <p>(<a href="#Awodey10">Awodey 10</a>) 中猜想, 这个<a href="https://ncatlab.org/nlab/show/object+classifier">对象分类子</a>是一个<a href="https://ncatlab.org/nlab/show/univalence">泛等</a><a href="https://ncatlab.org/nlab/show/type+universe">类型宇宙</a> (<a href="https://ncatlab.org/nlab/show/type+of+types">类型的类型</a>) 的范畴语义, 因而带有<a href="https://ncatlab.org/nlab/show/univalence">泛等</a>的<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>在<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-toposes"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a>中具有范畴语义. 这一陈述对于典范的<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos<a href="https://ncatlab.org/nlab/show/%E2%88%9EGrpd"><math><mi>&infin;</mi></math>Grpd</a>在 (<a href="#KapulkinLumsdaineVoevodsky12">Kapulkin-Lumsdaine-Voevodsky 12</a>) 中得到了证明, 更一般地, 对于<a href="https://ncatlab.org/nlab/show/elegant+Reedy+categories">优雅Reedy范畴</a>上的<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-presheaf"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-预层</a><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos在 (<a href="#Shulman13">Shulman 13</a>) 中得到了证明. 一般情形在<a href="#Shulman19">Shulman 19</a>中得到证明.</p>
+    <p>在这些证明中, 解释同伦类型论句法的<a href="https://ncatlab.org/nlab/show/type-theoretic+model+categories">类型论模型范畴</a>被要求提供在拉回下严格地表现的类型宇宙. 这与类型论中通常的句法上方便的宇宙 (要么是Russell式的, 要么是Tarski式的) 相匹配, 但在范畴语义中更难实现. 更灵活地, 我们可以考虑句法上的<a href="https://ncatlab.org/nlab/show/type+of+types#TarskiStyle">弱Tarski式类型宇宙</a> (<a href="#Luo12">Luo 12</a>, <a href="#Gallozzi14">Gallozzi 14</a>). 这些在句法上用起来更复杂, 但应该在任何<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-topos"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a> (的表现它的<a href="https://ncatlab.org/nlab/show/type-theoretic+model+categories">类型论模型范畴</a>) 中都有解释. 在这一一般的灵活意义下对<a href="https://ncatlab.org/nlab/show/univalence">泛等</a>的讨论见于 (<a href="#GepnerKock12">Gepner-Kock 12</a>). 关于一般的句法问题见
+      <ul>
+        <li><a href="https://ncatlab.org/homotopytypetheory/show/model+of+type+theory+in+an+%28infinity%2C1%29-topos">model of type theory in an (infinity,1)-topos</a></li>
+      </ul>
+    </p>
+    <p>虽然<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-sheaf"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-层</a><a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-toposes"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a>是目前被理解的那些, 带有泛等宇宙的基本类型论并不看到或者在意它们本身的<a href="https://ncatlab.org/nlab/show/locally+presentable+%28%E2%88%9E%2C1%29-category">局部可表现性</a> (尽管它在其他地方被用到, 例如<a href="https://ncatlab.org/nlab/show/higher+inductive+types">高阶归纳类型</a>的构造). 可以预期存在一个像样的<a href="https://ncatlab.org/nlab/show/elementary+%28%E2%88%9E%2C1%29-topos">初等<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a>概念, 使得带有<a href="https://ncatlab.org/nlab/show/univalence">泛等</a><a href="https://ncatlab.org/nlab/show/type+universes">类型宇宙</a>和一定供给的<a href="https://ncatlab.org/nlab/show/higher+inductive+types">高阶归纳类型</a>的<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>恰好在<a href="https://ncatlab.org/nlab/show/elementary+%28%E2%88%9E%2C1%29-toposes">初等<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a>中具有范畴语义 (如<a href="#Awodey10">Awodey 10</a>中所猜想的). 但是这一陈述的精细调整目前仍在研究之中.</p>
+    <p>注意到这一陈述, 一旦实现, 就使得 (或者将会使得) 泛等HoTT+HIT成为<a href="https://ncatlab.org/nlab/show/William+Lawvere">William Lawvere</a>所提出的<a href="https://ncatlab.org/nlab/show/topos+theory">topos理论</a>中的<a href="https://ncatlab.org/nlab/show/foundations+of+mathematics">数学基础</a>的一种<a href="https://ncatlab.org/nlab/show/homotopy+theory">同伦论</a>精化. 它可以与他的<a href="https://ncatlab.org/nlab/show/elementary+theory+of+the+category+of+sets">集合范畴的初等理论</a>相比较, 尽管由于是一个类型论而非一阶逻辑中的理论, 它更类似于一个初等topos的内类型论.</p>
+    <h2>第4章 相关概念</h2>
+    <ul>
+      <li><a href="https://ncatlab.org/nlab/show/initiality+conjecture">初始性猜想 (initiality conjecture)</a></li>
+      <li><a href="https://ncatlab.org/nlab/show/categorical+model+of+dependent+types">依赖类型的范畴模型 (categorical model of dependent types)</a></li>
+      <li><a href="https://ncatlab.org/nlab/show/syntax-semantics+duality">句法-语义对偶 (syntax-semantics duality)</a></li>
+      <li><a href="https://ncatlab.org/nlab/show/computational+trinitarianism">计算三位一体 (computational trinitarianism)</a></li>
+      <li><a href="https://ncatlab.org/nlab/show/Awodey%27s+conjecture">Awodey猜想 (Awodey's conjecture)</a></li>
+    </ul>
+    <h2>第5章 参考文献</h2>
+    <p>以<a href="https://ncatlab.org/nlab/show/Haskell">Haskell</a><a href="https://ncatlab.org/nlab/show/programming+language">编程语言</a>给出的一个初等阐述见于
+      <ul>
+        <li>WikiBooks, <i><a href="https://en.wikibooks.org/wiki/Haskell/The_Curry%E2%80%93Howard_isomorphism">Haskell/The Curry&ndash;Howard isomorphism</a></i></li>
+      </ul>
+      <a href="https://ncatlab.org/nlab/show/first+order+logic">一阶理论</a>和<a href="https://ncatlab.org/nlab/show/hyperdoctrines">hyperdoctrine</a>之间的<a href="https://ncatlab.org/nlab/show/equivalence+of+categories">范畴等价</a>讨论于
+      <ul>
+        <li id="SeelyA"><a href="https://ncatlab.org/nlab/show/R.+A.+G.+Seely">R. A. G. Seely</a>, <i>Hyperdoctrines, natural deduction, and the Beck condition</i>, Zeitschrift für Math. Logik und Grundlagen der Math. (1984) (<a href="http://www.math.mcgill.ca/rags/ZML/ZML.PDF">pdf</a>)</li>
+      </ul>
+      <a href="https://ncatlab.org/nlab/show/categorical+model+of+dependent+types">依赖类型的范畴模型</a>和初始性讨论于
+      <ul>
+        <li>Simon Castellan, <i>Dependent type theory as the initial category with families</i>, 2014 (<a href="http://iso.mor.phis.me/archives/2011-2012/stage-2012-goteburg/report.pdf">pdf</a>)</li>
+      </ul>
+      其在带有<a href="https://ncatlab.org/nlab/show/higher+inductive+types">高阶归纳类型</a>的集合商的类型论内部被形式化于:
+      <ul>
+        <li id="AltKap2015"><a href="https://ncatlab.org/nlab/show/Thorsten+Altenkirch">Thorsten Altenkirch</a>, Ambrus Kaposi, <i>Type Theory in Type Theory using Quotient Inductive Types</i>, (2015) (<a href="http://www.cs.nott.ac.uk/~txa/publ/tt-in-tt.pdf">pdf</a>), (<a href="https://bitbucket.org/akaposi/tt-in-tt">formalisation in Agda</a>).</li>
+      </ul>
+      综述包括
+      <ul>
+        <li><a href="https://ncatlab.org/nlab/show/Tom+Hirschowitz">Tom Hirschowitz</a>, <i>Introduction to categorical logic</i> (2010) (<a href="http://www.lama.univ-savoie.fr/~hirschowitz/talks/cours.pdf">pdf</a>)
+          <p>(见导向<a href="http://www.lama.univ-savoie.fr/~hirschowitz/talks/cours.pdf#page=96">第96张幻灯片</a>上的定理的讨论)</p>
+        </li>
+        <li>Roy Crole, <i>Deriving category theory from type theory</i>, Theory and Formal Methods 1993 Workshops in Computing 1993, pp 15-26</li>
+        <li id="Maietti05"><a href="https://ncatlab.org/nlab/show/Maria+Maietti">Maria Maietti</a>, <i>Modular correspondence between dependent type theories and categories including pretopoi and topoi</i>, Mathematical Structures in Computer Science archive Volume 15 Issue 6, December 2005 Pages 1089 - 1149 (<a href="https://www.math.unipd.it/~maietti/papers/tumscs.pdf">pdf</a>)</li>
+      </ul>
+      <a href="https://ncatlab.org/nlab/show/linear+logic">线性逻辑</a>在<a href="https://ncatlab.org/nlab/show/star-autonomous+categories">星自治范畴</a>中的<a href="https://ncatlab.org/nlab/show/categorical+semantics">范畴语义</a>归功于
+      <ul>
+        <li id="Seely89"><a href="https://ncatlab.org/nlab/show/R.+A.+G.+Seely">R. A. G. Seely</a>, <i>Linear logic, <math><mo>&lowast;</mo></math>-autonomous categories and cofree coalgebras</i>, in <i>Categories in Computer Science and Logic</i>, Contemporary Mathematics <b>92</b> (1989) [<a href="https://ncatlab.org/nlab/files/SeelyLinearLogic.pdf">pdf</a>, <a href="http://www.math.mcgill.ca/rags/nets/llsac.ps.gz">ps.gz</a>, <a href="https://bookstore.ams.org/conm-92">ISBN:978-0-8218-5100-5</a>]</li>
+      </ul>
+      综述/进一步的发展见于
+      <ul>
+        <li>G. M. Bierman, <i>What is a Categorical Model of Intuitionistic Linear Logic?</i> (<a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.31.8687">web</a>)</li>
+        <li>Andrew Graham Barber, <i>Linear Type Theories, Semantics and Action Calculi</i>, 1997 (<a href="http://www.lfcs.inf.ed.ac.uk/reports/97/ECS-LFCS-97-371/">web</a>, <a href="http://www.lfcs.inf.ed.ac.uk/reports/97/ECS-LFCS-97-371/ECS-LFCS-97-371.pdf">pdf</a>)</li>
+        <li><a href="https://ncatlab.org/nlab/show/Paul-Andr%C3%A9+Melli%C3%A8s">Paul-André Melliès</a>, <i>Categorial Semantics of Linear Logic</i>, in <i>Interactive models of computation and program behaviour</i>, Panoramas et synthèses 27, 2009 (<a href="http://www.pps.univ-paris-diderot.fr/~mellies/papers/panorama.pdf">pdf</a>)</li>
+      </ul>
+      关于<a href="https://ncatlab.org/nlab/show/dependent+linear+type+theory">依赖线性类型论</a>, 见:
+      <ul>
+        <li id="Vakar14"><a href="https://ncatlab.org/nlab/show/Matthijs+V%C3%A1k%C3%A1r">Matthijs Vákár</a>, <i>Syntax and Semantics of Linear Dependent Types</i> [<a href="http://arxiv.org/abs/1405.0033">arXiv:1405.0033</a>]</li>
+        <li id="RileyFinsterLicata21"><a href="https://ncatlab.org/nlab/show/Mitchell+Riley">Mitchell Riley</a>, <a href="https://ncatlab.org/nlab/show/Eric+Finster">Eric Finster</a>, <a href="https://ncatlab.org/nlab/show/Daniel+Licata">Daniel Licata</a>, <i>Synthetic Spectra via a Monadic and Comonadic Modality</i> [<a href="https://arxiv.org/abs/2102.04099">arXiv:2102.04099</a>]</li>
+        <li><a href="https://ncatlab.org/nlab/show/Mitchell+Riley">Mitchell Riley</a>, <i>Extending Homotopy Type Theory with Linear Type Formers</i>, talk at <i>The ForML Lab</i> (2021) [<a href="https://the-au-forml-lab.github.io/colloquium_talks/Riley.html">web</a>, <a href="https://www.youtube.com/watch?v=sPxtdCtjSDc">video</a>]</li>
+        <li id="Riley22Thesis"><a href="https://ncatlab.org/nlab/show/Mitchell+Riley">Mitchell Riley</a>, <i>A Bunched Homotopy Type Theory for Synthetic Stable Homotopy Theory</i>, PhD Thesis (2022) [<a href="https://doi.org/10.14418/wes01.3.139">doi:10.14418/wes01.3.139</a>, <a href="https://digitalcollections.wesleyan.edu/object/ir%3A3269">ir:3269</a>, <a href="https://mvr.hosting.nyu.edu/pubs/thesis.pdf">pdf</a>]
+          <blockquote>
+            <p>(使用了来自<a href="https://ncatlab.org/nlab/show/bunched+logic">束逻辑</a>的想法)</p>
+          </blockquote>
+        </li>
+        <li id="Riley22"><a href="https://ncatlab.org/nlab/show/Mitchell+Riley">Mitchell Riley</a>, <i>Linear Homotopy Type Theory</i>, talk at: <a href="https://www.uwo.ca/math/faculty/kapulkin/seminars/hottest_junior_2022.html">HoTTEST Event for Junior Researchers 2022</a> (Jan 2022) [slides: <a href="https://www.uwo.ca/math/faculty/kapulkin/seminars/hottestfiles/Riley-2022-01-20-HoTTEST.pdf">pdf</a>, video: <a href="https://www.youtube.com/watch?v=o2oWhHabjdM">YT</a>]</li>
+      </ul>
+      <a href="https://ncatlab.org/nlab/show/typed+lambda-calculus">类型化lambda演算</a>和<a href="https://ncatlab.org/nlab/show/cartesian+closed+categories">笛卡尔闭范畴</a>之间的关系讨论于第I部分, 而带有<a href="https://ncatlab.org/nlab/show/product+types">积类型</a>的<a href="https://ncatlab.org/nlab/show/type+theory">类型论</a>的范畴和<a href="https://ncatlab.org/nlab/show/toposes">topos</a>之间的<a href="https://ncatlab.org/nlab/show/adjunction">伴随</a>讨论于第II章:
+      <ul>
+        <li id="LambekScott86"><a href="https://ncatlab.org/nlab/show/Joachim+Lambek">Joachim Lambek</a>, <a href="https://ncatlab.org/nlab/show/Philip+J.+Scott">Philip J. Scott</a>, <i>Introduction to higher order categorical logic</i>, Cambridge Studies in Advanced Mathematics <b>7</b> (1986) [<a href="https://www.cambridge.org/ae/academic/subjects/mathematics/logic-categories-and-sets/introduction-higher-order-categorical-logic?format=PB&amp;isbn=9780521356534">ISBN: 0-521-24665-2</a>, <a href="https://raw.githubusercontent.com/Mzk-Levi/texts/master/Lambek%20J.%2C%20Scott%20P.J.%20Introduction%20to%20Higher%20Order%20Categorical%20Logic.pdf">pdf</a>]</li>
+      </ul>
+      <a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+categories">局部笛卡尔闭范畴</a>和<a href="https://ncatlab.org/nlab/show/dependent+type+theories">依赖类型论</a>之间的<a href="https://ncatlab.org/nlab/show/equivalence+of+categories">范畴等价</a>最初声称于
+      <ul>
+        <li id="Seely84b"><a href="https://ncatlab.org/nlab/show/R.+A.+G.+Seely">R. A. G. Seely</a>, <i>Locally cartesian closed categories and type theory</i>, Math. Proc. Camb. Phil. Soc. <b>95</b> (1984) 33-48 [<a href="https://doi.org/10.1017/S0305004100061284">doi:10.1017/S0305004100061284</a>, <a href="http://www.math.mcgill.ca/rags/LCCC/LCCC.pdf">pdf</a>]</li>
+      </ul>
+      继先前猜想于以下文献中的一个陈述之后
+      <ul>
+        <li><a href="https://ncatlab.org/nlab/show/Per+Martin-L%C3%B6f">Per Martin-Löf</a>, <i>An intuitionistic theory of types: predicative part</i>, In Logic Colloquium (1973), ed. H. E. Rose and J. C. Shepherdson (North-Holland, 1974), 73-118. (<a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.131.926">web</a>)</li>
+      </ul>
+      这一论证中严格的代换相较于弱的拉回的问题讨论并修复于
+      <ul>
+        <li id="Curien"><a href="https://ncatlab.org/nlab/show/Pierre-Louis+Curien">Pierre-Louis Curien</a>, <i>Substitution up to isomorphism</i>, Fundamenta Informaticae, <b>19</b> 1-2 (1993) 51-86 [<a href="https://dl.acm.org/doi/10.5555/175469.175471">doi:10.5555/175469.175471</a>] and: Diagrammes <b>23</b> (1990) 43-66 [<a href="http://www.numdam.org/item/DIA_1990__23__43_0">numdam:DIA_1990__23__43_0</a>]</li>
+        <li id="Hofmann"><a href="https://ncatlab.org/nlab/show/Martin+Hofmann">Martin Hofmann</a>, <i>On the interpretation of type theory in locally cartesian closed categories</i>, in <i>Computer Science Logic. CSL 1994</i>, Lecture Notes in Computer Science <b>933</b> (1994) 427&ndash;441 [<a href="https://doi.org/10.1007/BFb0022273">doi:10.1007/BFb0022273</a>]</li>
+      </ul>
+      但是在此过程中范畴等价丢失了. 这最终在以下文献中被全部纠正
+      <ul>
+        <li id="ClairambaultDybjer"><a href="https://ncatlab.org/nlab/show/Pierre+Clairambault">Pierre Clairambault</a>, <a href="https://ncatlab.org/nlab/show/Peter+Dybjer">Peter Dybjer</a>, <i>The Biequivalence of Locally Cartesian Closed Categories and Martin-Löf Type Theories</i>, in <i>Typed lambda calculi and applications</i>, Lecture Notes in Comput. Sci. <b>6690</b> Springer (2011) [<a href="http://arxiv.org/abs/1112.3456">arXiv:1112.3456</a>, <a href="https://doi.org/10.1007/978-3-642-21691-6_10">doi:10.1007/978-3-642-21691-6_10</a>]</li>
+      </ul>
+      以及
+      <ul>
+        <li id="CurienGarnerHofmann"><a href="https://ncatlab.org/nlab/show/Pierre-Louis+Curien">Pierre-Louis Curien</a>, <a href="https://ncatlab.org/nlab/show/Richard+Garner">Richard Garner</a>, <a href="https://ncatlab.org/nlab/show/Martin+Hofmann">Martin Hofmann</a>, <i>Revisiting the categorical interpretation of dependent type theory</i>, Theoretical Computer Science <b>546</b> 21 (2014) 99-119 [<a href="https://doi.org/10.1016/j.tcs.2014.03.003">doi:10.1016/j.tcs.2014.03.003</a>, <a href="https://ncatlab.org/nlab/files/CurienGarnerHofmann.pdf">pdf</a>]</li>
+      </ul>
+      另一个也适用于<a href="https://ncatlab.org/nlab/show/intensional+identity+types">内涵恒等类型</a>并因而适用于<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>的版本见于
+      <ul>
+        <li id="LumsdaineWarren13"><a href="https://ncatlab.org/nlab/show/Peter+LeFanu+Lumsdaine">Peter LeFanu Lumsdaine</a>, <a href="https://ncatlab.org/nlab/show/Michael+Warren">Michael Warren</a>, <i>An overlooked coherence construction for dependent type theory</i>, CT2013 (<a href="https://ncatlab.org/nlab/files/LumsdaineWarren2013.pdf">pdf</a>)</li>
+        <li><a href="https://ncatlab.org/nlab/show/Peter+LeFanu+Lumsdaine">Peter LeFanu Lumsdaine</a>, <a href="https://ncatlab.org/nlab/show/Michael+Warren">Michael Warren</a>, <i>The local universes model: an overlooked coherence construction for dependent type theories</i> (<a href="http://arxiv.org/abs/1411.1736">arXiv:1411.1736</a>)</li>
+      </ul>
+      联系<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>和<a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+%28infinity%2C1%29-categories">局部笛卡尔闭<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴</a>的类似陈述大约在以下文献中被形式化地猜想
+      <ul>
+        <li id="Joyal"><a href="https://ncatlab.org/nlab/show/Andr%C3%A9+Joyal">André Joyal</a>, <i>Remarks on homotopical logic</i>, Oberwolfach (2011) (<a href="http://hottheory.files.wordpress.com/2011/06/report-11_2011.pdf#page=19">pdf</a>)</li>
+      </ul>
+      继<a href="https://ncatlab.org/nlab/show/Steve+Awodey">Steve Awodey</a>先前的提议之后. 明确地, 添加<a href="https://ncatlab.org/nlab/show/univalence">泛等</a>公理后这被精化为<a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-topos+theory"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos理论</a>的提议大约出现于
+      <ul>
+        <li id="Awodey"><a href="https://ncatlab.org/nlab/show/Steve+Awodey">Steve Awodey</a>, <i>Type theory and homotopy</i> (<a href="http://www.andrew.cmu.edu/user/awodey/preprints/TTH.pdf">pdf</a>)</li>
+      </ul>
+      <a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>的这一高阶范畴语义的细节见于
+      <ul>
+        <li id="Shulman12"><a href="https://ncatlab.org/nlab/show/Michael+Shulman">Michael Shulman</a>, <i>Univalence for inverse diagrams and homotopy canonicity</i> (<i>From type theory and homotopy theory to Univalent Foundations of Mathematics</i>), Mathematical Structures in Computer Science <b>25</b> 5 (2015) [<a href="https://arxiv.org/abs/1203.3253">arXiv:1203.3253</a>, <a href="https://doi.org/10.1017/S0960129514000565">doi:/10.1017/S0960129514000565</a>]</li>
+      </ul>
+      讲义见于
+      <ul>
+        <li><a href="https://ncatlab.org/nlab/show/Mike+Shulman">Mike Shulman</a>, <i>Categorical models of homotopy type theory</i>, April 13, 2012 (<a href="https://home.sandiego.edu/~shulman/hottminicourse2012/03models.pdf">pdf</a>)</li>
+        <li id="Joyal11"><a href="https://ncatlab.org/nlab/show/Andr%C3%A9+Joyal">André Joyal</a>, <i>Remarks on homotopical logic</i>, Oberwolfach (2011) (<a href="http://hottheory.files.wordpress.com/2011/06/report-11_2011.pdf#page=19">pdf</a>)</li>
+        <li id="Joyal14"><a href="https://ncatlab.org/nlab/show/Andr%C3%A9+Joyal">André Joyal</a>, <i>Categorical homotopy type theory</i>, March 17, 2014 (<a href="http://ncatlab.org/homotopytypetheory/files/Joyal.pdf">pdf</a>)</li>
+      </ul>
+      另见
+      <ul>
+        <li id="Kapulkin14"><a href="https://ncatlab.org/nlab/show/Chris+Kapulkin">Chris Kapulkin</a>, <i>Type theory and locally cartesian closed quasicategories</i>, Oxford 2014 (<a href="https://www.youtube.com/watch?v=g87bZJ2bvYk">video</a>)</li>
+        <li><a href="https://ncatlab.org/nlab/show/Chris+Kapulkin">Chris Kapulkin</a>, <a href="https://ncatlab.org/nlab/show/Peter+LeFanu+Lumsdaine">Peter LeFanu Lumsdaine</a>, <i>The homotopy theory of type theories</i>, Advances in Mathematics <b>337</b> (2018) 1-38 (<a href="https://arxiv.org/abs/1610.00037">arXiv:1610.00037</a>, <a href="https://doi.org/10.1016/j.aim.2018.08.003">doi:10.1016/j.aim.2018.08.003</a>)</li>
+        <li id="KapulkinSzumilo17"><a href="https://ncatlab.org/nlab/show/Chris+Kapulkin">Chris Kapulkin</a>, <a href="https://ncatlab.org/nlab/show/Karol+Szumilo">Karol Szumilo</a>, <i>Internal Language of Finitely Complete <math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-categories</i> (<a href="https://arxiv.org/abs/1709.09519">arXiv:1709.09519</a>)</li>
+        <li id="Isaev16"><a href="https://ncatlab.org/nlab/show/Valery+Isaev">Valery Isaev</a>, <i>Algebraic Presentations of Dependent Type Theories</i> (<a href="https://arxiv.org/abs/1602.08504">arXiv:1602.08504</a>)</li>
+        <li id="Isaev18"><a href="https://ncatlab.org/nlab/show/Valery+Isaev">Valery Isaev</a>, <i>Morita equivalences between algebraic dependent type theories</i> (<a href="https://arxiv.org/abs/1804.05045">arXiv:1804.05045</a>)</li>
+      </ul>
+      特别是在(<a href="https://ncatlab.org/nlab/show/constructive+set+theory">构造性的</a>)<a href="https://ncatlab.org/nlab/show/cubical+sets">立方集合</a>中的模型讨论于
+      <ul>
+        <li id="BezemCoquandHuber13">Marc Bezem, <a href="https://ncatlab.org/nlab/show/Thierry+Coquand">Thierry Coquand</a>, Simon Huber, <i>A model of type theory in cubical sets</i>, 2013 (<a href="http://drops.dagstuhl.de/opus/volltexte/2014/4628/">web</a>, <a href="http://drops.dagstuhl.de/opus/volltexte/2014/4628/pdf/7.pdf">pdf</a>)</li>
+        <li id="KaposiAltenkirch14">Ambrus Kaposi, <a href="https://ncatlab.org/nlab/show/Thorsten+Altenkirch">Thorsten Altenkirch</a>, <i>A syntax for cubical type theory</i> (<a href="http://mazzo.li/dump/aim-kaposi-pres.pdf">pdf</a>)</li>
+        <li id="Docherty14">Simon Docherty, <i>A model of type theory in cubical sets with connection</i>, 2014 (<a href="http://www.illc.uva.nl/Research/Publications/Reports/MoL-2014-12.text.pdf">pdf</a>)</li>
+      </ul>
+      受给予<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a>和<a href="https://ncatlab.org/nlab/show/univalence">泛等</a>一个自然的等价所启发的<a href="https://ncatlab.org/nlab/show/elementary+%28infinity%2C1%29-topos">初等<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a>的一个精确定义随后提出于
+      <ul>
+        <li><a href="https://ncatlab.org/nlab/show/Mike+Shulman">Mike Shulman</a>, <i>Inductive and higher inductive types</i> (2012) (<a href="http://www.sandiego.edu/~shulman/hottminicourse2012/04induction.pdf">pdf</a>)</li>
+      </ul>
+      <a href="https://ncatlab.org/nlab/show/univalence">泛等</a><a href="https://ncatlab.org/nlab/show/type+universes">类型宇宙</a>的范畴语义讨论于
+      <ul>
+        <li id="Awodey10"><a href="https://ncatlab.org/nlab/show/Steve+Awodey">Steve Awodey</a>, <i>Type theory and homotopy</i> (2010) (<a href="http://www.andrew.cmu.edu/user/awodey/preprints/TTH.pdf">pdf</a>)</li>
+        <li id="KapulkinLumsdaineVoevodsky12"><a href="https://ncatlab.org/nlab/show/Chris+Kapulkin">Chris Kapulkin</a>, <a href="https://ncatlab.org/nlab/show/Peter+LeFanu+Lumsdaine">Peter LeFanu Lumsdaine</a>, <a href="https://ncatlab.org/nlab/show/Vladimir+Voevodsky">Vladimir Voevodsky</a>, <i>The Simplicial Model of Univalent Foundations</i> (<a href="http://arxiv.org/abs/1211.2851">arXiv:1211.2851</a>)</li>
+        <li id="Shulman13"><a href="https://ncatlab.org/nlab/show/Michael+Shulman">Michael Shulman</a>, <i>The univalence axiom for elegant Reedy presheaves</i> (<a href="http://arxiv.org/abs/1307.6248">arXiv:1307.6248</a>)</li>
+        <li id="GepnerKock12"><a href="https://ncatlab.org/nlab/show/David+Gepner">David Gepner</a>, <a href="https://ncatlab.org/nlab/show/Joachim+Kock">Joachim Kock</a>, <i>Univalence in locally cartesian closed <math><mi>&infin;</mi></math>-categories</i> (<a href="http://arxiv.org/abs/1208.1749">arXiv:1208.1749</a>)</li>
+        <li id="Cisinski14"><a href="https://ncatlab.org/nlab/show/Denis-Charles+Cisinski">Denis-Charles Cisinski</a>, <i>Univalent universes for elegant models of homotopy types</i> (<a href="http://arxiv.org/abs/1406.0058">arXiv:1406.0058</a>)</li>
+      </ul>
+      <a href="https://ncatlab.org/nlab/show/Awodey%27s+conjecture">Awodey猜想</a>的证明, 即所有<a href="https://ncatlab.org/nlab/show/%E2%88%9E-stack"><math><mi>&infin;</mi></math>-栈</a><a href="https://ncatlab.org/nlab/show/%28%E2%88%9E%2C1%29-topos"><math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-topos</a>都具有由解释带有<a href="https://ncatlab.org/nlab/show/univalence">泛等</a><a href="https://ncatlab.org/nlab/show/type+universes">类型宇宙</a>的<a href="https://ncatlab.org/nlab/show/homotopy+type+theory">同伦类型论</a> (为其提供<a href="https://ncatlab.org/nlab/show/categorical+semantics">范畴语义</a>) 的<a href="https://ncatlab.org/nlab/show/model+categories">模型范畴</a>给出的<a href="https://ncatlab.org/nlab/show/presentable+%28%E2%88%9E%2C1%29-category">表现</a>:
+      <ul>
+        <li id="Shulman19"><a href="https://ncatlab.org/nlab/show/Michael+Shulman">Michael Shulman</a>, <i>All <math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-toposes have strict univalent universes</i> (<a href="https://arxiv.org/abs/1904.07004">arXiv:1904.07004</a>).</li>
+      </ul>
+      介绍和综述见于:
+      <ul>
+        <li id="Riehl22"><a href="https://ncatlab.org/nlab/show/Emily+Riehl">Emily Riehl</a>, <i>On the <math><mi>&infin;</mi></math>-topos semantics of homotopy type theory</i>, lecture at <i><a href="https://conferences.cirm-math.fr/2689.html">Logic and higher structures</a></i> CIRM (Feb. 2022) [<a href="https://emilyriehl.github.io/files/semantics.pdf">pdf</a>, <a href="https://ncatlab.org/nlab/files/Riehl-InfinityToposSemantics.pdf">pdf</a>]</li>
+      </ul>
+      弱Tarski式同伦类型宇宙的讨论见于
+      <ul>
+        <li id="Luo12"><a href="https://ncatlab.org/nlab/show/Zhaohui+Luo">Zhaohui Luo</a>, <i>Notes on Universes in Type Theory</i>, 2012 (<a href="http://www.cs.rhul.ac.uk/home/zhaohui/universes.pdf">pdf</a>)</li>
+        <li id="Gallozzi14"><a href="https://ncatlab.org/nlab/show/Cesare+Gallozzi">Cesare Gallozzi</a>, <i>Constructive Set Theory from a Weak Tarski Universe</i>, MSc thesis (2014) (<a href="https://ncatlab.org/nlab/files/GalloziCSTTarski.pdf">pdf</a>)</li>
+      </ul>
+      类型论和从lex范畴到topos的各类范畴之间的对应的一个讨论见于
+      <ul>
+        <li>Maria Emilia Maietti, <i>Modular correspondence between dependent type theories and categories including pretopoi and topoi</i>, Math. Struct. in Comp. Science (2005), vol. 15, pp. 1089&ndash;1149 (<a href="http://www.math.unipd.it/~maietti/papers/tumscs.ps.gz">gzipped ps</a>) (<a href="http://dx.doi.org/10.1017/S0960129505004962">doi</a>)</li>
+      </ul>
+      关于<a href="https://ncatlab.org/nlab/show/locally+cartesian+closed+%28infinity%2C1%29-categories">局部笛卡尔闭<math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-范畴</a>的<a href="https://ncatlab.org/nlab/show/internal+language">内语言</a>是带有<a href="https://ncatlab.org/nlab/show/dependent+sum+types">依赖和类型</a>, <a href="https://ncatlab.org/nlab/show/identity+types">恒等类型</a>, <a href="https://ncatlab.org/nlab/show/dependent+product+types">依赖积类型</a>以及<a href="https://ncatlab.org/nlab/show/function+extensionality">函数外延性</a>的<a href="https://ncatlab.org/nlab/show/Martin-L%C3%B6f+dependent+type+theory">Martin-Löf依赖类型论</a>:
+      <ul>
+        <li><a href="https://ncatlab.org/nlab/show/El+Mehdi+Cherradi">El Mehdi Cherradi</a>, <i>Internal languages of locally cartesian closed <math><mrow><mo stretchy="false">(</mo><mrow><mi>&infin;</mi><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>-categories</i> [<a href="https://arxiv.org/abs/2509.03371">arXiv:2509.03371</a>]</li>
+      </ul>
+    </p>
+  </body>
+</html>
