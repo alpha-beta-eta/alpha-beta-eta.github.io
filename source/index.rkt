@@ -6,7 +6,8 @@
    #:title "愚者"
    #:css "styles.css"
    (H1 "愚者 " (A "RSS" #:attr* '((href "rss.xml"))) " "
-       (A "网站介绍" #:attr* '((href "intro.html"))))
+       (A "网站介绍" #:attr* '((href "intro.html"))) " "
+       (A "cv" #:attr* '((href "cv.html"))))
    (columnize
     (H2 (LINK "编程语言的邀请" "notes/pl.pdf") ": "
         (LINK "程序集" "notes/pl.zip"))
@@ -37,5 +38,6 @@
     (TITLE "实用逻辑和自动推理手册" "automated.html")
     (TITLE "无聊的日记" "diary.html")
     (TITLE "构造性逻辑笔记" "constructive_logic_notes.html")
+    (TITLE "格论笔记" "lattice_theory.html")
     
     )))

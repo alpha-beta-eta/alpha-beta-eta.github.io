@@ -225,12 +225,59 @@
          "term_of_commutative_algebra.rkt"
          "hoare.rkt"
          "vostd.rkt"
+         "plcat.rkt"
+         "introduction_to_logical_relations.rkt"
+         "iris.rkt"
+         "semantics_of_type_systems.rkt"
+         "iris-lecture-notes.rkt"
+         "iris-reference.rkt"
+         "pli.rkt"
+         "iris-notes.rkt"
+         "conceptual.rkt"
+         "conceptual2.rkt"
+         "notes0.rkt"
+         "cps.rkt"
+         "residuated.rkt"
+         "cv.rkt"
+         "type_theory_and_homotopy.rkt"
+         "abstract_sl.rkt"
+         "locally_nameless.rkt"
          
          )
 (define emitXml (emit XML))
 (define emitXml-thunk (emit-thunk XML))
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml extensible_spec.html
+             "../extensible_spec.html")
+    (emitXml locally_nameless.html
+             "../locally_nameless.html")
+    (emitXml abstract_sl.html
+             "../abstract_sl.html")
+    (emitXml type_theory_and_homotopy.html
+             "../type_theory_and_homotopy.html")
+    (emitXml cv.html "../cv.html")
+    (emitXml residuated.html
+             "../residuated.html")
+    (emitXml cps.html "../cps.html")
+    (emitXml notes0.html "../notes0.html")
+    (emitXml conceptual2.html
+             "../conceptual2.html")
+    (emitXml conceptual.html
+             "../conceptual.html")
+    (emitXml iris-notes.html
+             "../iris-notes.html")
+    (emitXml pli.html "../pli.html")
+    (emitXml iris-reference.html
+             "../iris-reference.html")
+    (emitXml iris-lecture-notes.html
+             "../iris-lecture-notes.html")
+    (emitXml semantics_of_type_systems.html
+             "../semantics_of_type_systems.html")
+    (emitXml iris.html "../iris.html")
+    (emitXml introduction_to_logical_relations.html
+             "../introduction_to_logical_relations.html")
+    (emitXml plcat.html "../plcat.html")
     (emitXml vostd.html "../vostd.html")
     (emitXml hoare.html "../hoare.html")
     (emitXml term_of_commutative_algebra.html
@@ -267,11 +314,9 @@
     (emitXml kailai.html "../kailai.html")
     (emitXml imperative.html "../imperative.html")
     (emitXml context.html "../context.html")
-    (emitXml smathml1.html "../smathml1.html")
     (emitXml gtm5.html "../gtm5.html")
     (emitXml exercises_in_programming.html
              "../exercises_in_programming.html")
-    (emitXml smathml0.html "../smathml0.html")
     (emitXml contract.html
              "../contract.html")
     (emitXml napier.html "../napier.html")
@@ -302,14 +347,6 @@
              "../modal_type_theory.html")
     (emitXml modal_analysis.html
              "../modal_analysis.html")
-    (emitXml zork.html "../zork.html")
-    (emitXml metaocaml.html "../metaocaml.html")
-    (emitXml hot.html "../hot.html")
-    (emitXml habil.html "../habil.html")
-    (emitXml twolevel.html "../twolevel.html")
-    (emitXml inverse.html "../inverse.html")
-    (emitXml jones.html "../jones.html")
-    (emitXml cltt.html "../cltt.html")
     (emitXml cmu15122.html "../cmu15122.html")
     (emitXml lattice_theory.html
              "../lattice_theory.html")
@@ -328,40 +365,6 @@
              "../constructive_logic_notes.html")
     (emitXml algebraic_subtyping.html
              "../algebraic_subtyping.html")
-    (emitXml induc.html "../induc.html")
-    (emitXml smathml_everything.html
-             "../smathml_everything.html")
-    (emitXml proof_tree_test.html
-             "../proof_tree_test.html")
-    (emitXml spt.html "../spt.html")
-    (emitXml substructural.html
-             "../substructural.html")
-    (emitXml spec.html "../spec.html")
-    (emitXml object.html "../object.html")
-    (emitXml practical_implementation.html
-             "../practical_implementation.html")
-    (emitXml haskell_music.html "../haskell_music.html")
-    (emitXml mop.html "../mop.html")
-    (emitXml stone.html "../stone.html")
-    (emitXml topology_via_logic.html
-             "../topology_via_logic.html")
-    (emitXml unified.html "../unified.html")
-    (emitXml ds.html "../ds.html")
-    (emitXml domain.html "../domain.html")
-    (emitXml analysis1_amann.html
-             "../analysis1_amann.html")
-    (emitXml abstract.html "../abstract.html")
-    (emitXml abel.html "../abel.html")
-    (emitXml vector_analysis.html
-             "../vector_analysis.html")
-    (emitXml msp.html "../msp.html")
-    (emitXml manifolds_and_geometry.html
-             "../manifolds_and_geometry.html")
-    (emitXml boolean.html "../boolean.html")
-    (emitXml sicm.html "../sicm.html")
-    (emitXml analysis1_godement.html
-             "../analysis1_godement.html")
-    (emitXml bps.html "../bps.html")
     (emitXml pfpl.html "../pfpl.html")
     (emitXml rewrite.html "../rewrite.html")
     (emitXml automated.html "../automated.html")
@@ -390,6 +393,32 @@
                  "../tapl.html")
   (emitXml-thunk thunk:cat_awodey.html
                  "../cat_awodey.html")
+  (emitXml ds.html "../ds.html")
+  (emitXml domain.html "../domain.html")
+  (emitXml analysis1_amann.html
+           "../analysis1_amann.html")
+  (emitXml abstract.html "../abstract.html")
+  (emitXml abel.html "../abel.html")
+  (emitXml vector_analysis.html
+           "../vector_analysis.html")
+  (emitXml msp.html "../msp.html")
+  (emitXml manifolds_and_geometry.html
+           "../manifolds_and_geometry.html")
+  (emitXml boolean.html "../boolean.html")
+  (emitXml sicm.html "../sicm.html")
+  (emitXml analysis1_godement.html
+           "../analysis1_godement.html")
+  (emitXml bps.html "../bps.html")
+  (emitXml zork.html "../zork.html")
+  (emitXml metaocaml.html "../metaocaml.html")
+  (emitXml hot.html "../hot.html")
+  (emitXml habil.html "../habil.html")
+  (emitXml twolevel.html "../twolevel.html")
+  (emitXml inverse.html "../inverse.html")
+  (emitXml jones.html "../jones.html")
+  (emitXml cltt.html "../cltt.html")
+  (emitXml smathml1.html "../smathml1.html")
+  (emitXml smathml0.html "../smathml0.html")
   (emitXml some_programs.html "../some_programs.html")
   (emitXml brzozowski.html "../brzozowski.html")
   (emitXml programming.html "../programming.html")
@@ -523,7 +552,6 @@
   (emitXml engine.html "../engine.html")
   (emitXml ski.html "../ski.html")
   (emitXml cmu15150.html "../cmu15150.html")
-  (emitXml extensible_spec.html "../extensible_spec.html")
   (emitXml language_cognitive.html "../language_cognitive.html")
   (emitXml papers_plan.html "../papers_plan.html")
   (emitXml having_an_effect.html "../having_an_effect.html")
@@ -532,10 +560,28 @@
            "../algebraic_topology.html")
   (emitXml machine_logic.html
            "../machine_logic.html")
+  (emitXml induc.html "../induc.html")
+  (emitXml smathml_everything.html
+           "../smathml_everything.html")
+  (emitXml proof_tree_test.html
+           "../proof_tree_test.html")
+  (emitXml spt.html "../spt.html")
+  (emitXml substructural.html
+           "../substructural.html")
+  (emitXml spec.html "../spec.html")
+  (emitXml object.html "../object.html")
+  (emitXml practical_implementation.html
+           "../practical_implementation.html")
+  (emitXml haskell_music.html "../haskell_music.html")
+  (emitXml mop.html "../mop.html")
+  (emitXml stone.html "../stone.html")
+  (emitXml topology_via_logic.html
+           "../topology_via_logic.html")
+  (emitXml unified.html "../unified.html")
   )
-#;
-(emit-web)
 ;#;
+(time (emit-web))
+#;
 (time (parameterize ([replace? #t]
                      [compute-size? #t])
         (emit-web)))
