@@ -1,0 +1,120 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>iris参考</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>iris参考</h1>
+    <h2>第1章 iris from the ground up</h2>
+    <h2>第2章 代数结构</h2>
+    <h3>第2.1节 OFE</h3>
+    <p>iris的模型活在有序等价族 (OFE) 的范畴之中. 这里的定义和原本[2]中的定义有些许不同.</p>
+    <div class="definition"><b>定义2.1.1. </b>一个有序等价族是一个元组<math><mrow><mo stretchy="false">(</mo><mrow><mi>T</mi><mo>,</mo><msub><mrow><mo stretchy="false">(</mo><mrow><mover><mo>=</mo><mi>n</mi></mover><mo>&sube;</mo><mrow><mi>T</mi><mo>&times;</mo><mi>T</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mrow><mi>n</mi><mo>&in;</mo><mi>&Nopf;</mi></mrow></msub></mrow><mo stretchy="false">)</mo></mrow></math>满足
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(OFE-EQUIV)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo><mi>n</mi><mo lspace="0">.</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mover><mo>=</mo><mi>n</mi></mover>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mtext>是一个等价关系</mtext></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(OFE-EQUIV)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(OFE-MONO)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>n</mi><mo>,</mo><mi>m</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow><mi>n</mi><mo>&ge;</mo><mi>m</mi></mrow>
+                  <mo>&rArr;</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mover><mo>=</mo><mi>n</mi></mover>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&sube;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mover><mo>=</mo><mi>m</mi></mover>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(OFE-MONO)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(OFE-LIMIT)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow>
+                  <mo>&hArr;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mo>&forall;</mo><mi>n</mi><mo lspace="0">.</mo>
+                      <mrow><mi>x</mi>
+                        <mover><mo>=</mo><mi>n</mi></mover>
+                        <mi>y</mi></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(OFE-LIMIT)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      OFE背后的关键直觉在于元素<math><mi>x</mi></math>和<math><mi>y</mi></math>是<math><mi>n</mi></math>-等价的, 记号<math><mrow><mi>x</mi><mover><mo>=</mo><mi>n</mi></mover><mi>y</mi></mrow></math>, 如果它们<em>对于<math><mi>n</mi></math>步计算是等价的</em>, 即它们不能由运行不超过<math><mi>n</mi></math>步的程序区分开来. 换言之, 随着<math><mi>n</mi></math>的增长, <math><mover><mo>=</mo><mi>n</mi></mover></math>变得愈发精良 (OFE-MONO)&mdash;&mdash;并且在极限情况下, 其就与平直的相等性重合 (OFE-LIMIT).</div>
+    <div class="definition"><b>定义2.1.2. </b></div>
+    <div class="definition"><b>定义2.1.3. </b>一个OFE的一个元素<math><mrow><mi>x</mi><mo>&in;</mo><mi>T</mi></mrow></math>称为离散的, 如果
+      <math display="block">
+        <mrow><mo>&forall;</mo>
+          <mrow><mi>y</mi><mo>&in;</mo><mi>T</mi></mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow><mi>x</mi>
+              <mover><mo>=</mo><mn>0</mn></mover>
+              <mi>y</mi></mrow>
+            <mo>&rArr;</mo>
+            <mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      一个OFE被称为离散的, 如果其所有元素都是离散的. 对于一个集合<math><mi>X</mi></math></div>
+    <h3>第2.2节 COFE</h3>
+    <h3>第2.3节 RA</h3>
+    <h3>第2.4节 相机</h3>
+    <h2>第3章 OFE和COFE构造</h2>
+    <h2>第4章 RA和相机构造</h2>
+    <h2>第5章 基逻辑</h2>
+    <h2>第6章 模型和语义</h2>
+    <h2>第7章 基逻辑的扩展</h2>
+    <h2>第8章 语言</h2>
+    <h2>第9章 程序逻辑</h2>
+    <h2>第10章 导出构造</h2>
+    <h2>第11章 逻辑悖论</h2>
+    <h2>第12章 HeapLang</h2>
+  </body>
+</html>
