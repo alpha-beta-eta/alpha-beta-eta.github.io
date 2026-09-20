@@ -1,0 +1,96 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>局部动作和抽象分离逻辑</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>局部动作和抽象分离逻辑</h1>
+    <h2>摘要</h2>
+    <p>分离逻辑 (separation logic) 是Hoare逻辑的一种扩展, 它支持以一种局部的方式对修改内存的程序进行推理. 我们给出了对隐藏在该逻辑背后的语义结构的一项研究. 其核心思想是局部动作 (local action), 即一种以局部的方式修改状态的状态变换器. 我们针对一类称为分离代数 (separation algebra) 的模型表述了局部动作, 这类模型是对分离逻辑相关工作中所使用的RAM以及其他特定具体模型的抽象. 局部动作为一种推广形式的 (顺序) 分离逻辑提供了语义. 我们还表明, 我们对局部动作所施加的条件使得一个并发分离逻辑能够有一个一般的可靠性证明, 该逻辑在任意分离代数上解释.</p>
+    <h2>第1章 引论</h2>
+    <p>分离逻辑是Hoare逻辑的一种扩展, 它已被用来攻克对内存中数据结构的修改进行推理这一老问题 [33, 17, 23, 34]. 分离逻辑的能力来自分离合取连接词 (separating conjunction connective) <math><mo>&#8270;</mo></math>与使用<math><mo>&#8270;</mo></math>的命令的证明规则之间的相互作用. 这些规则中最主要的是框架规则 (frame rule) [17, 23] 和并发规则 (concurrency rule) [22].
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">{</mo><mi>p</mi><mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo><mi>q</mi><mo stretchy="false">}</mo></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>p</mi><mo>&#8270;</mo><mi>r</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/><mi>C</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow><mi>q</mi><mo>&#8270;</mo><mi>r</mi></mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="sans-serif">FrameRule</mi></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>p</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>q</mi><mn>1</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>p</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/>
+                <msub><mi>C</mi><mn>2</mn></msub>
+                <mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo>
+                  <msub><mi>q</mi><mn>2</mn></msub>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>p</mi><mn>1</mn></msub>
+                  <mo>&#8270;</mo>
+                  <msub><mi>p</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+              <mspace width="2ex"/>
+              <mrow>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <mo>&parallel;</mo>
+                <msub><mi>C</mi><mn>2</mn></msub>
+              </mrow>
+              <mspace width="2ex"/>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <msub><mi>q</mi><mn>1</mn></msub>
+                  <mo>&#8270;</mo>
+                  <msub><mi>q</mi><mn>2</mn></msub>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="sans-serif">ConcurrencyRule</mi></mrow>
+      </math>
+      框架规则把局部推理的一种直觉编纂成文. 其想法是, 如果我们确立了一个给定的Hoare三元组, 那么前条件包含了该命令在计算期间将会访问的所有资源 (命令开始之后分配的资源除外). 因此, 任何额外的状态都将保持不变; 于是规则中的不变断言<math><mi>R</mi></math> (框架公理 (frame axiom)) 可以被自由地附加到前条件和后条件上. 类似地, 并发规则陈述了, 在分离的资源上操作的进程可以被独立地推理.</p>
+    <p>句法上, 并发规则和框架规则是直截了当的. 但是, 它们可靠性的原因是微妙的, 并且依赖于关于命令式程序运作的局部方式的观察 [37]. 通常, 一个程序访问一组有界限的资源; 例如, 执行期间访问的内存单元 (内存足迹 (memory footprint)). 我们在本文中的目的是以一种一般的方式描述这些语义假设, 针对一组对分离逻辑相关工作中所使用的RAM以及其他具体模型进行抽象的模型.</p>
+    <p>通过为一类模型分离出界限原则 (circumscription principle), 为该逻辑提供正当性所需的本质假设变得更加清晰. 特别地, 我们对并发的处理表明, 分离逻辑的一个并发版本的可靠性只依赖于程序语言中原始动作 (primitive action) (基本命令) 的局部性性质. 并发逻辑的可靠性最初是非常难以得到的, 即便是对于一个特定的分离代数 (RAM模型); 它是在Brookes的一项杰出工作 [12] 中被证明的. 我们对并发的处理建立在Brookes最初的洞见之上, 但在表述中做出了若干不同的选择, 这些选择容许一个更一般的证明, 该证明适用于任意分离代数. 我们表明, 只要一个语言中的原始命令满足框架规则, 就能得到一个并发逻辑的模型. 这与Brookes最初的论文以及后续关于并发分离逻辑的论文 [10, 11, 16, 15] 形成对比, 这些论文全都是针对特定模型证明可靠性的, 其方式依赖于对原始动作的非常特定的解释, 而不是针对一类模型.</p>
+    <p>本文不会包含任何使用该逻辑的例子; 参见例如 [36, 28, 5, 4] 及其参考文献.</p>
+    <p><b>警告. </b>在本文中, 我们避免传统Hoare逻辑中把程序变量双关地当作逻辑变量的做法, 以避免证明规则中令人讨厌的附加条件; 进一步的讨论参见 [9, 27]. 这是为了理论上的简洁; 我们的结果可以被扩展以涵盖变量修改, 正如大多数分离逻辑论文中所做的那样, 连同它们相应的modifies子句. (此外, 避免这种双关更符合像C或ML这样的真实语言, 即便它稍微偏离了程序逻辑中的理论传统.)</p>
+    <h2>第2章 分离代数与谓词</h2>
+    <p>大多数关于分离逻辑的论文都使用一个堆 (heap) 的域, 该域配备了一个部分运算符, 用于把在某种意义上分离的堆粘合在一起 (文献中出现过各种不同的意义). 我们用下面的定义对这一情形进行抽象.</p>
+    <div class="definition"><b>定义1. 分离代数. </b>一个分离代数 (separation algebra) 是一个可消的部分交换幺半群<math><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">&Sigma;</mi><mo>,</mo><mo>&bull;</mo><mo>,</mo><mi>u</mi></mrow><mo stretchy="false">)</mo></mrow></math>. 一个部分交换幺半群由一个部分二元运算给出, 对于该运算, 单位律, 交换律和结合律对于这样一种等式成立: 该等式意味着两边都有定义且相等, 或者两边都无定义. 可消性质说的是, 对于每个<math><mrow><mi>&sigma;</mi><mo>&in;</mo><mi mathvariant="normal">&Sigma;</mi></mrow></math>, 部分函数<math><mrow><mrow><mi>&sigma;</mi><mo>&bull;</mo><mrow><mo stretchy="false">(</mo><mi>&sdot;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>:</mo><mrow><mi mathvariant="normal">&Sigma;</mi><mo>&rharu;</mo><mi mathvariant="normal">&Sigma;</mi></mrow></mrow></math>是单射. 诱导出的分离性 (separateness) (<math><mo>#</mo></math>) 关系和子状态 (substate) (<math><mo>&pre;</mo></math>) 关系由下式给出:</div>
+  </body>
+</html>

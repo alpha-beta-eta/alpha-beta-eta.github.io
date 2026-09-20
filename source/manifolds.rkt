@@ -1,11 +1,9 @@
 #lang racket
 (provide manifolds.html)
-(require SMathML)
+(require SMathML "todo.rkt")
 (define $~ (Mo "~"))
 (define-infix*
   (&~ $~))
-(define $sin (Mi "sin"))
-(define $cos (Mi "cos"))
 (define (&sin x)
   (ap $sin x))
 (define (&cos x)
@@ -14,7 +12,6 @@
   (Mo "d" #:attr* '((lspace "0") (rspace "0"))))
 (define (&d x)
   (ap $d:form x))
-(define $\| (Mo "|"))
 (define (derivativeAt f t v)
   (ap (_ (: (~ $d:form (&d t)) $\|)
          (&= t v))
@@ -32,17 +29,6 @@
   `(,(build-%heading #:present heading-present #:cite heading-cite
                      #:level 4 #:id id #:switch? switch?)
     ,attr* . ,html*))
-(define todo.svg
-  (Svg
-   #:attr* '((width "320")
-             (height "160")
-             (stroke "black")
-             (style "display: block; margin: auto;"))
-   (Path #:attr* '((x "0")
-                   (y "0")
-                   (d "M 0 0 h 320 v 160 h -320 z")
-                   (fill "none")))
-   (Text #:attr* '((x "130") (y "80")) "欠一张图")))
 (define (format-num section index)
   (and index
        (format "~a.~a" (cadr section) index)))
@@ -82,14 +68,6 @@
   (Proposition "命题" "proposition")
   (Lemma "引理" "lemma")
   (Problem "问题" "problem"))
-(define (MBL label . exp*)
-  (MB (Mtable
-       #:attr*
-       '((columnalign "left center right")
-         (width "100%"))
-       (Mtr (Mtd (Mphantom label))
-            (apply Mtd exp*)
-            (Mtd label)))))
 (define manifolds.html
   (TnTmPrelude
    #:title "流形引论"
@@ -123,6 +101,21 @@
       "毕竟第5章里流形上的微分形式的理论已经涵盖了" $RR^n
       "上的情形, 但是从教育学的角度来看, 单独处理" $RR^n
       "更好, 因为" $RR^n "上的情况展现了微分形式和外微分本质上的简单性.")
+   (P "我们不立即深入讨论流形的另一个原因是: "
+      "在课程教学中, 没有点集拓扑背景的学生可以在学习" $RR^n
+      "上的微分形式演算的同时, 自行阅读附录A.")
+   (P "掌握了点集拓扑的基础知识之后, 我们定义流形, 并推导出一个集合成为流形的各种条件. "
+      "微积分的一个核心思想是用线性对象来逼近非线性对象. "
+      "基于这一点, 我们研究流形与其切空间之间的关系. 关键的例子是李群及其李代数.")
+   (P "最后, 我们在流形上做微积分, 利用分析与拓扑之间的相互作用: "
+      "一方面展示向量微积分中的定理如何得到推广, "
+      "另一方面展示流形上的结果如何定义流形新的"
+      C^inf "不变量, 即de Rham上同调群.")
+   (P "事实上, de Rham上同调群不仅是" C^inf
+      "不变量, 也是拓扑不变量. 这是著名的de Rham定理的推论, "
+      "该定理建立了de Rham上同调与实系数奇异上同调之间的同构. "
+      "证明这一定理会使我们偏离主题太远. "
+      "感兴趣的读者可以在本书的续作 [4] 中找到证明.")
    (H2. "Euclid空间")
    (P "Euclid空间" $RR^n "是所有流形的原型. "
       "不只是因为其是最简单的流形, "
@@ -176,7 +169,7 @@
              (ap $partial (^ $x $i_j))))
     "均存在且在" $p "处连续. 一个向量值函数"
     (func $f $U $RR^m) "被称为在" $p "处是"
-    $C^k "的, 如果其每个分量函数" (&cm $f^1 $..h $f^k)
+    $C^k "的, 如果其每个分量函数" (&cm $f^1 $..h $f^m)
     "在" $p "处都是" $C^k "的. 我们称"
     (func $f $U $RR^m) "在" $U "上是"
     $C^k "的, 如果其在每个" $U

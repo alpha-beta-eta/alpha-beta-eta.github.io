@@ -28,7 +28,7 @@
       </ul>
     </p>
     <p>近期研究中, 逻辑关系已被用于证明不同逻辑的可靠性. 跨语言逻辑关系则用于推理编译过程, 外部函数接口或多语言语义.</p>
-    <p>逻辑谓词与一元逻辑关系这两个术语是同义的, 逻辑关系与二元逻辑关系亦然. 这两种术语在文献和日常用语中均有使用. 逻辑谓词<math><mrow><msub><mi>P</mi><mi>&tau;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></math>是集合, 用于对单个程序进行推理. 程序终止性, 类型安全性与健全性均属于逻辑谓词. 而逻辑关系<math><mrow><msub><mi>R</mi><mi>&tau;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><msub><mi>e</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是二元关系, 可用于更广泛地刻画程序等价性.</p>
+    <p>逻辑谓词与一元逻辑关系这两个术语是同义的, 逻辑关系与二元逻辑关系亦然. 这两种术语在文献和日常用语中均有使用. 逻辑谓词<math><mrow><msub><mi>P</mi><mi>&tau;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></math>是集合, 用于对单个程序进行推理. 程序终止性, 类型安全性与可靠性均属于逻辑谓词. 而逻辑关系<math><mrow><msub><mi>R</mi><mi>&tau;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>,</mo><msub><mi>e</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是二元关系, 可用于更广泛地刻画程序等价性.</p>
     <h2>第2章 STLC的规范化</h2>
     <p>本节我们展示了逻辑关系的一个例子, 用于证明STLC的规范化.</p>
     <h3>第2.1节 STLC的形式化</h3>
@@ -306,6 +306,149 @@
     <p>然后, 我们形式化地定义STLC的规范化, 其表达了任意良类型的封闭项实际都会终止. 我们使用记号<math><mrow><mi>e</mi><mo>&dArr;</mo><mi>v</mi></mrow></math>以表达项<math><mi>e</mi></math>求值至值<math><mi>v</mi></math>, 即<math><mrow><mi>e</mi><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><mi>v</mi></mrow></math>, 另以记号<math><mrow><mi>e</mi><mo>&dArr;</mo></mrow></math>表达<math><mi>e</mi></math>可以求值至某个值, 即<math><mrow><mo>&exist;</mo><mi>v</mi><mo lspace="0">.</mo><mrow><mi>e</mi><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><mi>v</mi></mrow></mrow></math>.</p>
     <div class="theorem"><b>定理. </b>对于每个项<math><mi>e</mi></math>, 若<math><mrow><mo>&sdot;</mo><mo>&vdash;</mo><mrow><mi>e</mi><mo>:</mo><mi>&tau;</mi></mrow></mrow></math>, 那么<math><mrow><mi>e</mi><mo>&dArr;</mo></mrow></math>.</div>
     <h3>第2.2节 第一次尝试: 以定型推导上的归纳证明STLC是规范化的</h3>
+    <p>为了看明白为什么我们想要使用逻辑关系, 让我们先尝试朴素地证明第2.1节里的这个规范化定理, 并理解我们卡在了哪里.</p>
+    <div class="proof"><b>证明.</b> 设<math><mrow><mo>&sdot;</mo><mo>&vdash;</mo><mrow><mi>e</mi><mo>:</mo><mi>&tau;</mi></mrow></mrow></math>, 欲证明<math><mrow><mi>e</mi><mo>&dArr;</mo></mrow></math>. 我们以定型推导上的归纳进行处理:
+      <ul>
+        <li><math><mtext class="small-caps">T-True</mtext></math>情形:
+          <math display="block">
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mo>&sdot;</mo><mo>&vdash;</mo>
+                <mrow><mi>true</mi><mo>:</mo><mi>bool</mi></mrow>
+              </mrow>
+            </mfrac>
+          </math>
+          <math><mi>true</mi></math>已经是一个值了, 所以终止.</li>
+        <li><math><mtext class="small-caps">T-False</mtext></math>情形:
+          <math display="block">
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mo>&sdot;</mo><mo>&vdash;</mo>
+                <mrow><mi>false</mi><mo>:</mo><mi>bool</mi></mrow>
+              </mrow>
+            </mfrac>
+          </math>
+          <math><mi>false</mi></math>已经是一个值了, 所以终止.</li>
+        <li><math><mtext class="small-caps">T-Var</mtext></math>情形:
+          <math display="block">
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>=</mo><mi>&tau;</mi></mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+              </mrow>
+            </mfrac>
+          </math>
+          根据归纳假设, 我们得到了<math><mrow><mrow><mo>&sdot;</mo><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>&tau;</mi></mrow></math>, 这意味着该情形空虚为真, 鉴于我们的上下文为空. {译注: 不如说是并不适用于此情形.}</li>
+        <li><math><mtext class="small-caps">T-Abs</mtext></math>情形:
+          <math display="block">
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                  <mrow><mi>x</mi><mo>:</mo>
+                    <msub><mi>&tau;</mi><mn>1</mn></msub>
+                  </mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow><mi>e</mi><mo>:</mo>
+                  <msub><mi>&tau;</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>&lambda;</mi>
+                    <mrow><mi>x</mi><mo>:</mo>
+                      <msub><mi>&tau;</mi><mn>1</mn></msub>
+                    </mrow>
+                    <mo lspace="0">.</mo><mi>e</mi></mrow>
+                  <mo>:</mo>
+                  <mrow>
+                    <msub><mi>&tau;</mi><mn>1</mn></msub>
+                    <mo>&rarr;</mo>
+                    <msub><mi>&tau;</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+          </math>
+          <math><mrow><mi>&lambda;</mi><mrow><mi>x</mi><mo>:</mo><msub><mi>&tau;</mi><mn>1</mn></msub></mrow><mo lspace="0">.</mo><mi>e</mi></mrow></math>已经是一个值了, 所以终止.</li>
+        <li><math><mtext class="small-caps">T-If</mtext></math>情形:
+          <math display="block">
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow><mi>e</mi><mo>:</mo><mi>bool</mi></mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>:</mo><mi>&tau;</mi></mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                    <mo>:</mo><mi>&tau;</mi></mrow>
+                </mrow>
+              </mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>if</mi><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/><mi>else</mi><mspace width="2ex"/>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo>:</mo><mi>&tau;</mi></mrow>
+              </mrow>
+            </mfrac>
+          </math>
+          根据归纳假设, 我们知道<math><mrow><mrow><mi>e</mi><mo>&dArr;</mo></mrow><mo>,</mo><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&dArr;</mo></mrow><mo>,</mo><mrow><msub><mi>e</mi><mn>2</mn></msub><mo>&dArr;</mo></mrow></mrow></math>. 既然对于某个<math><mi>v</mi></math>有<math><mrow><mi>e</mi><mo>&dArr;</mo><mi>v</mi></mrow></math>, 通过检视我们的归约语义, 我们知道<math><mrow><mrow><mi>if</mi><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/><msub><mi>e</mi><mn>1</mn></msub><mspace width="2ex"/><mi>else</mi><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><mrow><mi>if</mi><mspace width="2ex"/><mi>v</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/><msub><mi>e</mi><mn>1</mn></msub><mspace width="2ex"/><mi>else</mi><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow></mrow></math>. 感谢canonical form引理, 我们知道具有类型<math><mi>bool</mi></math>的值只能是<math><mi>true</mi></math>和<math><mi>false</mi></math>. 根据<math><mi>v</mi></math>上的情形分析, 要么<math><mrow><mrow><mi>if</mi><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/><msub><mi>e</mi><mn>1</mn></msub><mspace width="2ex"/><mi>else</mi><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><mrow><mi>if</mi><mspace width="2ex"/><mi>true</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/><msub><mi>e</mi><mn>1</mn></msub><mspace width="2ex"/><mi>else</mi><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><msub><mi>e</mi><mn>1</mn></msub><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><msub><mi>v</mi><mn>1</mn></msub></mrow></math>, 要么<math><mrow><mrow><mi>if</mi><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/><msub><mi>e</mi><mn>1</mn></msub><mspace width="2ex"/><mi>else</mi><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><mrow><mi>if</mi><mspace width="2ex"/><mi>false</mi><mspace width="2ex"/><mi>then</mi><mspace width="2ex"/><msub><mi>e</mi><mn>1</mn></msub><mspace width="2ex"/><mi>else</mi><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><msub><mi>e</mi><mn>2</mn></msub><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><msub><mi>v</mi><mn>2</mn></msub></mrow></math>.</li>
+        <li><math><mtext class="small-caps">T-App</mtext></math>情形:
+          <math display="block">
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo>:</mo>
+                    <mrow>
+                      <msub><mi>&tau;</mi><mn>2</mn></msub>
+                      <mo>&rarr;</mo>
+                      <msub><mi>&tau;</mi><mn>1</mn></msub>
+                    </mrow>
+                  </mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                    <mo>:</mo>
+                    <msub><mi>&tau;</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mspace width="2ex"/>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo>:</mo>
+                  <msub><mi>&tau;</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+            </mfrac>
+          </math>
+          根据归纳假设, 我们知道<math><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&dArr;</mo></mrow></math>和<math><mrow><msub><mi>e</mi><mn>2</mn></msub><mo>&dArr;</mo><msub><mi>v</mi><mn>2</mn></msub></mrow></math>. 类型为<math><mrow><msub><mi>&tau;</mi><mn>2</mn></msub><mo>&rarr;</mo><msub><mi>&tau;</mi><mn>1</mn></msub></mrow></math>的值是lambda表达式, 故<math><mrow><msub><mi>e</mi><mn>1</mn></msub><mo>&dArr;</mo><mrow><mi>&lambda;</mi><mrow><mi>x</mi><mo>:</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow><mo lspace="0">.</mo><msup><mi>e</mi><mo>&prime;</mo></msup></mrow></mrow></math>, 于是<math><mrow><mrow><msub><mi>e</mi><mn>1</mn></msub><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mrow><mi>x</mi><mo>:</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow><mo lspace="0">.</mo><msup><mi>e</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow><msup><mo>&mapsto;</mo><mo>&#8270;</mo></msup><mrow><msup><mi>e</mi><mo>&prime;</mo></msup><mrow><mo stretchy="false">[</mo><mrow><msub><mi>v</mi><mn>2</mn></msub><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></mrow></math>. <span style="color: red">问题来了, 我们对于<math><mrow><msup><mi>e</mi><mo>&prime;</mo></msup><mrow><mo stretchy="false">[</mo><mrow><msub><mi>v</mi><mn>2</mn></msub><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></math>的情况一无所知, 于是证明就卡住了.</span></li>
+      </ul>
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>我们这里主要的insight在于, 归纳假设太弱了: 定型判断没有告诉我们关于规范化所产生的值的任何信息. 为了解决这个问题, 我们将会定义一个逻辑关系, 其精确地加强了归纳假设, 这允许我们知道关于求值所产生的值的更多信息.</p>
     <h3>第2.3节 定义逻辑关系的原则</h3>
     <p>逻辑关系是表达式上的谓词<math><mrow><msub><mi>P</mi><mi>&tau;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 由类型索引. 在定义一个逻辑关系时, 通常我们需要遵循三条原则:
       <ul>
@@ -315,10 +458,153 @@
       </ul>
       接下来我们将会看到如何具体构造逻辑关系以证明STLC是规范化的.</p>
     <h3>第2.4节 STLC规范化的逻辑关系</h3>
+    <p>我们根据STLC类型上的归纳定义规范化的逻辑谓词, 遵循之前提及的三条原则:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>N</mi><mi>bool</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mover><mo>=</mo><mi>def</mi></mover>
+            </mtd>
+            <mtd>
+              <mrow><mo>&sdot;</mo><mo>&vdash;</mo>
+                <mrow><mi>e</mi><mo>:</mo><mi>bool</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&and;</mo></mtd>
+            <mtd>
+              <mrow><mi>e</mi><mo>&dArr;</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <msub><mi>N</mi>
+                  <mrow>
+                    <msub><mi>&tau;</mi><mn>1</mn></msub>
+                    <mo>&rarr;</mo>
+                    <msub><mi>&tau;</mi><mn>2</mn></msub>
+                  </mrow>
+                </msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mover><mo>=</mo><mi>def</mi></mover>
+            </mtd>
+            <mtd>
+              <mrow><mo>&sdot;</mo><mo>&vdash;</mo>
+                <mrow><mi>e</mi><mo>:</mo>
+                  <mrow>
+                    <msub><mi>&tau;</mi><mn>1</mn></msub>
+                    <mo>&rarr;</mo>
+                    <msub><mi>&tau;</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&and;</mo></mtd>
+            <mtd>
+              <mrow><mi>e</mi><mo>&dArr;</mo></mrow>
+            </mtd>
+            <mtd><mo>&and;</mo></mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <msup><mi>e</mi><mo>&prime;</mo></msup>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <msub><mi>N</mi>
+                      <msub><mi>&tau;</mi><mn>1</mn></msub>
+                    </msub>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msup><mi>e</mi><mo>&prime;</mo></msup>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&xrArr;</mo>
+                  <mrow>
+                    <msub><mi>N</mi>
+                      <msub><mi>&tau;</mi><mn>2</mn></msub>
+                    </msub>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>e</mi><mspace width="2ex"/>
+                        <msup><mi>e</mi><mo>&prime;</mo></msup>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      与前述原则相比较, 我们可以看出, 两种情况下最左边的合取分量都确保了逻辑关系中只包含良类型的项. 类似地, 两种情况下的下一个合取分量确保了逻辑关系中只包含满足所需性质 (即规范化) 的项. 最后, 我们需要确保所关注的性质在消去形式下得以保持, 这一点由<math><mrow><msub><mi>&tau;</mi><mn>1</mn></msub><mo>&rarr;</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow></math>情况中的第三个合取分量来处理. 有趣的是, 我们无需对<math><mi>bool</mi></math>的消去形式作任何说明, 这是由其正极性所决定的. 作为一条经验法则, 具有正极性的类型不需要任何额外的合取分量, 而具有负极性的类型则需要.</p>
+    <p>由此出发, 我们可以将规范化的证明拆分为两个步骤:
+      <ol type="A">
+        <li>对于所有的项<math><mi>e</mi></math>, 如果<math><mrow><mo>&sdot;</mo><mo>&vdash;</mo><mrow><mi>e</mi><mo>:</mo><mi>&tau;</mi></mrow></mrow></math>, 那么<math><mrow><msub><mi>N</mi><mi>&tau;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></math>;</li>
+        <li>对于所有的项<math><mi>e</mi></math>, 如果<math><mrow><msub><mi>N</mi><mi>&tau;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 那么<math><mrow><mi>e</mi><mo>&dArr;</mo></mrow></math>.</li>
+      </ol>
+    </p>
+    <p>步骤B可以直接由逻辑谓词<math><msub><mi>N</mi><mi>&tau;</mi></msub></math>的定义推出. 根据<math><mi>&tau;</mi></math>上的归纳, 我们有两种需要考虑的情形, 而每种情形下<math><mrow><mi>e</mi><mo>&dArr;</mo></mrow></math>都可以直接由<math><mrow><msub><mi>N</mi><mi>&tau;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></math>的定义得到. 我们或许可以评注一下, 这实际上来源于第二条原则: 我们关心的性质 (规范化) 就在逻辑关系的定义之中.</p>
+    <p>然而, 由于lambda抽象的问题, 步骤A并不如此直接. 设<math><mrow><mo>&sdot;</mo><mo>&vdash;</mo><mrow><mrow><mi>&lambda;</mi><mrow><mi>x</mi><mo>:</mo><msub><mi>&tau;</mi><mn>1</mn></msub></mrow><mo lspace="0">.</mo><mi>e</mi></mrow><mo>:</mo><mrow><msub><mi>&tau;</mi><mn>1</mn></msub><mo>&rarr;</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow></mrow></mrow></math>, 于是我们知道<math><mrow><mrow><mi>x</mi><mo>:</mo><msub><mi>&tau;</mi><mn>1</mn></msub></mrow><mo>&vdash;</mo><mrow><mi>e</mi><mo>:</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow></mrow></math>. 为了证明A, 我们需要表明<math><mrow><mo>&sdot;</mo><mo>&vdash;</mo><mrow><mrow><mi>&lambda;</mi><mrow><mi>x</mi><mo>:</mo><msub><mi>&tau;</mi><mn>1</mn></msub></mrow><mo lspace="0">.</mo><mi>e</mi></mrow><mo>:</mo><mrow><msub><mi>&tau;</mi><mn>1</mn></msub><mo>&rarr;</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow></mrow></mrow></math>, 这由假设成立. 我们也必须表明<math><mrow><mrow><mi>&lambda;</mi><mrow><mi>x</mi><mo>:</mo><msub><mi>&tau;</mi><mn>1</mn></msub></mrow><mo lspace="0">.</mo><mi>e</mi></mrow><mo>&dArr;</mo></mrow></math>, 这之所以成立, 是因为lambda项已然为值. 最后的一步是要证明对于任意的项<math><msup><mi>e</mi><mo>&prime;</mo></msup></math>, 如果<math><mrow><msub><mi>N</mi><msub><mi>&tau;</mi><mn>1</mn></msub></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msup><mi>e</mi><mo>&prime;</mo></msup><mo stretchy="false">)</mo></mrow></mrow></math>, 那么<math><mrow><msub><mi>N</mi><msub><mi>&tau;</mi><mn>2</mn></msub></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mrow><mi>x</mi><mo>:</mo><msub><mi>&tau;</mi><mn>1</mn></msub></mrow><mo lspace="0">.</mo><mi>e</mi></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><msup><mi>e</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 此时我们卡住了, 因为<math><mi>e</mi></math>不是一个封闭项, 于是我们不能通过定型推导上的归纳进行处理. </p>
     <h2>第3章 STLC的类型安全性</h2>
     <h3>第3.1节 STLC类型安全性的逻辑关系</h3>
     <h2>第4章 具有递归类型的STLC的类型安全性的逻辑关系</h2>
     <h3>第4.1节 递归类型的目的</h3>
+    <p>递归类型可以捕获潜在无限的数据结构, 例如列表, 流, 树, 等等. 加入递归类型到语言里允许非终止程序通过类型检查.</p>
+    <p>为了刻画递归类型的用处, 让我们检视无类型lambda演算里的<math><mi mathvariant="normal">&Omega;</mi></math>组合子, 其无限循环:
+      <math display="block">
+        <mrow><mi mathvariant="normal">&Omega;</mi><mo>=</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo>
+                <mrow><mi>x</mi><mspace width="2ex"/><mi>x</mi></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo>
+                <mrow><mi>x</mi><mspace width="2ex"/><mi>x</mi></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>如果我们试着将第一个项应用于第二个项, 我们就又步入了<math><mi mathvariant="normal">&Omega;</mi></math>组合子. 现在让我们试着在简单类型lambda演算中对于该项进行定型:
+      <math display="block">
+        <mrow><mi mathvariant="normal">&Omega;</mi><mo>=</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&lambda;</mi>
+                <mrow><mi>x</mi><mo>:</mo><mi>?</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow><mi>x</mi><mspace width="2ex"/><mi>x</mi></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&lambda;</mi>
+                <mrow><mi>x</mi><mo>:</mo><mi>?</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow><mi>x</mi><mspace width="2ex"/><mi>x</mi></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </p>
+    <p><math><mi>x</mi></math>的一个面貌是其在项<math><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mrow><mi>x</mi><mspace width="2ex"/><mi>x</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math>中被应用于自身, 所以我们期望其类型差不多是<math><mrow><msub><mi>&tau;</mi><mn>1</mn></msub><mo>&rarr;</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow></math>. 然而, 作为函数<math><mi>x</mi></math>的参数的<math><mi>x</mi></math>的类型就不大对了. 我们将会看到递归类型是如何帮助对于<math><mi mathvariant="normal">&Omega;</mi></math>组合子进行定型的.</p>
+    <p>考虑描述了一个树的递归类型 (这里我们使用OCaml的句法):<pre><code>type tree = Leaf | Node of int * tree * tree</code></pre></p>
     <h3>第4.2节 具有递归类型的STLC的形式化</h3>
     <h3>第4.3节 具有递归类型的STLC的步骤索引逻辑关系</h3>
     <h2>第5章 多态性</h2>

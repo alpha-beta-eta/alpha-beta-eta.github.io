@@ -5485,6 +5485,61 @@
     <p>似乎只有非常简单或者平凡的陈述, 例如<q>终对象在同构意义下唯一</q>服从于这种对偶性, 但是实际上远非如此. 我们将会看到, 范畴对偶性实际上是极其强大且影响深远的现象. 就像射影几何里点和线的对偶一样, 它有效地对于每个证明产生两个定理, 真是<q>物超所值 (bang for the buck)</q>.</p>
     <h3>第3.2节 余积</h3>
     <h3>第3.3节 等化子</h3>
+    <p>本节我们将考虑另一抽象刻画; 这次是同态的核与等式定义<q>簇</q>的共同泛化, 像是实值函数的零点集合, 也像是集合论的分离公理.</p>
+    <div class="definition"><b>定义3.3. </b>在任意的范畴<math><mi mathvariant="bold">C</mi></math>中, 给定平行箭头
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+      <math><mi>f</mi></math>和<math><mi>g</mi></math>的一个<em>等化子(equalizer)</em>由一个对象<math><mi>E</mi></math>和一个箭头<math><mrow><mi>e</mi><mo>:</mo><mrow><mi>E</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>构成, 其相对于
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&compfn;</mo><mi>e</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi>g</mi><mo>&compfn;</mo><mi>e</mi></mrow>
+        </mrow>
+      </math>
+      是泛的 (universal). 也就是说, 对于任何<math><mrow><mi>z</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>满足<math><mrow><mrow><mi>f</mi><mo>&compfn;</mo><mi>z</mi></mrow><mo>=</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>z</mi></mrow></mrow></math>, 存在<em>唯一</em>的<math><mrow><mi>u</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>E</mi></mrow></mrow></math>满足<math><mrow><mrow><mi>e</mi><mo>&compfn;</mo><mi>u</mi></mrow><mo>=</mo><mi>z</mi></mrow></math>, 如以下图表所示
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+    </div>
+    <p>让我们考虑一些简单的例子.</p>
+    <div class="example"><b>例子3.4. </b>设我们有函数<math><mrow><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo>:</mo><mrow><msup><mi>&Ropf;</mi><mn>2</mn></msup><mo>&rrarr;</mo><mi>&Ropf;</mi></mrow></mrow></math>, 其中
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>f</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msup><mi>x</mi><mn>2</mn></msup>
+                <mo>+</mo>
+                <msup><mi>y</mi><mn>2</mn></msup>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>g</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mn>1</mn></mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </div>
     <h3>第3.4节 余等化子</h3>
     <h3>第3.5节 练习</h3>
     <h2>第4章 群和范畴</h2>
@@ -5540,8 +5595,208 @@
     <h2>第5章 极限和余极限</h2>
     <p>在本章中, 我们首先简要讨论一些与已有定义相关的主题, 即子对象和拉回. 这样做一方面是为了了解它们如何被使用, 另一方面也是因为我们很快就需要用到这些材料. 然后我们以更系统的方式展开, 定义极限的一般概念, 它涵摄了我们迄今所遇到的许多特定的抽象刻画. 当然, 还有一个对偶概念即余极限, 它同样有许多有趣的应用. 在第6章简要考察另一个基本概念之后, 我们将进入可以称为<q>高阶范畴论</q>的领域.</p>
     <h3>第5.1节 子对象</h3>
-    <p>我们已经看到一个集合<math><mi>X</mi></math>的每个子集<math><mrow><mi>U</mi><mo>&sube;</mo><mi>X</mi></mrow></math>都作为一个等化子而出现, 而等化子总是单态射. </p>
+    <p>我们已经看到一个集合<math><mi>X</mi></math>的每个子集<math><mrow><mi>U</mi><mo>&sube;</mo><mi>X</mi></mrow></math>都作为一个等化子而出现, 而等化子总是单态射. 因此, 将单态射视为广义的子集是自然的. 也就是说, <math><mi mathvariant="bold">Groups</mi></math>中的单态射可以视为子群, <math><mi mathvariant="bold">Top</mi></math>中的单态射可以视为子空间, 诸如此类.</p>
+    <p>大致的想法如下: 给定某个范畴<math><mi mathvariant="bold">G</mi></math>中的一个单态射
+      <math display="block">
+        <mrow><mi>m</mi><mo>:</mo>
+          <mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      这个范畴应该是某种结构化集合的范畴, 我们将其对象称为<q>gadget</q>. 像子集
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mi>m</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>|</mo>
+              <mrow><mi>y</mi><mo>&in;</mo><mi>M</mi></mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+          <mo>&sube;</mo><mi>X</mi></mrow>
+      </math>
+      或可以写成<math><mrow><mi>m</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 其往往是<math><mi>X</mi></math>的一个sub-gadget, 而<math><mi>M</mi></math>藉由<math><mi>m</mi></math>同构于它.
+      <math display="block">
+        <mrow><mi>m</mi><mo>:</mo>
+          <mrow><mi>M</mi>
+            <mover><mo>&rarr;</mo><mo>&Tilde;</mo></mover>
+            <mrow>
+              <mrow><mi>m</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&sube;</mo><mi>X</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      更一般地, 我们可以将单态射<math><mrow><mi>m</mi><mo>:</mo><mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow></mrow></math>想成是确定了<math><mi>X</mi></math>的一个<q>部分</q>, 即便是在那些没有潜在函数可用之取像的范畴.</p>
+    <div class="definition"><b>定义5.1. </b>某个范畴<math><mi mathvariant="bold">C</mi></math>中的一个对象<math><mi>X</mi></math>的一个<em>子对象(subobject)</em>是一个单态射
+      <math display="block">
+        <mrow><mi>m</mi><mo>:</mo>
+          <mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      对于<math><mi>X</mi></math>的子对象<math><mi>m</mi></math>和<math><msup><mi>m</mi><mo>&prime;</mo></msup></math>, 一个态射<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>m</mi><mo>&rarr;</mo><msup><mi>m</mi><mo>&prime;</mo></msup></mrow></mrow></math>是<math><mrow><mi mathvariant="bold">C</mi><mo lspace="0" rspace="0">/</mo><mi>X</mi></mrow></math>中的一个箭头, 如下图所示:
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+      因此, 我们有了一个范畴
+      <math display="block">
+        <mrow>
+          <msub><mi>Sub</mi><mi mathvariant="bold">C</mi></msub>
+          <mo>&af;</mo>
+          <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      其由<math><mi mathvariant="bold">C</mi></math>中<math><mi>X</mi></math>的子对象构成.</div>
+    <p>在此定义之中, 既然<math><msup><mi>m</mi><mo>&prime;</mo></msup></math>是单态射, 那么在上图中至多只有一个这样的<math><mi>f</mi></math>, 于是<math><mrow><msub><mi>Sub</mi><mi mathvariant="bold">C</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></math>是一个预序范畴. 我们定义子对象的<em>包含(inclusion)</em>关系如下:
+      <math display="block">
+        <mrow><mi>m</mi><mo>&sube;</mo>
+          <msup><mi>m</mi><mo>&prime;</mo></msup>
+        </mrow>
+        <mtext>当且仅当存在某个</mtext>
+        <mrow><mi>f</mi><mo>:</mo>
+          <mrow><mi>m</mi><mo>&rarr;</mo>
+            <msup><mi>m</mi><mo>&prime;</mo></msup>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </p>
+    <p>最后, 我们称<math><mi>m</mi></math>和<math><msup><mi>m</mi><mo>&prime;</mo></msup></math>是<em>等价的</em>, 记作<math><mrow><mi>m</mi><mo>&equiv;</mo><msup><mi>m</mi><mo>&prime;</mo></msup></mrow></math>, 当且仅当它们作为子对象是同构的, 即<math><mrow><mi>m</mi><mo>&sube;</mo><msup><mi>m</mi><mo>&prime;</mo></msup></mrow></math>且<math><mrow><msup><mi>m</mi><mo>&prime;</mo></msup><mo>&sube;</mo><mi>m</mi></mrow></math>. 这个成立仅当存在<math><mi>f</mi></math>和<math><msup><mi>f</mi><mo>&prime;</mo></msup></math>使得下面两个三角形都是交换的:
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+    </p>
+    <p>观察到在以上图表之中, <math><mrow><mi>m</mi><mo>=</mo><mrow><msup><mi>m</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><mrow><mi>m</mi><mo>&it;</mo><msup><mi>f</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi></mrow></mrow></math>. 既然<math><mi>m</mi></math>是单态射, 那么<math><mrow><mrow><msup><mi>f</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><msub><mn>1</mn><mi>M</mi></msub></mrow></math>. 类似地, 我们有<math><mrow><mrow><mi>f</mi><mo>&it;</mo><msup><mi>f</mi><mo>&prime;</mo></msup></mrow><mo>=</mo><msub><mn>1</mn><msup><mi>M</mi><mo>&prime;</mo></msup></msub></mrow></math>. 因此, 藉由<math><mi>f</mi></math>有<math><mrow><mi>M</mi><mo>&cong;</mo><msup><mi>M</mi><mo>&prime;</mo></msup></mrow></math>. 也就是说, 我们看到<em>等价的子对象有着同构的定义域</em>. 有时我们滥用记号和语言, 在单态射<math><mrow><mi>m</mi><mo>:</mo><mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow></mrow></math>明确时称<math><mi>M</mi></math>为子对象.</p>
+    <div class="remark"><b>评注5.2. </b>往往通过商掉等价关系<q><math><mo>&equiv;</mo></math></q>以从预序
+      <math display="block">
+        <mrow>
+          <msub><mi>Sub</mi><mi mathvariant="bold">C</mi></msub>
+          <mo>&af;</mo>
+          <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      过渡到偏序是比较方便的. 那么, 一个子对象就是互包含关系下的单态射的等价类.</div>
+    <p>在<math><mi mathvariant="bold">Sets</mi></math>之中, 在此子对象概念之下, 我们有一个同构
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>Sub</mi><mi mathvariant="bold">Sets</mi></msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&cong;</mo>
+          <mrow><mi>&Pscr;</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      换言之, 每个子对象都由唯一一个子集所表示. 两种子对象的概念我们都会使用, 并且会明确何时意在使用单态射, 何时意在使用单态射的等价类.</p>
+    <p>注意到如果<math><mrow><mi>M</mi><mo>&sube;</mo><msup><mi>M</mi><mo>&prime;</mo></msup></mrow></math>, 那么作见证的箭头<math><mi>f</mi></math>, 见下图
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+      也是单态射, 于是<math><mi>M</mi></math>也是<math><msup><mi>M</mi><mo>&prime;</mo></msup></math>的一个子对象. 因此, 我们有一个函子
+      <math display="block">
+        <mrow>
+          <mrow><mi>Sub</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <msup><mi>M</mi><mo>&prime;</mo></msup>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&rarr;</mo>
+          <mrow><mi>Sub</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其由与<math><msup><mi>m</mi><mo>&prime;</mo></msup></math>的复合定义, 鉴于单态射之复合仍是单态射. {译注: 原文这段本来不太对.}</p>
+    <div class="tcomment"><b>译者注记. </b>作一简单注记, 关于<math><mi>f</mi></math>为何是单态射. 对于<math><mrow><mrow><mi>g</mi><mo>,</mo><mi>h</mi></mrow><mo>:</mo><mrow><mi>Y</mi><mo>&rarr;</mo><mi>M</mi></mrow></mrow></math>, 如果<math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><mrow><mi>f</mi><mo>&it;</mo><mi>h</mi></mrow></mrow></math>, 那么<math><mrow><mrow><msup><mi>m</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><mrow><msup><mi>m</mi><mo>&prime;</mo></msup><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>h</mi></mrow></mrow></math>, 于是<math><mrow><mrow><mi>m</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><mrow><mi>m</mi><mo>&it;</mo><mi>h</mi></mrow></mrow></math>. 鉴于<math><mi>m</mi></math>是单态射, 那么<math><mrow><mi>g</mi><mo>=</mo><mi>h</mi></mrow></math>, 即<math><mi>f</mi></math>是单态射.</div>
+    <p>基于某个对象<math><mi>X</mi></math>的广义元素
+      <math display="block">
+        <mrow><mi>z</mi><mo>:</mo>
+          <mrow><mi>Z</mi><mo>&rarr;</mo><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      我们可以定义这样的元素和子对象<math><mrow><mi>m</mi><mo>:</mo><mrow><mi>M</mi><mo>&rarrtl;</mo><mi>X</mi></mrow></mrow></math>之间的<em>局部成员关系</em>
+      <math display="block">
+        <mrow><mi>z</mi>
+          <msub><mo>&in;</mo><mi>X</mi></msub>
+          <mi>M</mi></mrow>
+      </math>
+      为存在<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>M</mi></mrow></mrow></math>使得<math><mrow><mi>z</mi><mo>=</mo><mrow><mi>m</mi><mo>&it;</mo><mi>f</mi></mrow></mrow></math>. 既然<math><mi>m</mi></math>是单态射, 如果<math><mi>z</mi></math>能够藉此分解, 那么分解的方式就是唯一的.</p>
+    <div class="example"><b>例子5.3. </b>一个等化子
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+      是<math><mi>A</mi></math>的一个子对象, 其具有性质
+      <math display="block">
+        <mrow><mi>z</mi>
+          <msub><mo>&in;</mo><mi>A</mi></msub>
+          <mi>E</mi></mrow>
+        <mtext>当且仅当</mtext>
+        <mrow>
+          <mrow><mi>f</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>g</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      因此, 我们可以将<math><mi>E</mi></math>视为由满足<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>的广义元素<math><mrow><mi>z</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>构成的子对象, 其暗示了以下记号
+      <math display="block">
+        <mrow>
+          <mrow><mi>E</mi><mo>=</mo>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi>z</mi><mo>&in;</mo><mi>Z</mi></mrow>
+                <mo>|</mo>
+                <mrow>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>=</mo>
+                  <mrow><mi>g</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+          <mo>&sube;</mo><mi>A</mi></mrow>
+      </math>
+      在范畴逻辑中, 我们会建立一种方法, 通过给出一种关于这样的子对象的演算以使得这种直觉精确化.</div>
     <h3>第5.2节 拉回</h3>
+    <p>拉回的概念, 如同积, 在数学和逻辑中经常出现. 其是交与逆像的泛化.</p>
+    <p>我们从以下定义开始.</p>
+    <div class="definition"><b>定义5.4. </b>在任何范畴<math><mi mathvariant="bold">C</mi></math>只在, 给定箭头<math><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow></math>满足<math><mrow><mrow><mi>cod</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>cod</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>:
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+      <math><mi>f</mi></math>和<math><mi>g</mi></math>的<em>拉回(pullback)</em>由以下箭头构成
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+      其满足<math><mrow><mrow><mi>f</mi><mo>&it;</mo><msub><mi>p</mi><mn>1</mn></msub></mrow><mo>=</mo><mrow><mi>g</mi><mo>&it;</mo><msub><mi>p</mi><mn>2</mn></msub></mrow></mrow></math>, 并在此性质下是泛的 (universal). 换言之, 对于任意的<math><mrow><msub><mi>z</mi><mn>1</mn></msub><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>A</mi></mrow></mrow></math>和<math><mrow><msub><mi>z</mi><mn>2</mn></msub><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></math>满足<math><mrow><mrow><mi>f</mi><mo>&it;</mo><msub><mi>z</mi><mn>1</mn></msub></mrow><mo>=</mo><mrow><mi>g</mi><mo>&it;</mo><msub><mi>z</mi><mn>2</mn></msub></mrow></mrow></math>, 存在唯一的<math><mrow><mi>u</mi><mo>:</mo><mrow><mi>Z</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>使得<math><mrow><msub><mi>z</mi><mn>1</mn></msub><mo>=</mo><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>&it;</mo><mi>u</mi></mrow></mrow></math>且<math><mrow><msub><mi>z</mi><mn>2</mn></msub><mo>=</mo><mrow><msub><mi>p</mi><mn>2</mn></msub><mo>&it;</mo><mi>u</mi></mrow></mrow></math>. 这种情况在下列图表中指明:
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+    </div>
+    <p>有时我们对于拉回使用积风格的记号.
+      <svg width="320" height="160" stroke="black" style="display: block; margin: auto;">
+        <path x="0" y="0" d="M 0 0 h 320 v 160 h -320 z" fill="none"/>
+        <text x="130" y="80">欠一张图</text>
+      </svg>
+    </p>
     <h3>第5.3节 拉回的性质</h3>
     <h3>第5.4节 极限</h3>
     <h3>第5.5节 极限的保持</h3>
