@@ -1,0 +1,433 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>iris笔记</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>iris笔记</h1>
+    <h2>第1章 资源代数</h2>
+    <h3>第1.1节 核 (core)</h3>
+    <math display="block">
+      <mrow>
+        <mrow><mi>a</mi><mo>⇝</mo><mi>b</mi></mrow>
+        <mover><mo>=</mo><mi>def</mi></mover>
+        <mrow><mo>&forall;</mo>
+          <mrow>
+            <msup><mi>c</mi><mi>?</mi></msup>
+            <mo>&in;</mo>
+            <msup><mi>M</mi><mi>?</mi></msup>
+          </mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow>
+              <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mo>&sdot;</mo>
+                  <msup><mi>c</mi><mi>?</mi></msup>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&rArr;</mo>
+            <mrow>
+              <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>b</mi><mo>&sdot;</mo>
+                  <msup><mi>c</mi><mi>?</mi></msup>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </mrow>
+    </math>
+    <p><math><mi>a</mi></math>能转移到<math><mi>b</mi></math>, 如果与<math><mi>a</mi></math>相兼容的资源也与<math><mi>b</mi></math>相兼容.</p>
+    <p><math><mrow><mi>&bottom;</mi><mo>&in;</mo><msup><mi>M</mi><mi>?</mi></msup></mrow></math>代表没有资源, 所以与没有资源复合就没有作用.</p>
+    <p>排他资源因为无法与其他资源复合, 因而可以转移至任意的(合法)资源.</p>
+    <math display="block">
+      <mtable columnalign="left center right" displaystyle="true" width="100%">
+        <mtr>
+          <mtd>
+            <mphantom><mtext>(RA-CORE-ID)</mtext></mphantom>
+          </mtd>
+          <mtd>
+            <mrow><mo>&forall;</mo><mi>a</mi><mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                  <mo>&in;</mo><mi>M</mi></mrow>
+                <mo>&rArr;</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                    <mo>&sdot;</mo><mi>a</mi></mrow>
+                  <mo>=</mo><mi>a</mi></mrow>
+              </mrow>
+            </mrow>
+          </mtd>
+          <mtd><mtext>(RA-CORE-ID)</mtext></mtd>
+        </mtr>
+      </mtable>
+    </math>
+    <math display="block">
+      <mtable columnalign="left center right" displaystyle="true" width="100%">
+        <mtr>
+          <mtd>
+            <mphantom><mtext>(RA-CORE-IDEM)</mtext></mphantom>
+          </mtd>
+          <mtd>
+            <mrow><mo>&forall;</mo><mi>a</mi><mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                  <mo>&in;</mo><mi>M</mi></mrow>
+                <mo>&rArr;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">|</mo>
+                    <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                    <mo stretchy="false">|</mo></mrow>
+                  <mo>=</mo>
+                  <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mtd>
+          <mtd><mtext>(RA-CORE-IDEM)</mtext></mtd>
+        </mtr>
+      </mtable>
+    </math>
+    <p>如果<math><mrow><mi>a</mi><mo>&in;</mo><mi>M</mi></mrow></math>满足<math><mrow><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo>&in;</mo><mi>M</mi></mrow></math>, 那么<math><mrow><mrow><mo stretchy="false">|</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo stretchy="false">|</mo></mrow><mo>&in;</mo><mi>M</mi></mrow></math>, 于是<math><mrow><mrow><mrow><mo stretchy="false">|</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo stretchy="false">|</mo></mrow><mo>&sdot;</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></mrow></math>. 又因为<math><mrow><mrow><mo stretchy="false">|</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo stretchy="false">|</mo></mrow><mo>=</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></mrow></math>, 所以<math><mrow><mrow><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo>&sdot;</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></mrow></math>. 即<math><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></math>是复合运算<math><mo>&sdot;</mo></math>的幂等元, 如果<math><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></math>有定义的话.</p>
+    <math display="block">
+      <mtable columnalign="left center right" displaystyle="true" width="100%">
+        <mtr>
+          <mtd>
+            <mphantom><mtext>(RA-CORE-IDEM0)</mtext></mphantom>
+          </mtd>
+          <mtd>
+            <mrow><mo>&forall;</mo><mi>a</mi><mo lspace="0">.</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                  <mo>&in;</mo><mi>M</mi></mrow>
+                <mo>&rArr;</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                    <mo>&sdot;</mo>
+                    <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                  </mrow>
+                  <mo>=</mo>
+                  <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mtd>
+          <mtd><mtext>(RA-CORE-IDEM0)</mtext></mtd>
+        </mtr>
+      </mtable>
+    </math>
+    <p>从直觉上来说, 这表达了<math><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></math>是可复制的. 并且, 即便<math><mrow><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo>=</mo><mi>&bottom;</mi></mrow></math>, 由于我们对于复合进行了延拓, 故<math><mrow><mrow><mi>&bottom;</mi><mo>&sdot;</mo><mi>&bottom;</mi></mrow><mo>=</mo><mi>&bottom;</mi></mrow></math>, 所以仍然有<math><mrow><mrow><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo>&sdot;</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></mrow></math>, 即没有资源当然也可以复制. 不过, 更准确地说, <math><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></math>代表了<q>知识</q>, 它从<math><mi>a</mi></math>中将排他的部分剥离出去. 排他资源本身就是排他的, 所以核只能为<math><mi>&bottom;</mi></math>.
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">exclusive</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mover><mo>=</mo><mi>def</mi></mover>
+          <mrow><mo>&forall;</mo><mi>c</mi><mo lspace="0">.</mo>
+            <mrow><mo>&not;</mo>
+              <mrow>
+                <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>&sdot;</mo><mi>c</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>另外, 根据资源代数上的预序关系的定义, 我们还能知道
+      <math display="block">
+        <mrow><mo>&forall;</mo>
+          <mrow><mi>a</mi><mo>&in;</mo><mi>M</mi></mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow>
+              <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+              <mo>&in;</mo><mi>M</mi></mrow>
+            <mo>&rArr;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+              <mo>&prcue;</mo><mi>a</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      这也是相当直觉化的, 即从<math><mi>a</mi></math>中提取的知识<math><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow></math>应当比<math><mi>a</mi></math>更小.</p>
+    <p>核的公理还包括
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(RA-CORE-MONO)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                      <mo>&in;</mo><mi>M</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow><mi>a</mi><mo>&prcue;</mo><mi>b</mi></mrow>
+                  </mrow>
+                  <mo>&rArr;</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">|</mo><mi>b</mi><mo stretchy="false">|</mo></mrow>
+                      <mo>&in;</mo><mi>M</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                      <mo>&prcue;</mo>
+                      <mrow><mo stretchy="false">|</mo><mi>b</mi><mo stretchy="false">|</mo></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(RA-CORE-MONO)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      这里的直觉是资源越多, 知识越多, 至少知识不应该变少.</p>
+    <p>如果<math><mrow><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo>=</mo><mi>a</mi></mrow></math>, 那么<math><mi>a</mi></math>都是知识, 故iris有规则
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(PERSISTENT-GHOST)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                  <mo>=</mo><mi>a</mi></mrow>
+                <mrow><mi mathvariant="sans-serif">persistent</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msup>
+                      <mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow>
+                      <mi>&gamma;</mi></msup>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mfrac>
+            </mtd>
+            <mtd><mtext>(PERSISTENT-GHOST)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <h3>第1.2节 权威资源代数 (auth RA)</h3>
+    <p>以下给出权威资源代数的构造. 对于单位资源代数<math><mrow><mo stretchy="false">(</mo><mrow><mi>M</mi><mo>,</mo><mi>&epsilon;</mi><mo>,</mo><mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover><mo>,</mo><mrow><mo stretchy="false">|</mo><mi>&minus;</mi><mo stretchy="false">|</mo></mrow><mo>,</mo><mo>&sdot;</mo></mrow><mo stretchy="false">)</mo></mrow></math>, 权威资源代数<math><mrow><mi>Auth</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></mrow></mrow></math>定义如下:
+      <ul>
+        <li>载体: <math><mrow><msub><mi>M</mi><mrow><mi>&bottom;</mi><mo>,</mo><mi>&top;</mi></mrow></msub><mo>&times;</mo><mi>M</mi></mrow></math></li>
+        <li>复合运算:
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>,</mo><mi>a</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&sdot;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>y</mi><mo>,</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow><mo>{</mo>
+                <mtable displaystyle="true">
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>y</mi><mo>,</mo>
+                          <mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mtd>
+                    <mtd columnalign="left"><mtext>, 如果</mtext>
+                      <mrow><mi>x</mi><mo>=</mo><mi>&bottom;</mi></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo>
+                          <mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mtd>
+                    <mtd columnalign="left"><mtext>, 如果</mtext>
+                      <mrow><mi>y</mi><mo>=</mo><mi>&bottom;</mi></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&top;</mi><mo>,</mo>
+                          <mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mtd>
+                    <mtd columnalign="left"><mtext>, 否则的话</mtext></mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+            </mrow>
+          </math>
+        </li>
+        <li>核:
+          <math display="block">
+            <mrow>
+              <mrow><mo stretchy="false">|</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>,</mo><mi>a</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo stretchy="false">|</mo></mrow>
+              <mo>=</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>&bottom;</mi><mo>,</mo>
+                  <mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </math>
+        </li>
+        <li>合法性:
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>,</mo><mi>a</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>x</mi><mo>=</mo><mi>&bottom;</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow>
+                      <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&or;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>x</mi><mo>&in;</mo><mi>M</mi></mrow>
+                    <mo>&and;</mo>
+                    <mrow>
+                      <mover><mi mathvariant="script">V</mi><mo>&OverBar;</mo></mover>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>&and;</mo>
+                    <mrow><mi>a</mi><mo>&prcue;</mo><mi>x</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </math>
+        </li>
+        <li>我们定义<math><mrow><mrow><mo>•</mo><mo>&af;</mo><mi>x</mi></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi>&epsilon;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>而<math><mrow><mrow><mo>◦</mo><mo>&af;</mo><mi>a</mi></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&bottom;</mi><mo>,</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 于是<math><mrow><mo stretchy="false">(</mo><mrow><mi>&bottom;</mi><mo>,</mo><mi>&epsilon;</mi></mrow><mo stretchy="false">)</mo></mrow></math>是<math><mrow><mi>Auth</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></mrow></mrow></math>的单位元.</li>
+      </ul>
+    </p>
+    <h2>第2章 later模态</h2>
+    <h3>第2.1节 语义</h3>
+    <p>将iris命题<math><mi>P</mi></math>近似地看作序对<math><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow></math>的集合, 其中<math><mi>k</mi></math>是一个自然数而<math><mi>r</mi></math>是一个资源.</p>
+    <p>将<math><mi>k</mi></math>想成是步数索引, 即多少归约步骤之内我们知道<math><mi>r</mi></math>在<math><mi>P</mi></math>中.</p>
+    <p>如果<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mi>P</mi></mrow></math>且<math><mrow><mi>m</mi><mo>&le;</mo><mi>k</mi></mrow></math>, 那么也有<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>m</mi><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mi>P</mi></mrow></math>.</p>
+    <p>步骤索引可以解释<math><mo>▷</mo></math>:
+      <math display="block">
+        <mrow>
+          <mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow>
+          <mo>=</mo>
+          <mrow>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow>
+                    <mo>,</mo><mi>r</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>|</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>m</mi><mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&in;</mo><mi>P</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+            <mo>&cup;</mo>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mn>0</mn><mo>,</mo><mi>r</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>|</mo>
+                <mrow><mi>r</mi><mo>&in;</mo><mi mathvariant="script">R</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>以下我们证明L&ouml;b的soundness, 也就是我们要证明<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow><mo>&rArr;</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&sube;</mo><mi>P</mi></mrow></math>. 当然, 这两边其实是解释. 另外, 我们需要定义
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>P</mi><mo>&rArr;</mo><mi>Q</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>k</mi><mo>,</mo><mi>r</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>|</mo>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>m</mi><mo>&le;</mo><mi>k</mi></mrow>
+                <mo lspace="0">.</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>m</mi><mo>,</mo><mi>r</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&in;</mo><mi>P</mi></mrow>
+                  <mo>&rArr;</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>m</mi><mo>,</mo><mi>r</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&in;</mo><mi>Q</mi></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      令命题<math><mrow><mi mathvariant="script">P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>为<q>对于每个资源<math><mi>r</mi></math>, 如果<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow><mo>&rArr;</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 那么<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>k</mi><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mi>P</mi></mrow></math></q>.</p>
+    <p><math><mrow><mi mathvariant="script">P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></mrow></math>是平凡的, 因为<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mn>0</mn><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow><mo>&rArr;</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>等价于<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mn>0</mn><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mi>P</mi></mrow></math>.</p>
+    <p>假设<math><mrow><mi mathvariant="script">P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow></math>成立, 考察<math><mrow><mi mathvariant="script">P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 如果<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow><mo>&rArr;</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 那么<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>n</mi><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow><mo>&rArr;</mo><mi>P</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 根据归纳假设, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>n</mi><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mi>P</mi></mrow></math>. 于是, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow></mrow></math>. 由此可知, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow><mo>,</mo><mi>r</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mi>P</mi></mrow></math>.</p>
+  </body>
+</html>

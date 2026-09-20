@@ -19,7 +19,7 @@
           <math display="block">
             <mrow>
               <mrow><mi>x</mi><mo>&pre;</mo><mi>y</mi></mrow>
-              <mo>&DoubleLongLeftRightArrow;</mo>
+              <mo>&xhArr;</mo>
               <mrow>
                 <mrow><mo>&lfloor;</mo><mi>x</mi><mo>&rfloor;</mo></mrow>
                 <mo>&le;</mo>
@@ -28,17 +28,17 @@
             </mrow>
           </math>
           则<math><mrow><mo stretchy="false">(</mo><mrow><mi>&Ropf;</mi><mo>,</mo><mo>&pre;</mo></mrow><mo stretchy="false">)</mo></mrow></math>是一个预序集, 但不是偏序集.</li>
-        <li>对于集合<math><mi>X</mi></math>, 其幂集<math><mrow><mi mathvariant="script">P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></math>在关系<math><mo>&sube;</mo></math>下是一个偏序集. 当然了, 这个幂集的非空子集继承了自然的序关系也成为偏序集. 原书要求<math><mi>X</mi></math>非空是不必要的, 因为<math><mrow><mi mathvariant="script">P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></math>即便在<math><mi>X</mi></math>是空集的情况下也非空.</li>
+        <li>对于集合<math><mi>X</mi></math>, 其幂集<math><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></math>在关系<math><mo>&sube;</mo></math>下是一个偏序集. 当然了, 这个幂集的非空子集继承了自然的序关系也成为偏序集. 原书要求<math><mi>X</mi></math>非空是不必要的, 因为<math><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></math>即便在<math><mi>X</mi></math>是空集的情况下也非空.</li>
         <li>设<math><mi>G</mi></math>是一个群, <math><mrow><mi>Sub</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow></mrow></math>是由其所有子群构成的集合. 那么, <math><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>Sub</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mo>&sube;</mo></mrow><mo stretchy="false">)</mo></mrow></math>是一个偏序集.</li>
         <li>设<math><msup><mi mathvariant="normal">&Sigma;</mi><mo>&#8270;</mo></msup></math>是由所有<math><mrow><mn>0</mn><mo>,</mo><mn>1</mn></mrow></math>字符的有限序列构成的集合, 定义<math><mrow><mi>a</mi><mo>&le;</mo><mi>b</mi></mrow></math>当且仅当<math><mi>a</mi></math>是<math><mi>b</mi></math>的前缀, 则<math><mrow><mo stretchy="false">(</mo><mrow><msup><mi mathvariant="normal">&Sigma;</mi><mo>&#8270;</mo></msup><mo>,</mo><mo>&le;</mo></mrow><mo stretchy="false">)</mo></mrow></math>是一个偏序集.</li>
         <li>设<math><mi>P</mi></math>是一个偏序集 (当然已经默认非空了), <math><mi>X</mi></math>是一个集合, 定义<math><msup><mi>P</mi><mi>X</mi></msup></math>上的关系<math><mo>&le;</mo></math>为
           <math display="block">
             <mrow>
               <mrow><mi>f</mi><mo>&le;</mo><mi>g</mi></mrow>
-              <mo>&DoubleLongLeftRightArrow;</mo>
+              <mo>&xhArr;</mo>
               <mrow><mo>&forall;</mo>
                 <mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow>
-                <mo>.</mo>
+                <mo lspace="0">.</mo>
                 <mrow>
                   <mrow><mi>f</mi><mo>&af;</mo>
                     <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
@@ -52,35 +52,35 @@
             </mrow>
           </math>
           那么<math><mo>&le;</mo></math>是一个偏序关系, 其被称为<math><msup><mi>P</mi><mi>X</mi></msup></math>上的逐点序 (pointwise order). 原文需要<math><mi>X</mi></math>非空, 实则不需要.</li>
-        <li>设<math><mrow><mrow><mi>I</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&Ropf;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><mo>[</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>]</mo></mrow><mo>|</mo><mrow><mrow><mi>a</mi><mo>&le;</mo><mi>b</mi></mrow><mo>,</mo><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>&in;</mo><mi>&Ropf;</mi></mrow></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></math>, 定义
+        <li>设<math><mrow><mrow><mi>I</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&Ropf;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><mo stretchy="false">[</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy="false">]</mo></mrow><mo>|</mo><mrow><mrow><mi>a</mi><mo>&le;</mo><mi>b</mi></mrow><mo>,</mo><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>&in;</mo><mi>&Ropf;</mi></mrow></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></math>, 定义
           <math display="block">
             <mrow>
               <mrow>
-                <mrow><mo>[</mo>
+                <mrow><mo stretchy="false">[</mo>
                   <msub><mi>a</mi><mn>1</mn></msub>
                   <mo>,</mo>
                   <msub><mi>b</mi><mn>1</mn></msub>
-                  <mo>]</mo></mrow>
+                  <mo stretchy="false">]</mo></mrow>
                 <mo>&sqsube;</mo>
-                <mrow><mo>[</mo>
+                <mrow><mo stretchy="false">[</mo>
                   <msub><mi>a</mi><mn>2</mn></msub>
                   <mo>,</mo>
                   <msub><mi>b</mi><mn>2</mn></msub>
-                  <mo>]</mo></mrow>
+                  <mo stretchy="false">]</mo></mrow>
               </mrow>
-              <mo>&DoubleLongLeftRightArrow;</mo>
+              <mo>&xhArr;</mo>
               <mrow>
-                <mrow><mo>[</mo>
+                <mrow><mo stretchy="false">[</mo>
                   <msub><mi>a</mi><mn>2</mn></msub>
                   <mo>,</mo>
                   <msub><mi>b</mi><mn>2</mn></msub>
-                  <mo>]</mo></mrow>
+                  <mo stretchy="false">]</mo></mrow>
                 <mo>&sube;</mo>
-                <mrow><mo>[</mo>
+                <mrow><mo stretchy="false">[</mo>
                   <msub><mi>a</mi><mn>1</mn></msub>
                   <mo>,</mo>
                   <msub><mi>b</mi><mn>1</mn></msub>
-                  <mo>]</mo></mrow>
+                  <mo stretchy="false">]</mo></mrow>
               </mrow>
             </mrow>
           </math>
@@ -166,10 +166,10 @@
               <mrow><mi>i</mi><mo>&in;</mo><mi>I</mi></mrow>
             </msub>
           </mrow>
-          <mo>&DoubleLongLeftRightArrow;</mo>
+          <mo>&xhArr;</mo>
           <mrow><mo>&forall;</mo>
             <mrow><mi>i</mi><mo>&in;</mo><mi>I</mi></mrow>
-            <mo>.</mo>
+            <mo lspace="0">.</mo>
             <mrow>
               <msub><mi>x</mi><mi>i</mi></msub>
               <msub><mo>&le;</mo><mi>i</mi></msub>
@@ -182,8 +182,892 @@
     <div class="example"><b>例子1.1.3. </b></div>
     <div class="theorem"><b>定理1.1.1. </b></div>
     <h3>第1.2节 格与完备格</h3>
-    <div class="definition"><b>定义1.2.1. </b></div>
-    <div class="definition"><b>定义1.2.2. </b></div>
-    <div class="theorem"><b>定理1.2.1. </b></div>
+    <div class="definition"><b>定义1.2.1. </b>定义了上确界 (join) 和下确界 (meet), 不再赘述.</div>
+    <div class="remark"><b>评注1.2.1. </b></div>
+    <div class="definition"><b>定义1.2.2. </b>设<math><mi>L</mi></math>是一个偏序集.
+      <ol>
+        <li>如果对于任意的<math><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>L</mi></mrow></math>都有<math><mrow><mo>&Vee;</mo><mrow><mo stretchy="false">{</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">}</mo></mrow></mrow></math>存在, 则称<math><mi>L</mi></math>为并半格.</li>
+        <li>如果对于任意的<math><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>L</mi></mrow></math>都有<math><mrow><mo>&Wedge;</mo><mrow><mo stretchy="false">{</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo stretchy="false">}</mo></mrow></mrow></math>存在, 则称<math><mi>L</mi></math>为交半格.</li>
+        <li>如果<math><mi>L</mi></math>既是并半格又是交半格, 则称<math><mi>L</mi></math>为格.</li>
+      </ol>
+    </div>
+    <div class="theorem"><b>定理1.2.1. </b>设<math><mi>L</mi></math>是一个格, 则对于任意的<math><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow><mo>&in;</mo><mi>L</mi></mrow></math>, 运算<math><mo>&or;</mo></math>和<math><mo>&and;</mo></math>满足
+      <ol>
+        <li>幂等</li>
+        <li>交换</li>
+        <li>结合</li>
+        <li>吸收: <math><mrow><mrow><mi>a</mi><mo>&or;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&and;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>a</mi></mrow></math>, <math><mrow><mrow><mi>a</mi><mo>&and;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&or;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>a</mi></mrow></math>.</li>
+      </ol>
+    </div>
+    <div class="example"><b>例子1.2.1. </b></div>
+    <div class="theorem"><b>定理1.2.2. </b></div>
+    <div class="theorem"><b>定理1.2.3. </b></div>
+    <div class="definition"><b>定义1.2.3. </b>设<math><mi>L</mi></math>是一个格, <math><mi>S</mi></math>是<math><mi>L</mi></math>的一个非空子集.
+      <ol>
+        <li>如果对于任意的<math><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>S</mi></mrow></math>都有<math><mrow><mrow><mrow><mi>x</mi><mo>&and;</mo><mi>y</mi></mrow><mo>,</mo><mrow><mi>x</mi><mo>&or;</mo><mi>y</mi></mrow></mrow><mo>&in;</mo><mi>S</mi></mrow></math>, 称<math><mi>S</mi></math>为<math><mi>L</mi></math>的子格.</li>
+        <li>如果<math><mi>L</mi></math>是有界格, <math><mi>S</mi></math>是<math><mi>L</mi></math>的子格且<math><mrow><mrow><mn>0</mn><mo>,</mo><mn>1</mn></mrow><mo>&in;</mo><mi>S</mi></mrow></math>, 则称<math><mi>S</mi></math>为<math><mi>L</mi></math>的保界子格.</li>
+      </ol>
+    </div>
+    <div class="example"><b>例子1.2.2. </b></div>
+    <div class="definition"><b>定义1.2.4. </b>设<math><mi>L</mi></math>是一个偏序集, 如果<math><mi>L</mi></math>的每个子集 (包括空集) 都有上确界和下确界, 则称<math><mi>L</mi></math>是一个完备格.</div>
+    <div class="theorem"><b>定理1.2.4. </b>设<math><mi>L</mi></math>是一个偏序集, 则下列条件等价:
+      <ol>
+        <li><math><mi>L</mi></math>是一个完备格;</li>
+        <li><math><msup><mi>L</mi><mi>op</mi></msup></math>是一个完备格;</li>
+        <li><math><mi>L</mi></math>的每个子集都有上确界;</li>
+        <li><math><mi>L</mi></math>有最小元<math><mn>0</mn></math>且每个非空子集都有上确界;</li>
+        <li><math><mi>L</mi></math>的每个子集都有下确界;</li>
+        <li><math><mi>L</mi></math>有最大元<math><mn>1</mn></math>且每个非空子集都有下确界.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="corollary"><b>推论1.2.1. </b></div>
+    <div class="definition"><b>定义1.2.5. </b>设<math><mrow><mi>P</mi><mo>,</mo><mi>Q</mi></mrow></math>是偏序集, <math><mrow><mi>f</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>是一个映射.
+      <ol>
+        <li>如果对于任意的<math><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>P</mi></mrow></math>都有<math><mrow><mi>x</mi><mo>&le;</mo><mi>y</mi></mrow></math>可以推出<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 就称<math><mi>f</mi></math>为保序的, 或<math><mi>f</mi></math>是从<math><mi>P</mi></math>到<math><mi>Q</mi></math>的序同态.</li>
+        <li>如果对于任意的<math><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>P</mi></mrow></math>都有<math><mrow><mi>x</mi><mo>&le;</mo><mi>y</mi></mrow></math>可以推出<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 则称<math><mi>f</mi></math>为逆序的.</li>
+      </ol>
+    </div>
+    <div class="theorem"><b>定理1.2.5. </b><b>Knaster-Tarski不动点定理. </b>设<math><mi>L</mi></math>是一个完备格, 如果<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>L</mi><mo>&rarr;</mo><mi>L</mi></mrow></mrow></math>是一个保序映射, 则<math><mi>f</mi></math>有最大和最小不动点.</div>
+    <div class="proof"><b>证明.</b> 太过经典, 不写了.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="definition"><b>定义1.2.6. </b>设<math><mi>P</mi></math>是一个偏序集, <math><mrow><mi>f</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是一个自映射. 如果
+      <ol>
+        <li>保序性: <math><mrow><mi>x</mi><mo>&le;</mo><mi>y</mi></mrow></math>可以推出<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>;</li>
+        <li>增值性: <math><mrow><mi>x</mi><mo>&le;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>;</li>
+        <li>幂等性: <math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></li>
+      </ol>
+      则称<math><mi>f</mi></math>是<math><mi>P</mi></math>上的一个闭包算子 (closure operator).</div>
+    <div class="definition"><b>定义1.2.7. </b>设<math><mi>P</mi></math>是一个偏序集, <math><mrow><mi>g</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是一个自映射. 如果
+      <ol>
+        <li>保序性: <math><mrow><mi>x</mi><mo>&le;</mo><mi>y</mi></mrow></math>可以推出<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>;</li>
+        <li>减值性: <math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>x</mi></mrow></math>;</li>
+        <li>幂等性: <math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></li>
+      </ol>
+      则称<math><mi>g</mi></math>是<math><mi>P</mi></math>上的一个内部算子 (interior operator).</div>
+    <p>设<math><mrow><mi>h</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是偏序集<math><mi>P</mi></math>上的一个自映射. 记<math><mrow><mrow><mi>Im</mi><mo>&af;</mo><mi>h</mi></mrow><mo>=</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><mi>h</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>|</mo><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></math>. 当<math><mi>h</mi></math>是幂等的, 那么<math><mrow><mi>Im</mi><mo>&af;</mo><mi>h</mi></mrow></math>恰是<math><mi>h</mi></math>的所有不动点之集合. {译注: 实际上, 幂等性与<math><mrow><mi>Im</mi><mo>&af;</mo><mi>h</mi></mrow></math>是所有不动点之集合等价.} 幂等保序自映射也称为投影.</p>
+    <div class="theorem"><b>定理1.2.6. </b>设<math><mi>L</mi></math>是一个完备格, <math><mrow><mi>f</mi><mo>:</mo><mrow><mi>L</mi><mo>&rarr;</mo><mi>L</mi></mrow></mrow></math>是一个闭包算子, 则<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>也是一个完备格, </div>
+    <div class="corollary"><b>推论1.2.2. </b></div>
+    <div class="definition"><b>定义1.2.8. </b></div>
+    <h3>第1.3节 序同构与格同构</h3>
+    <div class="definition"><b>定义1.3.1. </b></div>
+    <h3>第1.4节 分配格与Boole代数</h3>
+    <div class="theorem"><b>定理1.4.1. </b>设<math><mi>L</mi></math>是一个格, 则下面两个有限分配律是等价的:
+      <ol>
+        <li><math><mrow><mrow><mi>x</mi><mo>&and;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>y</mi><mo>&or;</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>&and;</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&or;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>&and;</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mi>x</mi><mo>&or;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>y</mi><mo>&and;</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>&or;</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&and;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>&or;</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 1推出2: 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="definition"><b>定义1.4.1. </b>设<math><mi>L</mi></math>是一个格, 如果<math><mi>L</mi></math>满足上述定理中描述的两个条件之一, 那么称<math><mi>L</mi></math>为分配格.</div>
+    <div class="example"><b>例子1.4.1. </b>
+      <ol>
+        <li>每个链都是分配格.</li>
+        <li><math><mrow><mo stretchy="false">(</mo><mrow><mi>&Nopf;</mi><mo>,</mo><mo>|</mo></mrow><mo stretchy="false">)</mo></mrow></math>是分配格.</li>
+        <li>设<math><mrow><mo stretchy="false">(</mo><mrow><mi>X</mi><mo>,</mo><mrow><mi mathvariant="script">O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>是拓扑空间, 则<math><mrow><mo stretchy="false">(</mo><mrow><mrow><mi mathvariant="script">O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mo>&sube;</mo></mrow><mo stretchy="false">)</mo></mrow></math>是分配格.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem"><b>定理1.4.2. </b></div>
+    <div class="theorem"><b>定理1.4.3. </b>设<math><mi>L</mi></math>是一个格, 则<math><mi>L</mi></math>是分配格当且仅当
+      <math display="block">
+        <mrow>
+          <mrow><mi>z</mi><mo>&and;</mo><mi>x</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi>z</mi><mo>&and;</mo><mi>y</mi></mrow>
+        </mrow>
+        <mtext>且</mtext>
+        <mrow>
+          <mrow><mi>z</mi><mo>&or;</mo><mi>x</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi>z</mi><mo>&or;</mo><mi>y</mi></mrow>
+        </mrow>
+        <mtext>可以推出</mtext>
+        <mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow>
+      </math>
+    </div>
+    <div class="proof"><b>证明.</b> 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <h3>习题1</h3>
+    <div class="exercise"><b>练习1. </b>找出所有<math><mn>4</mn></math>元偏序集和<math><mn>5</mn></math>元格.</div>
+    <div class="exercise"><b>练习2. </b></div>
+    <div class="exercise"><b>练习3. </b>设<math><mi>P</mi></math>是一个偏序集, <math><mrow><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是闭包算子, 请证明下列条件等价:
+      <ol>
+        <li><math><mrow><mi>f</mi><mo>&le;</mo><mi>g</mi></mrow></math>;</li>
+        <li><math><mrow><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo>=</mo><mi>g</mi></mrow></math>;</li>
+        <li><math><mrow><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>=</mo><mi>g</mi></mrow></math>;</li>
+        <li><math><mrow><mrow><mi>Im</mi><mo>&af;</mo><mi>g</mi></mrow><mo>&sube;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></mrow></math>.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 由1推出2: 对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>, 我们知道<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&ge;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 这是增值性. 另外, 由于<math><mrow><mi>f</mi><mo>&le;</mo><mi>g</mi></mrow></math>, 所以<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 根据幂等性, 可以推出<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 因此, <math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即<math><mrow><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo>=</mo><mi>g</mi></mrow></math>.<br/>由2推出3: 对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>, 根据增值性和单调性, 我们有<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&ge;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 然后, 我们又知道<math><mrow><mi>g</mi><mo>=</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo>=</mo><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow></mrow></math>. <math><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow></math>当然是单调的, 所以说<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 于是<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 因此, <math><mrow><mrow><mi>g</mi><mo>&compfn;</mo><mi>f</mi></mrow><mo>=</mo><mi>g</mi></mrow></math>.<br/>由3推出4: 对于<math><mrow><mi>x</mi><mo>&in;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>g</mi></mrow></mrow></math>, 我们知道存在<math><mrow><mi>y</mi><mo>&in;</mo><mi>P</mi></mrow></math>使得<math><mrow><mi>x</mi><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 现在我们希望说明存在<math><mrow><mi>z</mi><mo>&in;</mo><mi>P</mi></mrow></math>使得<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 然而, 我们将要证明<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 首先根据增值性, <math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&ge;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 于是, 我们还需要证明<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 不过, 我们有<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 根据增值性这也是显然的.<br/>由4推出1: 对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>, 我们要证明<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 因为<math><mrow><mrow><mi>Im</mi><mo>&af;</mo><mi>g</mi></mrow><mo>&sube;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></mrow></math>, 所以既然<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&in;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>g</mi></mrow></mrow></math>, 那么存在<math><mrow><mi>y</mi><mo>&in;</mo><mi>P</mi></mrow></math>使得<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 接着, 我们可以推出
+      <math display="block">
+        <mtable displaystyle="true" columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow><mi>g</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>f</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>f</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>f</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      因为<math><mrow><mi>x</mi><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 所以<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="exercise"><b>练习4. </b></div>
+    <div class="exercise"><b>练习5. </b></div>
+    <div class="exercise"><b>练习6. </b>设<math><mi>L</mi></math>是一个格, <math><mrow><mi>d</mi><mo>:</mo><mrow><mi>L</mi><mo>&rarr;</mo><mrow><mo stretchy="false">[</mo><mn>0</mn><mo>,</mo><mrow><mo>+</mo><mi>&infin;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>是一个映射满足
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>+</mo>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>x</mi><mo>&or;</mo><mi>y</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>+</mo>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>x</mi><mo>&and;</mo><mi>y</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      且<math><mrow><mi>x</mi><mo>&lt;</mo><mi>y</mi></mrow></math>可以推出<math><mrow><mrow><mi>d</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&lt;</mo><mrow><mi>d</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 我们称<math><mrow><mo stretchy="false">(</mo><mrow><mi>L</mi><mo>,</mo><mi>d</mi></mrow><mo stretchy="false">)</mo></mrow></math>是一个度量格. 定义<math><mrow><mi>&rho;</mi><mo>:</mo><mrow><mrow><mi>L</mi><mo>&times;</mo><mi>L</mi></mrow><mo>&rarr;</mo><mrow><mo stretchy="false">[</mo><mn>0</mn><mo>,</mo><mrow><mo>+</mo><mi>&infin;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>为
+      <math display="block">
+        <mrow>
+          <mrow><mi>&rho;</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>x</mi><mo>&or;</mo><mi>y</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&minus;</mo>
+            <mrow><mi>d</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>x</mi><mo>&and;</mo><mi>y</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      证明<math><mi>&rho;</mi></math>是<math><mi>L</mi></math>上的一个度量, 并描述其所诱导的拓扑的开集和闭集.</div>
+    <div class="exercise"><b>练习7. </b></div>
+    <div class="exercise"><b>练习8. </b></div>
+    <div class="exercise"><b>练习9. </b></div>
+    <div class="exercise"><b>练习10. </b></div>
+    <div class="exercise"><b>练习11. </b></div>
+    <h2>第2章 Galois伴随和Galois连接</h2>
+    <p>本章标题中的两个名字在许多文献中存在着大量混用的现象, 现在我们从历史发展的角度阐述它们的异同点. 特别指出, Galois伴随的英文是Galois correspondence或Galois adjunction, 而Galois连接 (也称Galois联络) 英文则是Galois connection, 两者都是两个偏序集之间满足一定条件的映射序对.</p>
+    <h3>第2.1节 Galois伴随</h3>
+    <p>虽然Galois连接出现得比Galois伴随更早, 然而从格论的角度来看, Galois伴随给人以更加自然和实用之感. 因此, 我们先在本节介绍Galois伴随及其相关结果.</p>
+    <div class="definition"><b>定义2.1.1. </b>如图2.1所示, 设<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>和<math><mrow><mi>g</mi><mo>:</mo><mrow><mi>Q</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是偏序集之间的保序映射, 如果对于任意的<math><mrow><mi>a</mi><mo>&in;</mo><mi>P</mi></mrow></math>和<math><mrow><mi>b</mi><mo>&in;</mo><mi>Q</mi></mrow></math>都有
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&le;</mo><mi>b</mi></mrow>
+          <mo>&xhArr;</mo>
+          <mrow><mi>a</mi><mo>&le;</mo>
+            <mrow><mi>g</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      则称<math><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></math>是从<math><mi>P</mi></math>到<math><mi>Q</mi></math>的一个Galois伴随, 记作
+      <math display="block">
+        <mrow>
+          <mrow><mi>f</mi><mo>&dashv;</mo><mi>g</mi></mrow>
+          <mo>:</mo>
+          <mrow><mi>P</mi><mo>&rharu;</mo><mi>Q</mi></mrow>
+        </mrow>
+      </math>
+      如果<math><mrow><mi>P</mi><mo>=</mo><mi>Q</mi></mrow></math>, 则称<math><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></math>是<math><mi>P</mi></math>上的一个Galois伴随.</div>
+    <p>这里的<math><mi>f</mi></math>和<math><mi>g</mi></math>有位置之分: <math><mi>f</mi></math>位于不等号的左侧, 而<math><mi>g</mi></math>位于右侧. 一般情况下, 称<math><mi>f</mi></math>是<math><mi>g</mi></math>的左伴随, <math><mi>g</mi></math>是<math><mi>f</mi></math>的右伴随. 有些文献也将<math><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow></math>分别称为上伴随和下伴随.</p>
+    <div class="example"><b>例子2.1.1. </b>
+      <ol>
+        <li>设<math><mrow><mi>R</mi><mo>&sube;</mo><mrow><mi>X</mi><mo>&times;</mo><mi>Y</mi></mrow></mrow></math>是一个二元关系, 分别定义<math><mrow><msup><mi>R</mi><mo>&rarr;</mo></msup><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>和<math><mrow><msup><mi>R</mi><mo>&larr;</mo></msup><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>为
+          <math display="block">
+            <mrow>
+              <mrow>
+                <msup><mi>R</mi><mo>&rarr;</mo></msup>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>y</mi><mo>&in;</mo><mi>Y</mi></mrow>
+                  <mo>|</mo>
+                  <mrow><mo>&exist;</mo>
+                    <mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow>
+                    <mo lspace="0">.</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&in;</mo><mi>R</mi></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </math>
+          <math display="block">
+            <mrow>
+              <mrow>
+                <msup><mi>R</mi><mo>&larr;</mo></msup>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow>
+                  <mo>|</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&in;</mo><mi>R</mi></mrow>
+                    <mo>&rArr;</mo>
+                    <mrow><mi>y</mi><mo>&in;</mo><mi>B</mi></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </math>
+          则<math><mrow><mrow><msup><mi>R</mi><mo>&rarr;</mo></msup><mo>&dashv;</mo><msup><mi>R</mi><mo>&larr;</mo></msup></mrow><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rharu;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>.</li>
+        <li>设<math><mrow><mi>R</mi><mo>&sube;</mo><mrow><mi>X</mi><mo>&times;</mo><mi>Y</mi></mrow></mrow></math>是一个二元关系, 分别定义<math><mrow><mmultiscripts><mi>R</mi><mprescripts/><mrow/><mo>&rarr;</mo></mmultiscripts><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>和<math><mrow><mmultiscripts><mi>R</mi><mprescripts/><mrow/><mo>&larr;</mo></mmultiscripts><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>为
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mmultiscripts><mi>R</mi>
+                  <mprescripts/>
+                  <mrow/>
+                  <mo>&rarr;</mo></mmultiscripts>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>y</mi><mo>&in;</mo><mi>Y</mi></mrow>
+                  <mo>|</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&in;</mo><mi>R</mi></mrow>
+                    <mo>&rArr;</mo>
+                    <mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </math>
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mmultiscripts><mi>R</mi>
+                  <mprescripts/>
+                  <mrow/>
+                  <mo>&larr;</mo></mmultiscripts>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow>
+                  <mo>|</mo>
+                  <mrow><mo>&exist;</mo>
+                    <mrow><mi>y</mi><mo>&in;</mo><mi>B</mi></mrow>
+                    <mo lspace="0">.</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&in;</mo><mi>R</mi></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </math>
+          则<math><mrow><mrow><mmultiscripts><mi>R</mi><mprescripts/><mrow/><mo>&larr;</mo></mmultiscripts><mo>&dashv;</mo><mmultiscripts><mi>R</mi><mprescripts/><mrow/><mo>&rarr;</mo></mmultiscripts></mrow><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rharu;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>.</li>
+        <li>设<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow></mrow></math>是一个映射. 将<math><mi>f</mi></math>视为二元关系<math><mrow><mo stretchy="false">{</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>|</mo><mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></math>, 由1知<math><mrow><mrow><msup><mi>f</mi><mo>&rarr;</mo></msup><mo>&dashv;</mo><msup><mi>f</mi><mo>&larr;</mo></msup></mrow><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rharu;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>其中
+          <math display="block">
+            <mrow>
+              <mrow>
+                <msup><mi>f</mi><mo>&rarr;</mo></msup>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>|</mo>
+                  <mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </math>
+          <math display="block">
+            <mrow>
+              <mrow>
+                <msup><mi>f</mi><mo>&larr;</mo></msup>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi>x</mi><mo>&in;</mo><mi>X</mi></mrow>
+                  <mo>|</mo>
+                  <mrow>
+                    <mrow><mi>f</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>&in;</mo><mi>B</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </math>
+        </li>
+      </ol>
+    </div>
+    <p>Galois伴随除了用当且仅当的方式定义之外, 还可以利用映射的复合与偏序关系进行刻画.</p>
+    <div class="theorem"><b>定理2.1.1. </b>设<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>和<math><mrow><mi>g</mi><mo>:</mo><mrow><mi>Q</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是偏序集之间的保序映射, 则下列条件等价:
+      <ol>
+        <li><math><mrow><mrow><mi>f</mi><mo>&dashv;</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rharu;</mo><mi>Q</mi></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><msub><mi>id</mi><mi>P</mi></msub><mo>&le;</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow></mrow><mo>,</mo><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>&le;</mo><msub><mi>id</mi><mi>Q</mi></msub></mrow></mrow></math>.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 1推出2: 对于任意的<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>, 由<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>可以推出<math><mrow><mi>x</mi><mo>&le;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即<math><mrow><msub><mi>id</mi><mi>P</mi></msub><mo>&le;</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow></mrow></math>. 对于任意的<math><mrow><mi>y</mi><mo>&in;</mo><mi>Q</mi></mrow></math>, 由<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>可以推出<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>y</mi></mrow></math>, 即<math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>&le;</mo><msub><mi>id</mi><mi>Q</mi></msub></mrow></math>.<br/>2推出1: 对于任意的<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>和<math><mrow><mi>y</mi><mo>&in;</mo><mi>Q</mi></mrow></math>, 如果<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>y</mi></mrow></math>, 根据单调性可知<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 又因为<math><mrow><mrow><msub><mi>id</mi><mi>P</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 于是<math><mrow><mrow><msub><mi>id</mi><mi>P</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即<math><mrow><mi>x</mi><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 如果<math><mrow><mi>x</mi><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 那么根据单调性可知<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 又因为<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><msub><mi>id</mi><mi>Q</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 于是<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><msub><mi>id</mi><mi>Q</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>y</mi></mrow></math>.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>由以上定理易得如下结论:</p>
+    <div class="theorem"><b>定理2.1.2. </b>设<math><mrow><mrow><mi>f</mi><mo>&dashv;</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rharu;</mo><mi>Q</mi></mrow></mrow></math>, 则
+      <ol>
+        <li><math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><mi>f</mi></mrow></math>, <math><mrow><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><mi>g</mi></mrow></math>;</li>
+        <li><math><mrow><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是闭包算子, <math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>Q</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>是内部算子.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 
+      <ol>
+        <li>我们知道<math><mrow><msub><mi>id</mi><mi>P</mi></msub><mo>&le;</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow></mrow></math>, 于是对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>都有<math><mrow><mi>x</mi><mo>&le;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 根据单调性, 可知<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 另外, 根据<math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>&le;</mo><msub><mi>id</mi><mi>Q</mi></msub></mrow></math>, 我们知道对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>都有<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><msub><mi>id</mi><mi>Q</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 因此, <math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><mi>f</mi></mrow></math>. 我们知道<math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>&le;</mo><msub><mi>id</mi><mi>Q</mi></msub></mrow></math>, 于是对于每个<math><mrow><mi>y</mi><mo>&in;</mo><mi>Q</mi></mrow></math>都有<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>y</mi></mrow></math>. 根据单调性, 可知<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 另外, 根据<math><mrow><msub><mi>id</mi><mi>P</mi></msub><mo>&le;</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow></mrow></math>, 我们知道对于每个<math><mrow><mi>y</mi><mo>&in;</mo><mi>Q</mi></mrow></math>都有<math><mrow><mrow><msub><mi>id</mi><mi>P</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 即<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 因此, <math><mrow><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><mi>g</mi></mrow></math>.</li>
+        <li><math><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow></math>的保序性和增值性都是显然的. 为了说明幂等性, 我们需要证明对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>都有
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </math>
+          由1的结论这也是显然的. <math><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow></math>的保序性和减值性也是显然的, 而幂等性则需要证明
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>f</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>=</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </math>
+          由1的结论这也是显然的.</li>
+      </ol>
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>虽然Galois伴随的两个偏序集不一定序同构, 但是我们可以通过缩小定义域和陪域的方式得到一组序同构的偏序集.</p>
+    <div class="theorem"><b>定理2.1.3. </b>如果<math><mrow><mrow><mi>f</mi><mo>&dashv;</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rharu;</mo><mi>Q</mi></mrow></mrow></math>, 则<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&cong;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Q</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</div>
+    <div class="proof"><b>证明.</b> 将<math><mi>f</mi></math>限制为<math><mrow><mi>&phi;</mi><mo>:</mo><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Q</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>, 将<math><mi>g</mi></math>限制为<math><mrow><mi>&psi;</mi><mo>:</mo><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Q</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>. 对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Q</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 存在<math><mrow><mi>y</mi><mo>&in;</mo><mi>Q</mi></mrow></math>满足<math><mrow><mi>x</mi><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 于是
+      <math display="block">
+        <mtable displaystyle="true" columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&psi;</mi><mo>&it;</mo><mi>&phi;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>g</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>x</mi></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      同理, 我们可以推出
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&phi;</mi><mo>&it;</mo><mi>&psi;</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo><mi>y</mi></mrow>
+      </math>
+      对于每个<math><mrow><mi>y</mi><mo>&in;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>成立. 也就是说, <math><mi>&phi;</mi></math>和<math><mi>&psi;</mi></math>是可逆的保序映射, 也就是序同构.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>由定义2.1.1和定理2.1.1可以看出, Galois伴随的两个映射之间具有良好的协调关系, 以至于它们可以相互唯一确定.</p>
+    <div class="theorem"><b>定理2.1.4. </b>设<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>和<math><mrow><mi>g</mi><mo>:</mo><mrow><mi>Q</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是偏序集之间的保序映射, 那么下列条件等价:
+      <ol>
+        <li><math><mrow><mrow><mi>f</mi><mo>&dashv;</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rharu;</mo><mi>Q</mi></mrow></mrow></math>;</li>
+        <li><math><mrow><mo>&forall;</mo><mrow><mi>a</mi><mo>&in;</mo><mi>P</mi></mrow><mo lspace="0">.</mo><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>Min</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>g</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>;</li>
+        <li><math><mrow><mo>&forall;</mo><mrow><mi>b</mi><mo>&in;</mo><mi>Q</mi></mrow><mo lspace="0">.</mo><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>Max</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>f</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 1推出2: 对于任意的<math><mrow><mi>a</mi><mo>&in;</mo><mi>P</mi></mrow></math>, 由于<math><mrow><mi>a</mi><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 我们有<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&in;</mo><mrow><msup><mi>g</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>; 任取<math><mrow><mi>y</mi><mo>&in;</mo><mrow><msup><mi>g</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 我们有<math><mrow><mi>a</mi><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 从而<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>y</mi></mrow></math>. 这说明<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>Min</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>g</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.<br/>2推出1: 对于任意的<math><mrow><mi>a</mi><mo>&in;</mo><mi>P</mi></mrow></math>和<math><mrow><mi>b</mi><mo>&in;</mo><mi>Q</mi></mrow></math>, 如果<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>b</mi></mrow></math>, 则由<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>Min</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>g</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>可知<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&in;</mo><mrow><msup><mi>g</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 于是<math><mrow><mi>a</mi><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 再根据<math><mi>g</mi></math>的单调性就有<math><mrow><mi>a</mi><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>; 反过来, 如果<math><mrow><mi>a</mi><mo>&le;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 那么<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&in;</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>a</mi></mrow></mrow></math>, <math><mrow><mi>b</mi><mo>&in;</mo><mrow><msup><mi>g</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 于是<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>b</mi></mrow></math>. 因此, <math><mrow><mrow><mi>f</mi><mo>&dashv;</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rharu;</mo><mi>Q</mi></mrow></mrow></math>.<br/>通过类似的方法我们也可以证明1等价于3.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="definition"><b>定义2.1.2. </b>设<math><mrow><mi>h</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>是偏序集之间的一个映射.
+      <ol>
+        <li>如果主理想的原像是主理想, 则称<math><mi>h</mi></math>为剩余映射 (residuated mapping).</li>
+        <li>如果主滤子的原像是主滤子, 则称<math><mi>h</mi></math>为残余映射 (residual mapping).</li>
+      </ol>
+    </div>
+    <div class="theorem"><b>定理2.1.5. </b>设<math><mrow><mi>h</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>是偏序集之间的一个保序映射, 那么
+      <ol>
+        <li><math><mi>h</mi></math>有右伴随当且仅当<math><mi>h</mi></math>是一个剩余映射;</li>
+        <li><math><mi>h</mi></math>有左伴随当且仅当<math><mi>h</mi></math>是一个残余映射.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 2是1的对偶结论, 故我们只证明1.<br/>左推右: 设<math><mi>h</mi></math>有右伴随, 根据前述定理, 对于任意的<math><mrow><mi>b</mi><mo>&in;</mo><mi>Q</mi></mrow></math>, <math><mrow><msup><mi>h</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>都有最大元; 又因为<math><mi>h</mi></math>是保序的, 易知<math><mrow><msup><mi>h</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是一个下集, 从而是一个主理想.<br/>右推左: 对于任意的<math><mrow><mi>b</mi><mo>&in;</mo><mi>Q</mi></mrow></math>, 由于<math><mrow><msup><mi>h</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是一个主理想, <math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>Max</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mi>h</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>是良定的, 由此得到映射<math><mrow><mi>g</mi><mo>:</mo><mrow><mi>Q</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>. <math><mi>g</mi></math>按照定义自动是单调的. {译注: 原文说根据<math><mi>h</mi></math>的保序性, 这是不对的.} 由前述定理可知, <math><mi>g</mi></math>是<math><mi>h</mi></math>的右伴随.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <p>集合论中我们熟知对于映射<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>X</mi><mo>&rarr;</mo><mi>Y</mi></mrow></mrow></math>, 对应的<math><mrow><mi>f</mi><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>保持并, <math><mrow><msup><mi>f</mi><mrow><mo>&minus;</mo><mn>1</mn></mrow></msup><mo>:</mo><mrow><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&rarr;</mo><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>既保持并又保持交. 实际上, 映射序对的保并性和保交性是对于Galois伴随的一种刻画.</p>
+    <div class="theorem"><b>定理2.1.6. </b>在Galois伴随中, 左伴随保持任意存在的并, 右伴随保持任意存在的交.</div>
+    <div class="proof"><b>证明.</b> 设<math><mrow><mo stretchy="false">(</mo><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo stretchy="false">)</mo></mrow></math>是从偏序集<math><mi>P</mi></math>到偏序集<math><mi>Q</mi></math>的一个Galois伴随. 设<math><mrow><mi>A</mi><mo>&sube;</mo><mi>P</mi></mrow></math>且<math><mrow><mo>&Vee;</mo><mi>A</mi></mrow></math>存在. 如果<math><mrow><mi>A</mi><mo>=</mo><mi>&empty;</mi></mrow></math>, 那么<math><mi>P</mi></math>有最小元素<math><msub><mn>0</mn><mi>P</mi></msub></math>
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem"><b>定理2.1.7. </b>设<math><mrow><mi>P</mi><mo>,</mo><mi>Q</mi></mrow></math>是两个完备格.
+      <ol>
+        <li>保序映射<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></mrow></math>保持任意的并当且仅当<math><mi>f</mi></math>有右伴随<math><mrow><mi>g</mi><mo>:</mo><mrow><mi>Q</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>, 且</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem"><b>定理2.1.8. </b>设<math><mrow><mrow><mi>f</mi><mo>&dashv;</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rharu;</mo><mi>Q</mi></mrow></mrow></math>, 则下列条件等价:
+      <ol>
+        <li><math><mi>f</mi></math>是单射;</li>
+        <li><math><mrow><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><msub><mi>id</mi><mi>P</mi></msub></mrow></math>;</li>
+        <li><math><mi>g</mi></math>是满射.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 1推出2: 由定理2.1.2, 我们知道<math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><mi>f</mi></mrow></math>. 换言之, 对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>, 我们都有<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 因为<math><mi>f</mi></math>是单射, 所以<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>x</mi></mrow></math>, 也就是<math><mrow><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><msub><mi>id</mi><mi>P</mi></msub></mrow></math>.<br/>2推出3: 我们知道<math><mrow><mrow><mi>Im</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&sube;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>g</mi></mrow></mrow></math>, 又知道<math><mrow><mrow><mi>Im</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>Im</mi><mo>&af;</mo><msub><mi>id</mi><mi>P</mi></msub></mrow><mo>=</mo><mi>P</mi></mrow></math>, 所以<math><mi>g</mi></math>是满射.<br/>3推出2: 对于每个<math><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></math>, 鉴于<math><mi>g</mi></math>是满射, 所以存在<math><mrow><mi>y</mi><mo>&in;</mo><mi>Q</mi></mrow></math>使得<math><mrow><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>x</mi></mrow></math>. 于是, 我们有
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>g</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>g</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo><mi>x</mi></mrow>
+      </math>
+      换言之, <math><mrow><mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow><mo>=</mo><msub><mi>id</mi><mi>P</mi></msub></mrow></math>.<br/>2推出1: 对于<math><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>P</mi></mrow></math>, 如果<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 那么
+      <math display="block">
+        <mtable displaystyle="true" columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow><mi>g</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>id</mi><mi>P</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>x</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>g</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>f</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>g</mi><mo>&it;</mo><mi>f</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>id</mi><mi>P</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>y</mi></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      即<math><mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>, 换言之则是<math><mi>f</mi></math>为单射.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem"><b>定理2.1.9. </b>设<math><mrow><mrow><mi>f</mi><mo>&dashv;</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>P</mi><mo>&rharu;</mo><mi>Q</mi></mrow></mrow></math>, 则下列条件等价:
+      <ol>
+        <li><math><mi>f</mi></math>是满射;</li>
+        <li><math><mrow><mrow><mi>f</mi><mo>&it;</mo><mi>g</mi></mrow><mo>=</mo><msub><mi>id</mi><mi>Q</mi></msub></mrow></math>;</li>
+        <li><math><mi>g</mi></math>是单射.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="corollary"><b>推论2.1.1. </b></div>
+    <h3>第2.2节 内部算子和闭包算子与Galois伴随的关系</h3>
+    <p>定理2.1.2指出从Galois伴随出发可以得到一个闭包算子和一个内部算子. 实际上, 每个闭包算子和内部算子也都可以分解为Galois伴随.</p>
+    <div class="theorem"><b>定理2.2.1. </b></div>
+    <div class="theorem"><b>定理2.2.2. </b></div>
+    <div class="theorem"><b>定理2.2.3. </b></div>
+    <h3>第2.3节 Galois连接</h3>
+    <p>Galois连接是一种逆序的映射对, 故常称为逆序Galois伴随或者对偶Galois伴随.</p>
+    <div class="definition"><b>定义2.3.1. </b></div>
+    <h3>第2.4节 形式概念分析的格论基础</h3>
+    <h3>第2.5节 偏序集的Dedekin-MacNeille完备化</h3>
+    <h3>习题2</h3>
+    <div class="exercise"><b>练习1. </b></div>
+    <h2>第3章 Heyting代数</h2>
+    <p>Heyting代数由荷兰数学家A. Heyting于1930年引入. 由于其逻辑排中律一般不再成立, 所以Heyting代数可以看作直觉主义逻辑演算的Tarski-Lindenbaum代数. 在数学方面, Heyting代数是Boole代数的一般化, 曾被称为伪Boole代数或Brouwer格.</p>
+    <h3>第3.1节 Heyting代数的基本概念</h3>
+    <div class="definition"><b>定义3.1.1. </b>设<math><mi>H</mi></math>是一个格, 若存在二元运算<math><mrow><mo>&rarr;</mo><mo>:</mo><mrow><mrow><mi>H</mi><mo>&times;</mo><mi>H</mi></mrow><mo>&rarr;</mo><mi>H</mi></mrow></mrow></math>使得
+      <math display="block">
+        <mrow><mo>&forall;</mo>
+          <mrow>
+            <mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow>
+            <mo>&in;</mo><mi>H</mi></mrow>
+          <mo lspace="0">.</mo>
+          <mrow>
+            <mrow>
+              <mrow><mi>c</mi><mo>&and;</mo><mi>a</mi></mrow>
+              <mo>&le;</mo><mi>b</mi></mrow>
+            <mo>&xhArr;</mo>
+            <mrow><mi>c</mi><mo>&le;</mo>
+              <mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      则称<math><mi>H</mi></math>为Heyting代数.</div>
+    <p>容易验证, <math><mi>H</mi></math>有最大元但不一定有最小元. 有些文献会假定Heyting代数是一个有界格.</p>
+    <p>由Heyting代数的定义和第2章中Galois伴随之性质, 我们有以下定理.</p>
+    <div class="theorem"><b>定理3.1.1. </b>设<math><mi>H</mi></math>是一个格, 则下列条件等价:
+      <ol>
+        <li><math><mi>H</mi></math>为Heyting代数;</li>
+        <li>对于任意的<math><mrow><mi>a</mi><mo>&in;</mo><mi>H</mi></mrow></math>, <math><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>a</mi><mo>&and;</mo><mrow><mo stretchy="false">(</mo><mi>-</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mi>a</mi><mo>&rarr;</mo><mrow><mo stretchy="false">(</mo><mi>-</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>构成<math><mi>H</mi></math>上的Galois伴随;</li>
+        <li>对于任意的<math><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>&in;</mo><mi>H</mi></mrow></math>, <math><mrow><mo stretchy="false">{</mo><mrow><mrow><mi>x</mi><mo>&in;</mo><mi>H</mi></mrow><mo>|</mo><mrow><mrow><mi>a</mi><mo>&and;</mo><mi>x</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></math>存在最大元.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 1推出2: 根据Galois伴随的定义, 我们需要证明对于任意的<math><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>H</mi></mrow></math>, 都有
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>a</mi><mo>&and;</mo><mi>x</mi></mrow>
+            <mo>&le;</mo><mi>y</mi></mrow>
+          <mo>&xhArr;</mo>
+          <mrow><mi>x</mi><mo>&le;</mo>
+            <mrow><mi>a</mi><mo>&rarr;</mo><mi>y</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      而这由Heyting代数的定义所保证. 我们还需要说明这两个函数的单调性. 如果<math><mrow><mi>x</mi><mo>&le;</mo><mi>y</mi></mrow></math>, 那么<math><mrow><mrow><mi>a</mi><mo>&and;</mo><mi>x</mi></mrow><mo>&le;</mo><mrow><mi>a</mi><mo>&and;</mo><mi>y</mi></mrow></mrow></math>, 这可由定义得到. 如果<math><mrow><mi>x</mi><mo>&le;</mo><mi>y</mi></mrow></math>, 我们要证明<math><mrow><mrow><mi>a</mi><mo>&rarr;</mo><mi>x</mi></mrow><mo>&le;</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>y</mi></mrow></mrow></math>. 根据<math><mrow><mrow><mi>a</mi><mo>&rarr;</mo><mi>x</mi></mrow><mo>&le;</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>x</mi></mrow></mrow></math>, 根据剩余律我们有<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&and;</mo><mi>a</mi></mrow><mo>&le;</mo><mi>x</mi></mrow></math>, 鉴于<math><mrow><mi>x</mi><mo>&le;</mo><mi>y</mi></mrow></math>, 所以有<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&and;</mo><mi>a</mi></mrow><mo>&le;</mo><mi>y</mi></mrow></math>, 再用一次剩余律可知<math><mrow><mrow><mi>a</mi><mo>&rarr;</mo><mi>x</mi></mrow><mo>&le;</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>y</mi></mrow></mrow></math>.<br/>2推出1: 根据1推出2的证明, 这就是立即可以得到的.<br/>1推出3: 我们欲说明<math><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow></math>是<math><mrow><mo stretchy="false">{</mo><mrow><mrow><mi>x</mi><mo>&in;</mo><mi>H</mi></mrow><mo>|</mo><mrow><mrow><mi>a</mi><mo>&and;</mo><mi>x</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></math>的最大元. 首先, 根据1推出2的证明过程, 我们知道<math><mrow><mrow><mi>a</mi><mo>&and;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>b</mi></mrow></math>这一事实, 于是<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&in;</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><mi>x</mi><mo>&in;</mo><mi>H</mi></mrow><mo>|</mo><mrow><mrow><mi>a</mi><mo>&and;</mo><mi>x</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></math>. 其次, 如果<math><mrow><mi>c</mi><mo>&in;</mo><mi>H</mi></mrow></math>满足<math><mrow><mrow><mi>a</mi><mo>&and;</mo><mi>c</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></math>, 那么根据剩余律<math><mrow><mi>c</mi><mo>&le;</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow></mrow></math>. 由此, 我们知道<math><mrow><mi>b</mi><mo>&rarr;</mo><mi>c</mi></mrow></math>就是最大元.<br/>3推出1: 我们定义<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&colone;</mo><mrow><mi>Max</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><mi>x</mi><mo>&in;</mo><mi>H</mi></mrow><mo>|</mo><mrow><mrow><mi>a</mi><mo>&and;</mo><mi>x</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></mrow><mo stretchy="false">}</mo></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 当然这是良定的. 接着, 我们需要证明剩余律. 对于任意的<math><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow><mo>&in;</mo><mi>H</mi></mrow></math>, 如果<math><mrow><mrow><mi>c</mi><mo>&and;</mo><mi>a</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></math>, 即<math><mrow><mi>c</mi><mo>&in;</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><mi>x</mi><mo>&in;</mo><mi>H</mi></mrow><mo>|</mo><mrow><mrow><mi>a</mi><mo>&and;</mo><mi>x</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></math>, <math><mrow><mi>c</mi><mo>&le;</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow></mrow></math>根据定义即得. 如果<math><mrow><mi>c</mi><mo>&le;</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow></mrow></math>, 那么<math><mrow><mrow><mi>c</mi><mo>&and;</mo><mi>a</mi></mrow><mo>&le;</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&and;</mo><mi>a</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></math>, 这就是根据<math><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow></math>的定义得到的.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="example"><b>例子3.1.1. </b></div>
+    <div class="theorem"><b>定理3.1.2. </b>每个Heyting代数都是分配格.</div>
+    <div class="proof"><b>证明.</b> 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="theorem"><b>定理3.1.3. </b>每个有限分配格都是Heyting代数.</div>
+    <div class="theorem"><b>定理3.1.4. </b>每个Boole代数都是Heyting代数.</div>
+    <div class="theorem"><b>定理3.1.5. </b>设<math><mi>H</mi></math>是一个Heyting代数, 则对于任意的<math><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow><mo>&in;</mo><mi>H</mi></mrow></math>, 我们有
+      <ol>
+        <li><math><mrow><mi>b</mi><mo>&le;</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mn>1</mn><mo>&rarr;</mo><mi>a</mi></mrow><mo>=</mo><mi>a</mi></mrow></math>;</li>
+        <li><math><mrow><mrow><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo>=</mo><mn>1</mn></mrow><mo>&xhArr;</mo><mrow><mi>a</mi><mo>&le;</mo><mi>b</mi></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mi>a</mi><mo>&and;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>a</mi><mo>&and;</mo><mi>b</mi></mrow></mrow></math>;</li>
+        <li><math><mrow><mi>a</mi><mo>&rarr;</mo><mrow><mo stretchy="false">(</mo><mi>-</mi><mo stretchy="false">)</mo></mrow></mrow></math>保序, <math><mrow><mrow><mo stretchy="false">(</mo><mi>-</mi><mo stretchy="false">)</mo></mrow><mo>&rarr;</mo><mi>a</mi></mrow></math>逆序;</li>
+        <li><math><mrow><mrow><mi>a</mi><mo>&rarr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>b</mi><mo>&and;</mo><mi>c</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&and;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>c</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>;</li>
+        <li></li>
+      </ol>
+    </div>
+    <div class="theorem"><b>定理3.1.6. </b></div>
+    <div class="theorem"><b>定理3.1.7. </b></div>
+    <div class="theorem"><b>定理3.1.8. </b></div>
+    <div class="theorem"><b>定理3.1.9. </b></div>
+    <h3>第3.2节 滤子和同余关系之间的一一对应</h3>
+    <h2>第4章 Frame和拓扑表示定理</h2>
+    <h3>第4.1节 Frame的定义和基本性质</h3>
+    <h3>第4.2节 空间式frame和sober空间</h3>
+    <h2>第5章 Domain与连续格</h2>
+    <h2>第6章 完全分配格</h2>
+    <h2>第7章 剩余格</h2>
+    <h3>第7.1节 剩余格的基本概念</h3>
+    <div class="definition"><b>定义7.1.1. </b>设<math><mi>L</mi></math>是一个有界格, <math><mn>0</mn></math>和<math><mn>1</mn></math>分别是其最小元和最大元, <math><mrow><mrow><mo displaystyle="false">&otimes;</mo><mo>,</mo><mo>&rarr;</mo></mrow><mo>:</mo><mrow><mrow><mi>L</mi><mo>&times;</mo><mi>L</mi></mrow><mo>&rarr;</mo><mi>L</mi></mrow></mrow></math>是两个其上的二元运算. 如果
+      <ol>
+        <li><math><mrow><mo stretchy="false">(</mo><mrow><mi>L</mi><mo>,</mo><mo displaystyle="false">&otimes;</mo><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></math>是交换幺半群;</li>
+        <li>对于任意的<math><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow><mo>&in;</mo><mi>L</mi></mrow></math>都有
+          <math display="block">
+            <mrow>
+              <mrow>
+                <mrow><mi>a</mi><mo displaystyle="false">&otimes;</mo><mi>b</mi></mrow>
+                <mo>&le;</mo><mi>c</mi></mrow>
+              <mo>&xhArr;</mo>
+              <mrow><mi>a</mi><mo>&le;</mo>
+                <mrow><mi>b</mi><mo>&rarr;</mo><mi>c</mi></mrow>
+              </mrow>
+            </mrow>
+          </math>
+        </li>
+      </ol>
+      则称<math><mrow><mo stretchy="false">(</mo><mrow><mi>L</mi><mo>,</mo><mo displaystyle="false">&otimes;</mo><mo>,</mo><mo>&rarr;</mo></mrow><mo stretchy="false">)</mo></mrow></math>为剩余格. 当<math><mi>L</mi></math>还是完备格时, 则称<math><mi>L</mi></math>为完备剩余格.</div>
+    <div class="theorem"><b>定理7.1.1. </b>设<math><mi>L</mi></math>是一个剩余格, 则对于任意的<math><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow><mo>&in;</mo><mi>L</mi></mrow></math>, 我们有
+      <ol>
+        <li><math><mrow><mrow><mi>a</mi><mo displaystyle="false">&otimes;</mo><mi>b</mi></mrow><mo>&le;</mo><mrow><mi>a</mi><mo>&and;</mo><mi>b</mi></mrow></mrow></math>;</li>
+        <li><math><mrow><mrow><mrow><mi>a</mi><mo displaystyle="false">&otimes;</mo><mn>0</mn></mrow><mo>=</mo><mn>0</mn></mrow><mo>,</mo><mrow><mrow><mn>1</mn><mo>&rarr;</mo><mi>a</mi></mrow><mo>=</mo><mi>a</mi></mrow></mrow></math>;</li>
+        <li><math><mrow><mi>b</mi><mo>&le;</mo><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow></mrow></math>;</li>
+        <li><math><mrow><mi>a</mi><mo>&le;</mo><mi>b</mi></mrow></math>当且仅当<math><mrow><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo>=</mo><mn>1</mn></mrow></math>;</li>
+      </ol>
+    </div>
   </body>
 </html>
