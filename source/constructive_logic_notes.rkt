@@ -1,12 +1,255 @@
 #lang racket
 (provide constructive_logic_notes.html)
 (require SMathML)
+(define <<
+  (case-lambda
+    ((x f) (f x))
+    ((x f . g*) (apply << (f x) g*))))
+(define (attach x* x)
+  (append x* (list x)))
+(struct goal (sequent) #:transparent)
+(struct step
+  (rule conclusion premise*)
+  #:transparent)
+(struct state
+  (table goal* next)
+  #:transparent)
+(define (initialize sequent)
+  (state (hash 0 (goal sequent)) '(0) 1))
+(define (sequent-render seq)
+  (match-define (sequent ante* succ) seq)
+  (Mrow (apply &cm (map reify-type ante*))
+        $==> (reify-type succ)))
+(define (goal-render goal)
+  (define seq (goal-sequent goal))
+  (walk $..v (sequent-render seq)))
+(define (step-render step0 t)
+  (match-define
+    (step rule conclusion premise*)
+    step0)
+  (: (~ #:attr* '((displaystyle "true"))
+        (apply split8 (map (table-render t) premise*))
+        (sequent-render conclusion))
+     rule))
+(define (state-render s)
+  ((table-render (state-table s)) 0))
+(define ((table-render t) n)
+  (define node (hash-ref t n))
+  (if (goal? node)
+      (goal-render node)
+      (step-render node t)))
+(define (enumerate start i)
+  (if (= i 0)
+      '()
+      (cons start
+            (enumerate (+ start 1) (- i 1)))))
+(define (split-insert lst i x*)
+  (define-values (left right) (split-at lst i))
+  (append left x* (cdr right)))
+(define (((refine rule rid) gid) s)
+  (match-define (state table goal* next) s)
+  (define loc (list-ref goal* gid))
+  (define goal0 (hash-ref table loc))
+  (define seq (goal-sequent goal0))
+  (define premise*
+    (map goal (rule seq)))
+  (define num (length premise*))
+  (define id* (enumerate next num))
+  (define table0
+    (let iter ((t (hash-set table loc
+                            (step rid seq id*)))
+               (id* id*)
+               (premise* premise*))
+      (if (null? id*)
+          t
+          (iter (hash-set t (car id*) (car premise*))
+                (cdr id*) (cdr premise*)))))
+  (state table0
+         (split-insert goal* gid id*)
+         (+ next num)))
+(struct sequent
+  (ante* succ)
+  #:transparent)
+;command = sequent -> sequent*
+;ImplR : command
+(define (ImplR conclusion)
+  (match-define (sequent ante* succ) conclusion)
+  (match succ
+    ((-> ,A ,B)
+     (list (sequent (attach ante* A) B)))
+    (,else
+     (error 'ImplR "the succedent ~s is not an implication"
+            succ))))
+;IdRule : command
+(define (IdRule conclusion)
+  (match-define (sequent ante* succ) conclusion)
+  (if (member succ ante*)
+      '()
+      (error 'IdRule "invalid application of the identity rule")))
+;DisjR1 : command
+(define (DisjR1 conclusion)
+  (match-define (sequent ante* succ) conclusion)
+  (match succ
+    ((disj ,A ,B)
+     (list (sequent ante* A)))
+    (,else
+     (error 'DisjR1 "the succedent ~s is not a disjunction"
+            succ))))
+;DisjR2 : command
+(define (DisjR2 conclusion)
+  (match-define (sequent ante* succ) conclusion)
+  (match succ
+    ((disj ,A ,B)
+     (list (sequent ante* B)))
+    (,else
+     (error 'DisjR2 "the succedent ~s is not a disjunction"
+            succ))))
+;DisjL : int -> command
+(define ((DisjL i) conclusion)
+  (match-define (sequent ante* succ) conclusion)
+  (define prop (list-ref ante* i))
+  (match prop
+    ((disj ,A ,B)
+     (list (sequent (attach ante* A) succ)
+           (sequent (attach ante* B) succ)))
+    (,else
+     (error 'DisjL "the prop ~s you choose is not a disjunction"
+            prop))))
+;DisjL^ : int -> command
+(define (removei i lst)
+  (if (= i 0)
+      (cdr lst)
+      (cons (car lst)
+            (removei (- i 1) (cdr lst)))))
+(define ((DisjL^ i) conclusion)
+  (match-define (sequent ante* succ) conclusion)
+  (define prop (list-ref ante* i))
+  (match prop
+    ((disj ,A ,B)
+     (define ante*^ (removei i ante*))
+     (list (sequent (attach ante*^ A) succ)
+           (sequent (attach ante*^ B) succ)))
+    (,else
+     (error 'DisjL^ "the prop ~s you choose is not a disjunction"
+            prop))))
+;ImplL : int -> command
+(define ((ImplL i) conclusion)
+  (match-define (sequent ante* succ) conclusion)
+  (define prop (list-ref ante* i))
+  (match prop
+    ((-> ,A ,B)
+     (list (sequent ante* A)
+           (sequent (attach ante* B) succ)))
+    (,else
+     (error 'ImplL "the prop ~s you choose is not an implication"
+            prop))))
+(define Γ_1 (_ Γ $1))
+(define Γ_2 (_ Γ $2))
+(define $~> (Mo "&zigrarr;"))
+(define $duarr (Mi "&duarr;"))
+(define $Hypotheses (% "Hypotheses"))
+(define $Eliminations (% "Eliminations"))
+(define $Introductions (% "Introductions"))
+(define $Identities (% "Identities"))
+(define $Left-Rules (% "Left Rules"))
+(define $Right-Rules (% "Right Rules"))
+(define $Elims (% "Elims"))
+(define $Intros (% "Intros"))
+(define (&~ x) (par0 (: $~ (&space 0.4) x)))
+(define (:FO position #:width [width 240] #:height [height 44] . x*)
+  (keyword-apply
+   ForeignObject
+   '(#:attr*)
+   `(((x ,(n2s (pt-x position)))
+      (y ,(n2s (pt-y position)))
+      (width ,(n2s width))
+      (height ,(n2s height))))
+   x*))
+(define (:FO-right position #:width [width 240] . x*)
+  (:FO (pt+ position (vec (- width) 0)) #:width width
+       (Div #:attr* '((style "text-align: right;"))
+            (apply : x*))))
+(define (bar x1 x2 y)
+  (:line (pt x1 y) (pt x2 y)))
+(define (vert x y1 y2)
+  (:arrow (pt x y1) (pt x y2)))
+(define sequent-rules.svg
+  (Svg
+   #:attr* '((width "720")
+             (height "260")
+             (viewBox "0 0 1080 390")
+             (font-size "28")
+             (style "display: block; margin: auto;"))
+   (Defs arrow-head)
+   (parameterize ((stroke-width "1.5"))
+     (G #:attr* '((stroke "black"))
+        (bar 60 115 40)
+        (vert 90 40 208)
+        (bar 75 135 212)
+        (vert 105 384 216)
+        (bar 640 890 212)
+        (vert 675 384 216)
+        (vert 855 384 216)))
+   (:FO (pt 135 18) $Hypotheses)
+   (:FO (pt 105 108) $Eliminations)
+   (:FO (pt 145 190) $duarr)
+   (:FO (pt 120 278) $Introductions)
+   (:FO (pt 380 190) $~>)
+   (:FO (pt 900 190) $Identities)
+   (:FO-right (pt 655 268) $Left-Rules)
+   (:FO-right (pt 655 305) (&~ (inv $Elims)))
+   (:FO (pt 870 268) $Right-Rules)
+   (:FO (pt 870 305) (&~ $Intros))))
+(define $unit (tupa0))
+(define $? (Mo "?"))
+(define $udarr (Mi "&udarr;"))
+(define (&? x) (: x $?))
+(define $udarr? (&? $udarr))
+(define $duarr* (&* $duarr))
+(define (Check M A)
+  (&lArr M A))
+(define (Infer M A)
+  (&=> M A))
+(define (make-monospace str)
+  (Mi str #:attr* '((mathvariant "monospace"))))
+(define $left
+  (make-monospace "left"))
+(define $right
+  (make-monospace "right"))
+(define $id:rule
+  (make-monospace "id"))
+(define $succ
+  (make-monospace "succ"))
+(define (&succ A)
+  (split2 A $succ))
+(define $ante
+  (make-monospace "ante"))
+(define (&ante A)
+  (split2 A $ante))
+(define $zero
+  (make-monospace "zero"))
+(define $one
+  (make-monospace "one"))
+(define $two
+  (make-monospace "two"))
+(define $option (make-monospace "option"))
+(define (&option τ) (split2 τ $option))
+(define $emptyCtx (Mi "&sdot;"))
+(define $code (Mi "code"))
+(define (&code M) (ap $code M))
+(define $cogen (Mi "cogen"))
+(define $let (Mi "let"))
+(define $in (Mi "in"))
+(define (LetCogen u M N)
+  (split2 $let (&= (App $cogen u) M) $in N))
+(define $nat (Mi "nat"))
+(define $vec (Mi "vec"))
 (define (type-of var env)
   (cond ((assoc var env) => cdr)
         (else (error 'type-of "unknown variable ~s" var))))
 (define (extend-env var type env)
   (cons (cons var type) env))
-(define (reify t)
+(define (reify-type t)
   (define (reify t)
     (match t
       ((-> ,t1 ,t2) (&impl (@reify t1) (@reify t2)))
@@ -24,22 +267,48 @@
       (top $top)
       (,else t)))
   (reify t))
+(define (reify-term t)
+  (define (r t)
+    (match t
+      ((cons ,t1 ,t2) (tupa0 (r t1) (r t2)))
+      ((car ,t) (&fst (@r t)))
+      ((cdr ,t) (&snd (@r t)))
+      ((lam ,x ,body) (Lam x (r body)))
+      ((app ,t1 ,t2) (App (@r t1) (@r t2)))
+      (,else t)))
+  (define (@r t)
+    (match t
+      ((cons ,t1 ,t2) (tupa0 (r t1) (r t2)))
+      ((car ,t) (@fst (r t)))
+      ((cdr ,t) (@snd (r t)))
+      ((lam ,x ,body) (@Lam x (r body)))
+      ((app ,t1 ,t2) (@App (@r t1) (@r t2)))
+      (,else t)))
+  (r t))
 (struct result (t c) #:transparent)
+(struct result0
+  (term type construction)
+  #:transparent)
 (define (VAR u)
   (lambda (env)
     (define t (type-of u env))
-    (result t (assume u (&true (reify t))))))
+    (result t (assume u (&true (reify-type t))))))
+(define (VAR0 u)
+  (lambda (env)
+    (define type (type-of u env))
+    (result0 u type
+             (assume u (&: u (reify-type type))))))
 (define (GIVEN l t)
   (lambda (env)
-    (result t (label l (&true (reify t))))))
+    (result t (label l (&true (reify-type t))))))
 (define (HYP l t u t^)
   (lambda (env)
-    (result t (walk (assume u (&true (reify t^)))
-                    (label l (&true (reify t)))))))
+    (result t (walk (assume u (&true (reify-type t^)))
+                    (label l (&true (reify-type t)))))))
 (define (HYP0 l t l^ u t^)
   (lambda (env)
-    (result t (walk (label l^ (assume u (&true (reify t^))))
-                    (label l (&true (reify t)))))))
+    (result t (walk (label l^ (assume u (&true (reify-type t^))))
+                    (label l (&true (reify-type t)))))))
 (define (CONS a b)
   (lambda (env)
     (match-define (result ta ca) (a env))
@@ -47,21 +316,51 @@
     (define type `(conj ,ta ,tb))
     (result type
             (&rull $conjI ca cb
-                   (&true (reify type))))))
+                   (&true (reify-type type))))))
+(define (CONS0 a b)
+  (lambda (env)
+    (match-define (result0 terma typea ca) (a env))
+    (match-define (result0 termb typeb cb) (b env))
+    (define term `(cons ,terma ,termb))
+    (define type `(conj ,typea ,typeb))
+    (result0 term type
+             (&rull $conjI ca cb
+                    (&: (reify-term term)
+                        (reify-type type))))))
 (define (CAR a)
   (lambda (env)
     (match-define (result ta ca) (a env))
     (match ta
       ((conj ,t1 ,t2)
        (result t1 (&rull $conjE1 ca
-                         (&true (reify t1))))))))
+                         (&true (reify-type t1))))))))
+(define (CAR0 a)
+  (lambda (env)
+    (match-define (result0 terma typea ca) (a env))
+    (define term `(car ,terma))
+    (match typea
+      ((conj ,t1 ,t2)
+       (result0 term t1
+                (&rull $conjE1 ca
+                       (&: (reify-term term)
+                           (reify-type t1))))))))
 (define (CDR a)
   (lambda (env)
     (match-define (result ta ca) (a env))
     (match ta
       ((conj ,t1 ,t2)
        (result t2 (&rull $conjE2 ca
-                         (&true (reify t2))))))))
+                         (&true (reify-type t2))))))))
+(define (CDR0 a)
+  (lambda (env)
+    (match-define (result0 terma typea ca) (a env))
+    (define term `(cdr ,terma))
+    (match typea
+      ((conj ,t1 ,t2)
+       (result0 term t2
+                (&rull $conjE2 ca
+                       (&: (reify-term term)
+                           (reify-type t2))))))))
 (define (LAM u t body)
   (lambda (env)
     (match-define (result tbody cbody)
@@ -69,7 +368,17 @@
     (define type `(-> ,t ,tbody))
     (result type
             (&rull (&implI u) cbody
-                   (&true (reify type))))))
+                   (&true (reify-type type))))))
+(define (LAM0 u t body)
+  (lambda (env)
+    (match-define (result0 termbody typebody cbody)
+      (body (extend-env u t env)))
+    (define term `(lam ,u ,termbody))
+    (define type `(-> ,t ,typebody))
+    (result0 term type
+             (&rull (&implI u) cbody
+                    (&: (reify-term term)
+                        (reify-type type))))))
 (define (APP a b)
   (lambda (env)
     (match-define (result ta ca) (a env))
@@ -79,19 +388,32 @@
        (unless (equal? t1 tb)
          (error 'APP "type mismatch"))
        (result t2 (&rull $implE ca cb
-                         (&true (reify t2))))))))
+                         (&true (reify-type t2))))))))
+(define (APP0 a b)
+  (lambda (env)
+    (match-define (result0 terma typea ca) (a env))
+    (match-define (result0 termb typeb cb) (b env))
+    (match typea
+      ((-> ,t1 ,t2)
+       (unless (equal? t1 typeb)
+         (error 'APP "type mismatch"))
+       (define term `(app ,terma ,termb))
+       (result0 term t2
+                (&rull $implE ca cb
+                       (&: (reify-term term)
+                           (reify-type t2))))))))
 (define (INL tb a)
   (lambda (env)
     (match-define (result ta ca) (a env))
     (define type `(disj ,ta ,tb))
     (result type (&rull $disjI1 ca
-                        (&true (reify type))))))
+                        (&true (reify-type type))))))
 (define (INR ta b)
   (lambda (env)
     (match-define (result tb cb) (b env))
     (define type `(disj ,ta ,tb))
     (result type (&rull $disjI2 cb
-                        (&true (reify type))))))
+                        (&true (reify-type type))))))
 (define (CASE a u1 b1 u2 b2)
   (lambda (env)
     (match-define (result ta ca) (a env))
@@ -104,15 +426,21 @@
        (unless (equal? tb1 tb2)
          (error 'CASE "branch type mismatch"))
        (result tb1 (&rull (&disjE u1 u2) ca cb1 cb2
-                          (&true (reify tb1))))))))
+                          (&true (reify-type tb1))))))))
 (define (ND proof)
   (result-c (proof '())))
+(define (ND0 proof)
+  (result0-construction
+   (proof '())))
+(define $id (Mi "id"))
 (define $D:script^
   (&prime $D:script))
 (define (assume u t)
   (&rull u t))
 (define $ver (Mi "&uarr;"))
 (define (&ver A) (: A $ver))
+(define $use (Mi "&darr;"))
+(define (&use A) (: A $use))
 (define (!- . x*)
   (let-values (((a* b*) (split-at-right x* 1)))
     (let ((b (car b*)))
@@ -131,11 +459,15 @@
   (let-values (((j* j1) (split-at-right j* 1)))
     (~ #:attr* '((displaystyle "true"))
        (apply (&split n) j*) (car j1))))
-(define &split16 (&split 16))
+(define split16 (&split 16))
+(define split8 (&split 8))
 (define (&rull label . x*)
   (if label
       (: (apply &rule x*) label)
       (apply &rule x*)))
+(define $box (Mo "&square;"))
+(define (&box x)
+  (ap $box x))
 (define √2 (Msqrt $2))
 (define √2^√2 (^ √2 √2))
 (define $neg:id (Mi "&not;"))
@@ -143,26 +475,40 @@
   (: $neg:id (^ $I u)))
 (define $negE (: $neg:id $E))
 (define $falsehood $bottom)
+(define $falsehoodI (: $falsehood $I))
 (define $falsehoodE (: $falsehood $E))
+(define $falsehoodL (: $falsehood $L))
 (define $truth $top)
 (define $truthI (: $truth $I))
+(define $truthR (: $truth $R))
+(define $truthE (: $truth $E))
 (define $disj:id (Mi "&or;"))
 (define $conj:id (Mi "&and;"))
 (define $impl:id (Mi "&sup;"))
 (define $disjI1 (: $disj:id $I_1))
+(define $disjR1 (: $disj:id $R_1))
 (define $disjI2 (: $disj:id $I_2))
-(define $? (Mo "?"))
+(define $disjR2 (: $disj:id $R_2))
 (define $disjE1? (: $disj:id $E_1 $?))
+(define $disjL (: $disj:id $L))
 (define $conjI (: $conj:id $I))
 (define $conjE1 (: $conj:id $E_1))
 (define $conjE2 (: $conj:id $E_2))
 (define $conjL (: $conj:id $L))
+(define $conjL1 (: $conj:id $L_1))
+(define $conjL2 (: $conj:id $L_2))
 (define $conjR (: $conj:id $R))
+(define $conjR^ (: $conj:id $R^))
 (define $implI (: $impl:id $I))
+(define $implR (: $impl:id $R))
 (define (&implI u)
   (: $impl:id (^ $I u)))
 (define $implE
   (: $impl:id $E))
+(define $implL
+  (: $impl:id $L))
+(define $implE?
+  (: $impl:id $E $?))
 (define (&disjE u w)
   (: $disj:id (^ $E (&cm u w))))
 (define $disjE?
@@ -179,15 +525,31 @@
 (define $snd (make-bold "snd"))
 (define (&snd p)
   (ap $snd p))
-(define $unit (make-bold "1"))
+(define $inl (make-bold "inl"))
+(define (&inl M)
+  (ap $inl M))
+(define $inr (make-bold "inr"))
+(define (&inr M)
+  (ap $inr M))
+(define $case (make-bold "case"))
+(define (&case M u N w P)
+  (appl $case M (bind u N) (bind w P)))
+(define $.:compact
+  (Mo "." #:attr* '((lspace "0") (rspace "0"))))
+(define $abort (make-bold "abort"))
+(define (&abort M)
+  (ap $abort M))
+(define $Void (make-bold "0"))
+(define $Unit (make-bold "1"))
 (define $name (make-italic "name"))
 (define $true (make-italic "true"))
 (define $false (make-italic "false"))
-(define &split2 (&split 2))
+(define split2 (&split 2))
+(define App split2)
 (define (&true A)
-  (&split2 A $true))
+  (split2 A $true))
 (define (&false A)
-  (&split2 A $false))
+  (split2 A $false))
 (define $not_type (make-sans "not_type"))
 (define (&not_type e t)
   (appl $not_type e t))
@@ -212,6 +574,7 @@
 (define $==>R (_ $==> $R))
 (define $==>E (_ $==> $E))
 (define-infix*
+  (bind $.:compact)
   (&==>R $==>R)
   (&==>E $==>E)
   (&def= $def=)
@@ -224,12 +587,26 @@
 (define (∃ x A)
   (: $exists x $. A))
 (define-@lized-op*
+  (@Check Check)
+  (@Infer Infer)
+  (@fst &fst)
+  (@snd &snd)
+  (@App App)
+  (@Lam Lam)
   (@impl &impl)
   (@∃ ∃))
 (define &impl*
   (case-lambda
     ((x y) (&impl x y))
     ((x y . z*) (&impl x (@ (apply &impl* y z*))))))
+(define IMPLR
+  (refine ImplR $implR))
+(define IDRULE (refine IdRule $id:rule))
+(define DISJR1 (refine DisjR1 $disjR1))
+(define DISJR2 (refine DisjR2 $disjR2))
+(define (DISJL n) (refine (DisjL n) $disjL))
+(define (DISJL^ n) (refine (DisjL^ n) $disjL))
+(define (IMPLL n) (refine (ImplL n) $implL))
 (define constructive_logic_notes.html
   (TnTmPrelude
    #:title "构造性逻辑讲义"
@@ -700,7 +1077,7 @@ fun even_or_odd x = case x of
       "根据以上的规则, 拥有对于" (&conj $A $B)
       "的一个验证意味着拥有对于" $A "和" $B
       "的验证. 因此, 以下两条规则得到了澄清:"
-      (MB (&split16
+      (MB (split16
            (&rull
             $conjE1
             (&true (&conj $A $B))
@@ -1034,7 +1411,7 @@ fun even_or_odd x = case x of
       ") 更为复杂, 但并不需要新的判断形式. "
       "析取是由两条引入规则刻画的: " (&disj $A $B)
       "为真, 如果" $A "或者" $B "为真."
-      (MB (&split16
+      (MB (split16
            (&rull
             $disjI1
             (&true $A)
@@ -1403,7 +1780,7 @@ fun even_or_odd x = case x of
       "我们应当理解, 这些规则即便可能被称为引入规则或消去规则, "
       "也与那些定义了联结词的规则具有不同的地位. "
       "在这一特定的情形, 我们得到如下导出规则:"
-      (MB (&split16
+      (MB (split16
            (&rull
             (&negI $u)
             (walk
@@ -1723,10 +2100,47 @@ fun even_or_odd x = case x of
       "作为引理. 但是怎么做呢? "
       "似乎很困难.")
    (P "作为最初的一步, 我们作如下的观察: "
-      
-      )
+      "如果我们有了一个带有模式变量 (例如这里的"
+      $A "或" $B ") 的命题的证明, "
+      "那么我们可以将这样的模式变量替换为任意的命题, "
+      "仍然得到一个正确的证明. 这是因为, "
+      "例如判断" (&true (&impl $A (@impl $B $A)))
+      "表达了这个嵌套的推出对于任意的"
+      $A "和" $B "都为真.")
+   (P "根据将" $A "机械替换为" (&impl $C $C)
+      ", 我们可以得到以下证明:"
+      (MB (ND (LAM $x `(-> ,$C ,$C)
+                   (LAM $y $B
+                        (VAR $x)))))
+      "现在我们可以用外部的对于" (&impl $C $C)
+      "的证明来使用推出消去:"
+      (MB (ND (APP (LAM $x `(-> ,$C ,$C)
+                        (LAM $y $B
+                             (VAR $x)))
+                   (LAM $z $C (VAR $z)))))
+      "现在我们有了一个经典的引入后跟着消去的例子: "
+      (&implI $x) "引入了一个推出, 而就在下一步其由"
+      $implE "消去.")
+   (P "为了归约这个证明 (消去" (Q "迂回")
+      "), 我们将" (&true (&impl $C $C))
+      "的证明替换进" (&implI $x)
+      "之上对于标记为" $x "的假设的使用."
+      (MB (ND (LAM $y $B
+                   (LAM $z $C (VAR $z)))))
+      "当然我们本也可以直接构造这个证明, "
+      "但是这里我们使用了一个引理来得到它. "
+      "这里似乎有些多余, "
+      "但是在数学推理中这是非常常见的, "
+      "即便并不严格必要的时候我们也会使用引理.")
    (H3. "证明归约作为计算")
-   
+   (P "在课上, 我们现在已经预告了这样一个想法: "
+      "直觉主义证明对应于构造, "
+      "而证明的归约对应于计算. "
+      "由于我们会在下一讲中更详细地再次讲到这一点, "
+      "因此本讲的讲义中将其略去. "
+      "下面附上了一些额外的补充材料, "
+      "演示如何在又一个联结词上逐步"
+      "检验局部可靠性与局部完备性.")
    (H3. "逻辑等价作为联结词")
    (P "作为另外一个例子, 现在我们想要定义一个新的联结词, "
       "建立引入和消去规则, 检查其局部可靠性和局部完备性 "
@@ -1796,7 +2210,7 @@ fun even_or_odd x = case x of
                      (&conj $A $B)))))
    (P "消去规则对应于从序对到其第一个和第二个分量的投影, 即从序对"
       $M "中取回各个独立的证明."
-      (MB (&split16
+      (MB (split16
            (&rull $conjE1
                   (&: $M (&conj $A $B))
                   (&: (&fst $M) $A))
@@ -1823,13 +2237,13 @@ fun even_or_odd x = case x of
       "从构造性的角度, 我们将" (&true $truth)
       "的证明看作一个不携带任何信息的单位元素."
       (MB (&rull $truthI
-                 (&: (tupa0) $truth)))
+                 (&: $unit $truth)))
       "因此, " $truth
-      "对应于只有一个元素的单位类型" $unit
+      "对应于只有一个元素的单位类型" $Unit
       ". 它没有消去规则, "
       "因而也没有进一步的证明项构造用于truth. "
       "{译注: 指用于解构的构造.} "
-      "事实上, 我们在通过" $truthI "构造" (tupa0)
+      "事实上, 我们在通过" $truthI "构造" $unit
       "时没有放入任何信息, "
       "所以也不能指望通过消去规则从中取出任何信息.")
    (P (B "推出. ")
@@ -1854,7 +2268,255 @@ fun even_or_odd x = case x of
       "一般而言, 我们用一个点号 (" (Q $.)
       ") 将所谓的绑定变量与其作用域分隔开来. "
       "这与自然演绎中假设的辖域概念完全相同.")
-   
+   (P "现在我们以" $lambda
+      "抽象为推出引入规则注解证明项."
+      (MB (&rull
+           (&implI $u)
+           (walk (assume $u (&: $u $A))
+                 $..v
+                 (&: $M $B))
+           (&: (Lam $u $M)
+               (&impl $A $B))))
+      "假设标签" $u "的行为如同变量, 而"
+      $B "的证明中任何对于标记为" $u
+      "的假设的使用都对应于" $M
+      "里一次" $u "的出现.")
+   (P "我们应该注意为了建立"
+      (&true (&impl $A $B))
+      ", 根据额外假设" (&true $A)
+      "而来的对于" (&true $B)
+      "的构造性证明, 是如何也描述了从"
+      (&true $A) "的证明到"
+      (&true $B) "的证明的变换的. "
+      "但是, 证明项" (Lam $u $M)
+      "显式地将这个变换句法地表示为一个函数, "
+      "而不是将这种构造保留为隐式的, "
+      "需要检视证明做了什么.")
+   (P "作为一个具体例子, 考虑"
+      (&true (&impl $A $A))
+      "的简单证明:"
+      (MB (ND (LAM $u $A (VAR $u))))
+      "如果我们以证明项对于这个演绎进行注解, "
+      "我们就得到了"
+      (MB (&rull
+           (&implI $u)
+           (assume $u (&: $u $A))
+           (&: (@Lam $u $u)
+               (&impl $A $A))))
+      "所以说我们的证明对应于类型"
+      $A "处的恒等函数" $id
+      ", 其直接返回它的参数.")
+   (P "从构造主义角度而言, "
+      (&true (&impl $A $B))
+      "的一个证明是一个函数, 其将"
+      (&true $A) "的一个证明转换为"
+      (&true $B) "的一个证明. "
+      "因此, 根据消去规则" $implE
+      "使用" (&true (&impl $A $B))
+      ", 对应于提供"
+      (&true (&impl $A $B))
+      "所等待的" (&true $A)
+      "的证明以得到" (&true $B)
+      "的一个证明. 推出消去规则对应于函数应用. "
+      "根据函数式编程的惯例, 对于函数"
+      $M "应用于参数" $N ", 我们记"
+      (App $M $N) "而非" (app $M $N) "."
+      (MB (&rull
+           $implE
+           (&: $M (&impl $A $B))
+           (&: $N $A)
+           (&: (App $M $N) $B)))
+      (&impl $A $B) "作为类型的意义是什么呢? "
+      "从之前的讨论可以看出, 其显然可以解释为函数类型"
+      (&-> $A $B) ". 推出的引入和消去规则也可以视为"
+      "函数抽象" (Lam $u $M) "和应用" (App $M $N)
+      "的定型规则. 构成一个函数" (Lam $u $M)
+      "对应于一个接受类型为" $A "的参数" $u
+      "产生类型为" $B "的" $M "的函数, 如"
+      $implI "所言. 使用一个函数"
+      (&: $M (&-> $A $B))
+      "对应于将其应用于具有类型" $A "的参数"
+      $N "以获得具有类型" $B "的输出"
+      (App $M $N) ".")
+   (P "注意到如果我们将证明项擦除就得到了"
+      "通常的推出的引入和消去规则. "
+      "对于本节剩余的所有规则也是如此, "
+      "并且这是证明项演算 (proof term calculus) "
+      "的可靠性的直接证据. 也就是说, 如果"
+      (&: $M $A) ", 那么" (&true $A) ".")
+   (P (B "析取. ")
+      "从构造主义的角度, 我们将"
+      (&true (&disj $A $B))
+      "的一个证明想成是要么有对于" (&true $A)
+      "的一个证明, 要么有对于" (&true $B)
+      "的一个证明. 因此, 析取对应于"
+      (Em "无交和") "类型" (&+ $A $B)
+      ", 其值要么具有类型" $A "要么具有类型"
+      $B ". 为了保证我们能够分辨出究竟是哪个类型, "
+      "这样的值会被打上标记, 要么是"
+      $inl " (如果其具有类型" $A
+      "), 要么是" $inr
+      " (如果其具有类型" $B "). 我们称"
+      $inl "和" $inr "分别" (Em "注入")
+      "了一个类型为" $A "或" $B
+      "的值进入和类型" (&+ $A $B) "."
+      (MB (split16
+           (&rull $disjI1
+                  (&: $M $A)
+                  (&: (&inl $M) (&disj $A $B)))
+           (&rull $disjI2
+                  (&: $N $B)
+                  (&: (&inr $N) (&disj $A $B)))))
+      "当在一个证明中使用一个析取"
+      (&true (&disj $A $B))
+      "时, 我们需要既需要准备处理"
+      (&true $A) "也需要准备处理" (&true $B)
+      ", 因为我们并不知道其是用"
+      $disjI1 "还是" $disjI2
+      "证明的. 消去规则对应于一个分情况讨论的结构, "
+      "其区分注入和类型的是左还是右."
+      (MB (&rull
+           (&disjE $u $w)
+           (&: $M (&disj $A $B))
+           (walk (assume $u (&: $u $A))
+                 $..v
+                 (&: $N $C))
+           (walk (assume $w (&: $w $B))
+                 $..v
+                 (&: $P $C))
+           (&: (&case $M $u $N $w $P) $C)))
+      "回忆一下标记为" $u
+      "的假设只在证明的第二个假设里能用, 标记为"
+      $w "的假设只在证明的第三个假设里能用. "
+      "这意味着变量" $u "的作用域是" $N
+      ", 变量" $w "的作用域是" $P
+      ". 通过写下" (bind $u $N) "和"
+      (bind $w $P) ", 我们指明了"
+      $u "和" $w "在其相应的作用域"
+      $N "和" $P "中被绑定.")
+   (P (B "谬. ")
+      "谬" $falsehood "不存在引入规则. "
+      "因此, 我们可以将其视为空类型"
+      $Void ". 相应的消去规则允许具有类型"
+      $falsehood "的项在以" $abort
+      "包裹时代表具有任意类型的表达式. "
+      "然而, 其并不存在计算规则, "
+      "也就是说在合法程序计算时"
+      "我们永远也不会试图对于具有形式"
+      (&abort $M) "的项进行求值."
+      (MB (&rull
+           $falsehoodE
+           (&: $M $falsehood)
+           (&: (&abort $M) $C))))
+   (H3. "一些例子")
+   (P "考虑"
+      (&true (&impl (@conj $A (@impl $A $B)) $B))
+      ". 让我们首先写下一个自然演绎."
+      (MB (ND (LAM $x `(conj ,$A (-> ,$A ,$B))
+                   (APP (CDR (VAR $x))
+                        (CAR (VAR $x))))))
+      "尽管我们在构造这个自然演绎的时候"
+      "结合了自底而上和自顶而下的步骤, "
+      "将其以证明项注解时最好是自顶而下的. "
+      "我们从假设开始." (Br)
+      "{译注: 省略原文的中间过程, 最后得到以下结果.}"
+      (MB (ND0 (LAM0 $x `(conj ,$A (-> ,$A ,$B))
+                     (APP0 (CDR0 (VAR0 $x))
+                           (CAR0 (VAR0 $x)))))))
+   (P "我们也可以走别的路, "
+      "先写下程序然后再将其扩展为自然演绎. "
+      "例如, 考虑写下具有类型"
+      (&-> (@c* $A $B) (@c* $B $A))
+      "的程序这一任务. 这常被写成"
+      (&-> (@c* $alpha $beta)
+           (@c* $beta $alpha))
+      ", 或者更具体地可以写为"
+      (Code "'a * 'b -> 'b * 'a")
+      ". 这样一个函数很容易构造: "
+      "它应该交换序对的元素."
+      (MB (&: (Lam $x (tupa0 (&snd $x) (&fst $x)))
+              (&impl (@conj $A $B)
+                     (@conj $B $A))))
+      "现在我们可以将其" (Q "展开 (unwind)")
+      "为自然演绎. 对于这个方向, 我们自底而上运作."
+      (Br) "{译注: 省略原文的中间过程.}"
+      (MB (ND0 (LAM0 $x `(conj ,$A ,$B)
+                     (CONS0 (CDR0 (VAR0 $x))
+                            (CAR0 (VAR0 $x))))))
+      "构造性命题逻辑中的程序有些乏味, "
+      "因为它们并不操作诸如自然数, "
+      "整数, 列表, 树等基本数据类型. "
+      "我们将在本课程的后续部分引入这些数据类型, "
+      "所采用的方法与我们发展逻辑时所用的方法相同.")
+   (P (B "总结. ")
+      "作为本节的结尾, 我们回顾一下这一对应关系背后的指导原则:"
+      (Ol (Li "每个命题都对应一个类型, 反之亦然.")
+          (Li "引入规则对应于值的构造子 (value constructors).")
+          (Li "消去规则对应于值的解构子 (value destructors).")
+          (Li "对于" (&true $A)
+              "的每个推导, 都存在一个证明项" $M
+              "以及" (&: $M $A) "的一个推导. "
+              "我们可以自顶向下地有效地构造出它.")
+          (Li "对于" (&: $M $A) "的每个推导, 都存在"
+              (&true $A) "的一个推导. "
+              "我们可以自底向上地有效地构造出它.")))
+   (P "我们还可以注意到, 一个给定的项可以对应于不止一个证明. "
+      "例如, " (Lam $x $x) "可以是" (&impl $A $A)
+      "的一个证明, 也可以是"
+      (&impl (@impl $A $B) (@impl $A $B))
+      "的一个证明. 由编程语言理论Milner [1978] 我们知道, "
+      "对于一个(良类型的)项, "
+      "总存在一个最一般类型 (most general type), "
+      "它对应于给定证明项所证明的最一般的命题. "
+      "具体而言, 这意味着我们可以通过用"
+      "其他命题实例化其中的模式变量 (如" (&cm $A $B)
+      "等), 从最一般的自然演绎得到所有其他的自然演绎, "
+      "而不影响该推导的结构.")
+   (P "我们也可以通过添加类型信息来消除项的歧义. 例如"
+      (Lam (&: $x (&impl $A $A)) $x) "就必定是"
+      (&impl (@impl $A $A) (@impl $A $A))
+      "的证明. 我们将在以后的某一讲 (也许就在下一讲) "
+      "中进一步发展这一想法.")
+   (H3. "归约")
+   (P "在前一节中, 我们介绍了如何为自然演绎指派证明项. "
+      "如果证明就是程序, 那么我们就需要解释证明该如何被执行, "
+      "以及一次计算可以返回哪些结果.")
+   (P "我们分两步来解释证明的操作性解读. "
+      "第一步, 我们引入一个归约判断, 写作"
+      (&==>R $M $M^) ", 读作"
+      (Q $M "归约至" $M^)
+      ". 第二步, 计算则按照一个固定的策略, "
+      "通过一系列归约"
+      (&==>R $M $M_1 $M_2 $..c)
+      ", 直到我们到达一个值, 它就是该计算的结果. "
+      "本节我们讨论归约; "
+      "归约策略可能会在以后的某一讲中再回过头来讨论.")
+   (P "正如在命题逻辑的展开过程中那样, "
+      "我们分别讨论每一个联结词, "
+      "并小心地确保这些解释彼此独立. "
+      "这意味着我们可以考察各种子语言, "
+      "并且日后可以扩展我们的逻辑或编程语言, "
+      "而不会使本节的结论失效. 此外, "
+      "这也极大地简化了对归约规则各种性质的分析.")
+   (P "如前所述, 我们把对应于引入规则的证明项看作构造子, "
+      "把对应于消去规则的证明项看作析构子. 关键的指导原则是:"
+      (Blockquote
+       "当一个析构子被作用于一个构造子时, 就产生归约.")
+      "事实表明, 这恰恰等同于:"
+      (Blockquote
+       "当我们把一条消去规则应用于某条引入规则的结果时, "
+       "就产生一个证明归约.")
+      "因此, 局部证明归约 "
+      "(即我们用以说明消去规则局部可靠性的依据) "
+      "恰好对应于项的归约.")
+   (P (B "合取. ")
+      "回顾合取的两个局部归约之一:"
+      (let ((A (GIVEN $D:script $A))
+            (B (GIVEN $E:script $B)))
+        (MB (&==>R (ND (CAR (CONS A B)))
+                   (ND A))))
+      
+      )
    (H2. "验证")
    (H3. "引论")
    (P "验证主义 (verificationist) 的观点在本课程前面已经介绍过, 它主张: "
@@ -1905,8 +2567,564 @@ fun even_or_odd x = case x of
    (P "然而, 推出 (implication) 引入了一个新的假设, "
       "该假设并非由某条引入规则显式地证成, "
       "而仅仅是一个新的标签. 例如, 在如下证明中"
+      (MB (ND (LAM $u `(conj ,$A ,$B)
+                   (CAR (VAR $u)))))
+      "合取" (&conj $A $B) "并不由某个引入所澄清.")
+   (P "早先对证明搜索策略的非形式化讨论, "
+      "即自底向上使用引入规则, 自顶向下使用消去规则, 已经包含了答案. "
+      "我们引入第二个判断" (&use $A)
+      ", 其含义为" (Q $A "可以被使用")
+      ". 当" (&true $A) "是一个假设, 或者" $A
+      "是通过消去规则从某个假设推导出来的时候, "
+      (&use $A) "应当成立. "
+      "我们的局部可靠性论证提供了一些证据, "
+      "表明我们不会以这种方式推导出任何错误的结论.")
+   (P "现在我们依次考察各个联结词, "
+      "定义它们的验证 (verification) 和使用 (use).")
+   (P (B "合取. ")
+      "总结上述的讨论, 我们就得到:"
+      (MB (split16
+           (&rull $conjI
+                  (&ver $A) (&ver $B)
+                  (&ver (&conj $A $B)))
+           (&rull $conjE1
+                  (&use (&conj $A $B))
+                  (&use $A))
+           (&rull $conjE2
+                  (&use (&conj $A $B))
+                  (&use $B))))
+      "第一条/左消去规则可以读作: "
+      (Q "如果我们可以使用" (&conj $A $B)
+         ", 那么我们可以使用" $A)
+      ", 右消去规则与之类似. "
+      "验证与使用中箭头的方向, "
+      "恰好与我们最终应用这些证明规则的方向相吻合. "
+      "带有全部验证的" $conjI
+      "规则是朝顶部方向应用的: 对" (&conj $A $B)
+      "的一个验证" (&ver (&conj $A $B))
+      ", 会继续寻找" $A "的一个验证" (&ver $A)
+      "以及" $B "的一个验证" (&ver $B)
+      ". 与之相反, 带有全部使用的消去规则"
+      $conjE1 "是朝底部方向应用的: 如果我们拥有使用"
+      (&conj $A $B) "的许可" (&use (&conj $A $B))
+      ", 那么我们也拥有使用" $A
+      "的许可" (&use $A) ".")
+   (P (B "推出. ")
+      "引入规则会创造一个新的假设, "
+      "这我们可以在证明中使用. 因此, "
+      "假设具有判断" (&use $A) ":"
+      (MB (&rull (&implI $u)
+                 (walk (assume $u (&use $A))
+                       $..v
+                       (&ver $B))
+                 (&ver (&impl $A $B)))))
+   (P "为了使用一个推出" (&impl $A $B)
+      ", 我们首先要求" $A "的一个验证. "
+      "仅是要求" $A "可以使用太弱了, "
+      "这可以从尝试证明"
+      (&ver (&impl (@impl (@impl $A $A) $B) $B))
+      "的过程中看出来 (见第3节). "
+      "这一点也应当从以下事实中看得很清楚, 我们并没有从"
+      $A "中消去一个联结词."
+      (MB (&rull $implE
+                 (&use (&impl $A $B))
+                 (&ver $A)
+                 (&use $B)))
+      "由于推出的方向性, 验证与使用在" (&implI $u)
+      "和" $implE "中相遇. 对" (&impl $A $B) "的一个验证"
+      (&ver (&impl $A $B)) ", 由" $B "的一个验证" (&ver $B)
+      "构成, 该验证拥有使用额外假设" $A "的许可" (&use $A)
+      ". 对" (&impl $A $B) "的一个使用" (&use (&impl $A $B))
+      "给予了使用" (&use $B)
+      "的许可, 但前提是先发起一个验证"
+      (&ver $A) "来证实" $A "确实成立.")
+   (P (B "析取. ")
+      "析取的验证立即由其引入规则得到."
+      (MB (split16
+           (&rull $disjI1
+                  (&ver $A)
+                  (&ver (&disj $A $B)))
+           (&rull $disjI2
+                  (&ver $B)
+                  (&ver (&disj $A $B))))))
+   (P "析取在分情形证明中被使用, 即" (&disjE $u $w)
+      ". 这条规则引入两个新的假设, "
+      "每个假设都可以在相应的子证明中使用. "
+      "每当我们建立一个假言判断时, "
+      "我们都是在试图找到结论的一个验证, "
+      "其中可能会用到假设. 因此"
+      (&disjE $u $w)
+      "的结论应当是一个验证."
       
       )
+   (P (B "truth. ")
+      "truth仅有的验证规则是平凡的."
+      (MB (&rull $truthI
+                 (&ver $truth)))
+      "假设" (&use $truth) "无法被使用, 因为"
+      $truth "没有消去规则.")
+   (P (B "falsehood. ")
+      "falsehood没有验证, 因为我们没有它的引入规则. "
+      "我们可以使用falsehood (它表示当前假设之间存在矛盾) 来验证任意结论. "
+      "这是析取的零元情形."
+      (MB (&rull $falsehoodE
+                 (&use $falsehood)
+                 (&ver $C)))
+      "有人可能会认为, 使用" $falsehood
+      "的许可应当给予我们使用任意其他" $C
+      "的许可. 但" $falsehoodE
+      "规则对此加以限制, 使得" (&use $falsehood)
+      "只能用于证明我们实际想要验证的那个"
+      $C ", 正如" (&disjE $u $w) "的结论"
+      (&ver $C) "那样.")
+   (P (B "命题变元. ")
+      "我们如何为像" $A "这样的模式变元 "
+      "(schematic variable) 构造一个验证? "
+      "我们无法拆解" $A
+      "的结构, 因为它根本没有结构, "
+      "所以只有当我们已经知道" $A
+      "为真时才能继续. "
+      "这一知识只能来自某个假设, "
+      "因此我们有一条规则, "
+      "允许我们利用对命题变元的使用来构造一个验证."
+      (MB (&rull $duarr*
+                 (&use $A)
+                 (&ver $A)))
+      "我们在这里给规则加上标注, 以提醒自己"
+      $A "必须是一个命题变元, 而不是任意命题. "
+      "这条规则具有特殊的地位, 因为它表示的是判断的转换, "
+      "而不与某个特定的联结词绑定. "
+      "我们称之为判断性规则 (judgmental rule), "
+      "以区别于刻画各联结词的通常的引入规则和消去规则.")
+   (P "这也是我们第一次限制一条规则只能应用于模式变元. "
+      "在课堂上我们没有明确指出这一点" --
+      "事实上, 即便" $A "可能具有某种命题结构, "
+      "这条规则也不会让你推导出任何不为真的东西. "
+      "但人们可能会质疑, 在那种情况下它是否仍然算作"
+      $A "的一个验证, 因为我们并没有"
+      "通过引入规则尽最大可能地拆解它的结构.")
+   (P (B "全局可靠性. ")
+      "局部可靠性是每个联结词的内在性质, 它断言: "
+      "在给定引入规则的前提下, 该联结词的消去规则不会过强. "
+      "全局可靠性则是它在整个推理规则系统层面上的对应物. "
+      "它说的是: 如果任意命题" $A
+      "有一个验证, 那么我们使用" $A
+      "时不会获得任何额外的信息. "
+      "也就是说, 对于任意命题"
+      $A "和" $C ":"
+      (Blockquote
+       "如果" (&ver $A) "且"
+       (walk (&use $A) $..v (&ver $C))
+       ", 那么" (&ver $C) ".")
+      "我们希望用替换原理来证明这一点, "
+      "但问题在于判断" (&ver $A) "与" (&use $A)
+      "并不匹配. 最终, 局部可靠性的论证"
+      "将帮助我们在本课程后面讲到相继式演算"
+      "时完成这一证明.")
+   (P (B "全局完备性. ")
+      "局部完备性同样是每个联结词的内在性质. "
+      "它断言: 相对于引入规则, 消去规则不会过弱. "
+      "全局完备性是它在整个推理规则系统上的对应. "
+      "它说的是: 如果我们可以使用" $A
+      ", 那么就能由此构造出" $A
+      "的一个验证. 也就是说, 对任意命题" $A ":"
+      (Blockquote
+       (walk (&use $A) $..v (&ver $A)))
+      "全局完备性可以相当直接地由局部完备性通过对"
+      $A "的结构归纳得到. 注意, "
+      "为了能清晰地陈述全局完备性的目标, "
+      "区分验证判断" (&ver $A) "与使用判断"
+      (&use $A) "是何等关键.")
+   (P "全局可靠性和全局完备性是整个演绎系统的性质. "
+      "它们的证明必须在数学元语言中进行, "
+      "这使它们与我们迄今为止在自然演绎内部完成的形式证明有所不同. "
+      "当然, 我们也希望这些证明是正确的, "
+      "这意味着它们应当遵循我们目前为止所阐述的有效推理原则.")
+   (P "我们还希望有另外两条性质, "
+      "它们将真, 验证与使用联系起来. "
+      "第一条是: 如果" $A "有一个验证, 或者"
+      $A "可以被使用, 那么" $A
+      "为真. 这一点相当显然, "
+      "因为我们只是把引入规则和消去规则特化了而已, "
+      "唯一的例外是判断规则" $duarr
+      ". 但在把验证和使用都解释为真的情况下, "
+      "这条推理就变得冗余了.")
+   (P "困难得多的是另一条性质: 如果"
+      $A "为真, 那么" $A "有一个验证. "
+      "由于我们是通过验证来为联结词的意义提供依据的, "
+      "这条性质一旦不成立, "
+      "对验证主义纲领 (verificationist program) "
+      "将是毁灭性的打击. 幸运的是, 它确实成立, "
+      "并且可以通过给出一个证明规范化 "
+      "(proof normalization) 过程来证明: "
+      "该过程接受任意一个" (&true $A)
+      "的证明, 并构造出" $A "的一个验证.")
+   (P "所有这些性质共同表明, "
+      "我们的规则无论在局部还是全局上都构造得当. "
+      "大量其他逻辑系统的经验表明, 这并非孤立现象: "
+      "我们不仅可以运用验证主义观点为构造性逻辑"
+      "给出一套融贯的规则, 也可以为经典逻辑, "
+      "时序逻辑, 空间逻辑, 模态逻辑以及"
+      "计算机科学中许多其他有意义的逻辑做到这一点. "
+      "综合来看, 这些都构成了强有力的证据, "
+      "表明将判断与命题分离, "
+      "并在定义逻辑联结词时采用验证主义观点, "
+      "确实是逻辑的一个恰当而有用的基础.")
+   (P "最后, 请注意验证如何通过"
+      "缩小证明搜索空间来指导证明搜索. "
+      "箭头的方向指明了在证明搜索中判断应当朝哪个方向展开. "
+      "验证" (&ver $A)
+      "需要通过应用其相应的引入规则向上验证. "
+      "使用许可" (&use $A)
+      "则可以通过应用其相应的消去规则向下使用. "
+      "验证与使用在判断规则" $duarr "处相遇. 事实上, "
+      "如果仔细检查我们迄今为止进行过的演绎示例, "
+      "你会发现它们最终都遵循了验证与使用所规定的"
+      "证明搜索顺序 (唯一的例外是我们在"
+      (&impl $A (@impl $B $B))
+      "的证明中为演示局部归约而构造的那个). "
+      "到目前为止, 证明搜索中需要我们发挥创造力的地方"
+      "变得系统化了, 这要归功于区分" $A
+      "是需要被验证, 还是可以被假定成立.")
+   (H3. "一个反例")
+   (P "本节说明如果我们没有正确地定义验证这一概念, "
+      "事情会如何出错.")
+   (P "如果" $implE "消去规则修改了第二个前提, "
+      "选择了使用" (&use $A)
+      "而非验证" (&ver $A) ":"
+      (MB (&rull $implE?
+                 (&use (&impl $A $B))
+                 (&use $A)
+                 (&use $B)))
+      "那么"
+      (&ver (&impl (@impl (@impl $A $A) $B) $B))
+      "的验证就会卡住:"
+      (MB (&rull
+           (&implI $u)
+           (&rull
+            $duarr
+            (&rull
+             $implE?
+             (assume
+              $u (&use (&impl (@impl $A $A) $B)))
+             (&use (&impl $A $A))
+             (&use $B))
+            (&ver $B))
+           (&ver (&impl (@impl (@impl $A $A) $B) $B))))
+      "因为我们没法根据我们仅有的假设提取出"
+      (&use (&impl $A $A))
+      ". 与之相对的是, 以下是正确的验证:"
+      (MB (&rull
+           (&implI $u)
+           (&rull
+            $duarr
+            (&rull
+             $implE
+             (assume
+              $u (&use (&impl (@impl $A $A) $B)))
+             (&rull
+              (&implI $w)
+              (&rull
+               $duarr
+               (assume $w (&use $A))
+               (&ver $A))
+              (&ver (&impl $A $A)))
+             (&use $B))
+            (&ver $B))
+           (&ver (&impl (@impl (@impl $A $A) $B) $B)))))
+   (H3. "重访证明项")
+   (P "任何验证都是一个证明. 这一点很容易看出, "
+      "因为我们可以遍历一个验证, 把其中的"
+      (&ver $A) "和" (&use $A) "都替换为"
+      (&true $A) ", 从而得到一个证明. "
+      "所需的极少的改动是把规则"
+      (MB (&rull $duarr
+                 (&use $A)
+                 (&ver $A)))
+      "直接变成" (&true $A)
+      ", 不然的话该规则的前提和结论将完全相同.")
+   (P "这些观察表明, 我们不必为证明项设计新的记法, "
+      "只需复用它们, 并区分出那些构成验证的证明项即可. "
+      "事实上, 我们只需用通常的证明项来标注规则, "
+      "就能得到一个系统, 可以写成" (&ver (&: $M $A))
+      " (" $M "是" $A "的一个验证) 和"
+      (&use (&: $M $A)) " (" $M
+      "是使用" $A "的一个依据).")
+   (P "在编程语言中, 流行的是一种略有不同的记法, "
+      "因此我们在这里引入它. 我们记"
+      (MB (set-attr*
+           (&Table
+            ((Check $M $A)
+             (: $M "&nbsp;checks against&nbsp;" $A))
+            ((Infer $M $A)
+             (: $M "&nbsp;synthesizes&nbsp;" $A)))
+           'columnalign "left"))
+      "你应当建立这样一种直觉 (尚待检验): 判断"
+      (Check $M $A) "体现了一个检查项"
+      $M "是否具有类型" $A
+      "的算法. 与之相对, 判断"
+      (Infer $M $A)
+      "体现了一个算法, 它在给定"
+      $M "时能够综合出一个" $A
+      " (当然, 前提是该项确实是良类型的).")
+   (P "此外, 由于我们保留了证明项, 命题, "
+      "乃至推理规则本身不变, "
+      "只是限制了它们的用法, 所以"
+      (Check $M $A) "和" (Infer $M $A)
+      "都可以推出" (&: $M $A)
+      "这一事实应当是显而易见的.")
+   (P "下面我们用证明项重写验证的规则, 并检验这一直觉.")
+   (P (B "合取. ")
+      "照例我们从合取开始."
+      (MB (&rull $conjI
+                 (Check $M $A)
+                 (Check $N $B)
+                 (Check (tupa0 $M $N) (&conj $A $B))))
+      "设想我们的任务是检查"
+      (Check (tupa0 $M $N) (&conj $A $B))
+      "是否成立. 我们把这个任务归约为检查"
+      $M "是否对照" $A "通过检查, 以及"
+      $N "是否对照" $B "通过检查. 幸运的是, "
+      "我们拥有提出这些问题所需的全部信息, "
+      "推导的构造得以继续进行.")
+   (P "反过来, 假设要求我们为" (&fst $M)
+      "综合一个类型, 即:"
+      (MB (Infer (&fst $M) $?))
+      "如果我们能询问" $M
+      "所综合出的类型, 就能完成这一任务. 由于"
+      $fst "试图取出一个序对的第一个分量, "
+      $M "最好能综合出一个合取 "
+      "(等于积类型) 以使用" $conjE1 "规则."
+      (MB (&rull $conjE1
+                 (Infer $M (&conj $A $B))
+                 (Infer (&fst $M) $?)))
+      "现在我们可以通过取出前提中的"
+      "第一个合取分量来填上" $? "."
+      (MB (&rull $conjE1
+                 (Infer $M (&conj $A $B))
+                 (Infer (&fst $M) $A)))
+      "对称的推理引出规则"
+      (MB (&rull $conjE2
+                 (Infer $M (&conj $A $B))
+                 (Infer (&snd $M) $B))))
+   (P (B "推出. ")
+      "推出稍微有点更加复杂了. "
+      "引入规则创建了一个新的假设, "
+      "这是我们可以" (Em "使用")
+      "的东西, 所以说它是合成一个类型."
+      (MB (&rull
+           (&implI $x)
+           (walk
+            (assume $x (Infer $x $A))
+            $..v
+            (Check $M $B))
+           (Check (Lam $x $M)
+                  (&impl $A $B))))
+      "以这种方式进行类型检查make sense吗? "
+      "是的! We are given " (Lam $x $M)
+      " to check against " (&impl $A $B)
+      ". 这意味着我们知道" $A
+      ", 于是" $x (Em "合成") "类型" $A
+      "是合理的. 而且, check " $M
+      " against " $B "也是合理的, "
+      "因为我们二者皆知.")
+   (P "至于消去规则:"
+      (MB (&rull $implE
+                 (Infer $M (&impl $A $B))
+                 (Check $N $A)
+                 (Infer (App $M $N) $B)))
+      "开始时, 给定了" (App $M $N)
+      ", 我们要合成" $B ". 既然我们知道" $M
+      ", 询问" $M "所合成的类型是可以的. "
+      "在构造推导的这个节点, 它看起来像是:"
+      (MB (&rull $implE
+                 (Infer $M $?)
+                 (Check $N $?)
+                 (Infer (App $M $N) $B)))
+      "{译注: 原文写的是"
+      (Infer (App $M $N) $?)
+      ", 个人感觉是笔误.} 为"
+      $M "合成一个类型要么失败, "
+      "要么它会给出一个不是推出 "
+      "(等价于函数类型) 的东西 "
+      "(此时我们还是失败了), "
+      "要么它会给我们一个推出."
+      (MB (&rull $implE
+                 (Infer $M (&impl $A $B))
+                 (Check $N $?)
+                 (Infer (App $M $N) $B)))
+      "但是到了这个阶段我们知道了" $A
+      ", 所以我们可以检查" $A
+      ", 我们当然也知道" $B
+      ", 这是由" (App $M $N)
+      "合成的类型."
+      (MB (&rull $implE
+                 (Infer $M (&impl $A $B))
+                 (Check $N $A)
+                 (Infer (App $M $N) $B)))
+      "因此, 一切都能推导出来, "
+      "取决于我们如何将规则视为证明构造的算法.")
+   (P (B "析取. ")
+      "现在我们走得快一点, 只贴出结果, "
+      "让读者自行检查规则是否遵循我们的算法解释. "
+      "首先是检查"
+      (MB (split16
+           (&rull
+            $disjI1
+            (Check $M $A)
+            (Check (&inl $M) (&disj $A $B)))
+           (&rull
+            $disjI2
+            (Check $N $B)
+            (Check (&inr $N) (&disj $A $B)))))
+      "{译注: 原文这里似乎存在笔误.} "
+      "然后是合成规则"
+      (MB (&rull
+           (&disjE $u $w)
+           (Infer $M (&disj $A $B))
+           (walk
+            (assume $u (Infer $u $A))
+            $..v
+            (Check $N $C))
+           (walk
+            (assume $w (Infer $w $B))
+            $..v
+            (Check $P $C))
+           (Check
+            (&case $M $u $N $w $P) $C))))
+   (P (B "falsehood. ")
+      "这里只有一条规则, 作为析取消去的零元版本."
+      (MB (&rull
+           $falsehoodE
+           (Infer $M $falsehood)
+           (Check (&abort $M) $C))))
+   (P (B "truth. ")
+      "对称地, truth仅有一条检查规则."
+      (MB (&rull
+           $truthI
+           (Check $unit $truth))))
+   (P (B "判断性规则. ")
+      "这里仅有一条规则操纵判断, 即"
+      (MB (&rull
+           $duarr
+           (&use $A)
+           (&ver $A)))
+      "这条规则并不实际改变证明项, "
+      "但是这里仍然存在有趣的事情. "
+      "现在开始, 根据结论, 我们想要让"
+      $M " against " $A "."
+      (MB (&rull
+           $duarr
+           (Infer $M $?)
+           (Check $M $A)))
+      "既然我们知道" $M
+      ", 那么在前提了要求"
+      $M "的某个类型的合成是合理的. "
+      "于是, 我们需要将合成出来的东西与"
+      $A "进行比较."
+      (MB (&rull
+           $duarr
+           (Infer $M $A^)
+           (&= $A^ $A)
+           (Check $M $A)))
+      "这里的" (&= $A^ $A)
+      "不过就是两个命题的通常相等. "
+      "如果我们想要扩展我们的语言以允许子定型, "
+      "那么这就是我们需要改变的地方, 检查"
+      $A^ "是" $A "的一个子类型.")
+   (P "不过在下一节我们将看到, "
+      "这里存在着限制 (caveat).")
+   (H3. "规范演绎")
+   (P "我们称一个演绎是规范的, "
+      "如果不存在一个子演绎屈服于局部归约. "
+      "换言之, 引入后直接跟着消去的话直接引入就好了.")
+   (P "我们可以检视所有可能的归约, "
+      "然后我们意识到所有的验证都是规范的. "
+      "让我们来看一个实际的推导可以被归约的例子:"
+      (MB (ND (CAR
+               (CONS
+                (GIVEN $D:script $A)
+                (GIVEN $E:script $B)))))
+      "以方向对于规则进行注解:"
+      (MB (&rull
+           $conjE1
+           (&rull
+            $conjI
+            (label $D:script (&ver $A))
+            (label $E:script (&ver $B))
+            (&? (&conj $A $B)))
+           (&use $A)))
+      "我们看到这里存在冲突: "
+      "引入规则强制" (&ver (&conj $A $B))
+      ", 而消去规则强制" (&use (&conj $A $B))
+      ". 问题在于我们没有以下规则:"
+      (MB (&rull
+           $udarr?
+           (&ver $A)
+           (&use $A)))
+      "因为这种规则连带着" $duarr
+      "会导致我们可以自由上下, "
+      "那么就会让我们陷入任何证明都允许的境地, "
+      "而不仅仅是验证.")
+   (P "我们也看到, 至关重要的子公式性质 "
+      "(subformula property) 在这里失效了, 因为"
+      (&ver $A) "的证明绕道经过了" (&conj $A $B)
+      ", 而" (&conj $A $B)
+      "既不是结论的子公式, "
+      "也不是任一前提的子公式.")
+   (P "事实证明, 我们并没有足够的归约来保证其逆命题, 即"
+      (Q "每个不能被归约的证明都是一个验证")
+      ". 我们可能会在以后的讲座中回到这一点.")
+   (H3. "验证的计数")
+   (P "回忆一下, 在验证主义的观点下, "
+      "命题的意义由它的验证决定.")
+   (P "首先, 我们观察到" $falsehood
+      "没有引入规则, 因此" $falsehood
+      "没有验证. 换言之, 并非每个命题都有一个验证. "
+      "如果我们假设全局可靠性 (尚待证明), "
+      "那么这就推出了该逻辑的一致性.")
+   (P "作为第二个例子, 对于一个命题变元" $A ", "
+      (&impl $A $A) "有多少个验证? "
+      "涂画一分钟就会告诉你只可能有一个, 即:"
+      (MB (&rull
+           (&implI $u)
+           (&rull
+            $duarr
+            (assume $u (&use $A))
+            (&ver $A))
+           (&ver (&impl $A $A))))
+      "这也意味着恰好有一个类型为" (&impl $A $A)
+      "的规范项 (normal term):"
+      (MB (Check (Lam $u $u) (&impl $A $A)))
+      "类似地, 正如我们在讲座中检查过的, "
+      (&impl $A (@impl $A $A))
+      "恰好有两个验证, "
+      "因此也只有两个规范证明项:"
+      (MB (Lam $u (Lam $w $u)))
+      (MB (Lam $u (Lam $w $w)))
+      "再进一步, 我们看到类型为"
+      (&impl (@impl $A $A) (@impl $A $A))
+      "的规范证明与自然数之间存在双射:"
+      (eqn*
+       ($zero $= (Lam $s (Lam $z $z)))
+       ($one $= (Lam $s (Lam $z (app $s $z))))
+       ($two $= (Lam $s (Lam $z (app* $s $s $z))))
+       ($ $..v $))
+      "{译注: 原文存在笔误, 写反了, 例如将" $zero
+      "写成了" (Lam $z (Lam $s $z)) ".}")
+   (H3 "参考文献")
+   (Ul (Li "Jana Dunfield and Neel Krishnaswami. "
+           "Bidirectional typing. "
+           "ACM Computing Surveys, 98 (5):1–38, 2022.")
+       (Li "Per Martin-L&ouml;f. "
+           "On the meanings of the logical constants and "
+           "the justifications of the logical laws. "
+           "Notes for three lectures given in Siena, Italy. "
+           "Published in Nordic Journal of Philosophical Logic, "
+           "1(1):11-60, 1996, April 1983.")
+       (Li "Wilfried Sieg and John Byrnes. "
+           "Normal natural deduction proofs (in classical logic). "
+           "Studia Logica, 60(1):67–106, January 1998."))
    (H2 "Rec 2: 验证和证明项")
    (H2. "规则作为算法")
    (H3. "引论")
@@ -1942,9 +3160,549 @@ fun even_or_odd x = case x of
               (CodeB "decide_true : prop -> term option")
               "其中" (Code "prop") "是命题的类型, "
               (Code "term") "是证明项的类型. "
-              )
-          )
-      )
+              "我们使用类型" (&option $tau)
+              "来对于表示" $A "的证明的" $M
+              "返回" (Code "SOME(M)")
+              ", 而若不存在这样的证明则为" (Code "NONE")
+              ". 回忆一下, 在SML之中, 我们定义"
+              (Code "datatype 'a option = NONE | SOME of 'a")
+              ".")
+          (Li (&: $M $A) ", 其中" $M "和" $A
+              "已给定. 这是" (Em "证明检查")
+              ". 换言之, 我们需要找到"
+              (MB (∀ $M (∀ $A (&disj (@: $M $A)
+                                     (&neg (@: $M $A))))))
+              "的一个构造性证明. "
+              "对应于这样一个构造性证明的函数或许具有类型"
+              (CodeB "type_check : term -> prop -> bool")
+              "这里我们想象如果" (&: $M $A)
+              "就返回" (Code "true") ", 否则的话就返回"
+              (Code "false") ". 类型" (Code "bool")
+              "只是作为具有两个可能值的类型顶替, "
+              "这就是一种方便的选择而言, "
+              "正如我们对于定理证明问题使用option类型.")
+          (Li (&: $M $A) ", 其中" $M "已给定. 这是"
+              (Em "类型推导") ". 换言之, 我们需要找到"
+              (MB (∀ $M (&disj (@∃ $A (&: $M $A))
+                               (&neg (@∃ $A (&: $M $A))))))
+              "一个被提取的函数可能具有类型"
+              (CodeB "type_infer : term -> prop option")
+              "其要么就给定项对于某个命题" $A
+              " (这里视为类型) 返回" (Code "SOME(A)")
+              ", 要么如果没有命题" $A "能够满足"
+              (&: $M $A) "就返回" (Code "NONE") ".")))
+   (P "对于所有这些例子, 元理论性质的证明都是相当困难的. "
+      "对于判断" (&: $M $A) "拥有推理规则无疑是重要的, "
+      "但这并不能立即给出这样的算法.")
+   (H3. "双向定型的一个算法")
+   (MB (set-attr*
+        (&Table
+         ($ (&rull
+             $duarr*
+             (Infer $M $P^)
+             (&= $P^ $P)
+             (Check $M $P)) $)
+         ((&rull
+           $conjI
+           (Check $M $A)
+           (Check $N $B)
+           (Check (tupa0 $M $N) (&conj $A $B)))
+          $ (split8
+             (&rull
+              $conjE1
+              (Infer $M (&conj $A $B))
+              (Infer (&fst $M) $A))
+             (&rull
+              $conjE2
+              (Infer $M (&conj $A $B))
+              (Infer (&snd $M) $B))))
+         ((&rull
+           (&implI $x)
+           (walk
+            (assume $x (Infer $x $A))
+            $..v
+            (Check $M $B))
+           (Check (Lam $x $M)
+                  (&impl $A $B)))
+          $ (&rull
+             $implE
+             (Infer $M (&impl $A $B))
+             (Check $N $A)
+             (Infer (App $M $N) $B)))
+         ((split8
+           (&rull
+            $disjI1
+            (Check $M $A)
+            (Check (&inl $M) (&disj $A $B)))
+           (&rull
+            $disjI2
+            (Check $N $B)
+            (Check (&inr $N) (&disj $A $B))))
+          $ (&rull
+             (&disjE $u $w)
+             (Infer $M (&disj $A $B))
+             (walk
+              (assume $u (Infer $u $A))
+              $..v
+              (Check $N $C))
+             (walk
+              (assume $w (Infer $w $B))
+              $..v
+              (Check $P $C))
+             (Check
+              (&case $M $u $N $w $P) $C)))
+         ((&rull $truthI
+                 (Check $unit $truth))
+          $ (: "(没有" $truthE "规则)"))
+         ((: "(没有" $falsehoodI "规则)")
+          $ (&rull
+             $falsehoodE
+             (Infer $M $falsehood)
+             (Check (&abort $M) $C))))
+        'columnalign "right center left"
+        'rowspacing "6ex"))
+   (P "双向定型规则具有特定的目标导向形式, "
+      "这允许我们算法性地阅读它们. "
+      "请参考图1以阅读这些规则.")
+   (P "我们看到存在两种断言: " (Check $M $A) "和"
+      (Infer $M $A) ". 记号暗示了其具有以下解释:"
+      (Ol (Li (Check $M $A) ": " $M "和" $A
+              "均已给定, 我们相对于类型" $A
+              (Em "检查") $M ". 这是一种方向.")
+          (Li (Infer $M $A) ": 只有" $M
+              "给定, 我们合成一个类型" $A
+              " (如果这样的类型存在的话). "
+              "这是另一种方向."))
+      "注意到我们在类型和命题的概念之间自由穿梭, "
+      "鉴于我们已然知道它们相互对应.")
+   (P "这种对于判断的解释是否正确将会"
+      "随着将判断规则转换为实现的过程"
+      "自然而然浮出水面.")
+   (P "对于这样的解释, 我们将试图构造"
+      "下列陈述的构造性证明的计算性解释."
+      (Ol (Li (∀ $M (∀ $A (&disj (@Check $M $A)
+                                 (&neg (@Check $M $A))))) ";")
+          (Li (∀ $M (&disj (@∃ $A (Infer $M $A))
+                           (&neg (@∃ $A (Infer $M $A))))) "."))
+      "实际上这些对于我们的目的而言还不足够, 但相当接近了. "
+      "我们将会在未来的讲座里回到这个地方.")
+   (P "由此我们可以抽取出两个函数:"
+      (CodeB "check : term -> prop -> bool
+synth : term -> prop option")
+      "我们将其直接写下, 对于规则进行解释, "
+      "而非编写(元理论的)证明.")
+   (P "作为一种一般性的开发方法论, "
+      "我发现最好先让一个片段运转正常, 然后对其进行扩展. "
+      "这里的话自然的方式是逐联结词划分, "
+      "而且这尤其适合于当前的情况, "
+      "因为我们是独立构造每个联结词的引入和消去规则的.")
+   (P (B "合取. ")
+      "让我们首先定义合取的命题与项的数据类型."
+      (CodeB "datatype prop =
+         And of prop * prop
+datatype term =
+         Pair of term * term (* &lt;M,N> *)
+       | Fst of term (* fst M *)
+       | Snd of term (* snd M *)")
+      "这里只有一条规则用于检查序对, "
+      "还有对于每种投影都有一条规则用于合成其类型."
+      (MB (&rull $conjI
+                 (Check $M $A)
+                 (Check $N $B)
+                 (Check (tupa0 $M $N) (&conj $A $B))))
+      (MB (split16
+           (&rull $conjE1
+                  (Infer $M (&conj $A $B))
+                  (Infer (&fst $M) $A))
+           (&rull $conjE2
+                  (Infer $M (&conj $A $B))
+                  (Infer (&snd $M) $B))))
+      "这些可以直接转化为以下的代码片段."
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check M A = false
+
+and synth (Fst(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(A)
+       | _ => NONE)
+  | synth (Snd(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(B)
+       | _ => NONE)
+  | synth M = NONE")
+      "在代码中, 我们利用了ML中模式匹配按顺序进行这一特点. "
+      "例如, 只要第一个参数不是序对, 或者第二个参数不是合取, "
+      "或者两者都不是, 就会进入" (Code "check M A")
+      "这一分支. 类似地, 在当前的语言片段中, "
+      "我们只能为第一投影和第二投影综合出类型.")
+   (P "我们目前还无法实际运行它, "
+      "因为还没有任何基本情形, 比如"
+      (Code "prop") "的定义中就没有. "
+      "我们先来解决这个问题, "
+      "以便尝试一个简单的例子.")
+   (P (B "truth. ")
+      "这里只有一条引入规则, 没有消去规则."
+      (MB (&rull $truthI
+                 (Check $unit $truth)))
+      "这意味着我们只需添加一种新的命题" (Code "True")
+      ", 以及一种新的项" (Code "Unit")
+      ", 还有" (Code "check") "函数中的一个分支."
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Unit) (True) = true
+  | check M A = false
+
+and synth (Fst(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(A)
+       | _ => NONE)
+  | synth (Snd(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(B)
+       | _ => NONE)
+  | synth M = NONE"))
+   (P "现在我们可以问"
+      (Check (tupa0 $unit $unit)
+             (&conj $truth $truth))
+      ", 当然如此. 我们也该有负面例子, "
+      "以避免总是成功的类型检查器也能通过我们的测试. "
+      "这里, 我们希望检查"
+      (&neg (@Check $unit (&conj $truth $truth)))
+      ". 我们作以下安排."
+      (CodeB "fun assert true = ()
+  | assert false = raise Fail &quot;assert&quot;
+fun deny true = raise Fail &quot;deny&quot;
+  | deny false = ()
+
+val () = assert (check (Pair(Unit,Unit)) (And(True,True)))
+val () = deny (check Unit (And(True,True)))")
+      "幸运的是, 的确通过了!")
+   (P (B "从合成到验证的桥梁. ") "规则"
+      (MB (&rull
+           $duarr*
+           (Infer $M $P^)
+           (&= $P^ $P)
+           (Check $M $P)))
+      "提供了从合成到验证的桥梁, 其中我们将" $P
+      "限制为一个命题变量, "
+      "而不是一个任意的命题. "
+      "为了刻画这一点, 我们需要在我们的句法中加入变量, "
+      "以及一个对照变量进行检查的情形, "
+      "我们通过变量的名字 (作为一个字符串) 来识别它们. "
+      "项的语言在这里没有改变, 合成函数也没有改变."
+      (CodeB "datatype prop =
+         And of prop * prop   (* A /\\ B *)
+       | True                 (* T *)
+       | Var of string        (* P *)
+
+datatype term =
+         Pair of term * term  (* &lt;M,N> *)
+       | Fst of term          (* fst M *)
+       | Snd of term          (* snd M *)
+       | Unit                 (* &lt;> *)
+
+(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Unit) (True) = true
+  | check M (Var(P)) =
+    (case synth M
+      of SOME(Var(P')) => P' = P
+       | _ => false)
+  | check M A = false
+
+and synth (Fst(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(A)
+       | _ => NONE)
+  | synth (Snd(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(B)
+       | _ => NONE)
+  | synth M = NONE"))
+   (H3. "推出")
+   (P "现在我们来到一个有些令人费解的部分. "
+      "推出引入的证明项是" $lambda
+      "抽象, 它引入一个新的假设."
+      (MB (split16
+           (&rull
+            (&implI $x)
+            (walk
+             (assume $x (Infer $x $A))
+             $..v
+             (Check $M $B))
+            (Check (Lam $x $M)
+                   (&impl $A $B)))
+           (&rull
+            $implE
+            (Infer $M (&impl $A $B))
+            (Check $N $A)
+            (Infer (App $M $N) $B))))
+      "问题是, 我们如何表示新变量" $x
+      "及其作用域 (即项" $M ")? 此外, "
+      "我们如何表示被引入推导中的假设"
+      (Infer $x $A) "?")
+   (P "关键的想法是把" $lambda
+      "构造子的作用域表示为ML中的一个函数, "
+      "这一想法被称为高阶抽象句法 "
+      "(higher-order abstract syntax). "
+      "一般地, 每当一个新变量 "
+      "(= 新假设) 被引入一个推导时, "
+      "我们就用一个ML函数来表示这个作用域. "
+      "这也意味着绑定变量" $x
+      "由一个同名的ML变量表示. 应用" (App $M $N)
+      "更简单, 因为其中不涉及绑定或作用域."
+      (CodeB "datatype prop =
+         And of prop * prop
+       | Imp of prop * prop
+       | True
+       | Var of string
+
+datatype term =
+         Pair of term * term  (* &lt;M,N> *)
+       | Fst of term          (* fst M *)
+       | Snd of term          (* snd M *)
+       | Lam of term -> term  (* \\x. M *)
+       | App of term * term   (* M N *)
+       | Unit                 (* &lt;> *)")
+      "注意到构造子的类型"
+      (Code "Lam : (term -> term) -> term")
+      ". 这不太可能令你感到熟悉, "
+      "所以让我们浏览一些例子, "
+      "以晓得我们对此表示有何期望."
+      (MB (set-attr*
+           (&Table
+            ("黑板" (: "类型" (Ms "term") "的ML值"))
+            ((Lam $x $x)
+             (Ms "Lam(fn x => x)"))
+            ((Lam $x (Lam $y $x))
+             (Ms "Lam(fn x => Lam(fn y => x))"))
+            ((Lam $x (tupa0 (&snd $x) (&fst $x)))
+             (Ms "Lam(fn x => Pair(Snd(x),Fst(x)))"))
+            ((Lam $x (App (@snd $x) (@fst $x)))
+             (Ms "Lam(fn x => App(Snd(x),Fst(x)))")))
+           'columnalign "left"))
+      "我们既已知项之表示, 那么该如何处理类型检查呢? "
+      "我们得到了以下情况:"
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F ???) B
+  ...")
+      "在" (Code "Lam")
+      "的情形中, 我们想要针对命题" $B "检查"
+      $lambda "抽象的体. 为了访问这个体, 我们需要将"
+      (Code "F : term -> term")
+      "应用于某个类型为" $A
+      "的项, 但我们并没有任何这样的项. "
+      "从直觉上, 这个项应该代表假设" (Infer $x $A)
+      ", 尽管变量" $x "的名字对于这个目的而言是无关紧要的. "
+      "因此我们创建一种新的项" (Code "Hyp(A)")
+      ", 代表一个类型为" $A
+      "的假设 (省略了名字, 因为它无关紧要). 然后我们将"
+      (Code "Hyp(A)") "代入绑定变量" $x
+      ", 这是通过ML中的函数应用来实现的."
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F (Hyp(A))) B
+  ...")
+      "为了纳入假设" (Infer $x $A)
+      "应当合成类型" $A
+      "这一事实, 我们在" (Code "synth")
+      "函数中添加一个关于假设的情形 "
+      "(省略了已经存在的第一投影和第二投影的情形)."
+      (CodeB "and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) = ...
+  | synth (Snd(M)) = ...
+  | synth M = NONE")
+      "剩下的是添加一个关于推出消去的情形, "
+      "也就是证明项的应用. 回忆:"
+      (MB (&rull
+           $implE
+           (Infer $M (&impl $A $B))
+           (Check $N $A)
+           (Infer (App $M $N) $B)))
+      "注意检查和合成的方向, 我们按照如下方式进行: "
+      "首先我们合成" $M "的类型, 它必须具有"
+      (&impl $A $B) "的形式. 从中我们提取出" $A
+      ", 然后针对" $A "检查参数" $N
+      ". 如果它返回真, 我们就可以返回" $B
+      "作为合成的类型. 如果任何一步失败, 我们就返回"
+      (Code "NONE") ". 我们将其转写为以下代码:"
+      (CodeB "and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) = ...
+  | synth (Snd(M)) = ...
+  | synth (App(M,N)) =
+    (case synth M
+      of SOME(Imp(A,B)) => if check N A
+                           then SOME(B)
+                           else NONE
+       | _ => NONE)
+  | synth M = NONE")
+      "现在我们可以尝试一些稍微更有挑战性的例子, 例如"
+      (&impl $A $A) ", "
+      (&impl (@conj $A $B) $A) "和"
+      (&impl $A (@impl $B $A))
+      "的证明项, 以及"
+      (&neg (@Check (Lam $x $x)
+                    (&impl $A $B)))
+      "."
+      (CodeB "val A = Var(&quot;A&quot;)
+val B = Var(&quot;B&quot;)
+val C = Var(&quot;C&quot;)
+
+val () = assert (check (Lam(fn x => x)) (Imp(A,A)))
+val () = deny (check (Lam(fn x => x)) (Imp(A,B)))
+val () = assert (check (Lam(fn x => Fst(x))) (Imp(And(A,B),A)))
+val () = assert (check (Lam(fn x => Lam(fn y => x))) (Imp(A,Imp(B,A))))"))
+   (H3. "析取")
+   (P "对于析取, 我们只需记住其消去形式 "
+      "(a) 引入了两个假设, 因此证明项有两个绑定变量, 以及 "
+      "(b) 结论是一个验证. 我们还顺带加入了假 (它更简单), "
+      "以便更快地得到我们完整的语言.")
+   (MB (split16
+        (&rull
+         $disjI1
+         (Check $M $A)
+         (Check (&inl $M) (&disj $A $B)))
+        (&rull
+         $disjI2
+         (Check $N $B)
+         (Check (&inr $N) (&disj $A $B)))))
+   (MB (&rull
+        (&disjE $u $w)
+        (Infer $M (&disj $A $B))
+        (walk
+         (assume $u (Infer $u $A))
+         $..v
+         (Check $N $C))
+        (walk
+         (assume $w (Infer $w $B))
+         $..v
+         (Check $P $C))
+        (Check
+         (&case $M $u $N $w $P) $C)))
+   (MB (&rull
+        $falsehoodE
+        (Infer $M $falsehood)
+        (Check (&abort $M) $C)))
+   (P "据此我们扩展命题和证明项."
+      (CodeB "datatype prop =
+         And of prop * prop
+       | Imp of prop * prop
+       | Or of prop * prop
+       | True
+       | False
+       | Var of string
+
+fun Not A = Imp(A,False)
+
+datatype term =
+         Pair of term * term   (* &lt;M,N> *)
+       | Fst of term           (* fst M *)
+       | Snd of term           (* snd M *)
+       | Lam of term -> term   (* \\x. M *)
+       | App of term * term    (* M N *)
+       | Inl of term           (* inl M *)
+       | Inr of term           (* inr M *)
+       | Case of term * (term -> term) * (term -> term)
+                               (* case (M, u.N, w.P) *)
+       | Unit                  (* &lt;> *)
+       | Abort of term         (* abort M *)
+       | Hyp of prop           (* _ : A *)")
+      "我们注意到两件事: "
+      "(1) 我们把否定作为一个记法定义 "
+      "(notational definition) 引入, "
+      "它在ML中就只是一个定义, 以及 "
+      "(2) 我们看到" (Code "case")
+      "表达式中的两个分支是如何由ML函数表示的. "
+      "幸运的是, 我们不需要更多的东西了. 注意"
+      (Code "Case") "构造子出现在"
+      (Code "check") "函数中, 因为该规则要求对"
+      $C "进行验证. 此外, 在两个分支中, "
+      "我们分别用假设" $A "和" $B "将其实例化."
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F (Hyp A)) B
+  | check (Inl(M)) (Or(A,B)) = check M A
+  | check (Inr(M)) (Or(A,B)) = check M B
+  | check (Case(M,F,G)) C =
+    (case synth M
+      of SOME(Or(A,B)) => check (F (Hyp A)) C
+                          andalso check (G (Hyp B)) C
+       | _ => false)
+  | check (Abort(M)) C =
+    (case synth M
+      of SOME(False) => true
+       | _ => false)
+  | check (Unit) (True) = true
+  | check M (Var(P)) =
+    (case synth M
+      of SOME(Var(P')) => P' = P
+       | _ => false)
+  | check M A = false
+
+and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(A)
+       | _ => NONE)
+  | synth (Snd(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(B)
+       | _ => NONE)
+  | synth (App(M,N)) =
+    (case synth M
+      of SOME(Imp(A,B)) => if check N A
+                           then SOME(B)
+                           else NONE
+       | _ => NONE)
+  | synth M = NONE"))
+   (P "最后一组例子指出了一件有趣的事情: 当从"
+      (Infer $M $falsehood)
+      " (表示" (&use $falsehood)
+      ") 转到" (Check $M $falsehood)
+      " (表示" (&ver $falsehood)
+      ") 时, 我们必须使用" $falsehoodE
+      "规则, 而不是在这两个判断之间悄无声息地转换. "
+      "这是因为" $falsehood
+      "不是一个命题变量, "
+      "尽管它可能看起来是原子的, "
+      "在它不能被分解的意义上."
+      (CodeB "fun assert true = ()
+  | assert false = raise Fail &quot;assert&quot;
+fun deny true = raise Fail &quot;deny&quot;
+  | deny false = ()
+
+val A = Var(&quot;A&quot;)
+val B = Var(&quot;B&quot;)
+val C = Var(&quot;C&quot;)
+
+val () = assert (check (Pair(Unit,Unit)) (And(True,True)))
+val () = deny (check Unit (And(True,True)))
+val () = assert (check (Lam(fn x => x)) (Imp(A,A)))
+val () = deny (check (Lam(fn x => x)) (Imp(A,B)))
+val () = assert (check (Lam(fn x => Fst(x))) (Imp(And(A,B),A)))
+val () = assert (check (Lam(fn x => Lam(fn y => x))) (Imp(A,Imp(B,A))))
+val () = assert (check (Lam(fn x => Case(x, fn u => Inr u,
+                                            fn w => Inl w)))
+                       (Imp(Or(A,B),Or(B,A))))
+val () = deny (check (Lam(fn x => Case(x, fn u => Inr u,
+                                          fn w => Inl w)))
+                     (Imp(Or(A,B),Or(A,B))))
+val () = assert (check (Lam(fn x => Abort(App(Snd(x),Fst(x)))))
+                       (Not(And(A,Not(A)))))
+val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
+                     (Not(And(A,Not(A)))))")
+      "最后一个正面的例子是对"
+      (&neg (@conj $A (&neg $A)))
+      "的一个验证, 用数学的方式写作"
+      (Lam $x (&abort (@App (@snd $x) (@fst $x)))) ".")
    (H2. "相继式演算")
    (H3. "引论")
    (P "在本讲中, 我们转向一种不同的证明演算呈现方式. "
@@ -1962,12 +3720,707 @@ fun even_or_odd x = case x of
       "而使用是自顶向下构造的, 使用消去规则从假设到结论. "
       "两者在中间交汇, 在那里我们从假设推导出的命题可以被用作验证. "
       "在相继式演算中, 这两个步骤都是自底向上进行的, "
-      "这最终使我们能够证明局部可靠性和完备性性质的全局版本.")
+      "这最终使我们能够证明局部可靠性和局部完备性的全局版本.")
    (H3. "相继式")
+   (P "在构造一个验证时, 我们一般处于如下形式的状态"
+      (MB (walk
+           (parallel
+            (&use $A_1) $..c (&use $A_n))
+           $..v
+           (&ver $C)))
+      "其中" (&cm $A_1 $..h $A_n)
+      "体现了我们可以使用的知识, 而" $C
+      "是我们试图验证的结论. 一个相继式 (sequent) "
+      "只不过是这样一个部分完成的验证的局部记号. 我们记"
+      (MB (Sequent
+           (&ante $A_1) $..h (&ante $A_n)
+           (&succ $C)))
+      "其中判断" (&ante $A)
+      " (表示" (Q $A "是一个前件 (antecedent)")
+      ") 和" (&succ $C)
+      " (表示" (Q $C "是一个后件 (succedent)")
+      ") 分别对应于" (&use $A) "和" (&ver $C)
+      ". 相继式演算 (sequent calculus) "
+      "明确给出可供使用的假设 (前件) 以及要被验证的命题 (后件). "
+      "因为它们在相继式中有固定的位置, 我们常常省略判断"
+      $ante "和" $succ ".")
+   (P "定义" (&ante $A) "和" (&succ $A)
+      "判断的规则是从引入规则和消去规则系统地构造出来的, "
+      "同时要记住它们在验证和使用方面的方向. "
+      "引入规则被翻译为相应的右规则 (right rule). "
+      "由于引入规则本来就是从结论向前提进行的, "
+      "这一映射是直截了当的. "
+      "消去规则是自上而下进行的, "
+      "因此它们必须被上下翻转才能作为相继式规则起作用, "
+      "并被转化为左规则 (left rule). 图示如下:"
+      sequent-rules.svg)
+   (P "我们现在逐个联结词地进行, "
+      "从引入规则和消去规则构造出右规则和左规则. 一组前件"
+      (&cm (&ante $A_1) $..h (&ante $A_n))
+      "缩略为" Γ ". 前件的顺序无关紧要, "
+      "因此我们允许它们被隐式地重新排序.")
+   (P (B "合取. ")
+      "我们首先回顾引入规则, 并展示对应的右规则."
+      (MB (split16
+           (&rull $conjI
+                  (&ver $A) (&ver $B)
+                  (&ver (&conj $A $B)))
+           (&rull $conjR
+                  (Sequent Γ $A)
+                  (Sequent Γ $B)
+                  (Sequent Γ (&conj $A $B)))))
+      "唯一的区别在于前件" Γ
+      "被显式写出. 两个前提有相同的前件, "
+      "因为任何假设都可以在两个子演绎 "
+      "(subdeduction) 中使用.")
+   (P "正如课上讨论过的, 写出下面的规则是完全合理且正确的:"
+      (MB (&rull $conjR^
+                 (Sequent Γ_1 $A)
+                 (Sequent Γ_2 $B)
+                 (Sequent (&union Γ_1 Γ_2)
+                          (&conj $A $B))))
+      "这条规则最自然的读法是从前提到结论. "
+      "确实, 如果我们有一个使用"
+      Γ_1 "的" $A "的验证和一个使用" Γ_2
+      "的" $B "的验证, 那么我们就可以得到一个使用"
+      (&union Γ_1 Γ_2) "的" (&conj $A $B)
+      "的验证. 另一方面, 如果我们考虑自底向上的证明构造, "
+      "我们希望把所有可用的前件传播到两个子目标, "
+      "因此出于这一目的, 原来的规则更为可取.")
+   (P "有两条消去规则, 所以我们有两条对应的左规则."
+      (MB (split16
+           (&rull $conjE1
+                  (&use (&conj $A $B))
+                  (&use $A))
+           (&rull $conjL1
+                  (Sequent
+                   Γ (&conj $A $B) $A $C)
+                  (Sequent
+                   Γ (&conj $A $B) $C))))
+      (MB (split16
+           (&rull $conjE2
+                  (&use (&conj $A $B))
+                  (&use $B))
+           (&rull $conjL2
+                  (Sequent
+                   Γ (&conj $A $B) $B $C)
+                  (Sequent
+                   Γ (&conj $A $B) $C))))
+      "我们在前提中保留左规则的主公式 (principal formula) "
+      (&conj $A $B) ". 这是因为我们试图模拟自然演绎中的证明构造, "
+      "在自然演绎中假设可以被多次使用. "
+      "如果我们暂时忽略前提中" (&conj $A $B)
+      "的复制, 就更容易看出这些规则是如何对应的.")
+   (P (B "truth. ")
+      "truth只由一条引入规则定义, 并且没有消去规则. "
+      "因此, 在相继式演算中只有一条右规则而没有左规则."
+      (MB (split16
+           (&rull $truthI
+                  (&ver $truth))
+           (&rull $truthR
+                  (Sequent Γ $truth)))))
+   (P (B "推出. ")
+      "同样, 推出的右规则相当直接, "
+      "因为它直接模拟了引入规则."
+      (MB (split16
+           (&rull
+            (&implI $u)
+            (walk
+             (assume $u (&use $A))
+             $..v
+             (&ver $B))
+            (&ver (&impl $A $B)))
+           (&rull
+            $implR
+            (Sequent Γ $A $B)
+            (Sequent Γ (&impl $A $B)))))
+      "我们在这里看到相继式演算相对于自然演绎的一个优点: "
+      "附加假设的作用域很简单. 新的前件" $A
+      "在前提的演绎中的任何地方都可用, "
+      "因为在相继式演算中我们只自底向上地工作. "
+      "此外, 我们安排所有规则使得前件是持久的 "
+      "(persistent): 它们总是从结论传播到所有前提.")
+   (P "消去规则更为棘手, 因为它涉及验证与使用的一种更复杂的组合."
+      (MB (split16
+           (&rull $implE
+                  (&use (&impl $A $B))
+                  (&ver $A)
+                  (&use $B))
+           (&rull $implL
+                  (Sequent Γ (&impl $A $B) $A)
+                  (Sequent Γ (&impl $A $B) $B $C)
+                  (Sequent Γ (&impl $A $B) $C))))
+      "以文字说明的话, 那就是: 为了使用"
+      (&impl $A $B) "以验证" $C
+      ", 我们需要产生一个" $A
+      "的验证, 在这种情形下我们可以在对于"
+      $C "的验证中使用" $B
+      ". 前件" (&impl $A $B)
+      "两个前提均需转交以维护持久性. "
+      "注意到和消去规则相比, "
+      "左规则的前提顺序是反过来的, "
+      "这是为了指明我们不想作出假设" $B
+      ", 除非我们已经建立了" $A ".")
+   (P "基于可证明性的话, " $implL
+      "规则存在些许冗余. 例如, 一旦我们知道了"
+      $B ", 我们就不再需要" (&impl $A $B)
+      "了, 因为" $B "是一个更强的假设. "
+      "不过正如之前强调过了的, "
+      "我们试图维护其与自然演绎之间的对应, "
+      "而把这种优化推迟到以后再做.")
+   (P (B "析取. ")
+      "析取的右规则直接对应于引入规则, 如常."
+      (MB (split16
+           (&rull
+            $disjI1
+            (&ver $A)
+            (&ver (&disj $A $B)))
+           (&rull
+            $disjR1
+            (Sequent Γ $A)
+            (Sequent Γ (&disj $A $B)))))
+      (MB (split16
+           (&rull
+            $disjI2
+            (&ver $B)
+            (&ver (&disj $A $B)))
+           (&rull
+            $disjR2
+            (Sequent Γ $B)
+            (Sequent Γ (&disj $A $B))))))
+   (P "析取的消去规则在某种意义上很是奇怪, "
+      "因为其引入了两个新的假设, "
+      "析取的每种情形一个. "
+      "析取的左规则实际上有着一种更为简单的形式, "
+      "而这种形式与我们目前所呈现的其他规则更为一致."
+      (MB (split16
+           (&rull
+            (&disjE $u $w)
+            (&use (&disj $A $B))
+            (walk
+             (assume $u (&use $A))
+             $..v
+             (&ver $C))
+            (walk
+             (assume $w (&use $B))
+             $..v
+             (&ver $C))
+            (&ver $C))
+           (&rull
+            $disjL
+            (Sequent
+             Γ (&disj $A $B) $A $C)
+            (Sequent
+             Γ (&disj $A $B) $B $C)
+            (Sequent
+             Γ (&disj $A $B) $C))))
+      "和推出的情形差不多, 但是作用域问题更为明确和简化, "
+      "因为分别出现在第一个和第二个前提里的新假设"
+      $A "和" $B "也(相应)上方的演绎也处处可用. "
+      "不过, 假设" $A "只在左前提的演绎里可用, 而"
+      $B "只在右前提的演绎里可用. "
+      "{译注: 这句话是解释上一句话.} "
+      "相继式演算使得这一点显式化. "
+      "相继式演算的表述形式也使得"
+      "适切的验证/使用标签的赋予更为透明.")
+   (P (B "falsehood. ")
+      "falsehood没有引入规则, "
+      "因而相继式演算里没有其右规则. "
+      "为了抵达左规则, 我们需要注意使用和验证的区分. "
+      "我们也可以根据之前的结果构建析取的零元情形."
+      (MB (split16
+           (&rull
+            $falsehoodE
+            (&use $falsehood)
+            (&ver $C))
+           (&rull
+            $falsehoodL
+            (Sequent Γ $falsehood $C)))))
+   (P (B "完成验证. ")
+      "回想一下, 我们不能使用引入规则来验证原子命题"
+      $P ", 因为它们不能被进一步分解. " $P
+      "唯一可能的验证是直接通过对" $P
+      "的一次使用. 在我们所展示的验证的版本中, 只要" (&use $P)
+      "可用, 我们就可以完成一个验证的构造, 得出" (&ver $P)
+      ". {原注: 这条规则存在更为宽松的版本, 其中"
+      $duarr "规则可以应用于一切命题" $A
+      ", 而不仅仅是命题变元. "
+      "我们将于下一次讲座回到这里.} "
+      "这就变成了所谓的始相继式 (initial sequent), "
+      "也称为恒等规则 (identity rule) 的一次应用."
+      (MB (split16
+           (&rull
+            $duarr*
+            (&use $P)
+            (&ver $P))
+           (&rull
+            $id:rule
+            (Sequent
+             Γ $P $P))))
+      "这条规则具有特殊的地位, 因为它不分解任何命题, "
+      "而是在两个判断之间建立联系. "
+      "在自然演绎中, 它是使用与验证之间的联系; "
+      "在相继式演算中, 它是"
+      $left "判断与" $right "判断之间的联系. "
+      "{译注: 个人猜测是笔误, 实际上应该是"
+      $ante "和" $succ ".}")
+   (P "作为一个简单的例子, 我们考虑"
+      (&impl (@disj $A $B)
+             (@disj $B $A))
+      "的证明. 既然" $A "和" $B
+      "均为变元, 我们可以使用恒等规则完成推导."
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj ,$A ,$B)
+                (disj ,$B ,$A))))
+         (IMPLR 0)
+         ((DISJL 0) 0)
+         (DISJR2 0)
+         (DISJR1 1)
+         (IDRULE 0)
+         (IDRULE 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj ,$A ,$B)
+                      (disj ,$B ,$A))))
+               (IMPLR 0)
+               ((DISJL 0) 0)
+               (DISJR2 0)
+               (DISJR1 1)
+               (IDRULE 0)
+               (IDRULE 0)
+               )))
+      "注意, 相继式演算的证明总是自下而上构造的: "
+      "所期望的结论在底部, "
+      "然后在前件或后件中分别使用相应的"
+      "左证明规则或右证明规则向上进行.")
+   (H3. "关于相继式证明的观察")
+   (P "我们已经提到过, 相继式证明中的前件是持久的: "
+      "一旦做出了一个假设, 它从此在引入它的那个推理之上都是可用的. "
+      "相继式证明还遵守重要的子公式性质 (subformula property): "
+      "如果我们考察一个相继式之上的完整或部分证明, "
+      "我们会观察到所有的相继式都是由该相继式本身的子公式构成的. "
+      "这与验证的设计准则是一致的: 一个命题"
+      $A "的验证只可以包含" $A
+      "的子公式. 这一点从多个角度来看都很重要. "
+      "从基础上讲, 我们把验证看作是在定义命题的意义, "
+      "因此一个命题的验证应当只依赖于它的组成部分. "
+      "对于证明搜索而言, 这意味着我们不必求助于某个未知的公式, "
+      "而可以专注于我们证明目标的子公式.")
+   (P "如果我们暂且相信一个命题" $A
+      "为真当且仅当它在相继式演算中"
+      "有一个推导 (作为" (Sequent $A)
+      "), 那么我们就可以使用相继式演算来"
+      "形式地证明某个命题不可能一般地为真. "
+      "例如, 我们可以证明直觉主义逻辑是一致的.")
+   ((theorem #:n "1")
+    (B "一致性. ")
+    "没有" (Sequent $falsehood) ".")
+   ((proof)
+    "没有左规则可以应用, 因为其没有前件. "
+    "{译注: 这个是看结论.} "
+    "没有右规则可以应用, 因为falsehood没有右规则. "
+    "恒等规则也无法应用. 因此, 不存在"
+    (Sequent $falsehood) "的证明.")
+   ((theorem #:n "2")
+    (B "析取性质. ")
+    "如果" (Sequent (&disj $A $B))
+    ", 那么有" (Sequent $A) "或"
+    (Sequent $B) ".")
+   ((proof)
+    "没有左规则可以应用, 因为其没有前件. "
+    "唯一可以应用的右规则是"
+    $disjR1 "和" $disjR2
+    ". 对于第一种情形, 我们有"
+    (Sequent $A)
+    ", 第二种情形则是"
+    (Sequent $B) ".")
+   ((theorem #:n "3")
+    (B "排中律的失败. ")
+    "不是对于任意的" $A "都有"
+    (Sequent (&disj $A (&neg $A))) ".")
+   ((proof)
+    "根据析取性质, 我们有"
+    (Sequent $A) "或" (Sequent (&neg $A))
+    ". 对于第一个相继式, 没有规则可以应用. "
+    "{译注: 因为我们不知道" $A
+    "具体是什么东西.} "
+    "对于第二个相继式, 只有" $implR
+    "可以应用, 那么我们就不得不具有"
+    (Sequent $A $falsehood)
+    "的一个演绎. 但是对于这条相继式, "
+    "也没有规则能够应用.")
+   ((tcomment)
+    "更严谨地, 这个证明其实是将" $A
+    "取为一个原子命题, 然后才能顺理成章.")
+   (P "当然了, 仍然存在特定的公式" $A
+      "可以使得"
+      (Sequent (&disj $A (&neg $A)))
+      "是可证明的, 例如"
+      (Sequent (&disj $truth (&neg $truth)))
+      "或者"
+      (Sequent (&disj $falsehood
+                      (&neg $falsehood)))
+      ", 但这并不一般地对于任意的" $A "成立.")
+   (H3. "可证明性和不可证明性")
+   (P "我们已经看到" $falsehood "和" (&disj $A (&neg $A))
+      "在相继式演算中均无法根据空的前件集合证明出来.")
+   (P "让我们检视推出是否相对于析取分配. "
+      "存在两个需要验证的命题, "
+      "当然我们也可以拒绝 (deny) 一个验证:"
+      (MB (&ver (&impl (@disj (@impl $A $B)
+                              (@impl $A $C))
+                       (@impl $A (@disj $B $C)))))
+      (MB (&ver (&impl (@impl $A (@disj $B $C))
+                       (@disj (@impl $A $B)
+                              (@impl $A $C)))))
+      "第一个从直觉上而言应该为真: "
+      "如果我们假定" $A "可以推出" $B "或者"
+      $A "可以推出" $C ", 那么根据分类讨论, "
+      "可以产生" $A "能够推出" $B "或" $C
+      ". 我们将完全自底而上地构建一个相继式推导."
+      (CodeB "(MB (state-render
+     (initialize
+      (sequent
+       (list)
+       `(-> (disj (-> ,$A ,$B)
+                  (-> ,$A ,$C))
+            (-> ,$A (disj ,$B ,$C)))))))")
+      (MB (state-render
+           (initialize
+            (sequent
+             (list)
+             `(-> (disj (-> ,$A ,$B)
+                        (-> ,$A ,$C))
+                  (-> ,$A (disj ,$B ,$C)))))))
+      "这里我们别无选择: 我们只能应用推出的右规则."
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj (-> ,$A ,$B)
+                      (-> ,$A ,$C))
+                (-> ,$A (disj ,$B ,$C)))))
+         (IMPLR 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj (-> ,$A ,$B)
+                            (-> ,$A ,$C))
+                      (-> ,$A (disj ,$B ,$C)))))
+               (IMPLR 0)
+               )))
+      "现在我们在" $disjL "和" $implR
+      "之间有了选择. 让我们使用后者:"
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj (-> ,$A ,$B)
+                      (-> ,$A ,$C))
+                (-> ,$A (disj ,$B ,$C)))))
+         (IMPLR 0)
+         (IMPLR 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj (-> ,$A ,$B)
+                            (-> ,$A ,$C))
+                      (-> ,$A (disj ,$B ,$C)))))
+               (IMPLR 0)
+               (IMPLR 0)
+               )))
+      "此时我们有了三条可应用的规则: "
+      $disjR1 ", " $disjR2 ", 以及" $disjL
+      ". 这两条右规则都不能将我们引向可证明的子目标, 因为"
+      $B "或" $C "都不是能够直接推得的. "
+      "转而, 我们首先需要应用" $disjL
+      "规则以对于情形进行区分."
+      ;it is obvious that we have to
+      ;mechanize sequent calculus.
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj (-> ,$A ,$B)
+                      (-> ,$A ,$C))
+                (-> ,$A (disj ,$B ,$C)))))
+         (IMPLR 0)
+         (IMPLR 0)
+         ((DISJL 0) 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj (-> ,$A ,$B)
+                            (-> ,$A ,$C))
+                      (-> ,$A (disj ,$B ,$C)))))
+               (IMPLR 0)
+               (IMPLR 0)
+               ((DISJL 0) 0)
+               )))
+      "{译注: 本来这一段是对于他们用的"
+      "证明检查和排版工具Dcheck"
+      "的使用细节的描述, "
+      "其在应用析取左规则时需要指出"
+      "到底是应用在前件中的哪一个析取之上.}")
+   (P "现在或许是再作一个观察的好时机: "
+      "一旦我们区分了这两种情形, "
+      "我们就不再真正需要那个析取了. "
+      "规则说它仍然可以在那里, "
+      "但是我们写下推导的方式允许我们悄无声息地丢掉它, "
+      "因为它是完全冗余的. 于是事态就变成了:"
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj (-> ,$A ,$B)
+                      (-> ,$A ,$C))
+                (-> ,$A (disj ,$B ,$C)))))
+         (IMPLR 0)
+         (IMPLR 0)
+         ((DISJL^ 0) 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj (-> ,$A ,$B)
+                            (-> ,$A ,$C))
+                      (-> ,$A (disj ,$B ,$C)))))
+               (IMPLR 0)
+               (IMPLR 0)
+               ((DISJL^ 0) 0)
+               )))
+      "观察第一个子目标, 我们看出现在我们知道到底是"
+      $B "还是" $C "在给定的前件下为真了. "
+      "因此, 我们可以使用析取的第一条右规则."
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj (-> ,$A ,$B)
+                      (-> ,$A ,$C))
+                (-> ,$A (disj ,$B ,$C)))))
+         (IMPLR 0)
+         (IMPLR 0)
+         ((DISJL^ 0) 0)
+         (DISJR1 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj (-> ,$A ,$B)
+                            (-> ,$A ,$C))
+                      (-> ,$A (disj ,$B ,$C)))))
+               (IMPLR 0)
+               (IMPLR 0)
+               ((DISJL^ 0) 0)
+               (DISJR1 0)
+               )))
+      "接下来我们可以应用推出的左规则."
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj (-> ,$A ,$B)
+                      (-> ,$A ,$C))
+                (-> ,$A (disj ,$B ,$C)))))
+         (IMPLR 0)
+         (IMPLR 0)
+         ((DISJL^ 0) 0)
+         (DISJR1 0)
+         ((IMPLL 1) 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj (-> ,$A ,$B)
+                            (-> ,$A ,$C))
+                      (-> ,$A (disj ,$B ,$C)))))
+               (IMPLR 0)
+               (IMPLR 0)
+               ((DISJL^ 0) 0)
+               (DISJR1 0)
+               ((IMPLL 1) 0)
+               )))
+      "{译注: 个人认为这里有地方写的不对, "
+      "不过我已修正. 原作者在推出左规则的"
+      "第二个前提上写的相继式为"
+      (Sequent (&impl $A $B) $B $B)
+      ", 但是实际上应该是"
+      (Sequent $A (&impl $A $B) $B $B)
+      ". 并且, 这里面可以丢掉的是"
+      (&impl $A $B) ", 即可以写成"
+      (Sequent $A $B $B)
+      ", 但原文的写法肯定是不对的.} "
+      "两个分支的推出均是冗余的, "
+      "所以我们可以丢弃它们, "
+      "然后以恒等规则的应用结束这些分支. "
+      "{译注: 因为前文是错的, "
+      "所以这里说的也是错的.}"
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj (-> ,$A ,$B)
+                      (-> ,$A ,$C))
+                (-> ,$A (disj ,$B ,$C)))))
+         (IMPLR 0)
+         (IMPLR 0)
+         ((DISJL^ 0) 0)
+         (DISJR1 0)
+         ((IMPLL 1) 0)
+         (IDRULE 0)
+         (IDRULE 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj (-> ,$A ,$B)
+                            (-> ,$A ,$C))
+                      (-> ,$A (disj ,$B ,$C)))))
+               (IMPLR 0)
+               (IMPLR 0)
+               ((DISJL^ 0) 0)
+               (DISJR1 0)
+               ((IMPLL 1) 0)
+               (IDRULE 0)
+               (IDRULE 0)
+               )))
+      "{译注: 这里我和原文的写法也不尽相同. "
+      "我是按照前文的字面来的, "
+      "而它的恒等规则没有" Γ
+      "这种陪伴上下文. 然后, "
+      "原文还省略了弱化规则的应用. "
+      "个人认为目前我的写法更容易阅读, "
+      "尽管原文的写法也不算错.} "
+      "{译注: 这里的原文也说的不太对, "
+      "我们就省略了. 不过, "
+      "大致上意思就是剩余要证明的和之前的是对称的, "
+      "然后就直接完成所有的证明.}"
+      (CodeB "(MB (state-render
+     (&lt;&lt; (initialize
+          (sequent
+           (list)
+           `(-> (disj (-> ,$A ,$B)
+                      (-> ,$A ,$C))
+                (-> ,$A (disj ,$B ,$C)))))
+         (IMPLR 0)
+         (IMPLR 0)
+         ((DISJL^ 0) 0)
+         (DISJR1 0)
+         ((IMPLL 1) 0)
+         (IDRULE 0)
+         (IDRULE 0)
+         (DISJR2 0)
+         ((IMPLL 1) 0)
+         (IDRULE 0)
+         (IDRULE 0)
+         )))")
+      (MB (state-render
+           (<< (initialize
+                (sequent
+                 (list)
+                 `(-> (disj (-> ,$A ,$B)
+                            (-> ,$A ,$C))
+                      (-> ,$A (disj ,$B ,$C)))))
+               (IMPLR 0)
+               (IMPLR 0)
+               ((DISJL^ 0) 0)
+               (DISJR1 0)
+               ((IMPLL 1) 0)
+               (IDRULE 0)
+               (IDRULE 0)
+               (DISJR2 0)
+               ((IMPLL 1) 0)
+               (IDRULE 0)
+               (IDRULE 0)
+               ))))
+   (P "现在让我们来看另外一个方向."
+      (MB (walk $..v
+                (Sequent
+                 (&impl (@impl $A (@disj $B $C))
+                        (@disj (@impl $A $B)
+                               (@impl $A $C))))))
+      "在我们尝试证明它之前, 我们可以做一个快速的检验: "
+      "它是经典地为真的吗? 由于经典逻辑"
+      "只多了一条额外的公理 (排中律), "
+      "每个直觉主义地为真的命题也是经典地为真的. "
+      "因此, 如果该命题是经典地为假的, "
+      "它就不可能是直觉主义地为真的. "
+      
+      )
+   (H3. "优化")
    
    (H2 "Rec 3: 相继式演算")
    (H2. "切消")
    (H3. "引论")
+   (P "相继式演算的恒等规则 (identity rule) 展示了判断" (&ante $A)
+      "与" (&succ $A) "之间的一种联系: 如果我们假设"
+      $A "为前件, 我们就能证明" $A
+      "为后件. 因为我们设计相继式演算是为了建模验证, "
+      "所以这条规则只适用于命题变元" $P
+      " (也称为原子命题), 因为这些是" $duarr
+      "规则所允许的命题. 恒等定理 (identity theorem) 于是说, "
+      "我们可以安全地将恒等规则推广到所有命题"
+      $A ". 正如我们将在第2节中看到的, "
+      "这相当于消去规则的局部完备性的一个全局版本.")
+   (P "相继式演算的切定理表达的是相反的内容: "
+      "如果我们有" (&succ $A)
+      "的一个证明, 我们就被允许假设" (&ante $A)
+      ". 这可以解释为在说左规则并不过强: "
+      "我们用前件" $A "所能做的任何事情, "
+      "如果我们知道" $A
+      "为真, 也都可以在没有它的情况下推导出来. 因为"
+      (&succ $A) "只作为后件出现, 而" (&ante $A)
+      "只作为前件出现, 我们必须以一种"
+      "有些迂回的方式来表述这一点: 如果"
+      (Sequent Γ (&succ $A)) "且"
+      (Sequent Γ (&ante $A) (&succ $C))
+      ", 那么" (Sequent Γ (&succ $C)) ".")
+   (P "因为在" (&succ $A) "的相继式演算推导与"
+      (&ver $A) "的验证之间来回转换非常容易, "
+      "我们可以使用切定理来证明每一个真命题都有一个验证, "
+      "这确立了真与验证之间的一种基本的全局的联系. "
+      "虽然相继式演算是一个方便的中介 "
+      "(而且Gentzen [1935]也正是如此构想它的), "
+      "这一定理也可以直接使用验证来建立.")
+   (H3. "identity")
+   (P "在今天的讲座中, 我们完全置身于哲学基础之外, "
+      "并用数学手段研究相继式证明的结构. "
+      "具体来说, 我们将使用各种形式的数学归纳法, "
+      "进行关于相继式演算推导的结构与存在性的证明. "
+      "尽管如此, 我们的证明即使在元层面上也仍然是构造性的, "
+      "并且对于我们所证明的定理, 我们将简要讨论它们的计算内容.")
+   (P "我们将我们的相继式演算中的恒等规则限制于原子命题" $P "."
+      (MB (&rull
+           $id:rule
+           (Sequent Γ $P $P)))
+      "我们的规则是否足够强以使得我们能够对于任意的命题"
+      $A "证明" (Sequent Γ $A $A) "呢? 是的!")
+   ((theorem #:n "1")
+    (B "identity定理. ")
+    "对于任意的命题" $A ", 我们有"
+    (Sequent Γ $A $A) ".")
+   
+   ((theorem #:n "2")
+    (B "弱化. ")
+    "如果" (Sequent Γ $C) ", 那么"
+    (Sequent Γ $A $C) ".")
    
    (H2. "证明和验证")
    (H2 "Rec4: 规则归纳")
@@ -2167,9 +4620,57 @@ fun even_or_odd x = case x of
       "Modal Types as Staging Specifications for Run-time Code Generation "
       "(模态类型作为运行时代码生成的阶段化描述). "
       "这篇论文探索和讨论了模态逻辑和多阶段编程之间的联系. "
+      "其引入了一个叫做lambda-box的语言, "
+      "通过Curry-Howard同构其对应于S4模态逻辑. "
+      (&box $A) "的意思是"
+      (Q $A "必然为真") ".")
+   (MB (split16
+        (&rule (∈ (&: $x $A) Γ)
+               (!- (&\; Δ Γ) (&: $x $A)))
+        (&rule (!- (&\; Δ Γ) (&: $M (&-> $A $B)))
+               (!- (&\; Δ Γ) (&: $N $A))
+               (!- (&\; Δ Γ) (&: (App $M $N) $B)))))
+   (MB (split16
+        (&rule (!- (&\; Δ $emptyCtx) (&: $M $A))
+               (!- (&\; Δ Γ) (&: (&code $M) (&box $A))))
+        (&rule (!- (&\; Δ (@cm Γ (&: $x $A)))
+                   (&: $M $B))
+               (!- (&\; Δ Γ)
+                   (&: (Lam $x $M) (&-> $A $B))))))
+   (MB (split16
+        (&rule (∈ (&: $u $A) Δ)
+               (!- (&\; Δ Γ) (&: $u $A)))
+        (&rule (!- (&\; Δ Γ) (&: $M (&box $A)))
+               (!- (&\; (@cm Δ (&: $u $A)) Γ)
+                   (&: $N $B))
+               (!- (&\; Δ Γ)
+                   (&: (LetCogen $u $M $N) $B)))))
+   (P "这里的" Γ "是普通的上下文, 而"
+      Δ "是所谓的模态上下文. " Γ
+      "表达了当前世界的事实, 而"
+      Δ "表达了所有可达世界的事实.")
+   
+   (H2 "Rec11: lambda盒子")
+   (P "本次习题课的目标是进一步练习lambda-box语言. "
+      "我们先从一个计算两个向量内积的函数开始, "
+      "然后再编写一个利用引用 (quotation) 的新函数.")
+   (P "原本的函数:"
+      (CodeB "ip := λn.λv.λw.case n
+       | 0    → 0
+       | s n' → (v[n] × w[n]) + ip n' v w"))
+   (P "解答: 该函数的类型应该为"
+      (MB (&-> $nat (&box (@-> $vec (&box (@-> $vec $nat))))))
+      (CodeB "ip' := λn.case n
+        | 0    → quote(λv.quote(λw.0))
+        | s n' → let n_□' = lift n' in
+                   unquote(n_□', n_v'.
+                   unquote(ip' n_v', f.quote(λv.
+                   unquote(f v, f'.quote(λw.(f' w) +
+                   (v[s n_v'] × w[s n_v']))))))"))
+   (P "例子精读: 我们首先定义以下函数:"
+      (CodeB "eval x := unquote(x, u.u)")
       
       )
-   (H2 "Rec11: lambda盒子")
    (H2. "线性逻辑")
    (H2. "同步消息传递")
    (H3. "引论")
