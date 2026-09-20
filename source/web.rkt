@@ -225,12 +225,33 @@
          "term_of_commutative_algebra.rkt"
          "hoare.rkt"
          "vostd.rkt"
+         "plcat.rkt"
+         "introduction_to_logical_relations.rkt"
+         "iris.rkt"
+         "semantics_of_type_systems.rkt"
+         "iris-lecture-notes.rkt"
+         "iris-reference.rkt"
+         "pli.rkt"
+         "iris-notes.rkt"
          
          )
 (define emitXml (emit XML))
 (define emitXml-thunk (emit-thunk XML))
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml iris-notes.html
+             "../iris-notes.html")
+    (emitXml pli.html "../pli.html")
+    (emitXml iris-reference.html
+             "../iris-reference.html")
+    (emitXml iris-lecture-notes.html
+             "../iris-lecture-notes.html")
+    (emitXml semantics_of_type_systems.html
+             "../semantics_of_type_systems.html")
+    (emitXml iris.html "../iris.html")
+    (emitXml introduction_to_logical_relations.html
+             "../introduction_to_logical_relations.html")
+    (emitXml plcat.html "../plcat.html")
     (emitXml vostd.html "../vostd.html")
     (emitXml hoare.html "../hoare.html")
     (emitXml term_of_commutative_algebra.html

@@ -1,0 +1,471 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>iris讲义</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>iris讲义</h1>
+    <h2>第1章 引论</h2>
+    <h2>第2章 编程语言</h2>
+    <h2>第3章 资源的逻辑</h2>
+    <p>iris是一种高阶逻辑. 逻辑是用来陈述和证明<q>东西</q>的性质的. 例如, 一个自然数就是这样一个<q>东西</q>, 一个自然数的列表, 一个编程语言的一个值, 等等亦是如此. 这些东西需要用某种语言写下. 在iris的情形下, <q>东西</q>的潜在语言是带有诸多基本常量的<em>简单类型论</em>. 这些基本常量是由签名<math><mi mathvariant="script">S</mi></math>给出的.</p>
+    <p>注意到这种<q>东西</q>的语言和第2章引入的编程语言是不同的. 实际上, 编程语言的项是我们所要进行推理的<q>东西</q>中的一种. 令人遗憾的是, 记号往往非常类似, 例如iris项的语言和编程语言都有lambda抽象, 序对, 和. 我们希望读者能够习惯于这种区分.</p>
+    <p>我们将逐步引入iris的不同概念, 现在从对于顺序语言有用的一种最小分离逻辑开始.</p>
+    <p><b>句法. </b>iris的句法由一个签名<math><mi mathvariant="script">S</mi></math>和一个可数无限的变量集合<math><mi>Var</mi></math>构成 (变量可由元变量<math><mrow><mi>x</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi></mrow></math>遍历). 具体而言, 签名<math><mi mathvariant="script">F</mi></math>是函数符号及其arity的列表, arity即类型. 对于一个函数符号<math><mi>F</mi></math>而言, 我们记<math><mrow><mrow><mi>F</mi><mo>:</mo><mrow><mrow><msub><mi>&tau;</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>&tau;</mi><mi>n</mi></msub></mrow><mo>&rarr;</mo><msub><mi>&tau;</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub></mrow></mrow><mo>&in;</mo><mi mathvariant="script">F</mi></mrow></math>以表达其可以应用于类型为<math><mrow><msub><mi>&tau;</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>&tau;</mi><mi>n</mi></msub></mrow></math>的项元组, 然后结果具有类型<math><msub><mi>&tau;</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub></math>. 函数符号的一个例子是整数加法. 其arity为<math><mrow><mrow><mi>&Zopf;</mi><mo>,</mo><mi>&Zopf;</mi></mrow><mo>&rarr;</mo><mi>&Zopf;</mi></mrow></math>, 其中<math><mi>&Zopf;</mi></math>是整数的类型.</p>
+    <p>iris的类型由以下语法构建, 其中<math><mi>T</mi></math>代表我们之后要添加的额外基类型, <math><mi>Val</mi></math>和<math><mi>Expr</mi></math>分别是语言的值和句法的类型, 而<math><mi>Prop</mi></math>是iris命题的类型.
+      <math display="block">
+        <mrow><mi>&tau;</mi><mo>&Colone;</mo>
+          <mrow><mi>T</mi><mo>|</mo><mi>&Zopf;</mi><mo>|</mo><mi>Val</mi><mo>|</mo><mi>Expr</mi><mo>|</mo><mi>Prop</mi><mo>|</mo><mi>1</mi><mo>|</mo>
+            <mrow><mi>&tau;</mi><mo>+</mo><mi>&tau;</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi>&tau;</mi><mo>&times;</mo><mi>&tau;</mi></mrow>
+            <mo>|</mo>
+            <mrow><mi>&tau;</mi><mo>&rarr;</mo><mi>&tau;</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      相应的iris项定义如下. 当我们之后引入新的iris概念时, 其会得到扩展, 而一些我们现在视为原语的项实际上是被定义的概念.
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>t</mi><mo>,</mo><mi>P</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow><mi>x</mi><mo>|</mo><mi>n</mi><mo>|</mo><mi>v</mi><mo>|</mo><mi>e</mi><mo>|</mo>
+                <mrow><mi>F</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <msub><mi>t</mi><mn>1</mn></msub>
+                      <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                      <msub><mi>t</mi><mi>n</mi></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow/>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>|</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>t</mi><mo>,</mo><mi>t</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>|</mo>
+                <mrow>
+                  <msub><mi>&pi;</mi><mi>i</mi></msub>
+                  <mspace width="2ex"/><mi>t</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>&lambda;</mi>
+                  <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+                  <mo lspace="0">.</mo><mi>t</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>t</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>inl</mi><mo>&af;</mo><mi>t</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>inr</mi><mo>&af;</mo><mi>t</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>case</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>t</mi><mo>,</mo>
+                      <mrow><mi>x</mi><mo lspace="0">.</mo><mi>t</mi></mrow>
+                      <mo>,</mo>
+                      <mrow><mi>y</mi><mo lspace="0">.</mo><mi>t</mi></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">False</mi><mo>|</mo><mi mathvariant="sans-serif">True</mi><mo>|</mo>
+                <mrow><mi>t</mi>
+                  <msub><mo>=</mo><mi>&tau;</mi></msub>
+                  <mi>t</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>P</mi><mo>&rArr;</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>P</mi><mo>&and;</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>P</mi><mo>&or;</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>P</mi><mo>&#8270;</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>P</mi><mo>&minus;&#8270;</mo><mi>P</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo>&exist;</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+                  <mo lspace="0">.</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mo>&forall;</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+                  <mo lspace="0">.</mo><mi>P</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo>&square;</mo><mo>&af;</mo><mi>P</mi></mrow>
+                <mo>|</mo>
+                <mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+                <mspace width="2ex"/><mi>t</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow><mi>t</mi><mo>&mapsto;</mo><mi>t</mi></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      其中<math><mi>x</mi></math>是变量, <math><mi>n</mi></math>是整数, <math><mi>v</mi></math>和<math><mi>e</mi></math>遍历语言的值 (即它们分别是类型<math><mi>Val</mi></math>和<math><mi>Expr</mi></math>的原始项), 而<math><mi>F</mi></math>遍历签名<math><mi mathvariant="script">S</mi></math>中的函数符号.</p>
+    <p>项<math><mrow><mo stretchy="false">(</mo><mrow/><mo stretchy="false">)</mo></mrow></math>是唯一具有单元类型<math><mi>1</mi></math>的项, <math><mrow><mo stretchy="false">(</mo><mrow><mi>t</mi><mo>,</mo><mi>t</mi></mrow><mo stretchy="false">)</mo></mrow></math>是序对, <math><mrow><msub><mi>&pi;</mi><mi>i</mi></msub><mspace width="2ex"/><mi>t</mi></mrow></math>是投影, <math><mrow><mi>&lambda;</mi><mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow><mo lspace="0">.</mo><mi>t</mi></mrow></math>是lambda抽象, 而<math><mrow><mi>t</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></math>代表函数应用. 接着我们有和的引入形式 (<math><mi>inl</mi></math>和<math><mi>inr</mi></math>) 以及对应的消去形式<math><mi>case</mi></math>.</p>
+    <p>剩下来的项是逻辑构造. 它们绝大多数都是标准的命题联结词. 额外的构造是分离合取<math><mrow><mo stretchy="false">(</mo><mo>&#8270;</mo><mo stretchy="false">)</mo></mrow></math>和魔杖<math><mrow><mo stretchy="false">(</mo><mo>&minus;&#8270;</mo><mo stretchy="false">)</mo></mrow></math>, 其将会在第3章进行解释. 然后我们有later模态<math><mrow><mo>▷</mo><mo>&af;</mo><mi>P</mi></mrow></math>, 其在第6章进行解释, 以及持续模态<math><mrow><mo>&square;</mo><mo>&af;</mo><mi>P</mi></mrow></math>, 其在第7章进行解释. 最后我们有Hoare三元组<math><mrow><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mrow><mo stretchy="false">{</mo><mi>P</mi><mo stretchy="false">}</mo></mrow></mrow></math>和指向谓词<math><mrow><mi>t</mi><mo>&mapsto;</mo><mi>t</mi></mrow></math>, 其于第4章进行解释.</p>
+    <p>项语言的定型规则见于图2. 判断具有形式<math><mrow><mi mathvariant="normal">&Gamma;</mi><msub><mo>&vdash;</mo><mi mathvariant="script">S</mi></msub><mrow><mi>t</mi><mo>:</mo><mi>&tau;</mi></mrow></mrow></math>, 其表达的是给定签名<math><mi mathvariant="script">S</mi></math>, 合适一个项<math><mi>t</mi></math>在上下文<math><mi mathvariant="normal">&Gamma;</mi></math>之中具有类型<math><mi>&tau;</mi></math>. 变量上下文<math><mi mathvariant="normal">&Gamma;</mi></math>为逻辑的变量指派类型. 其是变量<math><mi>x</mi></math>和类型<math><mi>&tau;</mi></math>的序对列表, 并且所有的变量都是不同的. 我们以通常的方式写下上下文, 例如<math><mrow><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>:</mo><msub><mi>&tau;</mi><mn>1</mn></msub></mrow><mo>,</mo><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>:</mo><msub><mi>&tau;</mi><mn>2</mn></msub></mrow></mrow></math>是一个上下文.</p>
+    <p>基本逻辑的良类型项
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow/>
+          <mrow>
+            <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+            <mo>&vdash;</mo>
+            <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow><mi>t</mi><mo>:</mo><mi>&tau;</mi></mrow>
+          </mrow>
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+              <mrow><mi>x</mi><mo>:</mo>
+                <msup><mi>&tau;</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </mrow>
+            <mo>&vdash;</mo>
+            <mrow><mi>t</mi><mo>:</mo><mi>&tau;</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+              <mrow><mi>x</mi><mo>:</mo>
+                <msup><mi>&tau;</mi><mo>&prime;</mo></msup>
+              </mrow>
+              <mo>,</mo>
+              <mrow><mi>y</mi><mo>:</mo>
+                <msup><mi>&tau;</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </mrow>
+            <mo>&vdash;</mo>
+            <mrow><mi>t</mi><mo>:</mo><mi>&tau;</mi></mrow>
+          </mrow>
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+              <mrow><mi>x</mi><mo>:</mo>
+                <msup><mi>&tau;</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </mrow>
+            <mo>&vdash;</mo>
+            <mrow>
+              <mrow><mi>t</mi>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow><mi>x</mi><mo lspace="0" rspace="0">/</mo><mi>y</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+              </mrow>
+              <mo>:</mo><mi>&tau;</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow/>
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="sans-serif">False</mi></mrow>
+            <mo>&vdash;</mo><mi>Prop</mi></mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow/>
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="sans-serif">True</mi></mrow>
+            <mo>&vdash;</mo><mi>Prop</mi></mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>t</mi><mo>:</mo><mi>&tau;</mi></mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>u</mi><mo>:</mo><mi>&tau;</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mi>t</mi>
+                <msub><mo>=</mo><mi>&tau;</mi></msub>
+                <mi>u</mi></mrow>
+              <mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>P</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>Q</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mi>P</mi><mo>&rArr;</mo><mi>Q</mi></mrow>
+              <mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>P</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>Q</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mi>P</mi><mo>&and;</mo><mi>Q</mi></mrow>
+              <mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>P</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>Q</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mi>P</mi><mo>&or;</mo><mi>Q</mi></mrow>
+              <mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>P</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>Q</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mi>P</mi><mo>&#8270;</mo><mi>Q</mi></mrow>
+              <mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>P</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>Q</mi><mo>:</mo><mi>Prop</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mi>P</mi><mo>&minus;&#8270;</mo><mi>Q</mi></mrow>
+              <mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+              <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+            </mrow>
+            <mo>&vdash;</mo>
+            <mrow><mi>P</mi><mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo>&exist;</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+                <mo lspace="0">.</mo><mi>P</mi></mrow>
+              <mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+              <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+            </mrow>
+            <mo>&vdash;</mo>
+            <mrow><mi>P</mi><mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo>&forall;</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+                <mo lspace="0">.</mo><mi>P</mi></mrow>
+              <mo>:</mo><mi>Prop</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      图2. 逻辑项的定型规则</p>
+    <h3>第3.1节 命题和蕴涵</h3>
+    <p>对于投影, <math><mi>&lambda;</mi></math>和<math><mi>&mu;</mi></math>我们由通常的<math><mi>&eta;</mi></math>和<math><mi>&beta;</mi></math>规则.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>t</mi><mo>:</mo><mi>1</mi></mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>t</mi><mo>&equiv;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow/>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mtext class="small-caps">UNIT-&eta;</mtext></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&lambda;</mi>
+                      <mrow><mi>x</mi><mo>:</mo><mi>&tau;</mi></mrow>
+                      <mo lspace="0">.</mo>
+                      <msub><mi>e</mi><mn>1</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&equiv;</mo>
+                <mrow>
+                  <msub><mi>e</mi><mn>1</mn></msub>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow>
+                      <msub><mi>e</mi><mn>2</mn></msub>
+                      <mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mtext class="small-caps">&lambda;-&beta;</mtext></mrow>
+      </math>
+      图3. 逻辑蕴涵</p>
+    <p>逻辑的蕴涵规则具有形式
+      <math display="block">
+        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>|</mo>
+          <mrow><mi>P</mi><mo>&vdash;</mo><mi>Q</mi></mrow>
+        </mrow>
+      </math>
+      和通常一样, 这从直觉上表达了<math><mi>Q</mi></math>由假设<math><mi>P</mi></math>是可证明的. 这里的<math><mi>P</mi></math>和<math><mi>Q</mi></math>应该是良类型的命题, 即<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mrow><mi>P</mi><mo>:</mo><mi>Prop</mi></mrow></mrow></math>和<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mrow><mi>Q</mi><mo>:</mo><mi>Prop</mi></mrow></mrow></math>.</p>
+    <p>陈述逻辑规则时, 如果上下文<math><mi mathvariant="normal">&Gamma;</mi></math>从规则的前提到结论没有发生改变, 我们就会省略. 而且, 如果存在多个前提, 我们假定省略的上下文<math><mi mathvariant="normal">&Gamma;</mi></math>对于它们都是一样的. 规则可以在图3里找到. 第一集规则是直觉主义高阶逻辑的标准蕴涵规则. 除此之外, 我们还有新逻辑联结词<math><mo>&#8270;</mo></math>和<math><mo>&minus;&#8270;</mo></math>的规则. 以下我们解释了新的规则.</p>
+    <h3>第3.2节 分离合取与魔杖的规则</h3>
+    <h3>第3.3节 iris中的基本数学构造</h3>
+    <h2>第4章 顺序程序的分离逻辑</h2>
+    <h2>第5章 </h2>
+    <h2>第6章 later模态</h2>
+  </body>
+</html>

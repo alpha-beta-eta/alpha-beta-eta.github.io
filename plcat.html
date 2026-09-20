@@ -1,0 +1,701 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>编程语言范畴论</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>编程语言范畴论</h1>
+    <h2>前言</h2>
+    <p>这些是一门面向程序设计语言研究者的范畴论课程的讲义. 我想说, 这份讲义和这门课程都是<q>被逼出来的</q>: 范畴论的用处无法回避, 我才不得不去学习和理解一些范畴论. 我不会把自己称作范畴论学者, 这门课也与我以往尝试讲授的任何课程都很不一样. 我在这门课上的目标, 是梳理出我认为范畴论中必然出现的东西, 并以我觉得最合理的方式呈现出来. 当然, 没有John, 这一切都不可能实现, 真正理解这里所有内容的人是他.</p>
+    <p>许多程序设计语言研究者和学生都曾在某个时候接触过范畴论. 大多数人第一次见到它, 可能是在学习Haskell时看到<q>monad (单子)</q>和<q>functor (函子)</q>这样的词. 也有些更偏数学的人, 是在学习lambda演算时接触到它的, 他们听说了Scott, Smyth和Plotkin关于无类型lambda演算模型论的著名成果 [34]. 你来到这里, 很可能是因为你在某处见过范畴论, 想知道为什么需要它, 或者怀疑它是否真的有必要.</p>
+    <p>就我而言, 范畴论第一次出现在我自己的研究中, 并迫使我停下来去理解它, 是因为Heunen等人关于拟Borel空间的论文. 那是我读研究生的第二年, 我得承认这篇论文让我非常发怵. 它可怕地结合了两点: (1) 似乎对我眼下的研究非常重要, (2) 完全无法理解. 简而言之, 这篇论文为一种支持连续概率分布的高阶概率编程语言提出了一种指称语义, 称为拟Borel空间 (quasi-Borel spaces, QBS). 我当时是, 现在也仍然是概率程序设计语言的研究者, 所以这个结果似乎至关重要: 我喜欢函数! 然而当时我甚至看不出这件事为什么一开始就很难做! 如果你连一个问题的动机都理解不了, 那么想理解它的解法就只能祝你好运了.</p>
+    <p>论文第二段恰好给出了核心难题:
+      <blockquote><q>这些语言中的程序可能会把高阶函数与连续分布结合起来, 甚至在函数上定义概率分布. 但是, 概率论标准的测度论形式化不能很好地处理高阶函数, 因为可测空间范畴不是笛卡尔闭的.</q> [14]</blockquote>
+    </p>
+    <p>这句话我当时完全看不懂. 它唯一的引用是一篇1961年的论文, 题为<q>Borel structures for function spaces (函数空间上的 Borel 结构)</q> [3]. 这篇论文和我当时想读懂的那篇一样难以理解, 甚至更难! 我已经力不能及, 只好先放下, 而且很多年都没能读懂这篇论文.</p>
+    <p>当时, QBS论文像晴天霹雳一样突然出现, 严重动摇了我对自己做研究能力的信心. 但在过去8年里, 我逐渐意识到, 这篇看起来像是神来之笔, 又像来自外星的论文, 在某种意义上几乎是若干简单想法必然会走到一起的结果. 原来, 拟Borel空间的想法并不诞生于概率论, 而是来自一个看似毫不相干的数学角落: 微分几何与拓扑. 去年我和Max New聊起QBS, 他告诉我, 他读研究生时就想到过这套构造, 但因为它与微分空间 (diffeological spaces) 的关系看起来太直接, 他没有动力把它完整地发展出来. 这些结果在结构上非常相似, 以至于在训练有素的专家眼里, 那篇庞大的QBS论文几乎显得过于平凡! 这是我们对<q>为什么要学范畴论?</q>这个问题的第一个回答: 它把不同数学领域之间存在的类比精确化, 让你可以用非常相似的工具解决不同的问题.</p>
+    <p>如果这是我唯一一次遇到范畴论, 我不会在它上面投入足够多的精力, 以至于尝试开一门相关的课. 但范畴论一再出现. 我后来与范畴论的接触, 主要是由我的博士生John推动的, 他正在帮我讲授这门课并撰写这份讲义. 这个故事要从Lilac [22] 说起. Lilac是一种概率分离逻辑, 是我们在John读博的头两年里开发的. 在讲Lilac之前, 我们需要先简要讨论一下分离逻辑. 我保证我们会讲到范畴论的.</p>
+    <p>分离逻辑是描述资源的逻辑. 它们在程序设计语言领域被广泛使用, 用来建模内存等资源如何在程序中流动. 具体来说, 考虑下面这个C程序:<pre><code>void foo(int* x, int* y) {
+  for(int i = 0; i &lt; 3; i++) {
+    *x += *y;
+  }
+}</code></pre>有人看到<code>foo</code>可能会觉得它写得非常低效: 它完全可以优化成直接把<code>3*y</code>加到<code>x</code>上. 但如果<code>x</code>和<code>y</code>指向内存中的同一个位置 (也就是说, 它们互为别名) 呢? 那么这个优化就不再成立, 因为<code>y</code>在循环的每一次迭代中也会被修改. 由于C编译器必须做最坏的假设, 它不能进行这个优化.</p>
+    <p>分离逻辑为我们提供了一种描述内存所有权的语言, 让我们可以告诉编译器这些指针不会互为别名. 要让这个优化成立, <code>foo</code>必须有一个前置条件, 断言这两个参数不会互为别名. 在分离逻辑中, 这个前置条件可以写成:
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">[</mo>
+            <mrow><ms>x</ms><mo>&mapsto;</mo><mi>&minus;</mi></mrow>
+            <mo stretchy="false">]</mo></mrow>
+          <mo>&#8270;</mo>
+          <mrow><mo stretchy="false">[</mo>
+            <mrow><ms>y</ms><mo>&mapsto;</mo><mi>&minus;</mi></mrow>
+            <mo stretchy="false">]</mo></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p><math><mo>&#8270;</mo></math>称为分离合取 (separating conjunction): 它表示两个命题<math><mrow><mo stretchy="false">[</mo><mrow><ms>x</ms><mo>&mapsto;</mo><mi>&minus;</mi></mrow><mo stretchy="false">]</mo></mrow></math> (读作<q><math><ms>x</ms></math>指向某个位置</q>) 和<math><mrow><mo stretchy="false">[</mo><mrow><ms>y</ms><mo>&mapsto;</mo><mi>&minus;</mi></mrow><mo stretchy="false">]</mo></mrow></math>分别在堆中互不相交的部分上成立, 因此<math><ms>x</ms></math>和<math><ms>y</ms></math>不可能互为别名.</p>
+    <p>然而, 内存并不是程序中唯一的一种资源: 随机性也是一种很自然的资源. 在概率程序中, 我们可能想表达这样的命题:
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">[</mo>
+            <mrow><mi>x</mi><mo>&Tilde;</mo>
+              <mrow><mi mathvariant="monospace">Bern</mi><mo>&af;</mo>
+                <mrow><mn>1</mn><mo lspace="0" rspace="0">/</mo><mn>2</mn></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">]</mo></mrow>
+          <mo>&#8270;</mo>
+          <mrow><mo stretchy="false">[</mo>
+            <mrow><mi>y</mi><mo>&Tilde;</mo>
+              <mrow><mi mathvariant="monospace">Bern</mi><mo>&af;</mo>
+                <mrow><mn>1</mn><mo lspace="0" rspace="0">/</mo><mn>2</mn></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">]</mo></mrow>
+        </mrow>
+      </math>
+      它表示两个变量<math><mi>x</mi></math>和<math><mi>y</mi></math>是相互独立的Bernoulli随机变量. 除了概率之外, 程序显然还可能涉及许多其他类型的资源, 比如网络套接字, 互斥锁等. 难道我们必须为每一种资源都从头开发一套分离逻辑吗?</p>
+    <p>这引出了<q>为什么要学范畴论?</q>的第二个回答: 它能让一些看似随意的选择变成必然的结果. 我们会看到, 分离合取有一个范畴论的描述, 可以用一种叫做<q>Day卷积 (Day convolution)</q>的构造计算出来 [11, 6]. 如果你对<math><mo>&#8270;</mo></math>的解释来自这个构造, 那么它会自动满足分离合取应当满足的许多其他良构性要求. 这说明了范畴论如何为种类繁多的资源交互带来清晰的理解: 它指出你做出的哪些决定是真正新的, 哪些只是推论. 它会逼你出牌, 而当你不知道该出哪张牌时, 这一点非常有用.</p>
+    <p>到这里, 我已经确信, 对于任何从事程序设计语言研究的人来说, 掌握一些范畴论都是值得的投入, 尤其是研究概率这类特殊效应 (exotic effects) 或研究程序逻辑的人. 我也有些自负: 我认为范畴论并不难理解, 尤其是当你被我们将在课程中逐步介绍的一些应用充分激发了兴趣时. 这门课的目标读者是2017年的我. 那时的我在自己的领域里看到一篇重要论文, 却因为它熟练运用了范畴论的思想而觉得它遥不可及. 我希望我们能把其中一些思想讲得足够清楚, 让你看到这些优雅思想的必然性, 而不是被它们的晦涩难懂淹没.</p>
+    <h2>第1章 为什么需要范畴?</h2>
+    <p>人们最常遇到范畴论的地方之一是语义. 为了刻画为何范畴出现在这里, 以及它们的典型用途, 我们将会考虑一个每个程序员都遇到过的具体例子: 我们想要建立什么操作会改变我们程序的行为, 什么操作则是无关紧要的.</p>
+    <p>考虑一个微型语言<math><mtext class="small-caps">Calc</mtext></math>, 其由let绑定, 序对, 以及布尔构成:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/><mi>N</mi></mrow>
+                <mo>|</mo><mi>x</mi><mo>|</mo><mi mathvariant="monospace">true</mi><mo>|</mo><mi mathvariant="monospace">false</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>|</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">then</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">else</mi><mspace width="2ex"/><mi>O</mi></mrow>
+                <mo>|</mo>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">fst</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">snd</mi><mo>&af;</mo><mi>M</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>A</mi><mo>,</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow>
+                <mo>|</mo><mi mathvariant="monospace">Bool</mi></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math><mtext class="small-caps">Calc</mtext></math>有着一个简单类型系统:
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi mathvariant="monospace">true</mi><mo>:</mo><mi mathvariant="monospace">Bool</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi mathvariant="monospace">false</mi><mo>:</mo><mi mathvariant="monospace">Bool</mi></mrow>
+            </mrow>
+          </mfrac>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow><mi>M</mi><mo>:</mo><mi mathvariant="monospace">Bool</mi></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow><mi>N</mi><mo>:</mo><mi>A</mi></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow><mi>O</mi><mo>:</mo><mi>A</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">then</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">else</mi><mspace width="2ex"/><mi>O</mi></mrow>
+                <mo>:</mo><mi>A</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow><mi>N</mi><mo>:</mo><mi>B</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+                <mo>:</mo>
+                <mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+              <mo>&in;</mo><mi mathvariant="normal">&Gamma;</mi></mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>M</mi><mo>:</mo>
+                <mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">fst</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo>:</mo><mi>A</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>M</mi><mo>:</mo>
+                <mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="monospace">snd</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo>:</mo><mi>B</mi></mrow>
+            </mrow>
+          </mfrac>
+        </mrow>
+      </math>
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow><mi>N</mi><mo>:</mo><mi>B</mi></mrow>
+            </mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/><mi>N</mi></mrow>
+              <mo>:</mo><mi>B</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      以下是一个或许我们想要澄清的简单变换: 两个let绑定可以交换, 如果它们的定义没有提及对方.
+      <math display="block">
+        <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>y</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                <mo stretchy="false">&rang;</mo></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mover><mo>=</mo><mi>?</mi></mover>
+      </math>
+      <math display="block">
+        <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>y</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                <mo stretchy="false">&rang;</mo></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      从直觉上说, 这个等式成立是因为<math><mtext class="small-caps">Calc</mtext></math>程序没有副作用. 要证明这个直觉是对的, 我们可以证明这两个程序具有相同的含义. 为此, 我们需要给<math><mtext class="small-caps">Calc</mtext></math>程序一个语义.</p>
+    <h3>第1.1节 <math><mtext class="small-caps">Calc</mtext></math>的一个指称语义</h3>
+    <p>设计语义的第一步是选择用于陈述语义的元语言. 元语言应该是能够无歧义描述和使用的形式语言, 因为其本身的意义应当在我们解释程序时理所当然. 对于像<math><mtext class="small-caps">Calc</mtext></math>这一的简单语言, 一种自然的选择是集合与函数的语言.</p>
+    <p>用这种元语言, 我们可以给<math><mtext class="small-caps">Calc</mtext></math>程序一个指称语义, 也就是用所选的元语言来描述语法层面的程序的含义. 类型将被解释为集合:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(1.1)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">Bool</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                <mo>=</mo>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mn>0</mn><mo>,</mo><mn>1</mn></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(1.1)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext>(1.2)</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                  <mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow>
+                  <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                <mo>=</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>A</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  <mo>&times;</mo>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>B</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext>(1.2)</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      布尔类型指称二元素集合<math><mrow><mo stretchy="false">{</mo><mrow><mn>0</mn><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">}</mo></mrow></math>, 积类型<math><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow></math>指称<math><mi>A</mi></math>的指称与<math><mi>B</mi></math>的指称的笛卡尔积. 利用对类型的这种解释, 我们可以给出对类型上下文 (typing contexts) 的一种解释:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>&bull;</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            <mo>=</mo>
+            <mrow><mo stretchy="false">{</mo><mi>&Star;</mi><mo stretchy="false">}</mo></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+              </mrow>
+              <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            <mo>=</mo>
+            <mrow>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+              <mo>&times;</mo>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>A</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      空上下文<math><mi>&bull;</mi></math>被解释为单元素集<math><mrow><mo stretchy="false">{</mo><mi>&Star;</mi><mo stretchy="false">}</mo></mrow></math>, 而上下文扩展则解释为笛卡尔积. 将这些拼在一起, 该解释将<math><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></math>定义为具有形状<math><mi mathvariant="normal">&Gamma;</mi></math>的替换集合, 其元素是将<math><mi mathvariant="normal">&Gamma;</mi></math>中的变量<math><mi>x</mi></math>映射为<math><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">&RightDoubleBracket;</mo></mrow></math>的元素的函数.</p>
+    <p>使用这种对于类型和上下文的解释, 我们可以将<math><mtext class="small-caps">Calc</mtext></math>项<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></mrow></math>解释为函数<math><mrow><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></mrow><mo stretchy="false">&RightDoubleBracket;</mo></mrow><mo>:</mo><mrow><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow><mo>&rarr;</mo><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>A</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></mrow></mrow></math>:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">true</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo><mn>1</mn></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">false</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo><mn>0</mn></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">then</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">else</mi><mspace width="2ex"/><mi>O</mi></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow><mo>{</mo>
+                  <mtable displaystyle="true">
+                    <mtr>
+                      <mtd>
+                        <mrow>
+                          <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>N</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                          <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                      </mtd>
+                      <mtd columnalign="left"><mo>,</mo>
+                        <mrow>
+                          <mrow>
+                            <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                            <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                          <mo>=</mo><mn>1</mn></mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow>
+                          <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>O</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                          <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                      </mtd>
+                      <mtd columnalign="left"><mo>,</mo>
+                        <mrow>
+                          <mrow>
+                            <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                            <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                          <mo>=</mo><mn>0</mn></mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>N</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mi mathvariant="monospace">fst</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow>
+                  <msub><mi>&pi;</mi><mn>1</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mi mathvariant="monospace">snd</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow>
+                  <msub><mi>&pi;</mi><mn>2</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>x</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow>
+                  <msub><mi>&pi;</mi><mi>x</mi></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>&gamma;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/><mi>N</mi></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>N</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&gamma;</mi>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow><mi>x</mi><mo>&mapsto;</mo>
+                          <mrow>
+                            <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                            <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                        </mrow>
+                        <mo stretchy="false">]</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      我们可以使用这种语义来validate先前的重排, 因为等式两边指称着相同的函数.
+      <math display="block">
+        <mtable displaystyle="true" columnalign="center left">
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>y</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">&lang;</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">&rang;</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                    <mo>,</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>N</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>y</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">&lang;</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">&rang;</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      但请注意, 这里有一些微妙之处! 我们在这里依赖元语言中函数相等的概念来判定相等. 两个函数<math><mrow><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo>:</mo><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></mrow></math>被认为相等, 当且仅当它们外延相等 (extensionally equal), 也就是说, 对所有<math><mrow><mi>a</mi><mo>&in;</mo><mi>A</mi></mrow></math>, 都有<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 如果仔细展开这两个语义, 我们会看到函数<math><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></math>和<math><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>N</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></math>是以不同的顺序复合的. 在集合语义下, 这个复合顺序无关紧要, 因为它不会改变输入输出行为.</p>
+    <h3>第1.2节 一般性的需要</h3>
+    <p>总结一下刚才的过程: 为了证明一个涉及let绑定重排的自然程序等价, 我们用集合与函数给出了<math><mtext class="small-caps">Calc</mtext></math>的指称语义. 然后, 元语言的一个性质, 即函数的外延相等, 直接推出了这一改写是保持语义的.</p>
+    <p>这种指称推理方式在验证程序等价时效果相当好, 由此引出一个问题: 它能多好地推广到其他类型的程序设计语言和分析上? 我们可能希望沿着几个有趣的方向推广这类论证:
+      <ol>
+        <li>推广到具有更有趣的效应的语言, 比如随机性, 非确定性或可变状态;</li>
+        <li>推广到具有更有趣的特性的语言, 比如高阶函数或更有趣的类型系统.</li>
+      </ol>
+      我们会看到, 用集合与函数作为元语言其实相当不方便. 这将成为我们发展范畴论的核心动机: 范畴论是另一种更灵活的元语言, 可以用来给程序 (以及程序逻辑等其他对象) 赋予语义. 不过在看到这一点之前, 我们先分别看一个这两类推广的例子.</p>
+    <h3>第1.3节 泛化1: 概率效应</h3>
+    <p>我们来看一个推广到具有有趣的概率效应的语言的例子. 考虑下面这个叫做<math><mtext class="small-caps">TinyPPL</mtext></math>的小型概率编程语言. 它在<math><mtext class="small-caps">Calc</mtext></math>的基础上增加了一个原语<math><mi mathvariant="monospace">flip</mi></math>, 用来生成随机布尔值:
+      <math display="block">
+        <mtable columnalign="left center right" displaystyle="true" width="100%">
+          <mtr>
+            <mtd>
+              <mphantom><mtext class="small-caps">TinyPPL</mtext></mphantom>
+            </mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                <mo>&Colone;</mo>
+                <mrow><mo>&ctdot;</mo><mo>|</mo><mi mathvariant="monospace">flip</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mtext class="small-caps">TinyPPL</mtext></mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>概率编程语言指称的是概率分布. 例如, <math><mi mathvariant="monospace">flip</mi></math>的指称如下:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">flip</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>:</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">Bool</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                <mo>&rarr;</mo>
+                <mrow><mo>[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>]</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">flip</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>b</mi><mo>&mapsto;</mo>
+                <mrow><mo>{</mo>
+                  <mtable displaystyle="true">
+                    <mtr>
+                      <mtd>
+                        <mrow><mn>1</mn><mo lspace="0" rspace="0">/</mo><mn>2</mn></mrow>
+                      </mtd>
+                      <mtd columnalign="left"><mtext>, 如果</mtext>
+                        <mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mn>1</mn><mo lspace="0" rspace="0">/</mo><mn>2</mn></mrow>
+                      </mtd>
+                      <mtd columnalign="left"><mtext>, 如果</mtext>
+                        <mrow><mi>b</mi><mo>=</mo><mn>0</mn></mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd><mn>0</mn></mtd>
+                      <mtd columnalign="left"><mtext>, 否则的话</mtext></mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      {译注: 个人感觉这里是不是不太对, 比如说少了个环境<math><mi>&gamma;</mi></math>. 另外, 原文第一行写的是<math><mo>=</mo></math>, 我改成了<math><mo>:</mo></math>.}</p>
+    <p>我们同样想证明一些自然的等价, 比如前面见过的let绑定可以重排的那个等价 (回忆一下, <math><mi>N</mi></math>不引用<math><mi>x</mi></math>):
+      <math display="block">
+        <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>y</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                <mo stretchy="false">&rang;</mo></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mover><mo>=</mo><mi>?</mi></mover>
+      </math>
+      <math display="block">
+        <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>y</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>N</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi mathvariant="monospace">let</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="monospace">be</mi><mspace width="2ex"/><mi>M</mi><mspace width="2ex"/><mi mathvariant="monospace">in</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                <mo stretchy="false">&rang;</mo></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      {译注: 当然, <math><mi>M</mi></math>也不能引用<math><mi>y</mi></math>. 不过, 如果出现这种引用, 似乎连指称的类型也对不上了, 鉴于<math><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow></math>对于自由变量是敏感的.}</p>
+    <p>直观上, 这个改写似乎应该是保持语义的, 理由和<math><mtext class="small-caps">Calc</mtext></math>中同样的改写成立的理由非常相似. 但<math><mtext class="small-caps">TinyPPL</mtext></math>的指称与<math><mtext class="small-caps">Calc</mtext></math>不同, 所以要证明这个改写是可靠的 (sound), 似乎需要从头证明.</p>
+    <p>显然, 这种重排是一个普遍的现象, 我们希望在许多具有不同语义解释的语言中研究它. 范畴论为语义domain的这种性质起了一个名字: 交换性 (commutativity). 此外, 范畴论还提供了一套语言, 用来描述各种各样效应的性质. 概率是单子 (monad) 的一个例子, 而这个单子是交换的. 因此, 这类改写对所有交换单子都成立.</p>
+    <h3>第1.4节 泛化2: 高阶函数</h3>
+    <p>函数式语言不只有let绑定和序对. 例如, OCaml还有高阶函数, 和类型 (sum types) 以及模式匹配. 这些特性可能很难刻画, 而范畴论为设计这些规约提供了一种典范的方式.</p>
+    <p>我们用高阶函数来说明这一原则:</p>
+    <h3>第1.5节 结语</h3>
+    <h2>第2章 范畴</h2>
+    <p>作为元语言, 集合与函数作为纯函数式编程的模型最能发挥效用, 其程序被想成是一个黑盒, 对于每个输入有唯一确定的输出. 但是现实程序很少是纯函数式的: 野生的程序基本上都需要操纵资源 (指针, 文件, 锁), 与其环境进行交互 (输入和输出), 并使用复杂的控制流构造 (异常, 协程).</p>
+    <p>范畴论提供了一种更换周遭 (ambient) 元语言的框架: 它给出一些系统化的技术, 用更适合建模实际编程特性的构造来取代集合与函数. 每个范畴都代表一种元语言的选择. 集合与函数属于集合范畴<math><mi mathvariant="monospace">Set</mi></math>, 我们稍后会遇到它. 把<math><mi mathvariant="monospace">Set</mi></math>换成其他范畴, 就能得到更适合建模编程语言特性的元语言:
+      <ul>
+        <li>传统的domain论活在domain的范畴. 它研究无类型lambda演算, 以及Haskell这类递归函数式编程. 作为元语言, 它支持任意递归定义和递归类型.</li>
+        <li>许多现代语义学工作在步进索引集合 (step-indexed sets) 的范畴中进行. 作为元语言, 它支持非常强的递归类型. 我们会在讨论预层 (presheaves) 时遇到这个范畴.</li>
+        <li>操作资源的程序属于资源化集合 (resourceful sets) 的范畴, 这些范畴用于定义现代分离逻辑. 我们会在讨论Day卷积时遇到它们.</li>
+        <li>普通的连续概率属于可测空间的范畴, 它的高阶推广属于拟Borel空间 (quasi-Borel spaces). 如果时间允许, 我们也许会讲到这些范畴.</li>
+      </ul>
+    </p>
+    <h3>第2.1节 我们的第一个元语言</h3>
+    <p>现在我们手头上有了范畴的精确定义, 那么我们准备好迎接第一个元语言了.</p>
+    <div class="definition"><b>定义2.1.1. </b>有限集合的范畴<math><mi mathvariant="monospace">FinSet</mi></math><br/>令<math><mi mathvariant="monospace">FinSet</mi></math>是范畴<math><mrow><mo stretchy="false">(</mo><mrow><mi>O</mi><mo>,</mo><mi>M</mi><mo>,</mo><mi mathvariant="monospace">dom</mi><mo>,</mo><mi mathvariant="monospace">cod</mi><mo>,</mo><mo>&compfn;</mo><mo>,</mo><mi mathvariant="monospace">id</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 其中
+      <ul>
+        <li><math><mi>O</mi></math>是有限集合的类.</li>
+        <li><math><mi>M</mi></math>是元组<math><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>,</mo><mi>f</mi><mo>,</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></math>的类, 其中<math><mi>A</mi></math>和<math><mi>B</mi></math>是有限集合, 而<math><mi>f</mi></math>是一个从<math><mi>A</mi></math>到<math><mi>B</mi></math>的函数.</li>
+        <li><math><mi mathvariant="monospace">dom</mi></math>是函数<math><mrow><mrow><mi mathvariant="monospace">dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>,</mo><mi>f</mi><mo>,</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>A</mi></mrow></math>.</li>
+        <li><math><mi mathvariant="monospace">cod</mi></math>是函数<math><mrow><mrow><mi mathvariant="monospace">cod</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>,</mo><mi>f</mi><mo>,</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>B</mi></mrow></math>.</li>
+        <li><math><mo>&compfn;</mo></math>是函数<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>,</mo><mi>f</mi><mo>,</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&compfn;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>,</mo><mi>g</mi><mo>,</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>,</mo><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo>,</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 其中<math><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow></math>是<math><mi>f</mi></math>和<math><mi>g</mi></math>的通常函数复合, </li>
+      </ul>
+    </div>
+    <h2>第3章 泛构造I: 积</h2>
+    <h2>第4章 泛构造II: </h2>
+  </body>
+</html>

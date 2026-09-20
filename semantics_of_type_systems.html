@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>类型系统的语义</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>类型系统的语义</h1>
+    <h2>第1章 简单类型lambda演算</h2>
+    <h2>第2章 System F: 多态和存在类型</h2>
+    <h2>第3章 递归类型</h2>
+    <h2>第4章 可变状态</h2>
+    <h2>第5章 程序逻辑</h2>
+    <p>对于到目前为止的每一种语言, 我们都是先定义其操作语义, 然后利用操作语义来推理该语言中的项. 现在我们转向另一种方法, 有时被称为公理语义: 公理语义以程序逻辑的形式为程序赋予意义, 即一组可以用来对程序进行模块化推理的规则.</p>
+    <p><b>为什么需要公理语义? </b>与基于操作语义和类型的语言模型不同, 公理语义旨在实现复合式的程序验证. 例如, 考虑验证用于计算最大公约数的Euclid算法:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>euclid</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&colone;</mo></mtd>
+            <mtd>
+              <mrow><mi>if</mi><mspace width="2ex"/>
+                <mrow><mi>b</mi><mo>==</mo><mn>0</mn></mrow>
+                <mspace width="2ex"/><mi>then</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>else</mi><mspace width="2ex"/>
+                <mrow><mi>euclid</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>b</mi><mo>,</mo>
+                      <mrow><mi>mod</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>mod</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&colone;</mo></mtd>
+            <mtd>
+              <mrow><mi>a</mi><mo>&minus;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>a</mi><mo>div</mo><mi>b</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&#8270;</mo><mi>b</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <h3>第5.1节 Hoare逻辑</h3>
+    <h3>第5.2节 分离逻辑</h3>
+    <h2>第6章 iris</h2>
+    <p>我们已经看到了如何用程序逻辑来验证简单的程序. 遗憾的是, 上一章中的分离逻辑相当有限: (1) 我们不支持(可能)无限的循环, (2) 我们不支持所有权共享, 是(3) 我们必须手动完成每一个证明步骤, (4) 我们不支持并发. 为了验证更大, 更复杂的程序, 我们现在转向一种强大得多且更易用的分离逻辑: Iris [6].</p>
+    <p>Iris在第5.2节的分离逻辑基础上扩展了若干联结词:</p>
+    <h3>第6.1节 魔杖</h3>
+    <h2>第7章 逻辑关系</h2>
+    <h2>第8章 幽灵状态</h2>
+    <h2>第9章 iris的模型</h2>
+    <h2>第10章 并发</h2>
+  </body>
+</html>
