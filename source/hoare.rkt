@@ -1,6 +1,13 @@
 #lang racket
 (provide hoare.html)
 (require SMathML)
+(define (If0 P Q R)
+  (&disj (@conj P Q)
+         (@conj (&neg P) R)))
+(define (P1 C Q)
+  (!- (Hoare (wlp C Q) C Q)))
+(define (ArrayAssign A E1 E2)
+  (: A (cur0 (&<- E1 E2))))
 (define $curried (Mi "curried"))
 (define $Com (Mi "Com"))
 (define $State (Mi "State"))
@@ -25,6 +32,9 @@
              . ,xml*))
 (define (AssignmentAxiom P V E)
   (!- (Hoare (P E) (&:= V E) (P V))))
+(define (FloydAxiom P V E v)
+  (!- (Hoare (P V) (&:= V (E V))
+             (∃ v (@conj (&= V (E v)) (P v))))))
 (define (subst P E V)
   (: P (bra0 (&/ E V))))
 (define (!- . x*)
@@ -95,6 +105,11 @@
 (define :MAX (Pid "MAX"))
 (define (Pred str)
   (Mi str #:attr* '((mathvariant "sans-serif"))))
+(define :IterWlp (Pred "IterWlp"))
+(define IterWlp
+  (case-lambda
+    ((n p c q s) (App :IterWlp n p c q s))
+    ((n p c q) (App :IterWlp n p c q))))
 (define :wlp (Pred "wlp"))
 (define (wlp C Q)
   (appl :wlp C Q))
@@ -103,6 +118,18 @@
   (case-lambda
     ((CS QS) (App :Wlp CS QS))
     ((CS QS s) (App :Wlp CS QS s))))
+(define :wp (Pred "wp"))
+(define (wp C Q)
+  (appl :wp C Q))
+(define :sp (Pred "sp"))
+(define (sp C P)
+  (appl :sp C P))
+(define :awp (Pred "awp"))
+(define (awp C Q)
+  (appl :awp C Q))
+(define :wvc (Pred "wvc"))
+(define (wvc C Q)
+  (appl :wvc C Q))
 (define :Iter (Pred "Iter"))
 (define (Iter n p c s1 s2)
   (App :Iter n p c s1 s2))
@@ -132,6 +159,10 @@
 (define-infix*
   (&impl $impl))
 (define-@lized-op*
+  (@If0 If0)
+  (@IterWlp IterWlp)
+  (@Wlp Wlp)
+  (@HSEM HSEM)
   (@App App)
   (@∀ ∀)
   (@∃ ∃)
@@ -827,7 +858,100 @@ WHILE Y≤R DO
       "上述简单的赋值公理对于" (Q "真实的")
       "编程语言是不成立的. 例如, G. Ligler [17] 的工作表明, "
       "它在(现已过时的)语言Algol 60中以六种不同的方式失效.")
-   (P "(以下是对于Floyd赋值公理的讨论, 翻译暂时省略.)")
+   (P "赋值公理存在一种" (Q "前向")
+      "版本, 其有时称为Floyd赋值公理, "
+      "因为其对应于应该归功于Floyd [9] 的赋值的原始语义. "
+      "在以下规则之中, 存在量化的变量" $v
+      "是执行赋值之前的状态 (始状态) 中的" $V
+      "之值. 后条件断言了在赋值之后, " $V
+      "之值是" $E "在初始状态下求得的值 (因而是"
+      (subst $E $v $V) "), 并且在初始状态下评估的前条件 "
+      "(因而是" (subst $P $v $V) ") 继续成立."
+      ((law)
+       (Center "Floyd赋值公理")
+       (MB (!- (Hoare $P (&:= $V $E)
+                      (∃ $v (@conj (&= $V (subst $E $v $V))
+                                   (subst $P $v $V))))))
+       "其中" $v "是一个新变量, 即既不等于" $V
+       "也没有出现在" $P "或" $E "中."))
+   ((tcomment)
+    "之所以" (subst $P $v $V)
+    "继续成立, 是因为" (&:= $V $E)
+    "仅仅改变了" $V "的值, 其他什么也没改动. "
+    "因此, " $P "大致上应该仍然成立, 只不过"
+    $V "的值要换成旧值" $v ".")
+   (P "一个实例是:"
+      (MB (!- (Hoare (&= :X $1)
+                     (&:= :X (&+ :X $1))
+                     (∃ $v (@conj
+                            (&= :X (@subst (&+ :X $1) $v :X))
+                            (@subst (&= :X $1) $v :X))))))
+      "简化这个后条件:"
+      (MB (set-attr*
+           (&Table
+            ((!- (Hoare (&= :X $1)
+                        (&:= :X (&+ :X $1))
+                        (∃ $v (@conj
+                               (&= :X (@subst (&+ :X $1) $v :X))
+                               (@subst (&= :X $1) $v :X))))))
+            ((FloydAxiom
+              (λ (V) (&= V $1))
+              :X (λ (V) (&+ V $1)) $v))
+            ((!- (Hoare (&= :X $1)
+                        (&:= :X (&+ :X $1))
+                        (∃ $v (@conj
+                               (&= :X (&+ $1 $1))
+                               (&= $v $1))))))
+            ((!- (Hoare (&= :X $1)
+                        (&:= :X (&+ :X $1))
+                        (&conj
+                         (&= :X (&+ $1 $1))
+                         (∃ $v (&= $v $1))))))
+            ((!- (Hoare (&= :X $1)
+                        (&:= :X (&+ :X $1))
+                        (&conj
+                         (&= :X $2) :T))))
+            ((!- (Hoare (&= :X $1)
+                        (&:= :X (&+ :X $1))
+                        (&= :X $2)))))
+           'columnalign "left"))
+      "Floyd赋值公理等价于标准的赋值公理, "
+      "但是更难于运用, 这是由于其所引入的存在量词. "
+      "然而, 这是分离逻辑的重要部分.")
+   (P "Hoare赋值公理与最弱前条件有关 (见第4.3.3小节), "
+      "而Floyd赋值公理则与最强后条件有关 (见第4.4.1小节). "
+      "以下这些会在刚才提及的小节里得到解释:"
+      (MB (set-attr*
+           (&Table
+            ("Hoare赋值公理:"
+             (Hoare (wlp (&:= $V $E) $Q)
+                    (&:= $V $E) $Q))
+            ("Floyd赋值公理:"
+             (Hoare $P (&:= $V $E)
+                    (sp (&:= $V $E) $P))))
+           'columnalign "left"))
+      "其中" (wlp $C $Q) "和" (sp $C $P)
+      "分别代表最弱自由前条件和最强后条件.")
+   (P "我们的小编程语言和真实语言不同的一个方面在于"
+      "对于赋值命令的右侧表达式的求值不会对于状态施加"
+      (Q "副作用") ". 赋值公理的有效性依赖于这个条件. "
+      "为了看出这一点, 设我们的语言得到了扩展, "
+      "其可以含有形如" (@\; $C $E) "的表达式, 其中"
+      $C "是一个命令, 而" $E "是一个表达式. "
+      "这样一种表达式的求值是先执行" $C
+      ", 然后对于" $E "求值, 最后返回该结果作为"
+      (@\; $C $E) "的值. 因此, 对于这种表达式的求值"
+      "可能会导致由执行" $C "引起的" (Q "副作用")
+      ". 例如, " (@\; (&:= :Y $1) $2) "具有值" $2
+      ", 但是其求值也会对于变量" :Y "产生" (Q "副作用")
+      ", 通过将" $1 "存储其中. 如果赋值公理应用于像"
+      (@\; $C $E) "这样的表达式, 那么其可以用来推导出:"
+      (MB (!- (Hoare (&= :Y $0)
+                     (&:= :X (@\; (&:= :Y $1) $2))
+                     (&= :Y $0))))
+      "这是由于" :X "压根就没有出现在" (&= :Y $0)
+      "之中. 这个显然是错的, 因为在赋值之后"
+      :Y "应该具有值" $1 ".")
    (H4. "前条件强化")
    (P "下一条Hoare逻辑规则允许第18页的i和ii的前条件得到简化. "
       "回忆一下,"
@@ -1077,6 +1201,60 @@ WHILE Y≤R DO
    (H4. :FOR "规则")
    (P "(未完待续)")
    (H4. "数组")
+   (P "在第2.1.1小节末我们表明了朴素的数组赋值公理"
+      (MB (!- (Hoare (subst $P $E_2 (app $A $E_1))
+                     (&:= (app $A $E_1) $E_2)
+                     $P)))
+      "并不成立, 这是因为对于" (app $A $X)
+      "的改变也可能改变" (&cm (app $A $Y) (app $A $Z) $..h)
+      ", 鉴于" $X "可能等于" (&cm $Y $Z $..h) ".")
+   ((tcomment)
+    "说明一下, 第2.1.1小节末没有讨论数组的事情.")
+   (P "这个问题的解法 (归功于Hoare) 是将数组赋值"
+      (MB (&:= (app $A $E_1) $E_2))
+      "处理为通常赋值"
+      (MB (&:= $A (ArrayAssign $A $E_1 $E_2)))
+      "其中项" (ArrayAssign $A $E_1 $E_2)
+      "代表一个等同于" $A "的数组, 除了"
+      $E_1 "分量被变为具有值" $E_2 ".")
+   (P "因此, 数组赋值不过是通常变量赋值的特殊情形."
+      ((law)
+       (Center "数组赋值公理")
+       (MB (!- (Hoare
+                (subst $P (ArrayAssign $A $E_1 $E_2) $A)
+                (&:= (app $A $E_1) $E_2) $P)))
+       "其中" $A "是一个数组变量, "
+       $E_1 "是一个整数值表达式, "
+       $P "是任意的陈述, 而记号"
+       (ArrayAssign $A $E_1 $E_2)
+       "代表一个等同于" $A
+       "的数组, 只是" $E_1
+       "处的值为" $E_2 "."))
+   (P "为了对于数组进行推理, 以下定义了记号"
+      (ArrayAssign $A $E_1 $E_2)
+      "意义的公理是必要的."
+      ((law)
+       (Center "数组公理")
+       (MB (!- (&= (app (ArrayAssign
+                         $A $E_1 $E_2)
+                        $E_1)
+                   $E_2)))
+       (MB (!- (&impl
+                (&!= $E_1 $E_3)
+                (&= (app (ArrayAssign
+                          $A $E_1 $E_2)
+                         $E_3)
+                    (app $A $E_3)))))))
+   ((tcomment)
+    "原文这里实际上写的是"
+    (MB (&impl
+         (&!= $E_1 $E_3)
+         (!- (&= (app (ArrayAssign
+                       $A $E_1 $E_2)
+                      $E_3)
+                 (app $A $E_3)))))
+    "但是译者认为这样写并不好.")
+   
    (P "(未完待续)")
    (H2. "机械化程序验证")
    (P "本章描述了一个简单的程序验证器的架构. "
@@ -1866,14 +2044,199 @@ WHILE Y≤R DO {X = R+Y×Q}
                            (@= $s_2 (subst $s_1 (@Esem $E $s_1) $V)))
                     (Ssem $P $s_2))))
       "这可以化简为:"
-      (MB (∀ (&cm $s_1 $s_2)
+      (MB (∀ $s_1
              (&impl (Ssem (@subst $P $E $V) $s_1)
                     (Ssem $P (@subst $s_1 (@Esem $E $s_1) $V)))))
       "这乍看上去可能有点令人困惑, 因为前件和后件里的记号"
       (bra0 (&/ $..c $..c)) "有着不同的含义. "
-      
-      )
+      "前件里的" (subst $P $E $V)
+      "指称着将陈述" $P "中的变量" $V
+      "替换为表达式" $E "的结果. 后件里的"
+      (subst $s_1 (@Esem $E $s_1) $V)
+      "指称着状态, 其由更新" $s_1
+      "以使得" $V "之值为" $E
+      "在" $s_1 "中的值得到 "
+      "(所有其他的变量之值保持不变).")
    (P (B "关于替换的离题.")
+      "我们避免了细致刻画表达式和陈述的句法到底是什么, "
+      "所以说也不可能证明关于它们的一般性质. "
+      "然而, 对于任何理想的定义, 我们会期望:"
+      (MB (&= (Ssem (@subst $P $E $V) $s)
+              (Ssem $P (@subst $s (@Esem $E $s) $V))))
+      "例如, 取" $P "为" (&> (&+ :X :Y) :Z) ", "
+      $E "为" (&+ :X $1) ", " $V "为" :Y
+      ", 那么这个等式就变成了:"
+      (MB (&= (Ssem (@subst (@> (&+ :X :Y) :Z) (@+ :X $1) :Y) $s)
+              (Ssem (@> (&+ :X :Y) :Z)
+                    (@subst $s (@Esem (@+ :X $1) $s) :Y))))
+      "既然" (&= (Esem (@+ :X $1) $s) (&+ (app $s :X) $1))
+      ", 于是以上等式变成了:"
+      (MB (&= (Ssem (@subst (@> (&+ :X :Y) :Z) (@+ :X $1) :Y) $s)
+              (Ssem (@> (&+ :X :Y) :Z)
+                    (@subst $s (@+ (app $s :X) $1) :Y))))
+      "对于左边的替换求值就将其归约为了:"
+      (MB (&= (Ssem (@> (&+ :X (@+ :X $1)) :Z) $s)
+              (Ssem (@> (&+ :X :Y) :Z)
+                    (@subst $s (@+ (app $s :X) $1) :Y))))
+      "对于" :Ssem "求值给出:"
+      (let ((s^ (λ (X) (app (@subst $s (@+ (app $s :X) $1) :Y) X)))
+            (s (λ (X) (app $s X))))
+        (MB (&= (@> (&+ (s :X) (@+ (s :X) $1)) (s :Z))
+                (@> (&+ (s^ :X) (s^ :Y)) (s^ :Z)))))
+      "使用" (subst $s $n $v)
+      ", 右边的等式可以化简, 这就给出 "
+      "{译注: 原文说" (&cm :X :Y :Z)
+      "要不同, 这不大对, 因为它们不是元变量, "
+      "而是对象语言中的变量}:"
+      (let ((s (λ (X) (app $s X))))
+        (MB (&= (@> (&+ (s :X) (@+ (s :X) $1)) (s :Z))
+                (@> (&+ (s :X) (@+ (s :X) $1)) (s :Z)))))
+      "这显然为真, 因为左边和右边是等同的." (Br)
+      "尽管这只是一个例子, 其刻画了为什么对于所有的"
+      (&cm $S $E $V $s) "都有"
+      (MB (&= (Ssem (@subst $S $E $V) $s)
+              (Ssem $S (@subst $s (@Esem $E $s) $V))))
+      "实际上, 如果这个等式并不成立的话, "
+      "那么这个替换的定义就很糟糕了" --
+      "这个等式的确应该当作替换的语义定义!" (Br)
+      (B "离题结束."))
+   (P "回到赋值公理的可靠性上来, "
+      "回忆一下其等价于对于所有的"
+      (&cm $P $E $V) ", 以下公式成立:"
+      (MB (∀ $s_1
+             (&impl (Ssem (@subst $P $E $V) $s_1)
+                    (Ssem $P (@subst $s_1 (@Esem $E $s_1) $V)))))
+      "如果之前离题讨论的替换等式成立, "
+      "那么这个推出当然也成立. "
+      "这是因为, 对于任意的陈述" $P "和" $Q
+      ", 如果" (&= $P $Q) ", 那么可以推出"
+      (&impl $P $Q) ".")
+   (P "除了" :WHILE "规则之外的其他"
+      "Hoare逻辑规则的可靠性几乎都是平凡的, "
+      "即便是" :WHILE "规则的可靠性也是相当直接的. "
+      "我们将会重述规则, 然后给出可靠性证明的提纲.")
+   ((law)
+    (Center (B "前条件强化"))
+    (MB (&rule (!- (&impl $P $P^))
+               (!- (Hoare $P^ $C $Q))
+               (!- (Hoare $P $C $Q)))))
+   (P "如果以下公式对于所有的"
+      (&cm $P $P^ $C $Q) "均成立:"
+      (MB (&impl (&conj (@∀ $s (&impl (Ssem $P $s)
+                                      (Ssem $P^ $s)))
+                        (Hsem $P^ $C $Q))
+                 (Hsem $P $C $Q)))
+      "那么这条规则就是可靠的." (Br)
+      "这在以" :Hsem "的定义扩展之后就变成了:"
+      (MB (&conj (@∀ $s (&impl (Ssem $P $s)
+                               (Ssem $P^ $s)))
+                 (@HSEM $P^ $C $Q)))
+      (MB $impl)
+      (MB (@HSEM $P $C $Q))
+      "这是以下陈述的一个实例, 如果我们取"
+      (&cm $p $p^ $q $c) "分别为"
+      (&cm (Ssem $P) (Ssem $P^)
+           (Ssem $Q) (Csem $C))
+      "."
+      (MB (&conj (@∀ $s (&impl (App $p $s) (App $p^ $s)))
+                 (@∀ (&cm $s_1 $s_2)
+                     (&impl (&conj (App $p^ $s_1)
+                                   (App $c $s_1 $s_2))
+                            (App $q $s_2)))))
+      (MB $impl)
+      (MB (@∀ (&cm $s_1 $s_2)
+              (&impl (&conj (App $p $s_1)
+                            (App $c $s_1 $s_2))
+                     (App $q $s_2))))
+      "这显然为真.")
+   ((law)
+    (Center (B "后条件弱化"))
+    (MB (&rule (!- (Hoare $P $C $Q^))
+               (!- (&impl $Q^ $Q))
+               (!- (Hoare $P $C $Q)))))
+   (P "以类似的论证, 这是可靠的.")
+   ((law)
+    (Center (B "规约合取"))
+    (MB (&rule (!- (Hoare $P_1 $C $Q_1))
+               (!- (Hoare $P_2 $C $Q_2))
+               (!- (Hoare (&conj $P_1 $P_2)
+                          $C
+                          (&conj $Q_1 $Q_2)))))
+    (Center (B "规约析取"))
+    (MB (&rule (!- (Hoare $P_1 $C $Q_1))
+               (!- (Hoare $P_2 $C $Q_2))
+               (!- (Hoare (&disj $P_1 $P_2)
+                          $C
+                          (&disj $Q_1 $Q_2))))))
+   (P "以类似的论证, 这是可靠的.")
+   ((law)
+    (Center (B "顺序规则"))
+    (MB (&rule (!- (Hoare $P $C_1 $Q))
+               (!- (Hoare $Q $C_2 $R))
+               (!- (Hoare $P (&\; $C_1 $C_2) $R)))))
+   (P "如果以下公式对于所有的"
+      (&cm $P $Q $R $C_1 $C_2) "为真:"
+      (MB (&impl (&conj (Hsem $P $C_1 $Q)
+                        (Hsem $Q $C_2 $R))
+                 (Hsem $P (@\; $C_1 $C_2) $R)))
+      "那么这条规则就是可靠的." (Br)
+      "这在以" :Hsem "的定义扩展之后就变成了:"
+      (MB (&conj (@HSEM $P $C_1 $Q)
+                 (@HSEM $Q $C_2 $R)))
+      (MB $impl)
+      (MB (@HSEM $P (@\; $C_1 $C_2) $R))
+      "这是以下陈述的一个实例, 如果我们展开"
+      (Csem (@\; $C_1 $C_2))
+      "的定义并取" (&cm $p $q $r $c_1 $c_2) "分别为"
+      (&cm (Ssem $P) (Ssem $Q) (Ssem $R)
+           (Csem $C_1) (Csem $C_2))
+      "."
+      (MB (&conj (@∀ (&cm $s_1 $s_2)
+                     (&impl (&conj (App $p $s_1)
+                                   (App $c_1 $s_1 $s_2))
+                            (App $q $s_2)))
+                 (@∀ (&cm $s_1 $s_2)
+                     (&impl (&conj (App $q $s_1)
+                                   (App $c_2 $s_1 $s_2))
+                            (App $r $s_2)))))
+      (MB $impl)
+      (MB (@∀ (&cm $s_1 $s_2)
+              (&impl (&conj (App $p $s_1)
+                            (@∃ $s (&conj (App $c_1 $s_1 $s)
+                                          (App $c_2 $s $s_2))))
+                     (App $r $s_2))))
+      "这显然为真.")
+   ((law)
+    (Center (B "条件规则"))
+    (MB (&rule (!- (Hoare (&conj $P $S) $C_1 $Q))
+               (!- (Hoare (&conj $P (&neg $S)) $C_2 $Q))
+               (!- (Hoare $P (IF $S $C_1 $C_2) $Q)))))
+   (P "和顺序规则类似的论证表明条件规则是可靠的.")
+   ((law)
+    (Center (B :WHILE "规则"))
+    (MB (&rule (!- (Hoare (&conj $P $S) $C $P))
+               (!- (Hoare $P (WHILE $S $C)
+                          (&conj $P (&neg $S)))))))
+   (P "如果以下公式对于所有的" (&cm $P $S $C) "均为真:"
+      (MB (&impl (Hsem (@conj $P $S) $C $P)
+                 (Hsem $P (@WHILE $S $C)
+                       (@conj $P (&neg $S)))))
+      "那么这条规则就是可靠的." (Br)
+      "在以" :Hsem "的定义扩展之后, 这就变成了:"
+      (MB (@HSEM (@conj $P $S) $C $P))
+      (MB $impl)
+      (MB (@HSEM $P (@WHILE $S $C)
+                 (@conj $P (&neg $S))))
+      "使用等式"
+      (!commute (λ (P) (Ssem P $s_1))
+                @conj $P $Q)
+      "和"
+      (!commute (λ (P) (Ssem P $s_2))
+                (λ (P Q)
+                  (@conj P (&neg Q)))
+                $P $Q)
+      "并扩展" (Csem (@WHILE $S $C))
+      "的定义可以将其转换为:"
       
       )
    (H3. "可判定性和完备性")
@@ -2000,6 +2363,15 @@ WHILE Y≤R DO {X = R+Y×Q}
       "相对于一个能够证明所有形如"
       (&impl $P (wlp $C $Q))
       "的真陈述的神谕机而言的.")
+   ((tcomment)
+    "大致上, " $P_1 "是说" :wlp
+    "在句法上是前条件, " $P_2 "是说"
+    :wlp "和" :Wlp "是一致的, " $P_3
+    "是说" :Wlp "在语义上是最弱前条件, "
+    "我是这样理解的.")
+   ((tcomment)
+    "神谕机是否会影响soundness? "
+    "这似乎是一个微妙的问题.")
    (P "总结一下: 相对完备性表明, 如果"
       (wlp $C $Q) "在规约语言中是可表达的, "
       "并且存在一个神谕机能够证明形如"
@@ -2054,20 +2426,374 @@ WHILE Y≤R DO {X = R+Y×Q}
       ". Hoare逻辑的公理和规则将被用于证明"
       $P_1 ", 而它们能够证明" $P_1
       "这一事实, 正是其完备性的本质所在.")
-   ((tcomment)
-    $P_1 "说的是" :wlp "的确是句法上的自由前条件. "
-    $P_2 "说的是" :wlp "和" :Wlp "是一致的. "
-    $P_3 "结合" $P_2 "说的是" $P "在语义上是"
-    $C "和" $Q "的自由前条件当且仅当" $P
-    "在语义层次上比" (wlp $C $Q) "强.")
    (H4. "句法和语义最弱前条件")
+   ((tcomment)
+    "这一小节的主要内容是" :Wlp
+    "的定义, 以及表述和证明了" :Wlp
+    "的一些性质, 这些下一小节要用到. "
+    "并且, 你会发现这些性质实际上"
+    "正是为了配合下一小节而如此表述的.")
    (P "如果" (&impl $P $Q)
       ", 我们说" $P "比" $Q
       "强, 对偶地, " $Q "比" $P
-      "弱. "
-      )
-   (H4. "句法前条件和可表达性")
+      "弱. 命令" $C "相对于后条件" $Q
+      "的" (Em "最弱前条件")
+      "记作" (wp $C $Q) ", 其是满足"
+      (THoare (wp $C $Q) $C $Q)
+      "的最弱谓词. 注意到这和完全正确性相关联. "
+      "部分正确性的相应概念是" (Em "最弱自由前条件")
+      ", 记作" (wlp $C $Q) ": 陈述" (wlp $C $Q)
+      "是满足" (Hoare (wlp $C $Q) $C $Q)
+      "的最弱谓词. 本章我们只会使用最弱自由前条件. "
+      "其关键性质是" $P_1 ", 即"
+      (!- (Hoare (wlp $C $Q) $C $Q))
+      ", 以及对于所有的" $P "都有"
+      (MB (&impl (Hoare $P $C $Q)
+                 (@impl $P (wlp $C $Q))))
+      "这些性质可以更为精确地表述为单一等式:"
+      (MB (&= (Hoare $P $C $Q)
+              (@impl $P (wlp $C $Q))))
+      "我们可以很容易地看出来这个等式"
+      "与刚才提及的关键性质是等价的, "
+      "只需使用前条件加强规则和"
+      $impl "的自反性.")
+   ((tcomment)
+    "这里没有看上去这么简单, "
+    "我不确定作者想表达什么. "
+    "但是这个等价需要神谕机, "
+    "或者说Hoare逻辑的(相对)完备性.")
+   (P "如果规约语言 (即前条件和后条件的语言) "
+      "足够强以表达所有命令" $C "和后条件"
+      $Q "的最弱自由前条件, 那么其就被称为"
+      (Em "有表达力的")
+      ". 既然我们还没有说规约语言是什么, "
+      "那么我们对于表达力也就不好说什么.")
+   (P "我们可以藉由我们的语义定义谓词上的语义算子"
+      :Wlp ": 这是" (Em "谓词转换器")
+      " [7] 的一个例子."
+      (MB (&= (Wlp $c $q)
+              (Lam $s (∀ $s^ (&impl (App $c $s $s^)
+                                    (App $q $s^))))))
+      "回忆一下" :Hsem "的定义:"
+      (MB (&= (Hsem $P $C $Q)
+              (HSEM $P $C $Q)))
+      "我们可以轻易证明性质" $P_3 ", 即"
+      (MB (&= (Hsem $P $C $Q)
+              (∀ $s (&impl (Ssem $P $s)
+                           (Wlp (@Csem $C)
+                                (@Ssem $Q) $s)))))
+      $P_3 "可由" :Hsem "和" :Wlp
+      "的定义推出, 通过在以下逻辑事实中取"
+      (&cm $p $c $q) "分别为"
+      (&cm (Ssem $P) (Csem $C) (Ssem $Q))
+      "得到."
+      (MB (&= (@∀ (&cm $s_1 $s_2)
+                  (&impl (&conj (App $p $s_1)
+                                (App $c $s_1 $s_2))
+                         (App $q $s_2)))
+              (@∀ $s (&impl (App $p $s)
+                            (App (@Lam $s (∀ $s^ (&impl (App $c $s $s^)
+                                                        (App $q $s^))))
+                                 $s)))))
+      "为了证明" $P_1 "和" $P_2
+      ", 我们需要下列等式, 其可由"
+      :Wlp "的定义推出."
+      (eqn*
+       ((Wlp (@Csem (@:= $V $E)) $q)
+        $= (Lam $s (app $q (subst $s (@Esem $E $s) $V))))
+       ((Wlp (@Csem (@\; $C_1 $C_2)) $q)
+        $= (Lam $s (Wlp (@Csem $C_1)
+                        (@Wlp (@Csem $C_2) $q)
+                        $s)))
+       ((Wlp (@Csem (@IF $S $C_1 $C_2)) $q)
+        $= (Lam $s (If (@Ssem $S $s)
+                       (@Wlp (@Csem $C_1) $q $s)
+                       (@Wlp (@Csem $C_2) $q $s))))
+       ((Wlp (@Csem (@WHILE $S $C)) $q)
+        $= (Lam $s (∀ $n (IterWlp $n (@Ssem $S)
+                                  (@Csem $C) $q $s))))
+       ((IterWlp $0 $p $c $q $s)
+        $= (&impl (&neg (@App $p $s)) (@App $q $s)))
+       ((IterWlp (@+ $n $1) $p $c $q $s)
+        $= (&impl (@App $p $s)
+                  (@Wlp $c (@IterWlp $n $p $c $q) $s))))
+      "{译注: " (@IterWlp $n $p $c $q $s)
+      "为真的含义应该是从状态" $s "出发, 如果恰好执行"
+      $n "次循环体并退出, 那么" (App $q $s)
+      "为真, 其中" $p "是循环条件" $S "的语义, "
+      $c "是循环体命令" $C "的语义. 注意一下, "
+      "提前或者延迟退出循环体都会导致这个谓词自动为真.}")
    
+   (P "(未完待续)")
+   (H4. "句法前条件和可表达性")
+   ((tcomment)
+    "这一小节递归定义了" :wlp
+    ", 并归纳证明了" :wlp "的性质, 也就是" $P_1
+    ", 以及" :wlp "和" :Wlp "的协调, 也就是"
+    $P_2 ". 可能用到前一小节的结果, "
+    "当然前一小节的定义肯定是要使用的.")
+   (P "现在我们讨论如何以性质" $P_1 "和" $P_2
+      "定义陈述" (wlp $C $Q) ", 即"
+      (MBL (@ $P_1)
+           (!- (Hoare (wlp $C $Q) $C $Q)))
+      (MBL (@ $P_2)
+           (&= (Ssem (wlp $C $Q))
+               (Wlp (@Csem $C) (@Ssem $Q))))
+      "请注意, " :wlp "是在句法东西 (命令和陈述) 上操作的, 而"
+      :Wlp "则是在语义东西 (状态上的数学函数, "
+      "代表命令和陈述的意义) 上操作的.")
+   (P "我们将在" $C "上递归定义" (wlp $C $Q)
+      ", 然后藉由" $C "上的结构归纳澄清"
+      $P_1 "和" $P_2 ". " $C
+      "为赋值, 序列或是条件式的情形是直接的."
+      (MB (&= (wlp (&:= $V $E) $Q)
+              (subst $Q $E $V)))
+      "如果" $C "为" (&:= $V $E)
+      ", 那么" $P_1 "直接就是赋值公理, "
+      "而根据第61页所讨论的等式"
+      (MB (&= (Wlp (@Csem (@:= $V $E)) $q)
+              (Lam $s (app $q (subst $s (@Esem $E $s) $V)))))
+      $P_2 "为等式"
+      (MB (&= (Ssem (@subst $Q $E $V) $s)
+              (Ssem $Q (@subst $s (@Esem $E $s) $V))))
+      "这不过就是第53页的" (Q "关于替换的离题") "所澄清的."
+      (MB (&= (wlp (&\; $C_1 $C_2) $Q)
+              (wlp $C_1 (wlp $C_2 $Q))))
+      "假定对于任意的" $Q
+      ", " $P_1 "和" $P_2 "对于"
+      $C_1 "和" $C_2 "均成立, 那么"
+      (MB (P1 $C_2 $Q))
+      (MB (P1 $C_1 (wlp $C_2 $Q)))
+      "于是根据顺序规则可以得到" $P_1 ", 即"
+      (MB (!- (Hoare (wlp $C_1 (wlp $C_2 $Q))
+                     (&\; $C_1 $C_2)
+                     $Q)))
+      "为了证明" $P_2 ", 当" $C "为"
+      (&\; $C_1 $C_2)
+      "时, 注意到这种情况下的" $P_2 "为"
+      (MB (deriv^
+           (Ssem (wlp (&\; $C_1 $C_2) $Q))
+           (Ssem (wlp $C_1 (wlp $C_2 $Q)))
+           (Wlp (@Csem (@\; $C_1 $C_2))
+                (@Ssem $Q))
+           (Wlp (@Lam (&cm $s_1 $s_2)
+                      (∃ $s (&conj (@Csem $C_1 $s_1 $s)
+                                   (@Csem $C_2 $s $s_2))))
+                (@Ssem $Q))
+           (Lam $s_1 (∀ $s_2 (&impl
+                              (@∃ $s (&conj (@Csem $C_1 $s_1 $s)
+                                            (@Csem $C_2 $s $s_2)))
+                              (@Ssem $Q $s_2))))
+           (Lam $s_1 (∀ (&cm $s $s_2)
+                        (&impl
+                         (&conj (@Csem $C_1 $s_1 $s)
+                                (@Csem $C_2 $s $s_2))
+                         (@Ssem $Q $s_2))))))
+      "(未完待续)"
+      (MB (&= (wlp (IF $S $C_1 $C_2) $Q)
+              (If0 $S (wlp $C_1 $Q) (wlp $C_2 $Q))))
+      "注意到" (If0 $S $S_1 $S_2)
+      "的含义是" (If $S $S_1 $S_2)
+      ". 前者是为了强调我们对于规约语言的假定仅是布尔运算符"
+      (&cm $neg $conj $disj)
+      "的存在. 注意到根据布尔代数以及"
+      (wlp (IF $S $C_1 $C_2) $Q)
+      "的定义, 我们有"
+      (eqn*
+       ((&conj $S (wlp (IF $S $C_1 $C_2) $Q))
+        $= (&conj $S (wlp $C_1 $Q)))
+       ((&conj (&neg $S) (wlp (IF $S $C_1 $C_2) $Q))
+        $= (&conj (&neg $S) (wlp $C_2 $Q))))
+      "根据归纳假设和前条件强化, 可以得到"
+      (MB (!- (Hoare (&conj $S (wlp $C_1 $Q))
+                     $C_1 $Q)))
+      (MB (!- (Hoare (&conj (&neg $S) (wlp $C_2 $Q))
+                     $C_2 $Q)))
+      "{译注: 原文忘了加" $vdash ", 译者将其补上.} "
+      "代入之前的等式, 并利用条件规则, 可以获得"
+      (MB (P1 (IF $S $C_1 $C_2) $Q))
+      "这就是条件式的性质" $P_1
+      ". {译注: 这里作者的措辞存在疏漏, "
+      "作者说是利用布尔代数得到了等式, "
+      "然后代入. 严格说来, 这并不正确, "
+      "因为布尔代数是语义层面的事情. "
+      "不过, 句法层面我们也有分配律等手段可用, "
+      "这和语义层面是一样的, "
+      "所以论证可以修补成正确的形式.} "
+      "性质" $P_2 "为"
+      (MB (deriv^
+           (Ssem (@If0 $S (wlp $C_1 $Q) (wlp $C_2 $Q)))
+           (Wlp (@Csem (@IF $S $C_1 $C_2)) (@Ssem $Q))))
+      
+      )
+   (P "(未完待续)")
+   (H3. "藉由" :wlp "生成验证条件")
+   (P "最弱前条件提供了一种理解和改进验证条件的方式. "
+      "回忆一下性质" $P_1 ", 即"
+      (!- (Hoare (wlp $C $Q) $C $Q))
+      ". 为了证明" (Hoare $P $C $Q)
+      "为真, (根据前条件强化)证明"
+      (!- (&impl $P (wlp $C $Q)))
+      "就足够了. 因此, 我们可以将"
+      (&impl $P (wlp $C $Q))
+      "视为对于目标" (Hoare $P $C $Q)
+      "而言的单独一条" (Q "超级验证条件")
+      ", 其无需对于" $C "进行注解即可生成! "
+      "如果" $C "不含有循环, 即不含有"
+      :WHILE "命令, 那么这就能很好地运转. 如果"
+      $C "的确含有" :WHILE "命令, 那么"
+      (wlp $C $Q) "将会是无限的陈述. "
+      "证明这样的陈述通常会涉及用归纳法证明"
+      "本质上就是某个不变式的验证条件的东西. "
+      "因此找不变式是无法回避的! 然而, "
+      "可以用最弱前条件的思想来既解释又改进验证条件方法. "
+      "为了看出它如何解释验证条件, 回忆第41页, 由"
+      (Hoare $P
+             (&\; $C_1 $..h (_ $C (&- $n $1))
+                  (&:= $V $E))
+             $Q)
+      "生成的验证条件是: "
+      (Hoare $P
+             (&\; $C_1 $..h
+                  (_ $C (&- $n $1)))
+             (subst $Q $E $V))
+      "(的验证条件), 也就是"
+      (Hoare $P
+             (&\; $C_1 $..h
+                  (_ $C (&- $n $1)))
+             (wlp (&:= $V $E) $Q))
+      "(的验证条件). 我们可以推广这一观察, "
+      "以减少序列中所需的标注数量, "
+      "做法是只要求在不是无循环的 (即包含"
+      :WHILE "命令的) 命令之前加标注, "
+      "然后修改序列的验证条件:"
+      ((law)
+       (Center "序列")
+       (Ol (Li (MB (Hoare $P
+                          (&\; $C_1 $..h (_ $C (&- $n $1))
+                               (Anno $R $C_n))
+                          $Q))
+               "其中" $C_n "包含一个" :WHILE
+               "命令, 由其所生成的验证条件为:"
+               (Ol #:attr* '((type "a"))
+                   (Li (MB (Hoare $P
+                                  (&\; $C_1 $..h (_ $C (&- $n $1)))
+                                  $R))
+                       "所生成的验证条件")
+                   (Li (MB (Hoare $R $C_n $Q))
+                       "所生成的验证条件")))
+           (Li (MB (Hoare $P
+                          (&\; $C_1 $..h (_ $C (&- $n $1)) $C_n)
+                          $Q))
+               "其中" $C_n
+               "无循环, 由其所生成的验证条件为"
+               (MB (Hoare $P
+                          (&\; $C_1 $..h (_ $C (&- $n $1)))
+                          (wlp $C_n $Q)))
+               "所生成的验证条件.")))
+      "这些改进验证条件的澄清本质上和原本的一样, "
+      "只不过要使用性质" $P_1 "而非赋值公理. "
+      "{译注: 只有赋值公理吗?} "
+      "然而, 使用" :wlp
+      "的想法我们甚至可以做的更好, "
+      "将注解的需求减少为仅需对于"
+      :WHILE "命令的不变量仅需标注. "
+      "这种方法的大致框架如下:"
+      (Ul (Li "定义" (awp $C $Q) ", 其和"
+              (wlp $C $Q) "类似, 除了"
+              :WHILE "命令必须要注解;")
+          (Li "定义陈述集合" (wvc $C $Q)
+              ", 其给出了用于验证" $C
+              "中所有" :WHILE
+              "循环的用户注解不变量"
+              "的确是不变量的条件."))
+      "由" :awp "和" :wvc "的定义可以推出"
+      (wvc $C $Q) "中的陈述之合取蕴涵"
+      (Hoare (awp $C $Q) $C $Q)
+      ". 如果我们定义" (Conj $S:script)
+      "为" $S:script "中的所有陈述之合取, "
+      "那么这可以写成:"
+      (MB (!- (&impl
+               (Conj (wvc $C $Q))
+               (Hoare (awp $C $Q) $C $Q))))
+      "因此, 根据Modus Ponens和前条件强化, "
+      "为了证明" (Hoare $P $C $Q)
+      "(为真), 证明" (!- (Conj (wvc $C $Q)))
+      "和" (!- (&impl $P (awp $C $Q)))
+      "就足够了. 如果" $C "是无循环的, "
+      "那么实际上有"
+      (&= (awp $C $Q) (wlp $C $Q)) "且"
+      (&= (wvc $C $Q) $empty)
+      ", 于是这种方法就会坍缩为仅是证明"
+      (!- (&impl $P (wlp $C $Q)))
+      ". " (awp $C $Q) "和" (wvc $C $Q)
+      "的定义都是" $C "上的递归, 给出如下. "
+      "假定所有的" :WHILE "命令都得到了注解: "
+      (AWHILE $S $R $C) "."
+      (eqn*
+       ((awp (&:= $V $E) $Q)
+        $= (subst $Q $E $V))
+       ((awp (&\; $C_1 $C_2) $Q)
+        $= (awp $C_1 (awp $C_2 $Q)))
+       ((awp (IF $S $C_1 $C_2) $Q)
+        $= (If0 $S (awp $C_1 $Q) (awp $C_2 $Q)))
+       ((awp (AWHILE $S $R $C) $Q) $= $R)
+       ((wvc (&:= $V $E) $Q) $= $empty)
+       ((wvc (&\; $C_1 $C_2) $Q)
+        $= (&union (wvc $C_1 (awp $C_2 $Q))
+                   (wvc $C_2 $Q)))
+       ((wvc (IF $S $C_1 $C_2) $Q)
+        $= (&union (wvc $C_1 $Q)
+                   (wvc $C_2 $Q)))
+       ((wvc (AWHILE $S $R $C) $Q)
+        $= (&union (setE (&impl (&conj $R (&neg $S)) $Q)
+                         (&impl (&conj $R $S)
+                                (awp $C $R)))
+                   (wvc $C $R)))))
+   ((theorem)
+    (&impl
+     (Conj (wvc $C $Q))
+     (Hoare (awp $C $Q) $C $Q)) ".")
+   ((proof)
+    "对于" $C "进行归纳." (Br)
+    "如果" (&= $C (@:= $V $E)) "."
+    )
+   
+   (H4. "最强后条件")
+   (P "最弱前条件是由后条件开始反向计算的. "
+      "存在一个最强后条件的对偶理论, "
+      "其是自前条件正向计算的. "
+      "最强后条件具有性质"
+      (!- (Hoare $P $C (sp $C $P)))
+      ", 并且是最强的, 意即对于任意的"
+      $Q ", 如果" (!- (Hoare $P $C $Q))
+      ", 那么" (!- (&impl (sp $C $P) $Q))
+      ". 从直觉上说, " (sp $C $P)
+      "是在由" $P "所描述的初始状态下对于执行"
+      $C "之后的状态的符号表示. 对于赋值而言:"
+      (MB (&= (sp (&:= $V $E) $P)
+              (∃ $v (@conj (&= $V (subst $E $v $V))
+                           (subst $P $v $V)))))
+      "存在量化变量" $v "是" $V
+      "在执行赋值之前的初始状态中的值. "
+      "最强后条件表达了在赋值之后, "
+      $V "之值是" $E "在初始状态下求得的值 (因而是"
+      (subst $E $v $V) "), 而前条件在初始状态下评估 "
+      "(因而是" (subst $P $v $V) ") 继续成立. "
+      "因此, 如果初始状态由陈述"
+      (&conj (@= $V $v) $P)
+      "符号地表示, 那么执行" (&:= $V $E)
+      "之后的状态可由"
+      (&conj (@= $V (subst $E $v $V))
+             (subst $P $v $V))
+      "符号地表示.")
+   (P "对于无循环命令" $C ", " (sp $C $P)
+      "相当于从符号状态" $P "开始对于" $C "进行"
+      (Q "符号执行") ". 符号执行的一个优点在于"
+      "其允许对于" (Q "到目前为止的状态")
+      "的表示进行" (Q "on-the-fly")
+      "式的化简, "
+      )
    (H2. "完全 (total) 正确性")
    (P "本章Hoare逻辑的公理和规则被扩展到了完全正确性, "
       "其给出了完全正确性规约的验证条件.")

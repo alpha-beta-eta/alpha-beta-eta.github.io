@@ -1,0 +1,498 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>HOT编译: 术语翻译对照</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>HOT编译: 术语翻译对照</h1>
+    <p>这是<a href="hot.html">HOT编译</a>各讲译文共用的术语翻译对照表. 表中只列出译法不显然的术语; 人名, 语言名, 系统名 (Sax, SSA, LLVM, TIL, TAL, Standard ML, OCaml) 以及课程中的<q>lab</q>保留英文. 新的讲座引入新术语时, 按类别追加到下面的表中.</p>
+    <h2>编译器与语言</h2>
+    <table align="center">
+      <tr>
+        <th>英文</th>
+        <th>中文</th>
+        <th>首次出现</th>
+      </tr>
+      <tr>
+        <td>intermediate language</td>
+        <td>中间语言</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>source / target (language)</td>
+        <td>源语言 / 目标语言</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>static single-assignment (SSA)</td>
+        <td>静态单赋值 (SSA)</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>typed assembly language (TAL)</td>
+        <td>有类型汇编语言 (TAL)</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>first-order</td>
+        <td>一阶的</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>higher-order function</td>
+        <td>高阶函数</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>first-class function</td>
+        <td>第一级函数</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>garbage collection</td>
+        <td>垃圾回收</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>deallocate</td>
+        <td>释放</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>concrete syntax</td>
+        <td>具体句法</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>call-by-value</td>
+        <td>按值调用</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>procedure</td>
+        <td>过程</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>parameterless procedure</td>
+        <td>无参数过程</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>store</td>
+        <td>存储</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>optimization</td>
+        <td>优化</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>baseline</td>
+        <td>基线</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>memory layout</td>
+        <td>内存布局</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>live-code</td>
+        <td>现场编写代码</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>duplicate</td>
+        <td>复制</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>garbage collector</td>
+        <td>垃圾回收器</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>error message</td>
+        <td>错误信息</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+    </table>
+    <h2>类型与值</h2>
+    <table align="center">
+      <tr>
+        <th>英文</th>
+        <th>中文</th>
+        <th>首次出现</th>
+      </tr>
+      <tr>
+        <td>positive / negative type</td>
+        <td>正类型 / 负类型</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>large value / small value</td>
+        <td>大值 / 小值</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>pair</td>
+        <td>序对</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>unit (type)</td>
+        <td>单位 (类型)</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>(disjoint) sum</td>
+        <td>(无交)和</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>summand</td>
+        <td>和项</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>label</td>
+        <td>标签</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>inhabited</td>
+        <td>寓居</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>equirecursive type</td>
+        <td>等价递归类型</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>coercion</td>
+        <td>强制</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>inductive</td>
+        <td>归纳的</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>mutually recursive</td>
+        <td>互递归的</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>type constructor / value constructor</td>
+        <td>类型构造子 / 值构造子</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>binding constructor</td>
+        <td>绑定构造子</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>well-typed</td>
+        <td>良类型的</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>generative (type definition)</td>
+        <td>生成性的 (类型定义)</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>definiens</td>
+        <td>定义项</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>type equality</td>
+        <td>类型相等</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>subtyping</td>
+        <td>子类型</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+    </table>
+    <h2>逻辑与证明论</h2>
+    <table align="center">
+      <tr>
+        <th>英文</th>
+        <th>中文</th>
+        <th>首次出现</th>
+      </tr>
+      <tr>
+        <td>judgment</td>
+        <td>判断</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>typing</td>
+        <td>定型</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>context</td>
+        <td>上下文</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>sequent</td>
+        <td>相继式</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>sequent calculus</td>
+        <td>相继式演算</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>semi-axiomatic sequent calculus</td>
+        <td>半公理相继式演算</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>antecedent / succedent</td>
+        <td>前件 / 后件</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>turnstile</td>
+        <td><math><mrow><mtext>十字转门 </mtext><mo>&vdash;</mo></mrow></math></td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>introduction rule</td>
+        <td>引入规则</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>left rule / right rule</td>
+        <td>左规则 / 右规则</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>premise</td>
+        <td>前提</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>cut / identity</td>
+        <td>切 / 恒等</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>derivation</td>
+        <td>推导</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>conjunction</td>
+        <td>合取</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>intuitionistic logic</td>
+        <td>直觉主义逻辑</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>linear logic</td>
+        <td>线性逻辑</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>substructural</td>
+        <td>亚结构的</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>Curry-Howard correspondence</td>
+        <td>Curry-Howard对应</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>metavariable</td>
+        <td>元变量</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>contextual modal type theory</td>
+        <td>上下文模态类型论</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>closed</td>
+        <td>闭的</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>algorithmic typing</td>
+        <td>算法定型</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>additive / subtractive typing</td>
+        <td>加法式 / 减法式定型</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>merge / subtraction (of contexts)</td>
+        <td>(上下文的) 合并 / 减法</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>disjoint</td>
+        <td>不相交的</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>escape (its) scope</td>
+        <td>逃逸出 (其) 作用域</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>coinductive</td>
+        <td>余归纳的</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>infinite / circular derivation</td>
+        <td>无穷推导 / 循环推导</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>counterexample</td>
+        <td>反例</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+    </table>
+    <h2>语义与执行</h2>
+    <table align="center">
+      <tr>
+        <th>英文</th>
+        <th>中文</th>
+        <th>首次出现</th>
+      </tr>
+      <tr>
+        <td>dynamics</td>
+        <td>动态语义</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>semantic object</td>
+        <td>语义对象</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>memory cell</td>
+        <td>内存单元</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>address</td>
+        <td>地址</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>destination</td>
+        <td>目的地</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>process / command</td>
+        <td>进程 / 命令</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>fresh</td>
+        <td>新鲜的</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>allocate</td>
+        <td>分配</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>spawn</td>
+        <td>派生</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>future</td>
+        <td>期值</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>point of synchronization</td>
+        <td>同步点</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>block</td>
+        <td>阻塞</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>schedule</td>
+        <td>调度</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>progress / preservation</td>
+        <td>进展 / 保持</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>substructural operational semantics (SSOS)</td>
+        <td>亚结构操作语义 (SSOS)</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>multiset rewriting</td>
+        <td>多重集重写</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>final state</td>
+        <td>终态</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>pattern matching</td>
+        <td>模式匹配</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>branch</td>
+        <td>分支</td>
+        <td><a href="hot_01_sax.html">第1讲</a></td>
+      </tr>
+      <tr>
+        <td>configuration</td>
+        <td>格局</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>final configuration</td>
+        <td>终格局</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+      <tr>
+        <td>reachable</td>
+        <td>可达的</td>
+        <td><a href="hot_02_typechecking.html">第2讲</a></td>
+      </tr>
+    </table>
+  </body>
+</html>

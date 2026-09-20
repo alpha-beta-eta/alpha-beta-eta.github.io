@@ -8,7 +8,7 @@ h1, h2, h3, h4, h5, h6, a, b {font-weight: 700;}
 a {text-decoration: none;color: black;}
 a:hover {text-decoration: underline;text-underline-offset: 5px;}
 code {font-family: Iosevka;color: white;background-color: black;font-variant-ligatures: none;}
-pre:has(> code) {line-height: 1.25;background-color: black;}
+pre:has(> code) {line-height: 1.25;overflow-x: auto;background-color: black;}
 em {font-style: normal;font-family: Segoe Script, KaiTi, cursive;}
 math {font-family: LatinModern, SHSerif;font-variant-ligatures: none;}
 mtext {font-weight: 400;}
@@ -26,3 +26,4 @@ div.frame {width: 60%;margin: auto;padding: 10px;border: 5px double black;break-
 .dashed {border: 2.5px dashed white;}
 .small-caps {font-variant: small-caps;}
 .emm {font-family: Segoe Script, KaiTi;}
+mtable.admissible > mtr:first-child > mtd {border-bottom: 1px dotted black;padding-bottom: 2px;}

@@ -1,0 +1,532 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>会话类型与邮箱类型 第2讲</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>会话类型与邮箱类型 第2讲</h1>
+    <p>Simon Gay. 原文标题为<q>Session Types and Mailbox Types</q>, 是俄勒冈编程语言暑期学校 (OPLSS) 的第2讲讲义, 2026年7月2日. 讲义由Billy Bai, Henry Olson, Xusheng Zhi整理. 上一讲见<a href="session_mailbox_01.html">第1讲</a>.</p>
+    <h2>翻译术语对照</h2>
+    <table align="center">
+      <tr>
+        <td>英文</td>
+        <td>中文</td>
+      </tr>
+      <tr>
+        <td>functional session types</td>
+        <td>函数式会话类型</td>
+      </tr>
+      <tr>
+        <td>exact (context)</td>
+        <td>精确的 (上下文)</td>
+      </tr>
+      <tr>
+        <td>leftovers</td>
+        <td>剩余</td>
+      </tr>
+      <tr>
+        <td>preservation</td>
+        <td>保持性</td>
+      </tr>
+      <tr>
+        <td>absence of immediate errors</td>
+        <td>无即时错误</td>
+      </tr>
+      <tr>
+        <td>linearity lemma / substitution lemma</td>
+        <td>线性引理 / 代换引理</td>
+      </tr>
+      <tr>
+        <td>labelled transition / simulation</td>
+        <td>带标签迁移 / 模拟</td>
+      </tr>
+      <tr>
+        <td>replication / replicated input</td>
+        <td>复制 / 复制输入</td>
+      </tr>
+      <tr>
+        <td>shared channel</td>
+        <td>共享信道</td>
+      </tr>
+      <tr>
+        <td>stateless</td>
+        <td>无状态的</td>
+      </tr>
+      <tr>
+        <td>linear / unrestricted</td>
+        <td>线性的 / 非受限的</td>
+      </tr>
+      <tr>
+        <td>affine</td>
+        <td>仿射的</td>
+      </tr>
+      <tr>
+        <td>weakening / contraction</td>
+        <td>弱化 / 收缩</td>
+      </tr>
+      <tr>
+        <td>multiplicity</td>
+        <td>重数</td>
+      </tr>
+      <tr>
+        <td>closure</td>
+        <td>闭包</td>
+      </tr>
+      <tr>
+        <td>gift voucher</td>
+        <td>礼券</td>
+      </tr>
+      <tr>
+        <td>evaluation context</td>
+        <td>求值上下文</td>
+      </tr>
+      <tr>
+        <td>replacement lemma</td>
+        <td>替换引理</td>
+      </tr>
+      <tr>
+        <td>context-free session types</td>
+        <td>上下文无关会话类型</td>
+      </tr>
+    </table>
+    <h2 id="pi-typing">第1章 <math><mi>&pi;</mi></math>演算中的会话类型</h2>
+    <p>这一讲首先完成第1讲中<math><mi>&pi;</mi></math>演算的内容. 这第一部分回顾了在课程转向函数式会话类型之前, 定型如何追踪协议结构并排除通信失配.</p>
+    <p><math><mi>&pi;</mi></math>演算中的定型判断具有以下形式.
+      <math display="block">
+        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>P</mi></mrow>
+        <mtext>,</mtext></math>
+      其中<math><mi>P</mi></math>本身并不被指派类型. 相反, 这个判断说的是<math><mi>P</mi></math>相对于<math><mi mathvariant="normal">&Gamma;</mi></math>中的资源是良构的. 这些资源是<math><mi>P</mi></math>被允许使用的信道端点, 连同它们当前的会话类型. 在第一个系统中, 上下文是精确的: <math><mi mathvariant="normal">&Gamma;</mi></math>的定义域恰好是<math><mi>P</mi></math>的自由变量的集合, 即<math><mrow><mrow><mi>FV</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi>dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</p>
+    <p>这种精确性是有类型<math><mi>&pi;</mi></math>演算的若干不变式背后的机制:
+      <ul>
+        <li>如果<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>P</mi></mrow></math>并且<math><mrow><mi>x</mi><mo>:</mo><mi>T</mi></mrow></math>出现在<math><mi mathvariant="normal">&Gamma;</mi></math>中, 那么<math><mi>P</mi></math>在<math><mi>x</mi></math>上的初始通信行为必须与<math><mi>T</mi></math>的初始构造子相匹配.</li>
+        <li>如果一个进程通过<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&nu;</mi><mi>x</mi><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow><mi>P</mi></mrow></math>创建一个私有信道, 那么内部所使用的两个端点类型必须是对偶的.</li>
+      </ul>
+    </p>
+    <p><math><mn mathvariant="bold">0</mn></math>, <math><mrow><mi>x</mi><mi>?</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow></math>和<math><mrow><mi>x</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow></math>的规则使这种精确资源的纪律变得清晰可见: 无动作的进程不需要任何资源. 进程<math><mrow><mi>x</mi><mi>?</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow></math>需要类型为<math><msub><mi mathvariant="sans-serif">end</mi><mi>?</mi></msub></math>的<math><mi>x</mi></math>, 加上恰好<math><mi>P</mi></math>所需要的资源; 类似地, <math><mrow><mi>x</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow></math>需要类型为<math><msub><mi mathvariant="sans-serif">end</mi><mi>!</mi></msub></math>的<math><mi>x</mi></math>, 加上其后续所需要的资源. 此外, 线性所有权是在句法上强制的: 在并行复合<math><mrow><mi>P</mi><mo>|</mo><mi>Q</mi></mrow></math>中, 一个变量至多可以出现在一侧.</p>
+    <p>在发送, 接收, 等待和关闭的定型规则之下, 一个端点的类型沿着其会话后续逐步推进. 最终它会到达终止会话类型<math><msub><mi mathvariant="sans-serif">end</mi><mi>!</mi></msub></math>或<math><msub><mi mathvariant="sans-serif">end</mi><mi>?</mi></msub></math>之一; 在稍后的函数式语言中, 对应的关闭和等待操作返回一个类型为<math><mi mathvariant="sans-serif">unit</mi></math>的值. 例如, 接收进程具有以下形式.
+      <math display="block">
+        <mrow><mi>x</mi><mi>?</mi><mi>y</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow>
+      </math>
+      它首先以输入类型<math><mrow><mi>?</mi><mi>T</mi><mo lspace="0" rspace="0">.</mo><mi>U</mi></mrow></math>使用<math><mi>x</mi></math>. 在接收发生之后, 后续<math><mi>P</mi></math>以后续类型<math><mi>U</mi></math>使用同一个端点<math><mi>x</mi></math>, 并且它也可以以类型<math><mi>T</mi></math>使用新约束的消息变量<math><mi>y</mi></math>. 因此, 约束变量的变化恰如在<math><mi>&lambda;</mi></math>抽象规则中那样; 不寻常的地方在于<math><mi>x</mi></math>的类型跨越横线发生了变化.</p>
+    <p>限制规则是检查相容性的核心位置.
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>T</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi>y</mi><mo>:</mo><mi>U</mi></mrow>
+              </mrow>
+              <mo>&vdash;</mo><mi>P</mi></mrow>
+            <mspace width="8ex"/>
+            <mrow><mi>T</mi><mo>&perp;</mo><mi>U</mi></mrow>
+          </mrow>
+          <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>&nu;</mi><mi>x</mi><mi>y</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mi>P</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      为了给<math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&nu;</mi><mi>x</mi><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow><mi>P</mi></mrow></math>定型, 主体<math><mi>P</mi></math>在假设<math><mrow><mi>x</mi><mo>:</mo><mi>T</mi></mrow></math>和<math><mrow><mi>y</mi><mo>:</mo><mi>U</mi></mrow></math>之下被定型, 并且规则要求对偶性<math><mrow><mi>T</mi><mo>&perp;</mo><mi>U</mi></mrow></math>. 通常人们期望<math><mi>x</mi></math>和<math><mi>y</mi></math>被<math><mi>P</mi></math>内部的不同线程所使用, 但规则本身并不要求这一点. 因此, 这个基本的类型系统仍然接纳一些自阻塞的进程: 它的安全性定理关乎的是通信失配, 而不是所有可能形式的不可约的非典范形式.</p>
+    <p>并行规则是强制线程之间不相交的所有权的地方.
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>P</mi></mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Delta;</mi><mo>&vdash;</mo><mi>Q</mi></mrow>
+          </mrow>
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="normal">&Delta;</mi></mrow>
+            <mo>&vdash;</mo>
+            <mrow><mi>P</mi><mo>|</mo><mi>Q</mi></mrow>
+          </mrow>
+        </mfrac>
+      </math>
+      结论中的逗号仅当两个上下文具有不相交的定义域时才有定义. 以声明式的方式来读, 这说的是<math><mrow><mi>P</mi><mo>|</mo><mi>Q</mi></mrow></math>所使用的资源就是<math><mi>P</mi></math>和<math><mi>Q</mi></math>分别使用的资源. 以算法的方式来读, 它就引出了线性定型中常见的问题, 即决定应当如何分拆环境. 标准的实现思路是带着<q>剩余</q>进行类型检查.
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <msub><mi mathvariant="normal">&Gamma;</mi><mn>1</mn></msub>
+              <mo>;</mo><mi>P</mi><mo>&mapsto;</mo>
+              <msub><mi mathvariant="normal">&Gamma;</mi><mn>2</mn></msub>
+            </mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <msub><mi mathvariant="normal">&Gamma;</mi><mn>2</mn></msub>
+              <mo>;</mo><mi>Q</mi><mo>&mapsto;</mo>
+              <msub><mi mathvariant="normal">&Gamma;</mi><mn>3</mn></msub>
+            </mrow>
+          </mrow>
+          <mrow>
+            <msub><mi mathvariant="normal">&Gamma;</mi><mn>1</mn></msub>
+            <mo>;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>P</mi><mo>|</mo><mi>Q</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&mapsto;</mo>
+            <msub><mi mathvariant="normal">&Gamma;</mi><mn>3</mn></msub>
+          </mrow>
+        </mfrac>
+      </math>
+      检查器被给予一个大的输入上下文, 消耗掉一个子项所使用的资源, 然后返回未使用的部分, 交由下一个子项去检查. 在顶层, 我们验证没有剩下任何线性资源.</p>
+    <h2 id="preservation">第2章 <math><mi>&pi;</mi></math>演算中的保持性</h2>
+    <p>下面这个进程是证明<math><mi>&pi;</mi></math>演算上会话类型的保持性时重要而又有趣的例子.
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>&nu;</mi><mi>a</mi><mi>b</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow><mi>a</mi><mi>!</mi><mi>m</mi><mo lspace="0" rspace="0">.</mo>
+                <mrow><mi>a</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mn mathvariant="bold">0</mn></mrow>
+              </mrow>
+              <mo>|</mo>
+              <mrow><mi>b</mi><mi>?</mi><mi>x</mi><mo lspace="0" rspace="0">.</mo>
+                <mrow><mi>b</mi><mi>?</mi><mo lspace="0" rspace="0">.</mo>
+                  <mrow><mi>x</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mn mathvariant="bold">0</mn></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      其中自由的消息<math><mi>m</mi></math>本身是一个最终将被关闭的信道端点. 第一个通信步骤把<math><mi>m</mi></math>从<math><mi>a</mi></math>一侧发送到<math><mi>b</mi></math>一侧.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&nu;</mi><mi>a</mi><mi>b</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mi>a</mi><mi>!</mi><mi>m</mi><mo lspace="0" rspace="0">.</mo>
+                  <mrow><mi>a</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mn mathvariant="bold">0</mn></mrow>
+                </mrow>
+                <mo>|</mo>
+                <mrow><mi>b</mi><mi>?</mi><mi>x</mi><mo lspace="0" rspace="0">.</mo>
+                  <mrow><mi>b</mi><mi>?</mi><mo lspace="0" rspace="0">.</mo>
+                    <mrow><mi>x</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mn mathvariant="bold">0</mn></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&rarr;</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&nu;</mi><mi>a</mi><mi>b</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mi>a</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mn mathvariant="bold">0</mn></mrow>
+                <mo>|</mo>
+                <mrow><mi>b</mi><mi>?</mi><mo lspace="0" rspace="0">.</mo>
+                  <mrow><mi>m</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mn mathvariant="bold">0</mn></mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </p>
+    <p>这两个进程的完整推导树展示在第1讲的幻灯片中. 归约前后的定型推导展示了保持性的全部思想. 在这一步之前, <math><mi>m</mi></math>出现在发送线程<math><mrow><mi>a</mi><mi>!</mi><mi>m</mi><mo lspace="0" rspace="0">.</mo><mrow><mi>a</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mn mathvariant="bold">0</mn></mrow></mrow></math>的上下文中. 在这一步之后, 它出现在接收线程<math><mrow><mi>b</mi><mi>?</mi><mo lspace="0" rspace="0">.</mo><mrow><mi>m</mi><mi>!</mi><mo lspace="0" rspace="0">.</mo><mn mathvariant="bold">0</mn></mrow></mrow></math>的上下文中, 因为所有权随着消息一起移动了. 同时, 被约束的端点<math><mi>a</mi></math>和<math><mi>b</mi></math>仍然具有对偶的类型, 但这些类型变短了: 它们的第一个发送/接收动作已经被消耗掉了. 这就是为什么进程的保持性并不是说每个内部端点都保持相同的类型. 外部可见的上下文被保持, 而隐藏在限制之内的类型则以相互匹配的对偶方式演化.</p>
+    <p>选择的行为与发送和接收类似, 只是没有消息值. 分支对应于外部选择: 进程提供一族以标签为索引的后续. 选取对应于内部选择: 进程选取一个标签, 然后以相应的会话后续继续. 在基本的规则中, 进程中的标签和类型中的标签必须精确匹配. 然而, 这可能比实际所需的更严格. 一个分支进程可以安全地实现额外的分支, 即使类型永远不会允许另一个端点选择它们; 而一个选取进程也不一定需要知道可能标签的完整菜单. 这些是在会话类型中加入子类型的典型动机, 这将在之后的讲座中解释.</p>
+    <h2 id="safety">第3章 运行时错误与类型安全</h2>
+    <p>为了精确地陈述安全性定理, 运行时错误需要一个形式的定义, 而不是依赖于卡住这一非形式的概念, 我们已经看到, 基本会话类型并不能完全防止卡住. 首先, 一个前缀进程是其顶层形式为一个通信动作的进程: 接收, 发送, 分支, 选取, 等待或关闭. 它的<em>主体</em>是第一个动作在其上进行通信的端点.</p>
+    <p>每个进程都结构同余于一个典范形式.
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>&nu;</mi>
+              <msub><mi>x</mi><mn>1</mn></msub>
+              <msub><mi>y</mi><mn>1</mn></msub>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>&ctdot;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>&nu;</mi>
+              <msub><mi>x</mi><mi>n</mi></msub>
+              <msub><mi>y</mi><mi>n</mi></msub>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <msub><mi>P</mi><mn>1</mn></msub>
+              <mo>|</mo><mo>&ctdot;</mo><mo>|</mo>
+              <msub><mi>P</mi><mi>m</mi></msub>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      其中每个<math><msub><mi>P</mi><mi>i</mi></msub></math>都是一个前缀进程, 除了在没有活跃的前缀时, 并行的部分可以只是<math><mn mathvariant="bold">0</mn></math>. 证明是通过使用结构同余来重新排列进程: 限制被向外提出, <math><mi>&alpha;</mi></math>转换避免了捕获, 而剩下的顶层并行成分被收集到一个进程之中.</p>
+    <p>一个<em>可约式</em>是一个能够执行一次成功的通信步骤的局部格局: 等待与关闭, 接收与发送, 或者分支与相容的选取. 于是, 一个<em>运行时错误</em>是这样的典范形式, 它包含两个线程, 其主体是同一个受限信道的两个端点, 但其动作并不构成一个可约式. 这样的一对线程试图在相互连接的端点上通信, 但操作并不互补.</p>
+    <p>这个定义有意地排除了一些死锁. 一个循环依赖可能会卡住, 因为每个线程都在等待一个信道, 而该信道的另一方尚未就绪. 一个自阻塞的进程可能在一个顺序线程中使用两个端点, 因而无法取得进展. 这些都是真实存在的问题, 但它们并不是这里所要排除的狭义上的通信失配.</p>
+    <p>类型安全性的证明有两个主要部分.</p>
+    <p><b>无即时错误. </b>如果<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>P</mi></mrow></math>, 那么<math><mi>P</mi></math>不是一个运行时错误.</p>
+    <p><b>保持性. </b>如果<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>P</mi></mrow></math>并且<math><mrow><mi>P</mi><mo>&rarr;</mo><mi>Q</mi></mrow></math>, 那么<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>Q</mi></mrow></math>.</p>
+    <p>因为归约在结构同余下是封闭的, 所以我们也要证明结构同余保持可定型性. 有两个简单的引理被反复使用: 1) 线性引理: 如果<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>P</mi></mrow></math>, 那么<math><mrow><mrow><mi mathvariant="monospace">dom</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">&Gamma;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mi mathvariant="monospace">fv</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>; 以及2) 代换引理: 在定型推导中, 变量可以被一致地重命名.</p>
+    <p>保持性是通过对归约推导进行归纳来证明的. 上下文情形, 例如在限制内部或者与另一个进程并行地进行归约, 是常规的. 通信情形才是有趣的. 在每种情形下, 我们对源进程的定型推导进行足够深入的考察, 以找到两个进行通信的线程. 然后, 这些片段被重新组装成目标进程的定型推导. 上面那个<math><mi>m</mi></math>从发送者的上下文移动到接收者的上下文的例子, 就是这种重新排列的原型.</p>
+    <p>无即时错误是通过反证法来证明的. 把一个运行时错误写成典范形式. 如果它是可定型的, 那么在应用最后的那些限制规则之前, 每一对受限的<math><mrow><msub><mi>x</mi><mi>k</mi></msub><mo>,</mo><msub><mi>y</mi><mi>k</mi></msub></mrow></math>都会具有对偶的类型. 考察那两个出问题的前缀进程, 它们的第一个动作决定了这两个类型的第一个构造子. 既然这一对并不构成一个可约式, 这些动作就不是互补的; 因此这两个类型不可能是对偶的. 这与限制规则相矛盾.</p>
+    <p>以这种方式得到的第一个安全性保证是不存在通信失配. 第二个标准的安全性保证, <em>会话保真性</em>, 说的是运行时消息的实际序列遵循会话类型所描述的协议. 保真性的一个完全形式化的证明需要更多的工具: 我们要为进程给出带标签迁移, 记录所传输的值或标签, 并为类型给出带标签迁移, 记录相应的协议动作. 于是保真性就是一个模拟结果, 它把具体的运行时标签与其抽象的类型标签联系起来.</p>
+    <h2 id="recursion">第4章 递归行为与共享信道</h2>
+    <p>到目前为止, 这个基本系统是有意受限的. 它只描述有穷行为, 并且对每个端点都强制唯一所有权. 在转向函数式编程的例子之前, 需要两个扩展.</p>
+    <p>首先, 重复的协议需要递归类型和重复的进程行为. 一个递归的数学服务器可以用如下形式的方程来描述.
+      <math display="block">
+        <mrow><mi>S</mi><mo>=</mo>
+          <mrow><mi>&amp;</mi>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">plus</mi><mo>:</mo>
+                  <mrow><mi>?</mi><mi mathvariant="sans-serif">int</mi><mo lspace="0" rspace="0">.</mo>
+                    <mrow><mi>?</mi><mi mathvariant="sans-serif">int</mi><mo lspace="0" rspace="0">.</mo>
+                      <mrow><mi>!</mi><mi mathvariant="sans-serif">int</mi><mo lspace="0" rspace="0">.</mo><mi>S</mi></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+                <mo>,</mo>
+                <mrow><mi mathvariant="sans-serif">neg</mi><mo>:</mo>
+                  <mrow><mi>?</mi><mi mathvariant="sans-serif">int</mi><mo lspace="0" rspace="0">.</mo>
+                    <mrow><mi>!</mi><mi mathvariant="sans-serif">int</mi><mo lspace="0" rspace="0">.</mo><mi>S</mi></mrow>
+                  </mrow>
+                </mrow>
+                <mo>,</mo>
+                <mrow><mi mathvariant="sans-serif">quit</mi><mo>:</mo>
+                  <msub><mi mathvariant="sans-serif">end</mi><mi>?</mi></msub>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      有时还带有一个额外的递归类型关键字<math><mrow><mrow><mi mathvariant="sans-serif">rec</mi><mspace width="1ex"/><mi>S</mi></mrow><mo lspace="0" rspace="0">.</mo><mo>&ctdot;</mo></mrow></math>. 会话类型的教科书首先发展了一套无穷类型的余归纳理论, 之后才加入有穷的递归语法. 于是, 对偶和类型等价必须考虑到递归类型的展开.</p>
+    <p>第一, 进程需要循环的能力, 尤其是无限循环, 这正是服务器通常所做的事. 在进程中表达无穷行为有几种标准的方式: 复制<math><mrow><mrow><mi>!</mi><mi>P</mi></mrow><mo>&equiv;</mo><mrow><mi>P</mi><mo>|</mo><mrow><mi>!</mi><mi>P</mi></mrow></mrow></mrow></math>, 复制输入<math><mrow><mrow><mi>x</mi><mi>&#x22C6;</mi><mi>?</mi><mi>y</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow><mo>&equiv;</mo><mrow><mrow><mi>x</mi><mi>?</mi><mi>y</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow><mo>|</mo><mrow><mi>x</mi><mi>&#x22C6;</mi><mi>?</mi><mi>y</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow></mrow></mrow></math>, 递归的进程定义, 以及在函数式语言中, 通过不动点算子实现的递归函数. 复制输入在操作上很有吸引力, 因为被复制的进程会先等待一条传入的消息, 然后才产生一个新的副本.</p>
+    <p>第二, 现实的程序需要某种形式的共享. 普通的会话类型是线性的, 因为共享一个有状态的协议端点可能会打乱预期的动作序列. 然而, 有一些通信类型是<em>无状态的</em>: 在一个通信步骤之后, 端点回到一个等价的类型. 例子包括以下类型.
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">rec</mi><mspace width="1ex"/><mi>X</mi></mrow>
+          <mo lspace="0" rspace="0">.</mo>
+          <mrow><mi>!</mi><mi>T</mi><mo lspace="0" rspace="0">.</mo><mi>X</mi></mrow>
+        </mrow>
+        <mspace width="4ex"/><mtext>和</mtext><mspace width="4ex"/>
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">rec</mi><mspace width="1ex"/><mi>X</mi></mrow>
+          <mo lspace="0" rspace="0">.</mo>
+          <mrow><mi>&amp;</mi>
+            <mrow><mo stretchy="false">{</mo>
+              <mrow>
+                <mrow><mi>a</mi><mo>:</mo><mi>X</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi>b</mi><mo>:</mo><mi>X</mi></mrow>
+              </mrow>
+              <mo stretchy="false">}</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      这样的类型可以被安全地视为非受限的. 这种语义上的非受限性概念随后与通常的弱化和收缩这两条结构规则联系起来: 非受限的资源可以被丢弃或复制, 而线性的资源则不可以.</p>
+    <h2 id="linearity">第5章 为什么函数式会话类型需要线性</h2>
+    <p>在回顾了<math><mi>&pi;</mi></math>演算之后, 这一讲转向一个带有会话定型的通信原语的高阶函数式语言. 主要的整合问题在于, 线性的会话端点会与普通的函数式构造相互作用.</p>
+    <p>序对是第一个例子. 如果<math><mi>c</mi></math>是一个线性端点, 而我们构造了序对<math><mrow><mo stretchy="false">(</mo><mrow><mi>c</mi><mo>,</mo><mi>v</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 那么共享这个序对也就会共享<math><mi>c</mi></math>. 因此, 这个语言使用线性积类型<math><mrow><mi>T</mi><msub><mo>&times;</mo><mn>1</mn></msub><mi>U</mi></mrow></math>. 一个完整的语言也会需要非受限的积类型, 但这一讲保持核心系统的最小化.</p>
+    <p>函数通过闭包引出了同样的问题. 假设我们有以下类型.
+      <math display="block">
+        <mrow><mi>f</mi><mo>:</mo>
+          <mrow>
+            <mrow><mi>!</mi><mi mathvariant="sans-serif">Int</mi><mo lspace="0" rspace="0">.</mo>
+              <msub><mi mathvariant="sans-serif">end</mi><mi>!</mi></msub>
+            </mrow>
+            <mo>&rarr;</mo><mi mathvariant="sans-serif">Int</mi><mo>&rarr;</mo><mi mathvariant="sans-serif">unit</mi></mrow>
+        </mrow>
+      </math>
+      并且我们把<math><mi>f</mi></math>部分应用于一个线性信道<math><mi>c</mi></math>. 结果是一个等待整数参数的闭包, 但这个闭包包含了<math><mi>c</mi></math>. 如果这个闭包被复制, 那么端点也会被复制. 因此, 这个语言区分线性函数<math><mrow><mi>T</mi><mo>&multimap;</mo><mi>U</mi></mrow></math>和非受限函数<math><mrow><mi>T</mi><msub><mo>&rarr;</mo><mi>&omega;</mi></msub><mi>U</mi></mrow></math> (在幻灯片中写作重数<math><mn>1</mn></math>和<math><mi>&omega;</mi></math>). 只有当闭包中不包含线性变量时, 才能构造非受限函数.</p>
+    <p>在下面所使用的形式记号中, 这两种函数类型写作<math><mrow><mi>T</mi><msub><mo>&rarr;</mo><mn>1</mn></msub><mi>U</mi></mrow></math>和<math><mrow><mi>T</mi><msub><mo>&rarr;</mo><mi>&omega;</mi></msub><mi>U</mi></mrow></math>; 幻灯片中把同样的区分写作<math><mrow><mi mathvariant="sans-serif">T</mi><msub><mo>&rarr;</mo><mn>1</mn></msub><mi mathvariant="sans-serif">U</mi></mrow></math>和<math><mrow><mi mathvariant="sans-serif">T</mi><msub><mo>&rarr;</mo><mi>&omega;</mi></msub><mi mathvariant="sans-serif">U</mi></mrow></math>.</p>
+    <p>有一个有用的子类型关系.
+      <math display="block">
+        <mrow>
+          <mrow><mi>T</mi>
+            <msub><mo>&rarr;</mo><mi>&omega;</mi></msub>
+            <mi>U</mi></mrow>
+          <mo>&lt;:</mo>
+          <mrow><mi>T</mi>
+            <msub><mo>&rarr;</mo><mn>1</mn></msub>
+            <mi>U</mi></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      在期望线性函数的地方可以使用非受限函数, 因为一个能被安全地使用许多次的函数当然也能被使用一次. 这避免了迫使程序员或类型推断过早地猜测一个函数之后是否需要被线性地使用.</p>
+    <h2 id="bookshop">第6章 书店的例子</h2>
+    <p>贯穿始终的例子是一个在线书店. 在商店一侧, 协议提供两个选择.
+      <math display="block">
+        <mrow><mi mathvariant="bold-sans-serif">type</mi><mspace width="2ex"/>
+          <mrow><mi mathvariant="sans-serif">Shop</mi><mo>=</mo>
+            <mrow><mi>&amp;</mi>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi mathvariant="sans-serif">add</mi><mo>:</mo>
+                    <mrow><mi>?</mi><mi mathvariant="sans-serif">Book</mi><mo lspace="0" rspace="0">.</mo><mi mathvariant="sans-serif">Shop</mi></mrow>
+                  </mrow>
+                  <mo>,</mo>
+                  <mrow><mi mathvariant="sans-serif">checkout</mi><mo>:</mo>
+                    <mrow><mi>?</mi><mi mathvariant="sans-serif">Card</mi><mo lspace="0" rspace="0">.</mo>
+                      <mrow><mi>?</mi><mi mathvariant="sans-serif">Address</mi><mo lspace="0" rspace="0">.</mo>
+                        <msub><mi mathvariant="sans-serif">end</mi><mi>?</mi></msub>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      购物者具有以下对偶的协议.
+      <math display="block">
+        <mrow><mi mathvariant="bold-sans-serif">type</mi><mspace width="2ex"/>
+          <mrow><mi mathvariant="sans-serif">Shopper</mi><mo>=</mo>
+            <mrow><mi>&oplus;</mi>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow><mi mathvariant="sans-serif">add</mi><mo>:</mo>
+                    <mrow><mi>!</mi><mi mathvariant="sans-serif">Book</mi><mo lspace="0" rspace="0">.</mo><mi mathvariant="sans-serif">Shopper</mi></mrow>
+                  </mrow>
+                  <mo>,</mo>
+                  <mrow><mi mathvariant="sans-serif">checkout</mi><mo>:</mo>
+                    <mrow><mi>!</mi><mi mathvariant="sans-serif">Card</mi><mo lspace="0" rspace="0">.</mo>
+                      <mrow><mi>!</mi><mi mathvariant="sans-serif">Address</mi><mo lspace="0" rspace="0">.</mo>
+                        <msub><mi mathvariant="sans-serif">end</mi><mi>!</mi></msub>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math><mi mathvariant="sans-serif">add</mi></math>的递归分支使得购物者可以在结账之前添加任意多本书.</p>
+    <p>关键的编程思想是, 通信操作会返回类型已经演化了的信道端点. 在一个信道上发送一个值会返回同一个信道.
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">send</mi><mspace width="2ex"/><mi>v</mi><mspace width="2ex"/><mi>c</mi></mrow>
+          <mo>&rarr;</mo><mi>c</mi></mrow>
+        <mtext>,</mtext></math>
+      但返回的<math><mi>c</mi></math>具有后续类型. <math><mi mathvariant="sans-serif">send</mi></math>的类型是柯里化的.
+      <math display="block">
+        <mrow><mi mathvariant="sans-serif">send</mi><mo>:</mo>
+          <mrow><mi>T</mi>
+            <msub><mo>&rarr;</mo><mi>&omega;</mi></msub>
+            <mrow>
+              <mrow><mi>!</mi><mi>T</mi><mo lspace="0" rspace="0">.</mo><mi>S</mi></mrow>
+              <msub><mo>&rarr;</mo><mn>1</mn></msub>
+              <mi>S</mi></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      外层函数是非受限的, 因为原语<math><mi mathvariant="sans-serif">send</mi></math>的闭包中没有线性数据. 内层函数是线性的, 因为部分应用的函数<math><mrow><mi mathvariant="sans-serif">send</mi><mspace width="2ex"/><mi>v</mi></mrow></math>可能包含一个线性的值<math><mi>v</mi></math>.</p>
+    <p>接收会同时返回所接收的值和演化了的信道.
+      <math display="block">
+        <mrow><mi mathvariant="sans-serif">receive</mi><mo>:</mo>
+          <mrow>
+            <mrow><mi>?</mi><mi>T</mi><mo lspace="0" rspace="0">.</mo><mi>S</mi></mrow>
+            <msub><mo>&rarr;</mo><mi>&omega;</mi></msub>
+            <mrow><mi>T</mi>
+              <msub><mo>&times;</mo><mn>1</mn></msub>
+              <mi>S</mi></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      这个积是线性的, 因为它的第二个分量常常是一个线性端点. 类似地, 选取一个标签会返回同一个信道, 其类型为分支的后续类型. 对外部选择进行匹配是对偶的操作: 被匹配的各个分支是期望以相应后续类型的信道为参数的函数, 并且所有分支都必须返回一个共同的结果类型.</p>
+    <p>在<math><mi mathvariant="sans-serif">mother</mi></math>和<math><mi mathvariant="sans-serif">shop</mi></math>的代码中, 信道通过反复的重新绑定被显式地在程序中传递下去. 例如, 在<math><mrow><mi mathvariant="bold-sans-serif">select</mi><mspace width="2ex"/><mi mathvariant="sans-serif">add</mi><mspace width="2ex"/><mi mathvariant="sans-serif">toShop</mi></mrow></math>之后, 名字<math><mi mathvariant="sans-serif">toShop</mi></math>被重新绑定到同一个运行时端点, 但其类型是<math><mi mathvariant="sans-serif">add</mi></math>选取之后的类型. 这种风格很冗长, 但它使类型的演化变得显式. 讲者指出, 一个单子接口可以隐藏其中的一些管道工作.</p>
+    <p>这个例子中的高阶部分是<q>礼券</q>. 母亲不想让她的儿子自由地访问商店的信道, 因此她给他发送一个类型为<math><mrow><mi mathvariant="sans-serif">Book</mi><msub><mo>&rarr;</mo><mn>1</mn></msub><mi mathvariant="sans-serif">Book</mi></mrow></math>的线性函数. 这个函数在商店的信道上闭包, 并且能够完成一次购买: 只有当儿子选的书合适时才选择这本书, 否则就使用母亲默认的书. 这个函数之所以必须是线性的, 恰恰是因为使用它会消耗掉隐藏在其闭包中的商店会话.</p>
+    <p>完整的系统使用<math><mi mathvariant="bold-sans-serif">new</mi></math>和<math><mi mathvariant="bold-sans-serif">fork</mi></math>. 操作<math><mrow><mi mathvariant="bold-sans-serif">new</mi><mspace width="2ex"/><mi mathvariant="sans-serif">S</mi></mrow></math>创建一对相互连接的端点, 其类型为<math><mi>S</mi></math>和<math><msup><mi>S</mi><mo>&perp;</mo></msup></math>. 操作<math><mrow><mi mathvariant="bold-sans-serif">fork</mi><mspace width="2ex"/><mi mathvariant="sans-serif">v</mi></mrow></math>通过把一个线性函数<math><mrow><mi>v</mi><mo>:</mo><mrow><mi mathvariant="sans-serif">unit</mi><msub><mo>&rarr;</mo><mn>1</mn></msub><mi mathvariant="sans-serif">unit</mi></mrow></mrow></math>应用于<math><mi mathvariant="sans-serif">unit</mi></math>来启动一个新线程. 这个例子在商店和购物者之间创建了一个信道, 在母亲和儿子之间创建了另一个信道, 派生出母亲和儿子的线程, 并在原来的线程中运行商店.</p>
+    <p>共享服务器的变体展示了非受限的会话类型. 一个服务器信道可以具有以下类型.
+      <math display="block">
+        <mrow><mi mathvariant="bold-sans-serif">type</mi><mspace width="2ex"/>
+          <mrow><mi mathvariant="sans-serif">ShopServer</mi><mo>=</mo>
+            <mrow><mi>&#x22C6;</mi><mi>!</mi><mi mathvariant="sans-serif">Shopper</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      它是<math><mrow><mrow><mi mathvariant="sans-serif">rec</mi><mspace width="1ex"/><mi>a</mi></mrow><mo lspace="0" rspace="0">.</mo><mrow><mi>!</mi><mi mathvariant="sans-serif">Shopper</mi><mo lspace="0" rspace="0">.</mo><mi>a</mi></mrow></mrow></math>的缩写. 在共享的服务器信道上的每次交互都会向一个客户端发送一个新鲜的私有端点. 这个私有端点是线性的, 支持一次普通的商店会话; 而服务器信道本身是无状态的, 可以被反复使用.</p>
+    <p>子类型在这里仅作为动机出现: 商店添加了一个新的<math><mi mathvariant="sans-serif">remove</mi></math>选项. 直觉上, 一个只会选取<math><mi mathvariant="sans-serif">add</mi></math>或<math><mi mathvariant="sans-serif">checkout</mi></math>的旧客户端应该仍然能够与一个更丰富的商店实现进行交互. 形式的子类型规则在这里暂且放在背景中; 主要的思想是子类型放宽了分支类型与选取类型的精确匹配.</p>
+    <h2 id="syntax">第7章 函数式语言的语法与语义</h2>
+    <p>这个形式语言有两层. 表达式层是一个传值调用的函数式语言, 具有变量, 常量, 抽象, 应用, 序对, 序对拆分, 信道创建和匹配. 常量包括<math><mi mathvariant="sans-serif">unit</mi></math>, <math><mi mathvariant="sans-serif">wait</mi></math>, <math><mi mathvariant="sans-serif">close</mi></math>, <math><mi mathvariant="sans-serif">receive</mi></math>, <math><mi mathvariant="sans-serif">send</mi></math>, <math><mi mathvariant="sans-serif">select</mi></math>, <math><mi mathvariant="sans-serif">fork</mi></math>和<math><mi mathvariant="sans-serif">fix</mi></math>. 值包括变量, 常量, 抽象, 由值构成的序对, 以及部分应用的发送.</p>
+    <p>进程层包含正在执行的表达式.
+      <math display="block">
+        <mrow><mi>P</mi><mo>&Colone;</mo>
+          <mrow>
+            <mrow><mo stretchy="false">&lang;</mo><mi>e</mi><mo stretchy="false">&rang;</mo></mrow>
+            <mo>|</mo>
+            <mrow><mi>P</mi><mo>|</mo><mi>Q</mi></mrow>
+            <mo>|</mo>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>&nu;</mi><mi>x</mi><mi>y</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mi>P</mi></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      进程层没有发送或接收前缀, 因为这些操作现在存在于表达式之中. 限制语法是<math><mi mathvariant="bold-sans-serif">new</mi></math>求值时所产生的运行时语法.</p>
+    <p>表达式归约是标准的使用求值上下文的小步传值调用归约. 应用对值执行<math><mi>&beta;</mi></math>归约, 序对拆分代入两个分量, 而<math><mi mathvariant="sans-serif">fix</mi></math>展开递归函数. 然后, 进程归约加入了并发和通信.</p>
+    <p>通信规则是被提升到求值上下文之中的<math><mi>&pi;</mi></math>演算规则. 当<math><mi>x</mi></math>和<math><mi>y</mi></math>相互连接时, 一个接下来的计算是<math><mrow><mi mathvariant="sans-serif">wait</mi><mspace width="2ex"/><mi>x</mi></mrow></math>的线程可以与一个接下来的计算是<math><mrow><mi mathvariant="sans-serif">close</mi><mspace width="2ex"/><mi>y</mi></mrow></math>的线程同步. 两个求值上下文中的洞都被填入<math><mi mathvariant="sans-serif">unit</mi></math>. <math><mi>x</mi></math>上的一次接收与<math><mi>y</mi></math>上对值<math><mi>v</mi></math>的一次发送同步; 接收者得到序对<math><mrow><mo stretchy="false">(</mo><mrow><mi>v</mi><mo>,</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 而发送者拿回<math><mi>y</mi></math>. 对于选择, <math><mi>x</mi></math>上的一次匹配与<math><mi>y</mi></math>上的一次选取同步, 并且被选中的分支函数被应用于<math><mi>x</mi></math>.</p>
+    <p><math><mi mathvariant="sans-serif">fork</mi></math>的规则在当前线程中把fork表达式替换为<math><mi mathvariant="sans-serif">unit</mi></math>, 并创建一个新线程, 运行被派生的函数应用于<math><mi mathvariant="sans-serif">unit</mi></math>的结果. <math><mrow><mi mathvariant="sans-serif">new</mi><mspace width="2ex"/><mi>S</mi></mrow></math>的规则创建新鲜的相互连接的端点, 并在一个新的限制之内把它们作为一个序对返回. 这些规则解释了源语言层面的函数式操作<math><mi mathvariant="bold-sans-serif">new</mi></math>与运行时的<math><mi>&pi;</mi></math>演算式的限制之间的关系.</p>
+    <h2 id="typing">第8章 函数式语言的定型与安全性</h2>
+    <p>这个函数式系统有两种判断.
+      <math display="block">
+        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+          <mrow><mi>e</mi><mo>:</mo><mi>T</mi></mrow>
+        </mrow>
+        <mspace width="4ex"/><mtext>和</mtext><mspace width="4ex"/>
+        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>P</mi></mrow>
+        <mtext>.</mtext></math>
+      现在上下文包含普通的数据类型, 函数类型, 积类型和会话类型. 数据类型和非受限函数类型根据声明就是非受限的; 线性积和线性函数是线性的; 会话类型可以是线性的或非受限的, 取决于它们是否是无状态的.</p>
+    <p>表达式的定型规则遵循通常的结构, 并按线性加以修改. 变量规则的上下文中只有被使用的那个变量, 因为任何额外的线性假设都会被悄无声息地丢弃. 线性函数的引入允许闭包中有线性假设, 而非受限函数的引入则要求整个闭包上下文都是非受限的. 应用组合不相交的上下文. 相比投影函数, 我们更倾向于序对拆分, 因为它使线性分量的消耗变得显式.</p>
+    <p>弱化和收缩仅对非受限类型可用. 收缩规则值得从操作的角度来读. 为了给一个使用了非受限变量<math><mi>x</mi></math>两次的表达式定型, 我们首先给一个使用两个新鲜名字 (比如<math><mi>y</mi></math>和<math><mi>z</mi></math>) 的版本定型, 然后再把它们收缩回<math><mi>x</mi></math>. 讲座用一个在信道上两次发送同一个非受限端点的函数来说明这一点. 这个表达式包含同一个变量的两次出现, 因此推导必须在使用收缩之前暂时把它们拆分为两个名字.</p>
+    <p>进程定型把表达式定型提升到线程, 并复用熟悉的并行规则和限制规则. 当一个线程的表达式具有类型<math><mi mathvariant="sans-serif">unit</mi></math>时, 它是良类型的. 并行复合组合不相交的线性资源, 而限制要求对偶的端点类型. 在进程层, 对于非受限资源也存在弱化和收缩.</p>
+    <p>安全性证明具有和之前相同的形状: 无即时错误和保持性. 运行时错误的定义是把一个进程写成典范形式
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>&nu;</mi>
+              <msub><mi>x</mi><mn>1</mn></msub>
+              <msub><mi>y</mi><mn>1</mn></msub>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>&ctdot;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>&nu;</mi>
+              <msub><mi>x</mi><mi>n</mi></msub>
+              <msub><mi>y</mi><mi>n</mi></msub>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <msub><mi>e</mi><mn>1</mn></msub>
+                <mo stretchy="false">&rang;</mo></mrow>
+              <mo>|</mo><mo>&ctdot;</mo><mo>|</mo>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <msub><mi>e</mi><mi>m</mi></msub>
+                <mo stretchy="false">&rang;</mo></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      然后寻找这样的两个线程, 其接下来的通信主体是相互连接的端点, 但其操作并不互补. 一个线程的主体是通过在其求值上下文中寻找一个待执行的wait, close, receive, send, match或select来找到的.</p>
+    <p>保持性要更复杂一些, 因为它必须经过表达式层. 证明使用了标准的传值调用的要素: 表达式的代换, 被求值上下文所选中的子项的可定型性, 求值上下文本身的定型判断, 以及一个替换引理, 它说的是一个具有正确类型的项可以被放回到一个有类型的上下文之中. 这些是Wright-Felleisen风格的证明成分. 一旦确立了表达式的保持性, 进程的保持性就可以通过把它与通信情形以及结构同余下的保持性结合起来而得到.</p>
+    <p>这一讲最后把形式系统与实际的实现联系起来. 关键的实践障碍在于对线性或仿射定型的支持. 随着主流语言获得了更丰富的类型系统, 实现会话类型已经变得更加容易. <a href="https://freest-lang.github.io/">FreeST</a> [4]是一个专为会话类型设计的函数式语言, 具有多态的上下文无关会话类型和丰富的高阶类型系统. 库的方式包括用于OCaml的<a href="https://github.com/boystrange/FuSe">FuSE</a> [3], 用于Haskell的<a href="https://github.com/wenkokke/priority-sesh">Priority Sesh</a> [2], 以及用于Rust的Ferrite [1]. 现在Haskell有了线性类型, 而Rust的语言中内置了仿射所有权, 因此Haskell和Rust的例子尤其自然.</p>
+    <h2>参考文献</h2>
+    <ol>
+      <li>Ruo Fei Chen, Stephanie Balzer, and Bernardo Toninho. Ferrite: A Judgmental Embedding of Session Types in Rust (Artifact). <i>Dagstuhl Artifacts Series</i>, 8(2):14:1&ndash;14:2, 2022.</li>
+      <li>Wen Kokke and Ornela Dardha. Deadlock-free session types in linear Haskell. In <i>Proceedings of the 14th ACM SIGPLAN International Symposium on Haskell</i>, pages 1&ndash;13, 2021.</li>
+      <li>Luca Padovani. A simple library implementation of binary sessions. <i>Journal of Functional Programming</i>, 27:e4, 2017.</li>
+      <li>Peter Thiemann and Vasco T. Vasconcelos. Context-free session types. In <i>Proceedings of the 21st ACM SIGPLAN International Conference on Functional Programming</i>, ICFP 2016, pages 462&ndash;475, New York, NY, USA, 2016. Association for Computing Machinery.</li>
+    </ol>
+  </body>
+</html>

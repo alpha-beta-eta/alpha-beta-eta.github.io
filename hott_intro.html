@@ -7,9 +7,9 @@
   <body>
     <h1>同伦类型论引论</h1>
     <h2>引论</h2>
-    <p>这是一本关于单价数学和同伦类型论的导引性质教科书. 同伦类型论是一种利用了数学定义和构造的结构性质的数学基础. 数学实践普遍将等价对象视为相同的, 例如, 将同构的群视作等同. 在集合论中并不可能形式化这一通常惯例. 例如, 集合论背景下存在多少不同的单元素集合就有多少不同的平凡群. 另一方面, 类型论采用了数学基础的一种更为结构化的方式, 其与单价公理兼容. 然而, 这要求我们重新思考两个对象相等的含义.</p>
+    <p>这是一本关于泛等数学和同伦类型论的导引性质教科书. 同伦类型论是一种利用了数学定义和构造的结构性质的数学基础. 数学实践普遍将等价对象视为相同的, 例如, 将同构的群视作等同. 在集合论中并不可能形式化这一通常惯例. 例如, 集合论背景下存在多少不同的单元素集合就有多少不同的平凡群. 另一方面, 类型论采用了数学基础的一种更为结构化的方式, 其与泛等公理兼容. 然而, 这要求我们重新思考两个对象相等的含义.</p>
     <h3>同伦类型论的起源</h3>
-    <p>同伦类型论大约在十年前浮出水面, 其沿着Awodey和Warren [3]对于Martin-Löf的依赖类型论的同伦解释 (而这也由Voevosky [25]独立发现), 以及Voevosky的单价公理 [26]继续前进. Martin-Löf的依赖类型论 [19]是数学的一种基础性语言, 用在了如今许多计算机证明助手之中.</p>
+    <p>同伦类型论大约在十年前浮出水面, 其沿着Awodey和Warren [3] 对于Martin-Löf的依赖类型论的同伦解释 (而这也由Voevosky [25] 独立发现), 以及Voevosky的泛等公理 [26] 继续前进. Martin-Löf的依赖类型论 [19] 是数学的一种基础性语言, 用在了如今许多计算机证明助手之中.</p>
     <p>在依赖类型论中存在着称为类型的原始对象和称为元素的原始对象. Martin-Löf的依赖类型论包含了诸多我们所熟悉的来源于传统数学的运算的类型形成规则, 例如积, 和, 以及归纳类型, 比如说自然数的类型. 其之所以被称为<em>依赖</em>类型论, 是因为类型和元素都可以由其他类型的元素参数化. {译注: 换言之, 可以依赖于类型的值.}</p>
     <p>Martin-Löf的依赖类型论的突出特征之一是<em>相等类型(identity type)</em>. 相等类型
       <math display="block">
@@ -22,6 +22,39 @@
         </mrow>
       </math>
       是依赖类型的一个例子, 因为其由两个元素<math><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>:</mo><mi>A</mi></mrow></math>参数化了. 相等类型的元素被称为identification, 而断言<math><mi>a</mi></math>和<math><mi>b</mi></math>是类型<math><mi>A</mi></math>的相等元素的类型论方式是断言相等类型<math><mrow><msub><mi mathvariant="sans-serif">Id</mi><mi>A</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>中存在一个元素. 换言之, 为了在类型论中证明两个元素<math><mi>a</mi></math>和<math><mi>b</mi></math>在类型<math><mi>A</mi></math>中相等, 我们不得不定义一个identification <math><mrow><mi>p</mi><mo>:</mo><mrow><msub><mi mathvariant="sans-serif">Id</mi><mi>A</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 因此, 通常将相等类型<math><mrow><msub><mi mathvariant="sans-serif">Id</mi><mi>A</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>记作<math><mrow><mi>a</mi><mo>=</mo><mi>b</mi></mrow></math>, 或者为了使得作为背景的类型显式化, 可以写成<math><mrow><mi>a</mi><msub><mo>=</mo><mi>A</mi></msub><mi>b</mi></mrow></math>.</p>
+    <p>相等类型的规则假定其是由以下的单一元素归纳生成的:
+      <math display="block">
+        <mrow>
+          <msub><mi mathvariant="sans-serif">refl</mi><mi>a</mi></msub>
+          <mo>:</mo>
+          <mrow><mi>a</mi>
+            <msub><mo>=</mo><mi>A</mi></msub>
+            <mi>a</mi></mrow>
+        </mrow>
+      </math>
+      其以<math><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow></math>参数化. 这产生了一个重要的疑问. 既然相等类型是一个类型, 那么任意两个元素<math><mrow><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo>:</mo><mi>A</mi></mrow></math>之间可能具有许多个identification <math><mrow><mi>p</mi><mo>:</mo><mrow><mi>a</mi><msub><mo>=</mo><mi>A</mi></msub><mi>b</mi></mrow></mrow></math>. 另一方面, 相等类型是由仅仅一个元素归纳生成的, 即由自反性生成的. 那么, 有没有可能使用相等类型的规则证明, 一个类型的任意两个元素之间的确最多只有一个identification?</p>
+    <p>类型论的先驱们早已意识到这似乎是不可能的. 但直到Hofmann和Streicher构造出Martin-Löf依值类型论的群胚模型 [15], 这个问题才有了定论. 在他们的模型中, 类型是群胚, 而群胚中两个对象之间的identification的类型, 就是它们之间的同构的集合. 群胚中两个对象之间可以有多个同构, 因此两个对象之间也可以有多个identification. 此外, 他们证明了在这一解释下, 相等类型确实满足<q>它由自反性归纳生成</q>这条规则. 换言之, 他们彻底驳倒了<q>相等类型至多只有一个元素</q>的想法. 这与通常的数学大不相同: 在通常的数学中, 一个集合的两个元素要么相等, 要么不相等. 在论文的末尾, 他们甚至设想, 是否可能用高阶群胚构造出一个类似的类型论模型. 但在当时, 高阶群胚的理论还很不成熟. 尽管如此, 舞台已经搭好, 类型论的同伦解释即将登场.</p>
+    <p>在类型论的同伦解释中, 我们把类型看作空间. 类型的元素是这些空间中的点, 而对于一个空间中的任意两点, 都有一个从一点到另一点的<em>路径空间</em>. 类似地, 对于一个类型中的任意两个元素, 都有一个从一个元素到另一个元素的<em>identification的类型</em>. 事实证明, 这种看待类型的方式非常富有成效. 它打开了重新思考数学基础的大门, 并让同伦论在其中占据显要的地位. 然而, 重要的是退一步, 问这样一个问题:
+      <blockquote>以类型论为基础的数学, 怎么可能与通常以集合论为基础的数学如此不同?</blockquote>
+      乍一看, 类型似乎和集合一样, 是装着东西的对象. 有自然数类型<math><mi>&Nopf;</mi></math>, 整数类型<math><mi>&Zopf;</mi></math>, 标准有限类型<math><msub><mi mathvariant="sans-serif">Fin</mi><mi>k</mi></msub></math>, 函数类型<math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math>和积类型<math><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow></math>. 它们和集合论中的对应物都没有太大区别. 自然数类型包含自然数; 类型<math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math>包含从<math><mi>A</mi></math>到<math><mi>B</mi></math>的函数; 类型<math><mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow></math>包含由元素<math><mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow></math>和<math><mrow><mi>b</mi><mo>:</mo><mi>B</mi></mrow></math>组成的序对<math><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 等等.</p>
+    <p>然而, 类型论和集合论有一个很大的区别: 在类型论中, 类型和元素是分开的实体, 而在经典集合论中有一个全局的属于关系. 集合论中的一切都是集合, 对于任意两个集合<math><mi>x</mi></math>和<math><mi>y</mi></math>, 我们都可以问命题<math><mrow><mi>x</mi><mo>&in;</mo><mi>y</mi></mrow></math>是否成立. 而在类型论中, 一边是被称为类型的东西, 另一边是被称为元素的东西. 此外, 类型论中的每个元素都有一个指定的类型. 例如, <math><mi mathvariant="sans-serif">true</mi></math>和<math><mi mathvariant="sans-serif">false</mi></math>被刻画为类型<math><mi mathvariant="sans-serif">bool</mi></math>的元素; 数<math><msub><mn>0</mn><mi>&Nopf;</mi></msub></math>, <math><msub><mn>1</mn><mi>&Nopf;</mi></msub></math>, <math><msub><mn>2</mn><mi>&Nopf;</mi></msub></math>等被刻画为为类型<math><mi>&Nopf;</mi></math>的元素; 后继函数<math><msub><mi mathvariant="sans-serif">succ</mi><mi>&Nopf;</mi></msub></math>是类型<math><mrow><mi>&Nopf;</mi><mo>&rarr;</mo><mi>&Nopf;</mi></mrow></math>的元素; identification <math><msub><mi mathvariant="sans-serif">refl</mi><mi>a</mi></msub></math>是类型<math><mrow><mi>a</mi><msub><mo>=</mo><mi>A</mi></msub><mi>a</mi></mrow></math>的元素. 换言之, Martin-Löf依值类型论中的类型不共享它们的元素.</p>
+    <p>在集合论中, 一个集合<math><mi>x</mi></math>由它与所有其他集合<math><mi>y</mi></math>之间的关系<math><mrow><mi>y</mi><mo>&in;</mo><mi>x</mi></mrow></math>唯一确定. 而类型论中的类型是由一小集类型形成运算构造出来的, 每个类型形成运算都带有一集结构规则, 规定如何构造该类型的元素, 以及如何使用该类型的元素. 设定上的这一简单改变, 对这个基础系统的运作方式有着深远的影响. 归根结底, 它为思考数学基础打开了新的大门, 其中就包括类型论的同伦解释.</p>
+    <p>首先, 事实证明, 追踪元素的类型对计算机来说极其有用. 大多数广泛使用的计算机证明助手, 如Agda, Coq或Lean, 都基于某种类型论. 由于每个元素都带有一个指定的类型, 计算机可以验证一个函数是否被应用到了类型正确的元素上, 以及它是否输出指定类型的元素. 这样的类型检查算法是每个证明助手的核心, 它们既可以用来验证数学构造的正确性, 也可以用来验证证明的正确性.</p>
+    <p>此外, 相等类型只比较同一类型中的元素. <q><math><mrow><mi mathvariant="sans-serif">true</mi><mo>=</mo><msub><mn>1</mn><mi>&Nopf;</mi></msub></mrow></math>是否成立</q>这种问题在类型论中根本没有意义, 因为<math><mi mathvariant="sans-serif">true</mi></math>是一个布尔值, 而<math><msub><mn>1</mn><mi>&Nopf;</mi></msub></math>是一个自然数. 然而, 如果相等类型只能比较相同类型中的两个元素, 我们怎么能指望证明两个类型是相同的呢? 借助宇宙就可以做到这一点. 宇宙是这样一种类型: 它的元素本身编码了类型. 给定同一个宇宙<math><mi mathvariant="script">U</mi></math>中的两个类型<math><mi>A</mi></math>和<math><mi>B</mi></math>, 我们可以问在宇宙<math><mi mathvariant="script">U</mi></math>中是否存在一个identification <math><mrow><mi>A</mi><msub><mo>=</mo><mi mathvariant="script">U</mi></msub><mi>B</mi></mrow></math>. 泛等公理给出了这个相等类型的刻画. 它断言, 类型之间的identification可以等价地描述为类型之间的等价: 对于同一个宇宙<math><mi mathvariant="script">U</mi></math>中的任意两个类型<math><mi>A</mi></math>和<math><mi>B</mi></math>, 都有一个等价
+      <math display="block">
+        <mrow>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>A</mi>
+              <msub><mo>=</mo><mi mathvariant="script">U</mi></msub>
+              <mi>B</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mo>&sime;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>A</mi><mo>&sime;</mo><mi>B</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      粗略地说, <math><mi mathvariant="script">U</mi></math>中<math><mi>A</mi></math>和<math><mi>B</mi></math>之间有多少个等价, 它们之间就有多少个identification. </p>
     <h2>第1章 依赖类型论</h2>
     <h2>第2章 依赖函数类型</h2>
     <h2>第3章 自然数</h2>

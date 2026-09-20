@@ -1,0 +1,414 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>deepseek harness笔记1</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>deepseek harness笔记1</h1>
+    <p><a href="dsh0.html">笔记0</a>给出了插件生命周期的核心模型和它的元理论, 最后把结果汇总成一个定理: 若服务满足规格, 插件满足义务, 系统就有安全, 活性, 恢复, 合流四层保证. 随后我们按这四层审计了npm上下载量最高的26个第三方dsh插件: 0个到第3层, 5个到第2层, 7个到第1层, 14个不在模型之内. 不在模型内的一部分是真正的bug (猴补丁, <code>globalThis</code>, <code>internal/*</code>钩子), 应当保持排除; 另一部分是模型缺了机制. 缺的主要有三样, 按影响的插件数排列:</p>
+    <ol>
+      <li><b>可选依赖</b>: 有就用, 没有不等. 过半插件读未注入的服务, 并按它在不在决定启动时登记什么.</li>
+      <li><b>编排者</b>: 插件市场, 自更新, bundle这类插件安装, 移除, 重启别的插件或自己.</li>
+      <li><b>交集生命期</b>: 效应挂在另一个fiber (如agent的上下文) 上, 任一方结束即撤销.</li>
+    </ol>
+    <p>本文给出这三项扩展, 每项都说明规则, 插件的义务, 以及在义务之下哪几层保证仍然成立. 三项都和核心隔离: 核心的规则和定理不改动, 扩展只单向依赖核心. 做法是把扩展的每一步归约为核心的一步: 要么就是核心在某张按状态选定的组件表下的一步, 要么是一个不碰服务状态, 也不碰累加器的簿记步. 核心的定理都对任意组件表陈述, 所以单步的结论 (保持性, 顺序, 进展) 直接搬过来, 只有核心没有的步需要新的证明.</p>
+    <p>术语和记号沿用笔记0. 扩展在Rocq中形式化 (cordis-rocq仓库的<code>theories/Ext/</code>), 对应关系见<cite>第<a href="#sec-rocq">7</a>章</cite>; 可运行的原型是<code>programs/cordis3.rkt</code>, 下面的例子都取自它.</p>
+    <h2 id="sec-opt">第1章 可选依赖</h2>
+    <p>审计中最常见的写法是这样的:</p>
+    <pre><code>const llm = ctx.get('llm')   // 没有 inject
+if (llm) { ... 登记 A ... } else { ... 登记 B ... }</code></pre>
+    <p>作者这样写, 是为了在缺少<code>llm</code>的宿主上不停在PENDING. 但核心模型只有必需依赖, <code>ctx.get</code>读未声明的服务不在保证范围之内; 而且<code>llm</code>此刻在不在取决于它的提供者是否恰好先激活, 所以登记了什么取决于调度, 合流不成立.</p>
+    <div class="definition" id="def-xcomp"><b>定义1.1. </b>带可选依赖的组件由以下部分组成: 必需依赖<math><mrow><mi>xdeps</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 可选依赖<math><mrow><mi>xopt</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 可能提供的键<math><mrow><mi>xprovs</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 事件处理器, 以及启动程序
+      <math display="block">
+        <mrow>
+          <mrow><mi>xbody</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>:</mo>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>K</mi><mo>&rarr;</mo><mi>Bool</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&rarr;</mo><mi>Prog</mi></mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      它按<q>哪些可选依赖在场</q>选择变体.</div>
+    <div class="definition" id="def-present"><b>定义1.2. </b>状态<math><mi>&gamma;</mi></math>下组件<math><mi>c</mi></math>的<b>在场集</b><math><mrow><msub><mi>present</mi><mi>&gamma;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>是<math><mrow><mi>xopt</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>中当前可见 (提供者Active) 的键, 按声明的顺序排列.</div>
+    <p>语义的关键是在场集变化时怎么办. 我们规定: fiber在开始加载时取定在场集<math><mi>S</mi></math>, 运行变体<math><mrow><mrow><mi>xbody</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&isin;</mo><mi>S</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>; 在场的可选依赖进入它的视图, 程序可以在其上执行操作. 加载中或Active的fiber, 只要当前的在场集不再等于<math><mi>S</mi></math>, 就中途放弃或离开, 之后按新的在场集重新加载. 出现和消失两个方向都重载. 若出现时不重载, 终态中的<math><mi>S</mi></math>就取决于提供者是否恰好先激活, 合流必然失败. 可选依赖从不阻止激活: fiber是否运行只取决于必需依赖.</p>
+    <div class="definition" id="def-xrules"><b>定义1.3. </b>扩展的规则如下, 未列出的标签都是核心规则.
+      <ul>
+        <li><b><math><mrow><mi>X-Begin</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若<math><mi>n</mi></math>是<math><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">None</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 则<math><mi>n</mi></math>先取<math><mrow><mi>S</mi><mo>=</mo><mrow><msub><mi>present</mi><mi>&gamma;</mi></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 再走核心的<math><mi>L-Begin</mi></math>.</li>
+        <li><b><math><mrow><mi>X-Step</mi><mspace width="2ex"/><mi>n</mi></mrow></math></b>: 若在场集仍是<math><mi>S</mi></math>, 则走核心的<math><mi>L-Step</mi></math> (核心目标改变后, 剩下的迭代照样可以落地, 见<a href="dsh0.html">笔记0</a>; 在场集改变之后的落地不在扩展之内).</li>
+        <li><b><span><math><mrow><mi>X-Divert</mi><mspace width="2ex"/><mi>n</mi></mrow></math>, <math><mrow><mi>X-Leave</mi><mspace width="2ex"/><mi>n</mi></mrow></math></span></b>: 若核心的<math><mi>L-Divert</mi></math>或<math><mi>L-Leave</mi></math>可走, 或者在场集已不是<math><mi>S</mi></math>, 则<math><mi>n</mi></math>进入<math><mi>Unloading</mi></math>.</li>
+      </ul>
+    </div>
+    <p>这些规则可以直接读成核心规则. 让fiber的组件是二元组<math><mrow><mo stretchy="false">(</mo><mrow><mi>c</mi><mo>,</mo><mi>S</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 即基组件和它开始加载时的在场集, 核心的组件表取</p>
+    <math display="block">
+      <mrow>
+        <mrow><mi>deps</mi><mo>&af;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>c</mi><mo>,</mo><mi>S</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mo>=</mo>
+        <mrow>
+          <mrow><mi>xdeps</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>++</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>S</mi><mo>&cap;</mo>
+              <mrow><mi>xopt</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </mrow>
+      <mtext>,</mtext></math>
+    <math display="block">
+      <mrow>
+        <mrow><mi>body</mi><mo>&af;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>c</mi><mo>,</mo><mi>S</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+        <mo>=</mo>
+        <mrow><mi>lift</mi><mo>&af;</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow><mi>xbody</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mo>&isin;</mo><mi>S</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </mrow>
+      <mtext>,</mtext></math>
+    <p>提供的键与<math><mi>S</mi></math>无关, <math><mi>lift</mi></math>把程序中spawn的组件<math><msup><mi>c</mi><mo>&prime;</mo></msup></math>记为<math><mrow><mo stretchy="false">(</mo><mrow><msup><mi>c</mi><mo>&prime;</mo></msup><mo>,</mo><mi>[]</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 事件处理器列表中的每一项<math><msup><mi>c</mi><mo>&prime;</mo></msup></math>同样记为<math><mrow><mo stretchy="false">(</mo><mrow><msup><mi>c</mi><mo>&prime;</mo></msup><mo>,</mo><mi>[]</mi></mrow><mo stretchy="false">)</mo></mrow></math>. 于是:</p>
+    <div class="theorem" id="thm-xcore"><b>定理1.4. </b>扩展的每一步是以下三者之一: 核心在上述组件表下的一步; 给一个Inactive的fiber换上当前的在场集, 再走核心的<math><mi>L-Begin</mi></math>; 核心的<math><mi>O-Restart</mi></math>. 没有任何可选依赖时 (每个fiber记下的在场集都为空), 扩展的每一步就是核心的一步.</div>
+    <p>第三种情况对应<q>可选依赖出现了, 核心目标却没有变</q>: fiber此时未被请求移除, 否则核心目标已是⊥, 走的是核心的<math><mi>L-Divert</mi></math>或<math><mi>L-Leave</mi></math>. 换组件只发生在Inactive的fiber上, 而核心的良构性只在fiber已安装时读它的依赖, 所以换组件保持良构性. 原型里这一点更直接: 在场的可选依赖记在视图中, 在场集一变, 视图就与应有的视图不符, 核心已有的<q>视图不符就卸载</q>规则自然使fiber重载.</p>
+    <div class="definition" id="def-xobl"><b>定义1.5. </b>带可选依赖的组件表满足义务, 如果
+      <ol>
+        <li><b>有界</b>: 每个变体的每条路径都不超过某个界;</li>
+        <li><b>有秩</b>: 有一个有界的秩, 沿提供, spawn, 事件处理器, <em>以及可选依赖</em>的边严格递增;</li>
+        <li><b>完整提供</b>: <em>每个</em>变体到达<math><mi>Done</mi></math>的每条路径都提供组件可能提供的全部键.</li>
+      </ol>
+    </div>
+    <p>有秩一条蕴涵组件不把自己提供的键列为自己的可选依赖, 否则它的秩严格小于自己. 这正是需要的: 否则fiber一激活, 自己就出现在自己的在场集里, 随即重载, 撤回, 再加载, 无限循环. 两个互为可选依赖的组件同理.</p>
+    <div class="theorem" id="thm-opt"><b>定理1.6. </b>设组件表满足<cite>定义<a href="#def-xobl">1.5</a></cite>的义务, 服务满足笔记0中相应层的规格.
+      <ol>
+        <li><b>安全</b> (不需要义务): 扩展执行可达的状态都良构, 因而笔记0中的顺序性质 (提供者比依赖者活得久, 整个卸载等依赖者离开等) 都成立.</li>
+        <li><b>活性</b>: 从可达状态出发, 扩展的生命周期步没有无限执行; 没有扩展规则可用时, 状态按核心的意义是稳定的, 并且每个Active的fiber的在场集都是当前的.</li>
+        <li><b>恢复</b> (服务可撤销): 笔记0的恢复精确性对任意扩展执行成立.</li>
+        <li><b>合流</b> (服务可合流, 并且被spawn或作为处理器运行的组件不声明可选依赖): 两次扩展执行若编排输入留下的基组件按插入次序排成的序列相同, 终于静止且没有失败的fiber, 则把Inactive的fiber过时的在场集换成终态的在场集之后, 两个终态在重命名意义下一致; 对应的Active的fiber运行同一个变体.</li>
+      </ol>
+    </div>
+    <p>证明的要点按层说.</p>
+    <ul>
+      <li><b>安全</b>由<cite>定理<a href="#thm-xcore">1.4</a></cite>和换组件保持良构性得到.</li>
+      <li><b>进展</b>要用核心的<q>静止即稳定</q>. 它要求子fiber的组件是父组件的程序可能spawn的, 而给子fiber换上在场集之后, 它的组件<math><mrow><mo stretchy="false">(</mo><mrow><msup><mi>c</mi><mo>&prime;</mo></msup><mo>,</mo><msup><mi>S</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">)</mo></mrow></math>不再字面地等于父程序中的<math><mrow><mo stretchy="false">(</mo><mrow><msup><mi>c</mi><mo>&prime;</mo></msup><mo>,</mo><mi>[]</mi></mrow><mo stretchy="false">)</mo></mrow></math>. 办法是换一张组件表: 它与<math><msup><mi>prog</mi><mo>&prime;</mo></msup></math>只差在事件处理器列表上, 把当前状态中子fiber的组件都列进去. 生命周期规则不读事件处理器列表, 所以两张表走同样的生命周期步, 而这张表满足核心的前提.</li>
+      <li><b>终止</b>需要新的度量. 核心的度量读核心目标, 而可选依赖刚出现的fiber核心目标没变, 却必须重载. 新的度量形状与核心相同, 只改两处: 加载中或Active的fiber算作<q>在目标上</q>, 要求在场集仍是当前的且核心目标等于它的视图; 卸载将尽或Inactive的fiber会不会再加载, 按它换上当前在场集之后的目标判断. 一个fiber的一步, 不改变秩不高于它的fiber所读的键 (必需的和可选的) 的可见性, 因而也不改变它们的在场集; 这里用到秩沿可选边递增. 于是按秩分层的度量向量仍然按字典序下降.</li>
+      <li><b>恢复</b>: 换组件不碰存储, 也不碰任何累加器, 所以保持核心的影子不变式; 其余步都是核心步.</li>
+      <li><b>合流</b>的核心是: 静止时一个fiber是Active, 当且仅当它没有被请求移除, 且它的<em>必需</em>依赖都由Active的fiber提供. 否则它是<math><mrow><mi>Inactive</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">None</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 而换上当前在场集之后它的目标可解析, <math><mi>X-Begin</mi></math>可走, 与静止矛盾. 这个不动点方程只涉及基组件, 沿秩只有一个解, 所以两个终态的Active集合相同; 在场集由Active集合读出, 所以也相同. 服务状态一层沿用笔记0的理想轨迹; 含spawn时, 规范名的秩归纳只改根的情形: 两个对应的根起初只知道基组件相同, 在场集相同由更低秩上的对应得到, 因为每个可选键的提供者秩更低.</li>
+    </ul>
+    <div class="remark" id="rem-child"><b>评注1.7. </b>合流要求子组件不声明可选依赖, 原因在笔记0的理想轨迹不变式: 它按组件的完整值检查父fiber spawn出的子fiber, 而父程序里写死的spawn目标是<math><mrow><mo stretchy="false">(</mo><mrow><msup><mi>c</mi><mo>&prime;</mo></msup><mo>,</mo><mi>[]</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 子fiber的组件却要记下它的在场集. 两者不可兼得, 换编码也绕不过去. 去掉这一限制要把这条检查改为按基组件比较, 并重证沿执行保持它的部分. 这一限制只影响合流; 审计中读可选服务的多是顶层插件.</div>
+    <div class="example" id="ex-assistant"><b>例子1.8. </b>组件assistant可选依赖llm. 有llm时它往llm登记自己, 并提供用llm的summarize; 没有时提供退化的summarize. 两个变体都提供skills. 先装assistant, 后装llm时, 原型的记录是:<pre><code>实例 25 (插件 assistant) 开始加载, 依赖 (服务 . 编号): (), 在场的可选依赖: ()
+...
+实例 28 (插件 llm) 开始加载, 依赖 (服务 . 编号): ()
+提供 llm (编号 29)
+加载完毕 -> active
+实例 25 (插件 assistant) 开始卸载, 原因: 依赖变化, 原视图 (), 现在应为 ((llm . 29)); 在场的可选依赖从 () 变为 (llm)
+...
+实例 25 (插件 assistant) 开始加载, 依赖 (服务 . 编号): ((llm . 29)), 在场的可选依赖: (llm)</code></pre>按相反的顺序安装则一开始就选用llm的变体. 两种顺序 (以及随机的调度) 终于同一个状态. 再移除llm时, llm的卸载被守卫挡住, assistant先卸载, 撤掉它在llm上登记的一项, 再按退化的变体加载.</div>
+    <h2 id="sec-orch">第2章 编排者</h2>
+    <p>审计中有6到7个插件本质上是编排者: 插件市场装卸插件, 插件自更新, bundle装配一组子插件. 它们装上的插件不随编排者卸载而消失: 安装写在配置里, 下次启动仍在. 这与spawn不同, spawn出的子fiber是父fiber的效应. 所以编排者不建模为父fiber, 而是建模为<b>输入源</b>: 它发出编排输入 (插入, 移除, 重启, 重置), 按插入序号指称根fiber, 交给笔记0中与生命周期步交错的执行. 它依据的状态是外部持久的配置, 不是服务. 这一项扩展不加任何规则.</p>
+    <div class="definition" id="def-orch"><b>定义2.1. </b>编排者的义务:
+      <ol>
+        <li><b>只编排根</b>: 只对插入的根fiber发移除, 重启, 重置, 从不直接移除启动时spawn的子fiber. 输入按插入序号指称, 这一条是内建的.</li>
+        <li><b>有限</b>: 在一次会话中只发出有限多个输入.</li>
+        <li><b>结果确定</b>: 存活的组件 (按多重集) 只由配置决定, 不由调度决定.</li>
+        <li><b>不在启动中自我重启</b>: 自更新放在反应中, 或交给loader.</li>
+      </ol>
+    </div>
+    <p>此外还有一条要求, 它在模型之外: 编排要经loader的条目进行.改loader条目再由loader协调, 或者经宿主的<code>pluginManager.installBundle</code>, <code>hmr.reconcileProfile()</code> (它们先装包, 再由loader按配置重组条目), 都在模型内; <code>internal/*</code>钩子, 给自己进程发SIGTERM, 自己清模块缓存热替换自己, 则是在修改运行时本身.</p>
+    <div class="theorem" id="thm-orch"><b>定理2.2. </b>编排执行本身就是演算的一次执行, 所以笔记0汇总定理的前三层对它成立, 不需要额外的义务; 活性一层说的是最后一个输入之后. 对合流: 设两次编排执行留下的存活组件是同一个多重集, <em>顺序可以不同</em>, 都终于静止且没有失败的fiber, 则存在存活位置的一个置换, 按它给第二次执行的根重新标号之后, 两个终态在重命名意义下一致.</div>
+    <p>笔记0中与编排交错的合流要求存活组件的顺序也相同. 去掉这一要求的证明很短: 两个列表互为排列, 就有一个单射把一边的位置送到另一边; 两边的位置是同一个有限集, 有限集到自身的单射即满射; 用它给根标号, 其余交给笔记0中与执行方式无关的终态比较. 插件市场按下载完成的任意顺序安装同一组插件, 终态一致, 这正是论文5.2.1节对loader的说法: <q>whatever instantiations and retirements the loader performs on the way, and in whatever order</q>, 系统都停在从头加载最终配置所得的状态.</p>
+    <div class="example" id="ex-update"><b>例子2.3. </b>自更新是移除旧版本, 再插入新版本. 次序要紧: 旧版本还在时插入新版本被拒绝, 因为两者提供同一个键; 必须等旧版本卸载并被移除 (它的依赖者先行卸载), 再插入新版本. 这与论文4.4节的修订一致: 退役, 让生命周期规则卸载, 移除, 再重新插入. 原型的测试检查了终态与直接安装新版本相同.</div>
+    <h2 id="sec-inter">第3章 交集生命期</h2>
+    <p>插件P给agent A的上下文挂一个效应, 例如限制A可用的工具, 要求P与A任一方结束时撤销. 审计中的插件都用私有的表手工回收, 常常只处理一个方向: 有的只在agent结束时释放, 插件卸载时就泄漏了.</p>
+    <p>核心已经能表达这件事. 效应做成P的反应子fiber; 它声明依赖A的条目键<math><mrow><mi>entry</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math> (笔记0中<q>条目即键</q>的编码). P结束时, 它先等运行期子fiber退出; A结束时, A离开Active, 子fiber的目标变为⊥, 子fiber卸载. 而且只要子fiber还解析着A的条目, A的卸载就整体停住, 一项也不撤 (笔记0中卸载的守卫<math><mi>held</mi></math>). 所以效应总在A的上下文的任何部分拆除之前撤销.</p>
+    <p>核心缺的只有一样: agent是运行时的数据, 而事件处理器是静态的列表, 不能为每个agent列一个组件.</p>
+    <div class="definition" id="def-ireact"><b>定义3.1. </b>事件处理器可以是一族<math><mrow><mi>E</mi><mo>&rarr;</mo><mi>C</mi></mrow></math>, 其中<math><mi>E</mi></math>是事件载荷 (如agent的编号). 标签<math><mrow><mi>I-React</mi><mspace width="2ex"/><mi>n</mi><mspace width="2ex"/><mi>i</mi><mspace width="2ex"/><mi>e</mi></mrow></math>运行<math><mi>n</mi></math>的第<math><mi>i</mi></math>个处理器族在<math><mi>e</mi></math>处的实例; 它就是核心的<math><mrow><mi>O-React</mi><mspace width="2ex"/><mi>n</mi><mspace width="2ex"/><mi>i</mi></mrow></math>, 只是用的组件表把处理器族实例化在<math><mi>e</mi></math>处. 其余标签都是核心规则, 用不带处理器的组件表.</div>
+    <p>两张表只差在处理器列表上, 而除<math><mi>O-React</mi></math>外没有规则读它. 一族处理器的实例各是一个组件, 这与论文4.4节<q>一个组件绑定两个载荷就是两个组件</q>是同一个想法; 区别在于论文的载荷在插入时绑定 (配置), 这里在反应时绑定.</p>
+    <div class="theorem" id="thm-inter"><b>定理3.2. </b>设组件表 (含每个处理器实例) 有界, 且秩沿提供, spawn和<em>每个处理器实例</em>严格递增.
+      <ol>
+        <li><b>安全与包含</b> (不需要假设): 可达状态都良构; 已安装的fiber的生命期在它的父fiber, 以及它解析的每个提供的提供者的生命期之内; 只要有别的fiber还解析着一个Unloading的fiber的某个提供, 后者既不撤销任何一项, 也不请子fiber退出.</li>
+        <li><b>活性</b>: 生命周期步没有无限执行, 静止即稳定.</li>
+        <li><b>恢复</b> (服务可撤销): 一个效应, 从它的fiber出现之前到它不再安装之后 (agent结束, 插件卸载, 或被直接移除), 每个绑定都<math><mo>&simeq;</mo></math>同一次执行中略去它的全部操作所得的结果, 不论别的fiber同时做了什么.</li>
+      </ol>
+    </div>
+    <p>合流不在其中, 这与笔记0一样: 合流不含运行期的反应. 恢复所需的独立性对任意两个组件 (含任意处理器实例) 可能在同一键上执行的操作陈述, 这本来就遍历所有组件; 同一处理器族的不同实例两两相遇受控, 通常由登记名带上agent编号得到. 活性的证明与可选依赖一样换一张组件表: 它的处理器列表含当前这一步的实例和现存子fiber的组件.</p>
+    <div class="example" id="ex-agent"><b>例子3.3. </b>agent3提供键<code>(agent 3)</code>; guard的处理器是restrict这一族, restrict3依赖<code>(agent 3)</code>并在其中登记一项. guard以载荷3反应之后移除agent3, 原型的记录是:<pre><code>实例 35 (插件 agent3) 开始卸载, 原因: 被要求移除
+实例 38 (插件 restrict3) 开始卸载, 原因: 依赖变化, 原视图 (((agent 3) . 37)), 现在有依赖不可用
+撤销 (agent 3) (编号 37) 上的一次操作 (令牌 39)
+卸载完毕 -> inactive (正常卸载)
+撤销提供 (agent 3) (编号 37)</code></pre>agent3开始卸载之后, 只要restrict3还解析着它, agent3就一步也走不了; 限制先撤销, agent3才撤回自己的上下文. 若改为移除guard, 限制随guard撤销并移除, agent3照常运行, 上下文完整.</div>
+    <p>限制撤销之后, 子fiber停在Inactive, 直到插件卸载才被移除; 若同一编号的agent重建, 它会重新加载. dsh的agent编号不复用, 所以这不会发生; 需要一次性的语义时, 插件在<q>agent结束</q>的处理器里移除这个子fiber即可, 不必加规则.</p>
+    <h2 id="sec-xsummary">第4章 汇总</h2>
+    <p>仿照笔记0的汇总定理, 下表列出每项扩展对组件表 (或编排者) 的义务换来哪几层保证. 服务一侧沿用笔记0的两档规格: 可撤销与可合流.</p>
+    <table align="center" border="1" style="border-collapse: collapse;">
+      <tr>
+        <th>层</th>
+        <th>可选依赖</th>
+        <th>编排者</th>
+        <th>交集生命期</th>
+      </tr>
+      <tr>
+        <td>0 安全</td>
+        <td>无假设</td>
+        <td>无假设</td>
+        <td>无假设; 另有包含性质</td>
+      </tr>
+      <tr>
+        <td>1 活性</td>
+        <td>有界, 秩含可选边</td>
+        <td>笔记0的义务; 输入有限</td>
+        <td>有界, 秩含处理器实例</td>
+      </tr>
+      <tr>
+        <td>2 恢复</td>
+        <td>可撤销</td>
+        <td>可撤销</td>
+        <td>可撤销</td>
+      </tr>
+      <tr>
+        <td>3 合流</td>
+        <td><span>可合流; 每个变体完整提供; 子组件无可选依赖</span></td>
+        <td><span>可合流; 存活组件相同, 顺序不限</span></td>
+        <td>不覆盖</td>
+      </tr>
+    </table>
+    <p>下一章按这张表重新给审计过的26个插件分层.</p>
+    <h2 id="sec-regrade">第5章 按扩展重新分层</h2>
+    <p>审计按笔记0的四层给26个插件打过分, 也估计过每个插件按怎样的升级路径能到哪一层; 其中8个插件只有等模型扩展之后才有希望进入模型. 有了三项扩展, 我们逐个重看: 哪项扩展适用, 要满足什么前提, 在原有的升级路径之外再用上扩展能到哪一层. 逐条证据 (文件与行号) 在cordis-rocq仓库的<code>docs/PLUGIN-AUDIT.md</code>及其<code>docs/plugin-audit/</code>目录里.</p>
+    <p>判断时有几条要点.</p>
+    <ul>
+      <li><b>可选依赖只解决时机</b>. 分支若取决于文件, 网络, 环境变量或端口就绪的时刻, 重载帮不上, 仍然算外部世界.</li>
+      <li><b>编排是否在模型内, 看走哪条路</b>. 改loader的条目再由loader协调, 或者经宿主的<code>pluginManager.installBundle</code>, <code>updateBundle</code>, <code>hmr.reconcileProfile()</code>, 都在模型内: 后几个先装包, 再由loader按配置停止, 替换, 启动条目. <code>internal/*</code>钩子, 给自己进程发SIGTERM, 自己清模块缓存再热替换自己, 直接移除启动时spawn的子fiber, 都在模型外.</li>
+      <li><b>自更新拆成两半</b>: 下载新版本属于外部世界; 让新版本生效应当是loader对条目的重启或替换.</li>
+      <li><b>插件自己创建的agent不算交集生命期</b>: 效应的生命期就是插件的, 核心的子fiber已经够用.</li>
+    </ul>
+    <p>下表中<q>原估计</q>是扩展之前审计估计的可达层, <q>现在</q>是再用上扩展之后的可达层, 加粗的是可达层或覆盖范围变了的. 那8个插件的原估计本来就以扩展为前提, 所以其中多数数字不变, 变的是扩展部分现在已经证明. <q>启动部分</q>的第3层指合流对不含运行期反应的执行成立, 与笔记0相同.</p>
+    <table align="center" border="1" style="border-collapse: collapse;">
+      <tr>
+        <th>插件</th>
+        <th>用到的扩展</th>
+        <th>前提与剩余障碍</th>
+        <th>原估计</th>
+        <th>现在</th>
+      </tr>
+      <tr>
+        <td>dsh-token-diet</td>
+        <td>可选依赖</td>
+        <td>按connection在不在二选一传输; 拆成两个inject子fiber会在两者都在时都登记, 改变行为; 可选依赖正好表达二选一, 不必改行为</td>
+        <td>3</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>dsh-agent-compare</td>
+        <td>可选依赖</td>
+        <td>启动时按agents或subagents二选一runner; 两者都不在时不能抛错, 否则失败的fiber不会因依赖出现而重载</td>
+        <td>3</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>dsh-remote</td>
+        <td>三项</td>
+        <td>/remote命令按commands在不在登记; 每个agent上的工具限制; 自热重载要改为经loader; 原估计把限制作例外, 现在限制留在0–2层内</td>
+        <td>3</td>
+        <td><b>启动部分3</b></td>
+      </tr>
+      <tr>
+        <td>dsh-skills-manager</td>
+        <td>交集生命期, 可选依赖</td>
+        <td>每个agent上登记的skill provider改为依赖agent条目键的反应子fiber; 启动部分可到3</td>
+        <td>2</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>dsh-onebot-qq</td>
+        <td>编排者</td>
+        <td>设置经configEditor改写自己的条目再重启, 是经loader的编排</td>
+        <td>2</td>
+        <td><b>3</b></td>
+      </tr>
+      <tr>
+        <td>dsh-qqbot</td>
+        <td>编排者, 可选依赖</td>
+        <td>写cordis.patch.yml由loader热重载; 需约定唯一的审批拦截者; 凭据来自配置与环境变量</td>
+        <td>2</td>
+        <td><b>对固定环境3</b></td>
+      </tr>
+      <tr>
+        <td>dsh-im</td>
+        <td>编排者</td>
+        <td>自更新改为下载加经loader重启; 去掉父fiber对子fiber的等待; 通道按本地文件启动</td>
+        <td>2</td>
+        <td><b>对固定环境3</b></td>
+      </tr>
+      <tr>
+        <td>dshmarket</td>
+        <td>编排者, 可选依赖</td>
+        <td>改条目, 在处理器中热挂载插件 (即反应子fiber), 经hmr.reconcileProfile的自更新都在模型内; 须去掉internal/plugin钩子, SIGTERM, 子进程装卸, 启动后自动重装; 原来只有组件部分到2</td>
+        <td>2</td>
+        <td><b>2</b></td>
+      </tr>
+      <tr>
+        <td>dsh-mnemon</td>
+        <td>编排者, 交集生命期</td>
+        <td>bundle经loader的group; 每个agent上的钩子改为反应子fiber; 须去掉internal/config钩子与CLI安装; 原来只有本体到2</td>
+        <td>2</td>
+        <td><b>2</b></td>
+      </tr>
+      <tr>
+        <td>dsh-free-search</td>
+        <td>编排者</td>
+        <td>改写web条目必须只在值不同时写, 否则自我触发, 违反输入有限; 不再改别人的服务实例; 自升级经loader; 编排部分已在模型内</td>
+        <td>2, 固定环境3</td>
+        <td>同左</td>
+      </tr>
+      <tr>
+        <td>ds-harness-remote</td>
+        <td>编排者, 可选依赖</td>
+        <td>自更新经pluginManager; 按connection条件provide违反每个变体完整提供; 换服务器时移除启动期效应</td>
+        <td>2</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>dsh-ops</td>
+        <td>交集生命期</td>
+        <td>五处agent.ctx.plugin与每个agent的工具限制改为反应子fiber; 仍需宿主提供tools/change事件; 扩展部分已证</td>
+        <td>2</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>dsh-windows-mcp</td>
+        <td>交集生命期</td>
+        <td>每个agent的工具限制在插件卸载时泄漏, 改为反应子fiber后两个方向都撤销; 另需修丢弃的路由disposer; 扩展部分已证</td>
+        <td>2</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>dsh-mobile-plugin</td>
+        <td>可选依赖 (到第2层)</td>
+        <td>唯一依赖时机的分支在被spawn的子组件里; 换代时移除自己spawn的子fiber; 仍需宿主的路由分发原语</td>
+        <td>1到2</td>
+        <td>1到2</td>
+      </tr>
+      <tr>
+        <td>dsh-prime-memory</td>
+        <td>可选依赖</td>
+        <td>settings的挂载时机由重载解决, 不再需要internal/service; 数据目录属外部世界</td>
+        <td>2</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td><span>dsh-image-gen, dsh-whale-widget, dsh-plugin-wallpaper-engine</span></td>
+        <td>可选依赖</td>
+        <td>为兼容旧宿主而软读的服务声明成可选依赖; 第3层的障碍是外部世界</td>
+        <td>不变</td>
+        <td>不变</td>
+      </tr>
+      <tr>
+        <td><span>其余8个</span></td>
+        <td>无</td>
+        <td>障碍是猴补丁, globalThis, internal/*, 泄漏, 撞名或外部世界, 三项扩展都不涉及</td>
+        <td>不变</td>
+        <td>不变</td>
+      </tr>
+    </table>
+    <p>汇总起来:</p>
+    <ul>
+      <li><b>第3层多了3个</b>: dsh-onebot-qq无条件; dsh-qqbot要先约定唯一的审批拦截者, dsh-im要先去掉对子fiber的等待, 两者都只对固定的外部环境合流. 它们原来都卡在<q>编排者</q>, 而它们的编排本来就经loader的条目.</li>
+      <li><b>原来要等扩展的8个中有6个可以到第2层</b>, 扩展部分都已证明: dshmarket与dsh-mnemon从只覆盖一部分扩大到整个插件, dsh-free-search与ds-harness-remote靠编排者, dsh-ops与dsh-windows-mcp靠交集生命期.</li>
+      <li><b>可选依赖</b>让dsh-token-diet不必改行为就到第3层, 让dsh-prime-memory不再需要<code>internal/service</code>; 对多数插件, 它把<q>为兼容旧宿主而软读</q>变成正式的声明.</li>
+      <li><b>仍要宿主新增原语</b>的: dsh-mobile-plugin (路由分发与换代), dsh-cost-meter (计费事件), dsh-ops (<code>tools/change</code>), dsh-context (工具所有者查询). 交集生命期还要宿主把agent的上下文暴露成键, 事件带上agent的编号.</li>
+      <li><b>剩下的主要障碍是外部持久的世界</b>: 配置, 凭据, 缓存, 日志不属于上下文, 恢复精确性只对上下文陈述; B类插件第3层的障碍大多是它, 这一项还没有写进模型.</li>
+    </ul>
+    <p>审计文件中有五处原来没写清, 已按插件的发布包和宿主的源码逐一复核. dsh-agent-compare的runner确实在启动时选; <code>pluginManager</code>的装包接口先装包, 再由loader按配置重组条目, 所以经它的编排在模型内, dshmarket的自更新同理; dsh-mnemon移动的只是已禁用的配置行, 不涉及运行中的fiber; dsh-windows-mcp直接改写配置文件, 由下次启动执行, 但绕过了插件管理器的文件锁; dsh-im对<code>connection</code>的检查是对必需依赖接口形状的检查, 不是存在性的分支. 复核之后各插件的可达层不变, 只有dsh-agent-compare的第3层多了上表中的那个前提.</p>
+    <h2 id="sec-xpaper">第6章 与论文的关系</h2>
+    <p>论文 (arXiv:2608.25512v1) 4.4节给出四个扩展: 异步, 失败, 隔离, 配置. 它们在笔记0的核心中已有对应, 都不是本文的三项. 重合与互补在这几处:</p>
+    <ul>
+      <li>论文5.2.1节说, 由定理80, loader不论以什么顺序实例化和退役, 系统都停在从头加载最终配置的状态. 笔记0中与编排交错的合流要求存活组件顺序相同, 覆盖不到<q>任意顺序</q>; <cite>定理<a href="#thm-orch">2.2</a></cite>补上了这一点.</li>
+      <li>论文4.4节的修订 (退役, 卸载, 移除, 重新插入) 就是<cite>例子<a href="#ex-update">2.3</a></cite>中的自更新; 论文在同一名字上重新插入, 这里用新的名字, 合流本来就在重命名意义下成立.</li>
+      <li>论文说组件修改自己的配置或禁用自己时, 改动写回它的条目. 这与把编排者建模为依据持久配置的输入源一致; 论文没有讨论插件本身充当编排者时的义务.</li>
+      <li>交集生命期依赖论文同样采用的L-Unload守卫: 效应在agent上下文的任何部分拆除之前撤销, 正是因为整个卸载被守卫停住.</li>
+      <li>可选依赖是论文没有覆盖的. 论文5.1.4节的代理访问对未声明的键抛<code>UNDECLARED_ACCESS</code>, 而<code>ctx.get</code>从不失败; 审计中读可选服务的写法正是绕道<code>ctx.get</code>. 论文5.2.1节说, 组件只在部分配置下装上它声明的键时, 加载结果也随这些配置而定; 这对应于可选依赖要求每个变体都完整提供.</li>
+    </ul>
+    <h2 id="sec-rocq">第7章 Rocq对应</h2>
+    <p>文件都在cordis-rocq仓库的<code>theories/Ext/</code>下, 核心不引用它们.</p>
+    <table align="center" border="1" style="border-collapse: collapse;">
+      <tr>
+        <th>本文</th>
+        <th>Rocq</th>
+        <th>文件</th>
+      </tr>
+      <tr>
+        <td><cite>定理<a href="#thm-xcore">1.4</a></cite></td>
+        <td><code>xstep_core, xstep_conservative</code></td>
+        <td><code>Optional.v</code></td>
+      </tr>
+      <tr>
+        <td><span><cite>定理<a href="#thm-opt">1.6</a></cite> 安全</span></td>
+        <td><code>wf_recomp, xwf_reachable</code></td>
+        <td><code>Optional.v</code></td>
+      </tr>
+      <tr>
+        <td><span><cite>定理<a href="#thm-opt">1.6</a></cite> 活性</span></td>
+        <td><code>xquiet_settled, xtermination</code></td>
+        <td><span><code>OptProgress.v</code>, <code>OptTermination.v</code></span></td>
+      </tr>
+      <tr>
+        <td><span><cite>定理<a href="#thm-opt">1.6</a></cite> 恢复</span></td>
+        <td><code>xrecovery_exact</code></td>
+        <td><code>OptRecovery.v</code></td>
+      </tr>
+      <tr>
+        <td><span><cite>定理<a href="#thm-opt">1.6</a></cite> 合流</span></td>
+        <td><code>xcontrol_confluence, xstate_confluence, xspawn_confluence, xdynamic_agree</code></td>
+        <td><span><code>OptConfluence.v</code>, <code>OptState.v</code>, <code>OptSpawn.v</code>, <code>OptDynamic.v</code></span></td>
+      </tr>
+      <tr>
+        <td><cite>定理<a href="#thm-orch">2.2</a></cite></td>
+        <td><code>orch_wf, orch_live, orch_recovery, dynamic_agree_perm</code></td>
+        <td><code>Orchestrator.v</code></td>
+      </tr>
+      <tr>
+        <td><cite>定理<a href="#thm-inter">3.2</a></cite></td>
+        <td><code>iwf_reachable, effect_within, unload_blocked_i, iquiet_settled, ieffect_exact, itermination</code></td>
+        <td><span><code>Intersect.v</code>, <code>IntersectLive.v</code></span></td>
+      </tr>
+      <tr>
+        <td><cite>第<a href="#sec-xsummary">4</a>章</cite></td>
+        <td><code>xsum_*, osum_confluence, isum_*</code></td>
+        <td><code>ExtSummary.v</code></td>
+      </tr>
+      <tr>
+        <td><span><cite>例子<a href="#ex-assistant">1.8</a></cite>, <cite>例子<a href="#ex-agent">3.3</a></cite></span></td>
+        <td><code>OptEx, AgentEx</code></td>
+        <td><code>Examples.v</code></td>
+      </tr>
+    </table>
+    <p>可选依赖的合流和<cite>定理<a href="#thm-xcore">1.4</a></cite>的保守性 (<code>xstep_conservative</code>) 用到核心已引入的函数外延性, 其余定理不依赖任何公理.</p>
+  </body>
+</html>

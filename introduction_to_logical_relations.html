@@ -1,0 +1,118 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>逻辑关系引论</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>逻辑关系引论</h1>
+    <h2>第1章 引论</h2>
+    <p>逻辑关系这一术语源自Gordon Plotkin于1973年撰写的备忘录<em>Lambda-definability and logical relations</em>. 然而, 这一证明方法的精神可以追溯到William W. Tait, 他在1967年使用该方法证明了System T的强规范化性质.</p>
+    <p>名称是一件有趣的事情. 当我说<q>椅子</q>时, 你脑海中会立刻浮现出一把椅子的画面. 如果我说<q>桌子</q>, 你就会想象一张桌子. 你之所以会这样做, 是因为我们用<q>椅子</q>来指代椅子, 用<q>桌子</q>来指代桌子, 但我们完全可以用<q>长颈鹿</q>来表示椅子, 用<q>佛陀</q>来表示桌子. 当我们遇到一个由已知词汇组合而成的新词时, 很自然地会尝试通过组合各组成部分的含义来推断其意思. 假设我们第一次遇到<q>桌布 (tablecloth)</q>这个词, 如果我们知道<q>桌子 (table)</q>和<q>布 (cloth)</q>分别指代什么, 就可以猜到它是一块铺在桌子上的布. 然而, 这种方法并不总是奏效. 例如, <q>摩天大楼 (skyscraper)</q>并不是一个用来刮擦天空的刮刀 (scraper). 逻辑关系也是如此, 试图从名称的各个组成部分中寻找含义可能是一种徒劳. 逻辑关系确实是关系, 所以名称中的这一部分是合理的. 它们的定义方式也与逻辑有些许相似之处, 但仅仅从名称的各个部分来理解逻辑关系并不能帮助你真正理解它们. 一个更贴切的名称或许是<q>类型索引归纳关系 (Type Indexed Inductive Relations)</q>. 不过, <q>逻辑关系</q>已经是一个广为接受的名称, 而且更容易说出口, 所以我们将沿用它 (毕竟没有人会接受用<q>长颈鹿</q>来指代椅子).</p>
+    <p>本文的大部分内容基于Amal Ahmed在2015年俄勒冈编程语言暑期学校上的系列讲座.</p>
+    <h3>第1.1节 简单类型lambda演算</h3>
+    <p>我们用来呈现逻辑谓词和逻辑关系的语言是简单类型lambda演算 (STLC). 在第一节中, 它将以其基本形式使用, 之后当我们研究新的构造和特性时, 它将作为基础语言使用. 在后文中, 我们将默认省略说明所扩展的基础语言是STLC. STLC的定义见图1.</p>
+    <p>对于不熟悉推理规则的读者: 一条规则
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow><mi>A</mi><mspace width="8ex"/><mi>B</mi></mrow>
+          <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+        </mfrac>
+      </math>
+      读作如果<math><mi>A</mi></math>和<math><mi>B</mi></math>的确如此, 那么我们就可以得出<math><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow></math>. 这意味着应用的定型规则
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <msub><mi>e</mi><mn>1</mn></msub>
+                  <mo>:</mo>
+                  <mrow>
+                    <msub><mi>&tau;</mi><mn>2</mn></msub>
+                    <mo>&rarr;</mo><mi>&tau;</mi></mrow>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <msub><mi>e</mi><mn>2</mn></msub>
+                  <mo>:</mo>
+                  <msub><mi>&tau;</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>e</mi><mn>1</mn></msub>
+                  <mspace width="2ex"/>
+                  <msub><mi>e</mi><mn>2</mn></msub>
+                </mrow>
+                <mo>:</mo><mi>&tau;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mtext class="small-caps">T-App</mtext></mrow>
+      </math>
+      是说当<math><msub><mi>e</mi><mn>2</mn></msub></math>在定型上下文<math><mi mathvariant="normal">&Gamma;</mi></math>下有着类型<math><msub><mi>&tau;</mi><mn>2</mn></msub></math>而<math><msub><mi>e</mi><mn>1</mn></msub></math>在<math><mi mathvariant="normal">&Gamma;</mi></math>下有着类型<math><mrow><msub><mi>&tau;</mi><mn>2</mn></msub><mo>&rarr;</mo><mi>&tau;</mi></mrow></math>时应用<math><mrow><msub><mi>e</mi><mn>1</mn></msub><mspace width="2ex"/><msub><mi>e</mi><mn>2</mn></msub></mrow></math>有着类型<math><mi>&tau;</mi></math>.</p>
+    <h3>第1.2节 逻辑关系</h3>
+    <p>逻辑关系是一种证明方法, 可以用来证明以特定编程语言写成的程序的性质. 编程语言性质的证明通常以定型或者求值判断上的归纳进行. 逻辑关系添加了非直接的层次, 通过构造具有我们所感兴趣的性质的程序的集合. {译注: 这是幺元关系, 或者说谓词.} 接下来我们将会更仔细地检视这一点. 作为动机, 以下是可由逻辑关系证明的诸多性质:
+      <ul>
+        <li>终止性 (强规范化)</li>
+        <li>类型安全性</li>
+        <li>程序等价
+          <ul>
+            <li>程序正确性</li>
+            <li>表示独立性</li>
+            <li>参数性和免费定理, 例如
+              <math display="block">
+                <mrow><mi>f</mi><mo>:</mo>
+                  <mrow><mo>&forall;</mo><mi>&alpha;</mi><mo lspace="0">.</mo>
+                    <mrow><mi>&alpha;</mi><mo>&rarr;</mo><mi>&alpha;</mi></mrow>
+                  </mrow>
+                </mrow>
+              </math>
+              该程序无法检视<math><mi>&alpha;</mi></math>, 因为其不知道它将会是哪个类型, 于是<math><mi>f</mi></math>必然是恒等函数.
+              <math display="block">
+                <mrow><mo>&forall;</mo><mi>&alpha;</mi><mo lspace="0">.</mo>
+                  <mrow><mi>int</mi><mo>&rarr;</mo><mi>&alpha;</mi></mrow>
+                </mrow>
+              </math>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </p>
+    <h3>第1.3节 逻辑关系的范畴</h3>
+    <h2>第2章 简单类型lambda演算的规范化</h2>
+    <h3>第2.1节 STLC的强规范化</h3>
+    <h3>第2.2节 练习</h3>
+    <h2>第3章 STLC的类型安全性</h2>
+    <h3>第3.1节 类型安全&mdash;&mdash;经典处理</h3>
+    <h3>第3.2节 类型安全&mdash;&mdash;使用逻辑谓词</h3>
+    <h3>第3.3节 练习</h3>
+    <h2>第4章 全称类型和关系替换</h2>
+    <h3>第4.1节 System F (具有全称类型的STLC)</h3>
+    <h3>第4.2节 System F的性质: 免费定理</h3>
+    <h3>第4.3节 上下文等价</h3>
+    <h3>第4.4节 System F的一种逻辑关系</h3>
+    <h3>第4.5节 可计算性引理</h3>
+    <h3>第4.6节 练习</h3>
+    <h2>第5章 存在类型</h2>
+    <h3>第5.1节 具有存在类型的STLC</h3>
+    <h3>第5.2节 例子</h3>
+    <h3>第5.3节 逻辑关系</h3>
+    <h2>第6章 递归类型和步骤索引</h2>
+    <h3>第6.1节 具有递归类型的简单类型lambda演算</h3>
+    <h3>第6.2节 一种步骤索引逻辑谓词</h3>
+    <h3>第6.3节 练习</h3>
+    <h2>第7章 引用和世界</h2>
+    <h3>第7.1节 具有引用的STLC</h3>
+    <h3>第7.2节 具有引用的STLC之性质</h3>
+    <h3>第7.3节 逻辑谓词</h3>
+    <h3>第7.4节 安全性证明</h3>
+    <h3>第7.5节 练习</h3>
+    <h3>第7.6节 深入阅读</h3>
+    <h2>附录A: Landin之结</h2>
+  </body>
+</html>

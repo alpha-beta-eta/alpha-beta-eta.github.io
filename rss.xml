@@ -4,16 +4,15 @@
     <link>https://alpha-beta-eta.github.io/</link>
     <description>愚者的主页, 关于逻辑, 语言, 计算.</description>
     <item>
-      <title>Linear Algebra (Hoffman &amp; Kunze) 翻译</title>
-      <link>linear_algebra.html</link>
-      <description>对于线性代数书籍Hoffman &amp; Kunze的翻译, 目前已完成了前8章.</description>
-      <pubDate>Wed, 18 Sep 2024 19:41:36 -0400</pubDate>
+      <title>Hoare逻辑</title>
+      <link>hoare.html</link>
+      <description>剑桥CST Part II课程的学习材料的翻译, 介绍Floyd和Hoare提出的程序规约与证明的经典思想, 并讲述机械化程序验证, 可靠性和完备性, 完全正确性, 程序精化, 以及指针和局部推理.</description>
     </item>
     <item>
-      <title>Lectures on the Curry-Howard Isomorphism翻译</title>
-      <description>这是一本关于Curry-Howard同构的逻辑学书籍, 深入浅出. 目前我还没有翻译多少.</description>
-      <link>curry-howard.html</link>
-      <pubDate>Sun, 21 Jan 2024 21:16:21 +0800</pubDate>
+      <title>Linear Algebra (Hoffman &amp; Kunze) 翻译</title>
+      <link>hoffman.html</link>
+      <description>对于线性代数书籍Hoffman &amp; Kunze的翻译.</description>
+      <pubDate>Wed, 18 Sep 2024 19:41:36 -0400</pubDate>
     </item>
     <item>
       <title>关于数组语言的随想</title>

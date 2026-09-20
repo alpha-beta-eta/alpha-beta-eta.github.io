@@ -8717,6 +8717,10 @@ let lhs eq = fst(dest_eq eq) and rhs eq = snd(dest_eq eq);;</code></pre></p>
     <h3>第6.7节 一阶导出规则</h3>
     <h3>第6.8节 通过推理进行一阶证明</h3>
     <h3>第6.9节 交互式证明风格</h3>
+    <p>我们似乎已经具备了实现本章开头所设想的交互式定理证明之梦的关键组件. 我们可以用推理规则交互地构造和修改定理, 也可以用<code>lcffol</code>之类的东西自动补全简单的步骤. 然而, 这仍然有点痛苦, 因为Hilbert风格的证明系统在利用假设进行推理方面不太方便. 自然演绎系统要好得多, 因为我们可以局部地把<math><mi>p</mi></math>用作假设来帮助我们推出<math><mi>q</mi></math>, 然后应用蕴涵引入规则 (见6.3节) 推出<math><mrow><mi>p</mi><mo>&rArr;</mo><mi>q</mi></mrow></math>. 此外, 有时向后 (自顶向下) 工作更方便: 把目标分解为更简单的子目标, 而不是从假设出发向前推进.</p>
+    <h4>策略</h4>
+    <p>无论是改用另一种演绎系统, 还是把向前证明和向后证明混合起来, 在LCF风格的定理证明器中都可以借助策略 (tactic) 的思想非常优雅地实现, 这一思想源自Milner (Gordon, Milner and Wadsworth 1979). 这一思想可以有不同的实现方式, 我们这里介绍的做法接近最初的LCF. 我们先定义目标 (goal) 的概念: 目标由一个想要得到的<q>结论</q>公式<math><mi>q</mi></math>和一集合假设<math><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>p</mi><mi>n</mi></msub></mrow></math>组成, 每个假设都可以起一个名字, 以便引用.</p>
+    <p>从直觉上来说, 一个目标对应于定理<math><mrow><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>&and;</mo><mo>&ctdot;</mo><mo>&and;</mo><msub><mi>p</mi><mi>n</mi></msub></mrow><mo>&rArr;</mo><mi>q</mi></mrow></math>; 若<math><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow></math>, 则对应于<math><mrow><mi>&top;</mi><mo>&rArr;</mo><mi>q</mi></mrow></math>, 其逻辑等价于<math><mi>q</mi></math>. </p>
     <h3>第6.10节 深入阅读</h3>
     <p>交互式定理证明, 乃至面向人类的证明, 在教科书中几乎没有得到任何涉及. 究其原因, 主要在于这些内容不易以某套标准定理与方法的形式加以阐述; 或许在一定程度上, 它们也被认为缺乏足够的学术吸引力. 不过, Reeves和Clarke (1990) 所著的<q>Logic for Computer Science</q>教材中包含了对交互式定理证明的讨论, Paulson (1991) 关于SML程序设计的书中也给出了一个较为详尽的示例. MacKenzie (2001) 记述了交互式定理证明的历史及其应用, 而Wiedijk (2006) 则是对若干主要交互式定理证明器的综述, 展示了各系统中对<math><msqrt><mn>2</mn></msqrt></math>无理性的证明.</p>
     <p>然而, 关于特定交互式系统的书籍为数不少, 其中许多属于LCF家族. Gordon, Milner和Wadsworth (1979) 所著的第一本关于Edinburgh LCF的书描述了其最初的创新思想, Paulson (1987) 则介绍了Cambridge LCF&mdash;&mdash;一个组织结构经过大幅优化的版本. Constable (1986), Gordon和Melham (1993) 以及Paulson (1994) 分别描述了源自LCF的证明器 Nuprl, HOL与Isabelle. Boyer和Moore (1979) 讨论了NQTHM, 即Boyer-Moore证明器&mdash;&mdash;尽管其自动化程度很高, 但就通常的使用方式而言, 仍可视为一个交互式系统. ACL2是一个基于类似原理的更现代的系统 (Kaufmann, Manolios和Moore 2000).</p>

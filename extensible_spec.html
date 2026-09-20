@@ -6,23 +6,3975 @@
   </head>
   <body>
     <h1>可扩展指称性语言描述</h1>
-    <p>当前状态: 试译, 以机翻为主.</p>
     <h2>摘要</h2>
-    <p>传统的指称语义为同一个phrase赋予截然不同的意义, 具体取决于编程语言的其余部分. 如果语言是纯函数式的, 一个numeral的指称是从环境到整数的函数. 但在具有命令式控制算子的函数式语言中, 一个numeral的指称是从环境和延续到整数的函数. 本文引入了一种新的格式用于指称性语言描述, 即<em>扩展直接语义</em>, 它能够容纳语言的正交扩展, 而无需改变既有phrase的指称. 扩展直接语义始终将一个numeral映射到相同的指称: 即将相应的数字inject到值域中. 一般而言, 一个phrase在函数式语言中的指称始终是同一phrase在一个扩展语言的语义中的指称的投影&mdash;&mdash;不论扩展是什么. 基于扩展直接语义, 还可以通过组合语言片段的解释器来构造完整语言的解释器.</p>
-    <h2>第1章 复杂语言的指称性描述</h2>
-    <p>像Scheme [25], Common LISP [32] 或ML [19] 这样的编程语言, 由一个丰富的函数式核心组成, 并辅以对数据对象的destructive operation, 控制构造, 以及可能的其他命令式算子. 传统的指称性语言描述 [1, 15, 27, 35] 通过将程序phrase解释为从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi><mo>&times;</mo><mi>continuations</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的函数来应对这些构造. 然而, 程序员在推理程序phrase时依赖的是更简单的语义描述. 大多数程序phrase并不利用语言的全部一般性, 因此可以用更简单的语义模型来分析. 例如, 如果一个程序phrase是纯函数式的, 且其自由变量始终绑定到无副作用的过程, 那么它可以被解释为从<math><mi>environments</mi></math>到<math><mi>values</mi></math>的函数. 类似地, 如果一个命令式程序phrase不使用像<span><code>callcc</code>, <code>goto</code>, <code>catch</code></span>这样的一般性控制算子, 且其自由变量始终绑定到满足相同约束的值和过程, 那么它可以被解释为从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的函数. 遗憾的是, 实际编程语言的指称定义所采用的形式使得很难为一个有纪律的子集提取出简化的定义&mdash;&mdash;更不用说证明这些定义在受限语言上是等价的了.</p>
-    <p>描述同一问题的另一种方式是观察当语言被扩展时, 像numeral <code>5</code>这样的简单程序phrase的意义会发生什么变化. 在函数式语言中, numeral <code>5</code>的指称正是程序员所期望的: 一个从环境到整数<math><mn>5</mn></math>的函数. 但如果我们向语言中添加引用单元 (reference cell), <code>5</code>就变成指称一个从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的常函数. 此外, 如果我们再添加控制算子 (如<code>goto</code>或<code>callcc</code>), <code>5</code>的意义就变成了一个从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi><mo>&times;</mo><mi>continuations</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的常函数. 指称语义的这一恼人性质在语言研究者中是众所周知的. 事实上, 在最近的一篇综述论文中, Peter Mosses [23] 指出, 这一现象一直是指称语义作为定义编程语言的实用工具被广泛接受的主要障碍.</p>
-    <h2>第2章 可扩展的操作语义</h2>
-    <h2>第3章 可扩展的指称性描述</h2>
-    <h3>第3.1节 语义框架: 扩展了的直接语义</h3>
-    <h3>第3.2节 纯Scheme</h3>
-    <h3>第3.3节 状态Scheme</h3>
-    <h3>第3.4节 控制Scheme</h3>
+    <p>传统的指称语义 (denotational semantics) 根据编程语言的其余部分, 给同一个句法成分 (phrase) 赋予截然不同的含义. 如果语言是纯函数式的, 数码 (numeral) 的指称是从环境到整数的函数. 但在带有命令式控制算子 (imperative control operator) 的函数式语言中, 数码指称从环境和延续 (continuation) 到整数的函数. 本文引入一种新的指称式语言描述 (specification) 格式, 即<em>扩展直接语义 (extended direct semantics)</em>, 它容许语言的正交扩展, 且不改变已有句法成分的指称. 扩展直接语义总是把数码映射到同一个指称: 相应的数字到值的domain中的嵌入 (injection). 一般而言, 函数式语言中一个句法成分的指称, 总是同一句法成分在扩展语言的语义中的指称的投影 (projection), 无论扩展是什么. 基于扩展直接语义, 还可以通过组合语言片段的解释器来构造完整语言的解释器.</p>
+    <h2>第1章 复杂语言的指称规格</h2>
+    <p>像Scheme [25], Common LISP [32] 或ML [19] 这样的编程语言, 由一个丰富的函数式核心组成, 并辅以对数据对象的破坏性操作 (destructive operation), 控制构造 (control construct), 以及可能的其他命令式算子. 传统的指称式语言规格 [1, 15, 27, 35] 通过把程序句法成分解释为将<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi><mo>&times;</mo><mi>continuations</mi></mrow></math>映射到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的函数, 来应对这些构造. 然而, 程序员在对程序句法成分进行推理时, 依赖更简单的语义描述. 大多数程序句法成分并不利用语言的全部一般性, 从而允许用更简单的语义模型来分析它们的语义. 例如, 如果一个程序句法成分是纯函数式的, 并且它的自由变量总是绑定到无效应 (effect-free) 的过程, 那么它可以被解释为将<math><mi>environments</mi></math>映射到<math><mi>values</mi></math>的函数. 类似地, 如果一个命令式程序句法成分不使用像<code>callcc</code>, <code>goto</code>或<code>catch</code>这样的一般控制算子, 并且它的自由变量总是绑定到符合同一约束的值和过程, 那么它可以被解释为将<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi></mrow></math>映射到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的函数. 不幸的是, 实用编程语言的指称定义被写成这样一种形式, 它使得为一个规范的 (disciplined) 子集提取简化的定义变得困难&mdash;&mdash;更不用说证明这些定义在受限的语言上是等价的.</p>
+    <p>描述同一问题的另一种方式, 是观察当一个语言被扩展时, 像数码<code>5</code>这样的简单程序句法成分的含义会发生什么. 在函数式语言中, 数码<code>5</code>指称程序员所期望的东西: 一个从环境到整数<math><mn>5</mn></math>的函数. 但如果我们向语言添加引用单元 (reference cell), <code>5</code>指称一个从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的常函数. 此外, 如果我们添加控制算子 (例如<code>goto</code>或<code>callcc</code>), <code>5</code>的含义变为一个从<math><mrow><mi>environments</mi><mo>&times;</mo><mi>stores</mi><mo>&times;</mo><mi>continuations</mi></mrow></math>到<math><mrow><mi>values</mi><mo>&times;</mo><mi>stores</mi></mrow></math>的常函数. 指称语义的这一恼人性质在语言研究者中是众所周知的. 实际上, 在最近的一篇综述论文中, Peter Mosses [23] 论证了, 这一现象一直是指称语义被接受为定义编程语言的实用工具 (vehicle) 的一大障碍.</p>
+    <p>在本文中, 我们展示如何把指称定义表述为这样一种形式, 它保持重要的语言子集 (例如函数式核心) 的简单语义. 为指定子集给出的简化定义是一般定义的投影. 指称定义的新形式由一个平凡的<em>基础 (base)</em>定义和一系列<em>扩展 (extension)</em>组成. 基础定义描述一个恰有两个程序的平凡语言: <math><mi>&bottom;</mi></math>, 它总是发散, 以及<code>err</code>, 它总是中止并报告一个错误. 这些扩展都符合同一个模式 (schema).</p>
+    <p>该模式关键地依赖于完整程序与嵌套程序句法成分之间的区别. 完整程序被看作一个与外部世界 (例如文件系统) 交互, 并且影响全局资源 (例如存储) 的主体 (agent). 一个中央权威 (central authority) 管理这些资源. 程序句法成分的含义是一个<em>计算 (computation)</em>, 它可以是一个<em>值 (value)</em>或一个<em>效应 (effect)</em>. 如果一个程序句法成分的含义是一个<em>效应</em>, 它被传播到中央权威. 传播过程向效应包 (effect package) 添加一个函数, 使得中央权威可以恢复被挂起的算术. 我们把效应包的这一组成部分称为<em>句柄 (handle)</em>, 因为它提供了对该包的来源地的访问.</p>
+    <p>中央权威通过函数<code>admin</code>实现. 它执行由效应指定的<em>动作 (action)</em>. 动作可以修改资源, 可以检查资源而不改变它们, 或者可以简单地中止程序执行. 一旦动作被执行, 管理者 (administrator) 就提取<em>效应</em>的<em>句柄</em>部分, 并在必要时调用它. <em>句柄</em>接着执行<em>效应</em>的<em>动作</em>之后剩余的任何计算. 因此, 在顶层, 句柄大致是一个常规的延续.</p>
+    <p>把一个语言扩展表述到我们的框架中, 需要描述四个组成部分:
+      <ul>
+        <li>对该扩展的新句法构造子 (syntactic constructor) 的声明;</li>
+        <li>对由该扩展产生的新<em>值</em>, <em>资源 (resource)</em>和<em>动作</em>的domain的定义;</li>
+        <li>对每个新句法构造子在意义函数 (meaning function) <math><mi mathvariant="script">M</mi></math>中的新子句 (clause) 的定义;</li>
+        <li>对新动作在函数<code>admin</code>中的新子句的定义.</li>
+      </ul>
+    </p>
+    <p>本质上, 语言扩展是通过向意义函数<math><mi mathvariant="script">M</mi></math>添加描述一个新构造的实例指称什么<em>值</em>或<em>效应</em>的子句来确定的. 函数<code>admin</code>中的新子句确定<em>动作</em>如何被解释为对<em>资源</em>的变换.</p>
+    <p>在第2章中, 我们基于我们先前关于操作语义的工作来引出 (motivate) 我们的指称框架. 我们用第3章来阐明我们组织指称定义的新方法, 方式是把<b>Scheme (Core ML)</b>的一个理想化方言呈现为对一个平凡基础语言的若干扩展之和. 接下来, 我们在第4章中展示如何利用这一新技术来编写模块化的解释器. 在第5章中, 我们讨论两条相关工作的路线. 附录A定义了domain方程的记号; 附录B包含实现中未在第4章中解释的部分.</p>
+    <h2>第2章 可扩展操作语义</h2>
+    <p>我们的可扩展语义规格框架背后的直觉, 来源于把<math><mi>&lambda;</mi></math>演算的操作语义推广到带有异常, 第一级延续和赋值的完备的Scheme风格编程语言 [9, 10, 11, 12]. 这些语义的扩展是保守的, 意思是扩展语言的归约关系是原始归约关系的超集. 更确切地说, 核心语言的归约关系只是在更大的句法上被解释, 除此之外并未改变. 新的语言设施 (linguistic facility) 通过添加新的归约来解释.</p>
+    <p>我们通过考察一个简单的函数式编程语言Pure Scheme, 来阐明我们的可扩展操作语义框架. <cite>图<a href="#pure-scheme">2.1</a></cite>包含Pure Scheme的句法和归约语义的完整规格. Pure Scheme的项语言包含数值常量, 布尔常量和函数常量, 变量, <math><mi>&lambda;</mi></math>抽象 (用户定义的过程), <math><mi mathvariant="monospace">if</mi></math>表达式, 以及应用. 表达式<math><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>e</mi></mrow><mo stretchy="false">)</mo></mrow></math><em>绑定</em><math><mi>e</mi></math>中的<math><mi>x</mi></math>. 不被外围的<math><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo></mrow></math>绑定的变量<math><mi>x</mi></math>的出现是<em>自由的</em>. 一个表达式是<em>封闭的</em>, 如果它不包含自由变量. 如果<math><mi>e</mi></math>和<math><msup><mi>e</mi><mo>&prime;</mo></msup></math>是表达式, 其中<math><mi>x</mi></math>可能在<math><mi>e</mi></math>中自由出现, 那么<math><mrow><mi>e</mi><mrow><mo stretchy="false">[</mo><mrow><mi>x</mi><mo lspace="0" rspace="0">/</mo><msup><mi>e</mi><mo>&prime;</mo></msup></mrow><mo stretchy="false">]</mo></mrow></mrow></math>是把<math><mi>e</mi></math>中<math><mi>x</mi></math>的所有自由出现替换为<math><msup><mi>e</mi><mo>&prime;</mo></msup></math>, 而不捕获后者中的自由变量的结果.</p>
+    <div class="fig" id="pure-scheme"><b>图2.1. </b><b>[Pure Scheme及其归约语义]</b>
+      <p><b>句法</b>
+        <math display="block">
+          <mtable columnalign="right center left left">
+            <mtr>
+              <mtd><mi>c</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow><mn>0</mn><mo>|</mo><mn>1</mn><mo>|</mo>
+                  <mrow><mo>&minus;</mo><mn>1</mn></mrow>
+                  <mo>|</mo><mn>2</mn><mo>|</mo>
+                  <mrow><mo>&minus;</mo><mn>2</mn></mrow>
+                  <mo>|</mo><mo>&hellip;</mo></mrow>
+              </mtd>
+              <mtd><mtext>(数码)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">true</mi><mo>|</mo><mi mathvariant="monospace">false</mi></mrow>
+              </mtd>
+              <mtd><mtext>(布尔值)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>f</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">zero?</mi><mo>|</mo><mi mathvariant="monospace">add1</mi><mo>|</mo><mi mathvariant="monospace">sub1</mi></mrow>
+              </mtd>
+              <mtd><mtext>(数值函数)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>v</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow><mi>c</mi><mo>|</mo><mi>f</mi></mrow>
+              </mtd>
+              <mtd><mtext>(常量)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd><mi>x</mi></mtd>
+              <mtd><mtext>(变量)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(抽象)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>e</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd><mi>v</mi></mtd>
+              <mtd><mtext>(值)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(分支)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>e</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(应用)</mtext></mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>辅助句法</b> (求值上下文)
+        <math display="block">
+          <mtable columnalign="right center left left">
+            <mtr>
+              <mtd><mi>E</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow/>
+                  <mo stretchy="false">]</mo></mrow>
+              </mtd>
+              <mtd><mtext>(洞)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>E</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(求值函数位置)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>v</mi><mspace width="2ex"/><mi>E</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(求值实参位置)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/><mi>E</mi><mspace width="2ex"/><mi>e</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(求值测试位置)</mtext></mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>标准归约</b>
+        <math display="block">
+          <mtable width="100%" columnalign="right center left left right">
+            <mtr>
+              <mtd>
+                <mrow><mi>E</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>f</mi><mspace width="2ex"/><mi>v</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&xrarr;</mo></mtd>
+              <mtd>
+                <mrow><mi>E</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow><mi>&delta;</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>f</mi><mo>,</mo><mi>v</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd>
+                <mrow><mtext>如果</mtext>
+                  <mrow><mi>&delta;</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>f</mi><mo>,</mo><mi>v</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mtext>有定义</mtext></mrow>
+              </mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo><mi>&delta;</mi><mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>E</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>e</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mspace width="2ex"/><mi>v</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&xrarr;</mo></mtd>
+              <mtd>
+                <mrow><mi>E</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow><mi>e</mi>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow><mi>x</mi><mo lspace="0" rspace="0">/</mo><mi>v</mi></mrow>
+                        <mo stretchy="false">]</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>&beta;</mi><mi>v</mi></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>E</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/><mi mathvariant="monospace">true</mi><mspace width="2ex"/>
+                        <msub><mi>e</mi><mn>1</mn></msub>
+                        <mspace width="2ex"/>
+                        <msub><mi>e</mi><mn>2</mn></msub>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&xrarr;</mo></mtd>
+              <mtd>
+                <mrow><mi>E</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <msub><mi>e</mi><mn>1</mn></msub>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo><mtext>iftrue</mtext><mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>E</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/><mi mathvariant="monospace">false</mi><mspace width="2ex"/>
+                        <msub><mi>e</mi><mn>1</mn></msub>
+                        <mspace width="2ex"/>
+                        <msub><mi>e</mi><mn>2</mn></msub>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&xrarr;</mo></mtd>
+              <mtd>
+                <mrow><mi>E</mi>
+                  <mrow><mo stretchy="false">[</mo>
+                    <msub><mi>e</mi><mn>2</mn></msub>
+                    <mo stretchy="false">]</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo><mtext>iffalse</mtext><mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>常量解释</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow><mi>&delta;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">zero?</mi><mo>,</mo><mn>0</mn></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd><mi mathvariant="monospace">true</mi></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>&delta;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">zero?</mi><mo>,</mo>
+                      <mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd><mi mathvariant="monospace">false</mi></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>&delta;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">add1</mi><mo>,</mo><mi>n</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>&delta;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">sub1</mi><mo>,</mo><mi>n</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>n</mi><mo>&minus;</mo><mn>1</mn></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+    </div>
+    <p>Pure Scheme的归约语义确定了一个从程序到值的部分函数, 其中程序是一个封闭表达式. 有两个<em>值</em>的集合: 过程和常量. 遵循<math><mi>&lambda;</mi></math>演算的传统, <math><mi>eval</mi></math>函数的规格基于标准归约函数的传递闭包. 后者是这样一种归约, 它把任何非值划分为一个<em>求值上下文</em>和一个可约式 (redex), 归约该可约式, 并用缩约式 (contractum) 填充求值上下文的洞. 求值上下文是一种特殊的上下文. 求值上下文中洞的位置确定了接下来必须对哪个子项求值. 因此, 一个语言的求值上下文集合的定义确定了求值的顺序.</p>
+    <p>在Pure Scheme这一函数式语言中, 在可约式被归约为值之前, 它的求值上下文不起任何作用. 例如, 表达式<math><mrow><mi>E</mi><mrow><mo stretchy="false">[</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">add1</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mn>0</mn><mspace width="2ex"/><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mi mathvariant="monospace">true</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">]</mo></mrow></mrow></math>归约为<math><mrow><mi>E</mi><mrow><mo stretchy="false">[</mo><mn>1</mn><mo stretchy="false">]</mo></mrow></mrow></math>, 无论<math><mi>E</mi></math>是什么. 更一般地, (带递归的) 数学语言中的所有 (封闭) 表达式要么产生一个值, 要么发出一个错误信号, 要么发散. 因此, 指称语义可以把这样一种语言中的表达式映射到数字, 布尔值, 函数, 错误或底 (bottom).</p>
+    <p>一旦Pure Scheme被扩展为带有ML风格引用单元的语言 (见<cite>图<a href="#state-scheme">2.2</a></cite>), 封闭表达式的归约就可能产生一个<q>卡住的表达式 (stuck expression)</q>, 它未来的行为依赖于并影响程序的其他部分. 考虑以下表达式:
+      <math display="block">
+        <mrow><mo stretchy="false">(</mo>
+          <mrow><mi mathvariant="monospace">ref</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>x</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo stretchy="false">)</mo></mrow>
+        <mtext>.</mtext></math>
+      它是一个封闭表达式, 它不发散, 不是值, 而且不影响上下文就不能被归约为值. 我们把这样的结果称为<em>效应</em>.</p>
+    <div class="fig" id="state-scheme"><b>图2.2. </b><b>[State Scheme及其归约语义]</b>
+      <p><b>附加句法</b>
+        <math display="block">
+          <mtable columnalign="right center left left">
+            <mtr>
+              <mtd><mi>e</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">ref</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(引用分配)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">!</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(引用解引用)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>e</mi><mspace width="2ex"/><mo>&colone;</mo><mspace width="2ex"/><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(引用更新 (中缀))</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>s</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <msup>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>,</mo><mi>v</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                  <mo>&#8270;</mo></msup>
+              </mtd>
+              <mtd><mtext>(存储 (标识符-值绑定))</mtext></mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>附加辅助句法</b>
+        <math display="block">
+          <mtable columnalign="right center left left">
+            <mtr>
+              <mtd><mi>E</mi></mtd>
+              <mtd><mo>&Colone;</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">ref</mi><mspace width="2ex"/><mi>E</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(求值子表达式)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="monospace">!</mi><mspace width="2ex"/><mi>E</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(求值子表达式)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>E</mi><mspace width="2ex"/><mo>&colone;</mo><mspace width="2ex"/><mi>e</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(求值地址位置)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>|</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>v</mi><mspace width="2ex"/><mo>&colone;</mo><mspace width="2ex"/><mi>E</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mtd>
+              <mtd><mtext>(求值值位置)</mtext></mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>标准归约</b>
+        <math display="block">
+          <mtable width="100%" columnalign="right center left left right">
+            <mtr>
+              <mtd>
+                <mrow><mi>s</mi><mspace width="2ex"/>
+                  <mrow><mi>E</mi>
+                    <mrow><mo stretchy="false">[</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">ref</mi><mspace width="2ex"/><mi>v</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">]</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&xrarr;</mo></mtd>
+              <mtd>
+                <mrow><mi>s</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>l</mi><mo>,</mo><mi>v</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <mrow><mi>E</mi>
+                    <mrow><mo stretchy="false">[</mo><mi>l</mi><mo stretchy="false">]</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd>
+                <mrow><mtext>如果</mtext><mi>l</mi><mtext>未在</mtext><mi>s</mi><mtext>或</mtext>
+                  <mrow><mi>E</mi>
+                    <mrow><mo stretchy="false">[</mo><mi>v</mi><mo stretchy="false">]</mo></mrow>
+                  </mrow>
+                  <mtext>中使用</mtext></mrow>
+              </mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo><mtext>alloc</mtext><mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>s</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>l</mi><mo>,</mo><mi>v</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <msup><mi>s</mi><mo>&prime;</mo></msup>
+                  <mspace width="2ex"/>
+                  <mrow><mi>E</mi>
+                    <mrow><mo stretchy="false">[</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">!</mi><mspace width="2ex"/><mi>l</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">]</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&xrarr;</mo></mtd>
+              <mtd>
+                <mrow><mi>s</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>l</mi><mo>,</mo><mi>v</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <msup><mi>s</mi><mo>&prime;</mo></msup>
+                  <mspace width="2ex"/>
+                  <mrow><mi>E</mi>
+                    <mrow><mo stretchy="false">[</mo><mi>v</mi><mo stretchy="false">]</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo><mtext>lookup</mtext><mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi>s</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>l</mi><mo>,</mo><mi>v</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <msup><mi>s</mi><mo>&prime;</mo></msup>
+                  <mspace width="2ex"/>
+                  <mrow><mi>E</mi>
+                    <mrow><mo stretchy="false">[</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>l</mi><mspace width="2ex"/><mo>&colone;</mo><mspace width="2ex"/>
+                          <msup><mi>v</mi><mo>&prime;</mo></msup>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">]</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>&xrarr;</mo></mtd>
+              <mtd>
+                <mrow><mi>s</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>l</mi><mo>,</mo>
+                      <msup><mi>v</mi><mo>&prime;</mo></msup>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <msup><mi>s</mi><mo>&prime;</mo></msup>
+                  <mspace width="2ex"/>
+                  <mrow><mi>E</mi>
+                    <mrow><mo stretchy="false">[</mo><mi>l</mi><mo stretchy="false">]</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mo stretchy="false">(</mo><mtext>update</mtext><mo stretchy="false">)</mo></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+    </div>
+    <p>效应最容易被理解为一个子表达式与一个管理程序全局资源的中央权威之间的交互. 这种资源的例子有存储, 堆, 文件系统, 程序最终结果的存放处, 以及其他输入/输出通道. 给定一个管理者, 效应可以被看作一条发给中央权威的消息加上足以恢复被挂起的算术的信息. 在操作语义中, 那个<q>卡住的表达式</q>, 即贯穿始终的例子中的<math><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">ref</mi><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math>, 可以扮演消息的前一半的角色; 求值上下文则充当消息的第二部分. 在扩展存储, 查找一个值或修改一个位置的内容之后, 算术过程就可以继续. 从技术上讲, 操作语义通过用某个数据填充求值上下文来做到这一点, 这个数据也把信息从管理者传达给被挂起的表达式. 通过把这一操作语义翻译到一个数学框架中, 我们可以为编程语言设计一个可扩展的指称语义.</p>
+    <h2>第3章 可扩展指称规格</h2>
+    <p>编程语言的指称规格由两部分组成. 第一部分定义语言的句法domain和语义domain. 这些domain是某个universal domain的subdomain, 例如<math><mrow><mi mathvariant="script">P</mi><mi>&omega;</mi></mrow></math> [29], <math><msup><mi mathvariant="bold">T</mi><mi>&omega;</mi></msup></math> [24], <math><mi mathvariant="normal">U</mi></math> [28] 或<math><mi>&Topf;</mi></math> [17]. 句法domain规定语言的句法成分; 语义domain包含各种句法成分的指称. 第二部分是一个函数式解释器, 它把句法domain的元素映射到语义domain中的元素. 它用像<span class="small-caps">Lambda</span> [29] 或KL [17] 这样的通用编程语言定义, 并满足组合性定律, 即, 一个句法成分的解释是其子句法成分的解释的函数. 为了追踪自由变量的指称, 解释器还以一个环境参数参数化. 从代数上讲, 解释器 (大致) 是一个从句法到语义的同态.</p>
+    <p>我们通过为Pure Scheme定义一个语义来阐明可扩展指称规格的方法论. 我们首先用破坏性的引用单元扩展该语义, 然后再用第一级延续对象扩展它. 尽管Pure Scheme是一个句法上简单的语言, 只有一种句法成分类型 (phrase type), 它在语义上却很丰富, 而且它的扩展提出了使传统指称式语言规格复杂化的大多数问题. 第一小节给出Pure Scheme及其扩展的可扩展指称规格的一般模式. 第二, 第三和第四小节分别包含Pure Scheme, State Scheme和Control Scheme的规格. 后两者从字面上讲是Pure Scheme语义的扩大. 最后一小节表明, 一个句法成分的指称相对于所有可能的扩展都是稳定的.</p>
+    <h3>第3.1节 语义框架: 扩展直接语义</h3>
+    <p>遵循上一节的想法, 句法成分的指称的domain<math><mi>&Copf;</mi></math>由两个不相交的部分组成: 值指称的subdomain<math><mi>&Vopf;</mi></math>和效应消息 (effect message) (效应) 的subdomain. <cite>图<a href="#ext-direct">3.1.1</a></cite>的第一部分展示了domain方程的一般模式. 一般而言, 值的domain是由<math><mi>&Vopf;</mi></math>和<math><mi>&Copf;</mi></math>构造出来的domain的和; 我们在<cite>图<a href="#ext-direct">3.1.1</a></cite>中用记号<math><mrow><msub><mi>&Sigma;</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>表示这一点. 对于像Pure Scheme这样的语言, 值的domain包含数字, 布尔值, 从值到计算的函数, 以及底 (bottom) (发散表达式的指称). 对于State Scheme, 值的domain还包含一个位置 (location) 的domain, 位置解释引用单元.</p>
+    <p>效应消息的domain总是两个domain的积. 这个积的第一个分量表示求值上下文, 另一个分量指定管理者必须执行的动作. 求值上下文的一个直截了当的表示是一个从值到计算的函数, 这直接对应于它在操作上作为从句法值到表达式的函数的用法. 效应domain的动作分量<math><mi>&Aopf;</mi></math>是由<math><mi>&Vopf;</mi></math>和<math><mi>&Copf;</mi></math>构建的domain的和; 在<cite>图<a href="#ext-direct">3.1.1</a></cite>中我们为此使用表达式<math><mrow><msub><mi>&Sigma;</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. 对于管理者必须执行的每一种动作, 它都包含一个被加项 (summand). 对于平凡的基础语言, 基本的动作domain只包含一个错误动作 (因为我们相信发出错误信号是最基本的效应). 对于Pure Scheme, 不需要额外的动作. 对于State Scheme, 有三个额外的动作: 分配一个填有某个值的引用单元, 对一个单元解引用, 以及修改一个引用单元.</p>
+    <div class="fig" id="ext-direct"><b>图3.1.1. </b><b>[语义框架]</b>
+      <p><b>语义domain</b>
+        <math display="block">
+          <mtable columnalign="left right center left left">
+            <mtr>
+              <mtd><mtext>(值)</mtext></mtd>
+              <mtd><mi>&Vopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>&Sigma;</mi><mn>1</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mtext>(依赖于语言)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd><mtext>(计算)</mtext></mtd>
+              <mtd><mi>&Copf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">inV</mi>
+                    <mrow><mo stretchy="false">(</mo><mi>&Vopf;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inFX</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <msub>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                          <mi>&bottom;</mi></msub>
+                        <mo largeop="false">&otimes;</mo><mi>&Aopf;</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mtext>(动作)</mtext></mtd>
+              <mtd><mi>&Aopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">inE</mi>
+                    <mrow><mo stretchy="false">(</mo><mi>&Eopf;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow>
+                    <msub><mi>&Sigma;</mi><mn>2</mn></msub>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+              <mtd><mtext>(依赖于语言)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd><mtext>(错误)</mtext></mtd>
+              <mtd><mi>&Eopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow><mi>&bottom;</mi><mo>,</mo><mi>err</mi></mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mtext>(资源)</mtext></mtd>
+              <mtd><mi>&Ropf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>&Pi;</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi><mo>,</mo><mo>&hellip;</mo></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mtext>(依赖于语言)</mtext></mtd>
+            </mtr>
+            <mtr>
+              <mtd><mtext>(环境)</mtext></mtd>
+              <mtd>
+                <mrow><mi>&Eopf;</mi><mi mathvariant="italic">nv</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="italic">Var</mi><mo>&#8692;</mo><mi>&Vopf;</mi></mrow>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>语义函数</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd><mi mathvariant="script">P</mi></mtd>
+              <mtd><mo>:</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="italic">Prog</mi><mo>&xrarr;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&Vopf;</mi><mo largeop="false">&oplus;</mo><mi>&Eopf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi mathvariant="script">M</mi></mtd>
+              <mtd><mo>:</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="italic">Expr</mi><mo>&xrarr;</mo>
+                  <mrow><mi>&Eopf;</mi><mi mathvariant="italic">nv</mi></mrow>
+                  <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="script">P</mi>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>P</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow>
+                        <mrow><mi mathvariant="script">M</mi>
+                          <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>P</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                        </mrow>
+                        <mi>&bottom;</mi></mrow>
+                      <mo>,</mo>
+                      <msub><mi>r</mi><mn>0</mn></msub>
+                    </mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>&Omega;</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">inV</mi>
+                    <mrow><mo stretchy="false">(</mo><mi>&bottom;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>=</mo><mi>&bottom;</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>err</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inAC</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">inE</mi>
+                      <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mo>&hellip;</mo><mtext>依赖于语言</mtext><mo>&hellip;</mo></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>辅助语义函数</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd><mi mathvariant="monospace">admin</mi></mtd>
+              <mtd><mo>:</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi>&Copf;</mi><mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                  <mo>&xrarr;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&Vopf;</mi><mo largeop="false">&oplus;</mo><mi>&Eopf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi mathvariant="monospace">handler</mi></mtd>
+              <mtd><mo>:</mo></mtd>
+              <mtd>
+                <mrow><mi>&Copf;</mi><mo>&xrarr;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi mathvariant="monospace">inAC</mi></mtd>
+              <mtd><mo>:</mo></mtd>
+              <mtd>
+                <mrow><mi>&Aopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow><mi>&bottom;</mi><mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd><mi>&bottom;</mi></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="monospace">inV</mi>
+                        <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>v</mi><mo>,</mo><mi>r</mi></mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="monospace">inFX</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>k</mi><mo>,</mo>
+                            <mrow><mi mathvariant="monospace">inE</mi>
+                              <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>err</mi><mo>,</mo><mi>r</mi></mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="monospace">inFX</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>k</mi><mo>,</mo><mi>p</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mo>&hellip;</mo><mtext>依赖于语言</mtext><mo>&hellip;</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">handler</mi>
+                    <mrow><mo stretchy="false">(</mo><mi>&bottom;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mi>f</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd><mi>&bottom;</mi></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">handler</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">inV</mi>
+                        <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mi>f</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>f</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">handler</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">inFX</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>k</mi><mo>,</mo><mi>p</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mi>f</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inFX</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow>
+                          <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                          <mi>v</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                          <mrow>
+                            <mrow><mi mathvariant="monospace">handler</mi>
+                              <mrow><mo stretchy="false">(</mo>
+                                <mrow><mi>k</mi><mo>&af;</mo>
+                                  <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+                                </mrow>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mi>f</mi></mrow>
+                        </mrow>
+                        <mo stretchy="false">]</mo></mrow>
+                      <mo>,</mo><mi>p</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inAC</mi>
+                  <mrow><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inFX</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">inV</mi><mo>,</mo><mi>e</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+    </div>
+    <p>一般而言, 解释器把<math><mrow><mi>phrases</mi><mo>&times;</mo><mi>environments</mi></mrow></math>映射到<math><mi>computations</mi></math>. 为了解释绑定变量的含义, 需要环境. 给定这些模式化的domain定义, 解释器可以处理两个简单的编程构造: <math><mi>&Omega;</mi></math>, 它代表发散, 以及<code>err</code>, 它发出一个错误信号. 其他种类的句法成分需要对解释器进行扩展.</p>
+    <p>复杂句法成分的子句法成分通过对解释器的递归调用来求值. 由于这样一个递归调用的结果是一个计算, 有必要检查结果的标签 (tag). 如果它是一个普通值, 值分量可以在局部被消耗. 然而, 如果它是一个效应, 它必须被传播到中央管理者, 由后者解释它的含义. 为了统一地处理这种情况, 我们引入一个函数<code>handler</code>, 它把一个计算和其最终值的消费者 (consumer) 映射到计算. 消费者是一个从值到一个计算的函数. {原注: 在没有计算效应和错误的情况下, 这一模式实际上退化为直接语义的模式.}</p>
+    <p>函数<code>handler</code>执行一个简单的标签检查: 如果第一个参数在值subdomain中, 它就把它的第二个参数应用于该值. 否则, 它创建一个新的效应消息, 这个消息通过一个修改过的句柄来容纳额外的消费者. 因此一个效应消息从<code>handler</code>传播到<code>handler</code>, 直到它最终到达中央管理者. 管理者<code>admin</code>是一个有两个参数的函数: 一个计算和一个 (开放式的) 资源列表 (<math><mrow><mi>&Pi;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi><mo>,</mo><mo>&hellip;</mo></mrow><mo stretchy="false">)</mo></mrow></mrow></math>). 如果计算是一个值, 那么值和资源作为程序的结果返回. 一个需要<q>错误</q>动作的计算产生与当前资源配对的错误. 程序的含义被定义为解释器与管理者的复合.</p>
+    <p><cite>图<a href="#ext-direct">3.1.1</a></cite>展示了一个一般语言定义的模式. 下面所有的定义都符合这个模式. 每个语言片段都要求在五个地方修改这个大纲: 值subdomain的和 (<math><msub><mi>&Sigma;</mi><mn>1</mn></msub></math>), 动作的和 (<math><msub><mi>&Sigma;</mi><mn>2</mn></msub></math>), 资源的列表, 意义函数<math><mi mathvariant="script">M</mi></math>的子句, 以及管理者函数<code>admin</code>的子句. 其他一切保持不变, 例如, 解释器的类型, <code>handler</code>函数, 顶层意义函数, 等等. 由于解释器把句法成分和环境映射到它们的含义, 我们把这种风格的语义称为<em>扩展直接语义</em>.</p>
+    <h3>第3.2节 Pure Scheme</h3>
+    <p>我们首先用一个简单的算术语言来阐明第一小节的抽象想法:
+      <math display="block">
+        <mrow>
+          <mrow><mi>M</mi><mo>&Colone;</mo>
+            <mrow>
+              <mrow><mo lspace="0" rspace="0">&ulcorn;</mo><mi>n</mi><mo lspace="0" rspace="0">&urcorn;</mo></mrow>
+              <mo>|</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="monospace">add1</mi><mspace width="2ex"/><mi>M</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>|</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="monospace">sub1</mi><mspace width="2ex"/><mi>M</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>|</mo><mo>&hellip;</mo></mrow>
+            <mo>,</mo></mrow>
+          <mspace width="2ex"/>
+          <mrow><mi>n</mi><mo>&in;</mo><mi>&Nopf;</mi></mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      这个语言的值domain只包含整数和底. 效应消息只为传播错误而存在. 因此, domain方程是:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>&Vopf;</mi></mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="monospace">inN</mi>
+                <mrow><mo stretchy="false">(</mo>
+                  <msub><mi>&Nopf;</mi><mi>&bottom;</mi></msub>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>&Aopf;</mi></mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="monospace">inE</mi>
+                <mrow><mo stretchy="false">(</mo><mi>&Eopf;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      而意义函数把数码映射到整数:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="script">M</mi>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mo lspace="0" rspace="0">&ulcorn;</mo><mi>n</mi><mo lspace="0" rspace="0">&urcorn;</mo></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mrow>
+            <mi>&rho;</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi mathvariant="monospace">inV</mi>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi mathvariant="monospace">inN</mi>
+                <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </p>
+    <p>一个<code>add1</code>表达式的解释, 是解释它的子表达式, 并用一个对所有数值输入都输出其后继的函数来处理结果, 所得到的结果:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="script">M</mi>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">add1</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+                <mi>&rho;</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="monospace">handler</mi>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="script">M</mi>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                    </mrow>
+                    <mi>&rho;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                <mi>m</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                <mrow><mi mathvariant="monospace">case</mi><mspace width="2ex"/><mi>m</mi><mspace width="2ex"/><mi mathvariant="monospace">of</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="2em"/>
+                <mtable columnalign="left center left">
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow><mi mathvariant="monospace">inN</mi>
+                          <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mrow>
+                    </mtd>
+                    <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                    <mtd>
+                      <mrow>
+                        <mrow><mi mathvariant="monospace">inV</mi>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow><mi mathvariant="monospace">inN</mi>
+                              <mrow><mo stretchy="false">(</mo>
+                                <mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo stretchy="false">]</mo>
+                        <mrow/>
+                      </mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">[</mo><mi>m</mi></mrow>
+                    </mtd>
+                    <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                    <mtd>
+                      <mrow>
+                        <mrow><mi mathvariant="monospace">inAC</mi>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow><mi mathvariant="monospace">inE</mi>
+                              <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      对于潜在的非数值输入, 消费者函数输出错误. 其他复杂表达式以同样的方式解释.</p>
+    <p>为了把算术语言扩展为完整的Pure Scheme, 我们添加<cite>图<a href="#pure-scheme">2.1</a></cite>的句法以及值的domain的另一个被加项: 过程指称的domain. Pure Scheme过程把非底的值映射到计算. 因此, 新的值的domain是从值到计算的严格函数 (strict function) 的domain:
+      <math display="block">
+        <mrow><mi>&Vopf;</mi><mo>=</mo>
+          <mrow>
+            <mrow><mi mathvariant="monospace">inN</mi>
+              <mrow><mo stretchy="false">(</mo>
+                <msub><mi>&Nopf;</mi><mi>&bottom;</mi></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo largeop="false">&oplus;</mo>
+            <mrow><mi mathvariant="monospace">inP</mi>
+              <mrow><mo stretchy="false">(</mo>
+                <msub>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&Vopf;</mi>
+                      <msub><mo>&xrarr;</mo><mi>s</mi></msub>
+                      <mi>&Copf;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mi>&bottom;</mi></msub>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      完整的Pure Scheme不需要新的效应.</p>
+    <p>语义函数 (见<cite>图<a href="#pure-spec">3.2.1</a></cite>) 以通常的方式把变量映射到值, 把过程映射到函数. 对于一个应用<math><mrow><mo stretchy="false">(</mo><mrow><mi>M</mi><mspace width="2ex"/><mi>N</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 解释器首先递归地确定<math><mi>M</mi></math>的含义, 并用<code>handler</code>把它强制转换为一个值<math><mi>f</mi></math>. 相应的消费者接着以类似的方式确定<math><mi>N</mi></math>的值<math><mi>a</mi></math>. 第二个消费者函数在<math><mi>f</mi></math>是函数时把<math><mi>f</mi></math>应用于<math><mi>a</mi></math>, 否则发出一个错误信号.</p>
+    <p>布尔值和<math><mi mathvariant="monospace">if</mi></math>表达式需要对算术语言进行类似于上面所描述的扩展. <cite>图<a href="#pure-spec">3.2.1</a></cite>包含Pure Scheme的完整规格.</p>
+    <div class="fig" id="pure-spec"><b>图3.2.1. </b><b>[Pure Scheme的一个扩展直接语义]</b>
+      <p><b>语义domain</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd><mi>&Vopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">inN</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>&Nopf;</mi><mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inB</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>&Topf;</mi><mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inP</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>&Vopf;</mi>
+                            <msub><mo>&xrarr;</mo><mi>s</mi></msub>
+                            <mi>&Copf;</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>&Aopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inE</mi>
+                  <mrow><mo stretchy="false">(</mo><mi>&Eopf;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>语义函数</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="script">M</mi>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                    <mrow><mo lspace="0" rspace="0">&ulcorn;</mo><mi>n</mi><mo lspace="0" rspace="0">&urcorn;</mo></mrow>
+                    <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inV</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">inN</mi>
+                      <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="script">M</mi>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">true</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inV</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">inB</mi>
+                      <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">true</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="script">M</mi>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">false</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inV</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">inB</mi>
+                      <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">false</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi mathvariant="monospace">add1</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inV</mi><mo stretchy="false">(</mo><mi mathvariant="monospace">inP</mi><mo stretchy="false">(</mo>
+                  <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                  <mi>m</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="2em"/>
+                  <mrow><mi mathvariant="monospace">case</mi><mspace width="2ex"/><mi>m</mi><mspace width="2ex"/><mi mathvariant="monospace">of</mi></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="3em"/>
+                  <mtable columnalign="left center left">
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo>
+                          <mrow><mi mathvariant="monospace">inN</mi>
+                            <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inV</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi mathvariant="monospace">inN</mi>
+                                <mrow><mo stretchy="false">(</mo>
+                                  <mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow>
+                                  <mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow/>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo><mi>m</mi></mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mo>&hellip;</mo></mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mo>&hellip;</mo></mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>x</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inV</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&rho;</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>e</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inV</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">inP</mi>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                          <mi>d</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                          <mrow>
+                            <mrow><mi mathvariant="script">M</mi>
+                              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                            </mrow>
+                            <mrow><mi>&rho;</mi>
+                              <mrow><mo stretchy="false">[</mo>
+                                <mrow><mi>x</mi><mo lspace="0" rspace="0">/</mo><mi>d</mi></mrow>
+                                <mo stretchy="false">]</mo></mrow>
+                            </mrow>
+                          </mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mspace width="2ex"/>
+                          <msub><mi>e</mi><mn>2</mn></msub>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">handler</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="script">M</mi>
+                        <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      </mrow>
+                      <mi>&rho;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="1em"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                    <mi>f</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                    <mrow><mi mathvariant="monospace">handler</mi>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <mrow><mi mathvariant="script">M</mi>
+                            <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                              <msub><mi>e</mi><mn>2</mn></msub>
+                              <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                          </mrow>
+                          <mi>&rho;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="2em"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                    <mi>a</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                    <mrow><mi mathvariant="monospace">case</mi><mspace width="2ex"/><mi>f</mi><mspace width="2ex"/><mi mathvariant="monospace">of</mi></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="4em"/>
+                  <mtable columnalign="left center left">
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo>
+                          <mrow><mi mathvariant="monospace">inP</mi>
+                            <mrow><mo stretchy="false">(</mo><mi>g</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi>g</mi><mo>&af;</mo>
+                            <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow/>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo><mi>g</mi></mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">if</mi><mspace width="2ex"/>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mspace width="2ex"/>
+                          <msub><mi>e</mi><mn>2</mn></msub>
+                          <mspace width="2ex"/>
+                          <msub><mi>e</mi><mn>3</mn></msub>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">handler</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="script">M</mi>
+                        <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      </mrow>
+                      <mi>&rho;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="1em"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                    <mi>t</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="2em"/>
+                  <mrow><mi mathvariant="monospace">case</mi><mspace width="2ex"/><mi>t</mi><mspace width="2ex"/><mi mathvariant="monospace">of</mi></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="3em"/>
+                  <mtable columnalign="left center left">
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo>
+                          <mrow><mi mathvariant="monospace">inB</mi>
+                            <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">true</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow>
+                            <mrow><mi mathvariant="script">M</mi>
+                              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                                <msub><mi>e</mi><mn>2</mn></msub>
+                                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                            </mrow>
+                            <mi>&rho;</mi></mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow/>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo>
+                          <mrow><mi mathvariant="monospace">inB</mi>
+                            <mrow><mo stretchy="false">(</mo><mi mathvariant="monospace">false</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow>
+                            <mrow><mi mathvariant="script">M</mi>
+                              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                                <msub><mi>e</mi><mn>3</mn></msub>
+                                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                            </mrow>
+                            <mi>&rho;</mi></mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow/>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo><mi>f</mi></mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+    </div>
+    <h3>第3.3节 State Scheme</h3>
+    <p>向Pure Scheme添加引用单元需要<cite>图<a href="#state-scheme">2.2</a></cite>的句法, 以及一类用于解释引用单元的新值. 遵循传统, 我们把这些值称为<em>位置</em>. 位置在<em>存储</em> (<math><mrow><mi>&Sopf;</mi><mi mathvariant="italic">to</mi></mrow></math>) 中被绑定, 存储是全局资源池的一部分. 和所有其他资源一样, 存储由管理者管理. 因此, 创建一个单元需要一条发给中央管理者的消息. 它分配一个新的位置, 并把它与分配消息的值关联起来. 分配的结果是新位置<math><mi>l</mi></math>, 也就是说, 管理者用句柄把<math><mi>l</mi></math>返回给程序. 类似地, 对单元解引用和修改单元内容的动作也需要程序句法成分与管理者之间的消息交换.</p>
+    <p>翻译成我们的指称框架的语言, State Scheme的定义需要值的domain的一个新被加项, 即位置的domain, 以及动作的domain (效应消息的第二个分量) 的三个新被加项:
+      <ol>
+        <li><math><mrow><mi mathvariant="monospace">inRef</mi><mrow><mo stretchy="false">(</mo><mi>&Vopf;</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 它表示一条分配消息;</li>
+        <li><math><mrow><mi mathvariant="monospace">inSet</mi><mrow><mo stretchy="false">(</mo><mrow><msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub><mo>,</mo><mi>&Vopf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 它表示一条更新消息; 以及</li>
+        <li><math><mrow><mi mathvariant="monospace">inDer</mi><mrow><mo stretchy="false">(</mo><msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub><mo stretchy="false">)</mo></mrow></mrow></math>, 它表示一条解引用消息.</li>
+      </ol>
+      此外, 资源列表 (到目前为止为空) 需要用一个存储来扩展. 扩展后的domain的详细规格见<cite>图<a href="#state-spec">3.3.1</a></cite>的第一部分.</p>
+    <p>三个新句法形式的解释是直截了当的. 对于每个形式, 解释器用一个最终发出关于一个位置的分配, 修改或解引用的效应消息的处理器 (handler), 递归地确定子表达式的计算. 扩展后的管理者恰好接受这三个新的效应消息. 如果效应消息是一条分配消息, 它按照本节开头所描述的那样进行. 另外两个效应消息以类似的方式处理. <cite>图<a href="#state-spec">3.3.1</a></cite>的第二部分给出了解释器和管理者函数的新子句; <math><mi mathvariant="script">M</mi></math>和<code>admin</code>中针对Pure Scheme句法和效应消息的子句保持不变!</p>
+    <div class="fig" id="state-spec"><b>图3.3.1. </b><b>[State Scheme的一个扩展直接语义]</b>
+      <p><b>语义domain</b>
+        <math display="block">
+          <mtable columnalign="left right center left">
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mi>&Vopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">inN</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>&Nopf;</mi><mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inB</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>&Topf;</mi><mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inP</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inL</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mi>&Aopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">inE</mi>
+                    <mrow><mo stretchy="false">(</mo><mi>&Eopf;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inRef</mi>
+                    <mrow><mo stretchy="false">(</mo><mi>&Vopf;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inDer</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inSet</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub>
+                        <mo largeop="false">&otimes;</mo><mi>&Vopf;</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd><mi>&Ropf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi>&Sopf;</mi><mi mathvariant="italic">to</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mtext>(存储)</mtext></mtd>
+              <mtd>
+                <mrow><mi>&Sopf;</mi><mi mathvariant="italic">to</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub>
+                  <mo>&#8692;</mo><mi>&Vopf;</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mtext>(位置)</mtext></mtd>
+              <mtd>
+                <msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub>
+              </mtd>
+              <mtd><mo>:</mo></mtd>
+              <mtd>
+                <mrow><mtext>一个平坦domain, 通常同构于</mtext>
+                  <msub><mi>&Nopf;</mi><mi>&bottom;</mi></msub>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>语义函数</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">ref</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">handler</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <mrow><mi mathvariant="script">M</mi>
+                          <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                        </mrow>
+                        <mi>&rho;</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                      <mi>v</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                      <mrow><mi mathvariant="monospace">inAC</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi mathvariant="monospace">inRef</mi>
+                            <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mspace width="2ex"/><mo>&colone;</mo><mspace width="2ex"/>
+                          <msub><mi>e</mi><mn>2</mn></msub>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">handler</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="script">M</mi>
+                        <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                          <msub><mi>e</mi><mn>1</mn></msub>
+                          <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      </mrow>
+                      <mi>&rho;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="1em"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                    <mi>l</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                    <mrow><mi mathvariant="monospace">handler</mi>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <mrow><mi mathvariant="script">M</mi>
+                            <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                              <msub><mi>e</mi><mn>2</mn></msub>
+                              <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                          </mrow>
+                          <mi>&rho;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="2em"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                    <mi>a</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                    <mrow><mi mathvariant="monospace">case</mi><mspace width="2ex"/><mi>l</mi><mspace width="2ex"/><mi mathvariant="monospace">of</mi></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="4em"/>
+                  <mtable columnalign="left center left">
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo>
+                          <mrow><mi mathvariant="monospace">inL</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <msup><mi>l</mi><mo>&prime;</mo></msup>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi mathvariant="monospace">inSet</mi>
+                                <mrow><mo stretchy="false">(</mo>
+                                  <mrow>
+                                    <msup><mi>l</mi><mo>&prime;</mo></msup>
+                                    <mo>,</mo><mi>a</mi></mrow>
+                                  <mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow/>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo><mi>g</mi></mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi mathvariant="monospace">inE</mi>
+                                <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">!</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">handler</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="script">M</mi>
+                        <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      </mrow>
+                      <mi>&rho;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="1em"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                    <mi>l</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                    <mrow><mi mathvariant="monospace">case</mi><mspace width="2ex"/><mi>l</mi><mspace width="2ex"/><mi mathvariant="monospace">of</mi></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="3em"/>
+                  <mtable columnalign="left center left">
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo>
+                          <mrow><mi mathvariant="monospace">inL</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <msup><mi>l</mi><mo>&prime;</mo></msup>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi mathvariant="monospace">inDer</mi>
+                                <mrow><mo stretchy="false">(</mo>
+                                  <msup><mi>l</mi><mo>&prime;</mo></msup>
+                                  <mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow/>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo><mi>g</mi></mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi mathvariant="monospace">inE</mi>
+                                <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>管理者函数</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="monospace">inFX</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>k</mi><mo>,</mo>
+                            <mrow><mi mathvariant="monospace">inRef</mi>
+                              <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi>k</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi mathvariant="monospace">inL</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi mathvariant="monospace">new</mi>
+                                <mrow><mo stretchy="false">(</mo><mi>r</mi><mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo>
+                      <mrow><mi mathvariant="monospace">extend</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>r</mi><mo>,</mo>
+                            <mrow><mi mathvariant="monospace">new</mi>
+                              <mrow><mo stretchy="false">(</mo><mi>r</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mo>,</mo><mi>v</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="monospace">inFX</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>k</mi><mo>,</mo>
+                            <mrow><mi mathvariant="monospace">inSet</mi>
+                              <mrow><mo stretchy="false">(</mo>
+                                <mrow><mi>l</mi><mo>,</mo><mi>v</mi></mrow>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi>k</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo>
+                      <mrow><mi mathvariant="monospace">extend</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>r</mi><mo>,</mo><mi>l</mi><mo>,</mo><mi>v</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="monospace">inFX</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>k</mi><mo>,</mo>
+                            <mrow><mi mathvariant="monospace">inDer</mi>
+                              <mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi>k</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi mathvariant="monospace">lookup</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi>r</mi><mo>,</mo><mi>l</mi></mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+    </div>
+    <h3>第3.4节 Control Scheme</h3>
+    <p>标准Scheme和SML of New Jersey提供了用第一级延续对象编程的构造. 延续对象是程序的控制状态的一个抽象. 获得对这一控制抽象的访问常被称为<em>捕获 (catch)</em>一个延续. 使用这一抽象, 或者用Scheme和SML的行话说, <em>抛出 (throw)</em>到一个延续, 程序可以丢弃它的当前延续, 并把一个值传送给一个先前捕获的延续对象. Control Scheme采用句法<math><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">catch</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>e</mi></mrow><mo stretchy="false">)</mo></mrow></math>来捕获延续并把它绑定到<math><mi>x</mi></math>, 并采用句法<math><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">throw</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>e</mi></mrow><mo stretchy="false">)</mo></mrow></math>来把<math><mi>e</mi></math>的值抛出到绑定到<math><mi>x</mi></math>的延续 [37]. 按照传统方法建模第一级延续对象, 需要使用延续语义 [36, 1, 15, 27, 35]. 延续语义把<em>每个</em>句法成分类型的指称在一个<em>延续</em>上参数化, 延续是一个把中间结果映射到最终答案的函数.</p>
+    <p>在扩展直接语义的框架中, 最终答案的输出处于中央管理者的控制之下. 从程序中任何位置向管理者发送一个效应消息, 按定义会构造一个句柄, 它是计算的其余部分的一个函数式抽象. 因此延续对象很容易被容纳进这个框架. 一个<math><mi mathvariant="monospace">catch</mi></math>表达式指称一个包含延续的接收者 (recipient) 的效应消息, 这个接收者大致是在延续对象的名字 (<math><mi>x</mi></math>) 上参数化的<math><mi mathvariant="monospace">catch</mi></math>表达式的体 (<math><mi>e</mi></math>). 管理者把接收者应用于句柄, 从而放弃对计算的其余部分的控制. 一个<math><mi mathvariant="monospace">throw</mi></math>表达式指称一个类似的包, 但这个包的延续接收者<em>忽略</em>它从管理者那里接收的延续, 转而使用绑定到<math><mi mathvariant="monospace">throw</mi></math>变量的对象.</p>
+    <p>就domain而言, 把Pure Scheme扩展为Control Scheme需要添加一个值被加项, 即延续的domain, 以及一个效应, 即一个控制消息. 后者包含延续的接收者, 它是一个从句柄到计算的函数. 意义函数<math><mi mathvariant="script">M</mi></math>和管理者<code>admin</code>的扩展实现了上述模式. 细节在<cite>图<a href="#control-spec">3.4.1</a></cite>中给出.</p>
+    <div class="fig" id="control-spec"><b>图3.4.1. </b><b>[Control Scheme的一个扩展直接语义]</b>
+      <p><b>句法</b>
+        <math display="block">
+          <mrow><mi>e</mi><mo>&Colone;</mo>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="monospace">catch</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>|</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="monospace">throw</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </math>
+      </p>
+      <p><b>语义domain</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd><mi>&Vopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">inN</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>&Nopf;</mi><mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inB</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub><mi>&Topf;</mi><mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inP</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inK</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd><mi>&Aopf;</mi></mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="monospace">inE</mi>
+                    <mrow><mo stretchy="false">(</mo><mi>&Eopf;</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inCon</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                            <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>语义函数</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">catch</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">inAC</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="monospace">inCon</mi>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                          <mi>k</mi><mo>:</mo>
+                          <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                          <mo lspace="0">.</mo>
+                          <mrow>
+                            <mrow><mi mathvariant="monospace">handler</mi>
+                              <mrow><mo stretchy="false">(</mo>
+                                <mrow>
+                                  <mrow><mi mathvariant="script">M</mi>
+                                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                                  </mrow>
+                                  <mrow><mi>&rho;</mi>
+                                    <mrow><mo stretchy="false">[</mo>
+                                      <mrow><mi>x</mi><mo lspace="0" rspace="0">/</mo>
+                                        <mrow><mi mathvariant="monospace">inK</mi>
+                                          <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                                        </mrow>
+                                      </mrow>
+                                      <mo stretchy="false">]</mo></mrow>
+                                  </mrow>
+                                </mrow>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                            <mi>k</mi></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="script">M</mi>
+                    <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">throw</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>e</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                  </mrow>
+                  <mi>&rho;</mi></mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">handler</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="script">M</mi>
+                        <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      </mrow>
+                      <mi>&rho;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="1em"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                    <mi>v</mi><mo>:</mo><mi>&Vopf;</mi><mo lspace="0">.</mo>
+                    <mrow><mi mathvariant="monospace">case</mi><mspace width="2ex"/>
+                      <mrow><mi>&rho;</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mspace width="2ex"/><mi mathvariant="monospace">of</mi></mrow>
+                  </mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow/>
+              </mtd>
+              <mtd>
+                <mrow><mspace width="3em"/>
+                  <mtable columnalign="left center left">
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo>
+                          <mrow><mi mathvariant="monospace">inK</mi>
+                            <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi mathvariant="monospace">inCon</mi>
+                                <mrow><mo stretchy="false">(</mo>
+                                  <mrow>
+                                    <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+                                    <msup><mi>k</mi><mo>&prime;</mo></msup>
+                                    <mo>:</mo>
+                                    <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                                    <mo lspace="0">.</mo>
+                                    <mrow><mi>k</mi><mo>&af;</mo>
+                                      <mrow><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow>
+                                    </mrow>
+                                  </mrow>
+                                  <mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo>
+                          <mrow/>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mo stretchy="false">[</mo><mi>k</mi></mrow>
+                      </mtd>
+                      <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                      <mtd>
+                        <mrow>
+                          <mrow><mi mathvariant="monospace">inAC</mi>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi mathvariant="monospace">inE</mi>
+                                <mrow><mo stretchy="false">(</mo><mi>err</mi><mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+      <p><b>管理者函数</b>
+        <math display="block">
+          <mtable columnalign="right center left" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi mathvariant="monospace">inFX</mi>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>k</mi><mo>,</mo>
+                            <mrow><mi mathvariant="monospace">inCon</mi>
+                              <mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+              <mtd><mo>=</mo></mtd>
+              <mtd>
+                <mrow><mi mathvariant="monospace">admin</mi>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow>
+                      <mrow><mi>f</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>r</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </p>
+    </div>
+    <p>把State Scheme扩展为Core Scheme, 即一个包含引用单元以及<math><mi mathvariant="monospace">catch</mi></math>和<math><mi mathvariant="monospace">throw</mi></math>的类Scheme语言, 同样容易. 有必要如下扩展State Scheme的domain:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd><mi>&Vopf;</mi></mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">inN</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>&Nopf;</mi><mi>&bottom;</mi></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo largeop="false">&oplus;</mo>
+                <mrow><mi mathvariant="monospace">inB</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>&Topf;</mi><mi>&bottom;</mi></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo largeop="false">&oplus;</mo>
+                <mrow><mi mathvariant="monospace">inP</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mi>&bottom;</mi></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo largeop="false">&oplus;</mo>
+                <mrow><mi mathvariant="monospace">inL</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo largeop="false">&oplus;</mo>
+                <mrow><mi mathvariant="monospace">inK</mi>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mi>&bottom;</mi></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi>&Aopf;</mi></mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="monospace">inE</mi>
+                <mrow><mo stretchy="false">(</mo><mi>&Eopf;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo largeop="false">&oplus;</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="monospace">inRef</mi>
+                      <mrow><mo stretchy="false">(</mo><mi>&Vopf;</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo largeop="false">&oplus;</mo>
+                    <mrow><mi mathvariant="monospace">inDer</mi>
+                      <mrow><mo stretchy="false">(</mo>
+                        <msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo largeop="false">&oplus;</mo>
+                    <mrow><mi mathvariant="monospace">inSet</mi>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <msub><mi>&Lopf;</mi><mi>&bottom;</mi></msub>
+                          <mo largeop="false">&otimes;</mo><mi>&Vopf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo largeop="false">&oplus;</mo>
+                  <mrow><mi mathvariant="monospace">inCon</mi>
+                    <mrow><mo stretchy="false">(</mo>
+                      <msub>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow>
+                            <mrow><mo stretchy="false">(</mo>
+                              <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                              <mo stretchy="false">)</mo></mrow>
+                            <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                        <mi>&bottom;</mi></msub>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      意义函数<math><mi mathvariant="script">M</mi></math>和管理者<code>admin</code>的新子句保持不变.</p>
+    <p>State Scheme与Control Scheme的合并是对称的. 把引用的domain合并进Control Scheme的domain, 得到与Core Scheme的domain同构的domain. 由此产生的意义函数和管理者会与我们刚才描述的那些完全相同. 一般而言, 添加新的正交语言构造, 就像把Pure Scheme扩展为Control Scheme, 或把State Scheme扩展为Core Scheme一样直截了当. 它需要在值的domain, 效应的domain, 解释器和管理者函数中添加被加项. 不需要对先前的规格进行任何修改. 因此我们相信, 对于我们的新风格的指称规格而言, <q>可扩展</q>这一属性是完全正当的. 下面的小节为这一属性的更形式化的论证提供基础.</p>
     <h3>第3.5节 稳定指称</h3>
-    <h2>第4章 将解释器复合</h2>
+    <p>回忆一下, 扩展直接定义的语义domain具有如下形式 {译注: 原文中动作一行的左边误作<math><mi>&Copf;</mi></math>.}
+      <math display="block">
+        <mtable columnalign="left right center left">
+          <mtr>
+            <mtd><mtext>(值)</mtext></mtd>
+            <mtd><mi>&Vopf;</mi></mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>&Sigma;</mi><mn>1</mn></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(动作)</mtext></mtd>
+            <mtd><mi>&Aopf;</mi></mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="monospace">inE</mi>
+                  <mrow><mo stretchy="false">(</mo><mi>&Eopf;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo largeop="false">&oplus;</mo>
+                <mrow>
+                  <msub><mi>&Sigma;</mi><mn>2</mn></msub>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mtext>(资源)</mtext></mtd>
+            <mtd><mi>&Ropf;</mi></mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&Pi;</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi><mo>,</mo><mo>&hellip;</mo></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      其中<math><mrow><msub><mi>&Sigma;</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>和<math><mrow><msub><mi>&Sigma;</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是用domain运算以及<math><mi>&Vopf;</mi></math>和<math><mi>&Copf;</mi></math>的子集构造出来的项的不交和. 在这个框架中写出的一个语义定义的一个正交<em>扩展</em>由六个部分组成:
+      <ul>
+        <li>一个定义扩展的句法的句法构造子集合;</li>
+        <li>由和<math><mrow><msub><mi>&Sigma;</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>中的新项所指明的一组新值;</li>
+        <li>由和<math><mrow><msub><mi>&Sigma;</mi><mn>2</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>,</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>中的新项所指明的一组新动作;</li>
+        <li>对于每个新句法构造子, 意义函数<math><mi mathvariant="script">M</mi></math>中的一个新子句;</li>
+        <li>资源列表的一个新分量;</li>
+        <li>对于每种新的动作, <code>admin</code>函数中的一个新子句.</li>
+      </ul>
+      除第一个之外, 这些组成部分中的任何一个都可以省略.</p>
+    <p>根据domain规格的形式, 一个语言扩展的语义domain是原始语言的语义domain的超集. 扩展过程向语义domain添加新的元素. 更确切地说, 有两对函数把原始domain<math><mi>&Vopf;</mi></math>, <math><mi>&Copf;</mi></math>与对应的扩大的domain<math><msup><mi>&Vopf;</mi><mo>&prime;</mo></msup></math>, <math><msup><mi>&Copf;</mi><mo>&prime;</mo></msup></math>联系起来. 首先, 有一对函数<math><mrow><msub><mi>&Phi;</mi><mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><msup><mi>&Vopf;</mi><mo>&prime;</mo></msup></mrow></msub><mo>:</mo><mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><msup><mi>&Vopf;</mi><mo>&prime;</mo></msup></mrow></mrow></math>和<math><mrow><msub><mi>&Phi;</mi><mrow><mi>&Copf;</mi><mo>&xrarr;</mo><msup><mi>&Copf;</mi><mo>&prime;</mo></msup></mrow></msub><mo>:</mo><mrow><mi>&Copf;</mi><mo>&xrarr;</mo><msup><mi>&Copf;</mi><mo>&prime;</mo></msup></mrow></mrow></math>, 它们把较小domain中的值和计算注入到较大domain中的值和计算. 这些注入实际上是恒等函数 (在universal domain上解释). 其次, 有一对函数<math><mrow><msub><mi>&Psi;</mi><mrow><msup><mi>&Vopf;</mi><mo>&prime;</mo></msup><mo>&xrarr;</mo><mi>&Vopf;</mi></mrow></msub><mo>:</mo><mrow><msup><mi>&Vopf;</mi><mo>&prime;</mo></msup><mo>&xrarr;</mo><mi>&Vopf;</mi></mrow></mrow></math>和<math><mrow><msub><mi>&Psi;</mi><mrow><msup><mi>&Copf;</mi><mo>&prime;</mo></msup><mo>&xrarr;</mo><mi>&Copf;</mi></mrow></msub><mo>:</mo><mrow><msup><mi>&Copf;</mi><mo>&prime;</mo></msup><mo>&xrarr;</mo><mi>&Copf;</mi></mrow></mrow></math>, 它们把较大domain中的值和计算投影到较小domain的值和计算上. 这些投影把值和计算的任何带有新标签的分量映射到<math><mi>&bottom;</mi></math>, 并保持所有其他分量不变. 总之,
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow>
+              <msub><mi>&Phi;</mi>
+                <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo>
+                  <msup><mi>&Vopf;</mi><mo>&prime;</mo></msup>
+                </mrow>
+              </msub>
+              <mo>&compfn;</mo>
+              <msub><mi>&Psi;</mi>
+                <mrow>
+                  <msup><mi>&Vopf;</mi><mo>&prime;</mo></msup>
+                  <mo>&xrarr;</mo><mi>&Vopf;</mi></mrow>
+              </msub>
+            </mrow>
+            <mo>=</mo>
+            <msub><mi>&Psi;</mi>
+              <mrow>
+                <msup><mi>&Vopf;</mi><mo>&prime;</mo></msup>
+                <mo>&xrarr;</mo><mi>&Vopf;</mi></mrow>
+            </msub>
+            <mo>&sqsube;</mo>
+            <msub><mi>I</mi>
+              <msup><mi>&Vopf;</mi><mo>&prime;</mo></msup>
+            </msub>
+          </mrow>
+          <mspace width="2ex"/><mtext>并且</mtext><mspace width="2ex"/>
+          <mrow>
+            <msub><mi>&Phi;</mi>
+              <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo>
+                <msup><mi>&Vopf;</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </msub>
+            <mo>=</mo>
+            <msub><mi>I</mi><mi>&Vopf;</mi></msub>
+          </mrow>
+        </mrow>
+      </math>
+      以及
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow>
+              <msub><mi>&Phi;</mi>
+                <mrow><mi>&Copf;</mi><mo>&xrarr;</mo>
+                  <msup><mi>&Copf;</mi><mo>&prime;</mo></msup>
+                </mrow>
+              </msub>
+              <mo>&compfn;</mo>
+              <msub><mi>&Psi;</mi>
+                <mrow>
+                  <msup><mi>&Copf;</mi><mo>&prime;</mo></msup>
+                  <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+              </msub>
+            </mrow>
+            <mo>=</mo>
+            <msub><mi>&Psi;</mi>
+              <mrow>
+                <msup><mi>&Copf;</mi><mo>&prime;</mo></msup>
+                <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+            </msub>
+            <mo>&sqsube;</mo>
+            <msub><mi>I</mi>
+              <msup><mi>&Copf;</mi><mo>&prime;</mo></msup>
+            </msub>
+          </mrow>
+          <mspace width="2ex"/><mtext>并且</mtext><mspace width="2ex"/>
+          <mrow>
+            <msub><mi>&Phi;</mi>
+              <mrow><mi>&Copf;</mi><mo>&xrarr;</mo>
+                <msup><mi>&Copf;</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </msub>
+            <mo>=</mo>
+            <msub><mi>I</mi><mi>&Copf;</mi></msub>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      其中<math><msub><mi>I</mi><mi>X</mi></msub></math>是domain<math><mi>X</mi></math>上的恒等函数.</p>
+    <p>非正式地说, 这一性质断言, 在可扩展语义的框架中, 添加一个编程构造对应于向含义空间添加一个新的<q>维度</q>. 这种添加满足如下性质. 令<math><mi mathvariant="script">M</mi></math>是核心语言的意义函数, 并令<math><msup><mi mathvariant="script">M</mi><mo>&prime;</mo></msup></math>是一个<em>任意</em>扩展的意义函数. 如果<math><mi>e</mi></math>是核心语言中的一个表达式, <math><mi>&rho;</mi></math>是<math><mrow><mi mathvariant="italic">Var</mi><mo>&#8692;</mo><mi>&Vopf;</mi></mrow></math>中的一个环境, 而<math><msup><mi>&rho;</mi><mo>&prime;</mo></msup></math>在<math><mrow><mi mathvariant="italic">Var</mi><mo>&#8692;</mo><msup><mi>&Vopf;</mi><mo>&prime;</mo></msup></mrow></math>中, 那么
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="script">M</mi>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mrow>
+            <mi>&rho;</mi></mrow>
+          <mo>=</mo>
+          <mrow>
+            <msub><mi>&Psi;</mi>
+              <mrow>
+                <msup><mi>&Copf;</mi><mo>&prime;</mo></msup>
+                <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+            </msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow>
+                  <msup><mi mathvariant="script">M</mi><mo>&prime;</mo></msup>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>&Phi;</mi>
+                      <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo>
+                        <msup><mi>&Vopf;</mi><mo>&prime;</mo></msup>
+                      </mrow>
+                    </msub>
+                    <mo>&compfn;</mo><mi>&rho;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      并且
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi>&Phi;</mi>
+              <mrow><mi>&Copf;</mi><mo>&xrarr;</mo>
+                <msup><mi>&Copf;</mi><mo>&prime;</mo></msup>
+              </mrow>
+            </msub>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <mrow><mi mathvariant="script">M</mi>
+                  <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                </mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>&Psi;</mi>
+                      <mrow>
+                        <msup><mi>&Vopf;</mi><mo>&prime;</mo></msup>
+                        <mo>&xrarr;</mo><mi>&Vopf;</mi></mrow>
+                    </msub>
+                    <mo>&compfn;</mo>
+                    <msup><mi>&rho;</mi><mo>&prime;</mo></msup>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&sqsube;</mo>
+          <mrow>
+            <mrow>
+              <msup><mi mathvariant="script">M</mi><mo>&prime;</mo></msup>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>e</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mrow>
+            <msup><mi>&rho;</mi><mo>&prime;</mo></msup>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      读者也许想把这个一般陈述与关于直接语义和延续语义之间关系的众多论文 [13, 18, 26, 30, 34] 进行对比.</p>
+    <h2>第4章 组合解释器</h2>
+    <p>给定Core Scheme的一个扩展直接语义, 我们应该能够以模块化的方式实现Core Scheme的解释器. 一个明显的可能性是把domain被加项以及函数<math><mi mathvariant="script">M</mi></math>和<code>admin</code>的子句连接起来. 这种方法产生由独立的片段定义的整体式 (monolithic) 解释器, 但把它们粘合在一起的方法基于程序<em>文本</em>, 因此超出了大多数编程语言的能力范围.</p>
+    <p>一种替代方案是使用一个遵循CLOS [6] 精神的面向对象编程语言. 每个语言片段会扩展一个已有语言的资源列表, 以及解释器和管理者方法. 此外, 一个语言片段还会引入新的局部数据构造子.</p>
+    <p>这里我们介绍另一种基于Rice Scheme的模块系统的替代方案. 它受到Steele即将发表的关于组合单子 (monad) 的论文 [33] 的启发. 本节中的<cite>图<a href="#base-module">4.1</a></cite>到<cite>图<a href="#store-module-2">B.5</a></cite>以及附录B包含完整的代码.</p>
+    <p>一个语言被实现为一个导出三个绑定的模块:
+      <ol>
+        <li>一个解释器函数;</li>
+        <li>一个管理者函数; 以及</li>
+        <li>一个资源列表.</li>
+      </ol>
+      <cite>图<a href="#base-module">4.1</a></cite>中的基本语言模块解释两个常量, <math><mi mathvariant="italic">Err</mi></math>和<math><mi mathvariant="italic">Loop</mi></math>, 它们具有显然的含义; 它实现了<cite>图<a href="#ext-direct">3.1.1</a></cite>的管理者, 并导出一个空的资源列表.</p>
+    <div class="fig" id="base-module"><b>图4.1. </b><b>[基础语言的模块]</b><pre><code>(define-const-structure (Loop))
+(define-const-structure (Err))
+
+(define baseM
+  (module (Interpreter Admin Resources)
+
+    (define Interpreter
+      (lambda (exp env)
+        (match exp
+          [($ Loop) (printf &quot;looping~n&quot;) (Interpreter exp env)]
+          [($ Err) (inExc 'error)]
+          [exp (error 'Interpreter &quot;can't interpret ~s&quot; exp)])))
+
+    (define Admin
+      (lambda (comp resources)
+        (match comp
+          [($ Val v) (cons v resources)]
+          [($ FX continuation ($ Exc n))
+           (error 'Admin &quot;exception raise:~~s~n&quot; n)]
+          [else (error 'Admin &quot;bad effect message: ~s&quot; comp)])))
+
+    (define Resources '()) ))</code></pre></div>
+    <p>每个<em>语言片段</em>由一个包含两个部分的文件组成. 第一部分是一组 (抽象) 句法构造子. 为了便于语言的交互式用户访问, 句法构造子是全局的. 第二部分是一个<em>语言变换器 (language transformer)</em>, 即一个把一个语言实现映射到一个更丰富的语言实现的函数. 语言变换器中的解释器函数为语言片段引入的每个新句法设施包含一个子句. 当局部解释器函数解释一个子表达式时, 它必须调用<em>完整</em>语言的解释器, 因为子表达式可能包含来自一个尚待添加的语言片段的设施. 类似地, 语言变换器的局部管理者必须处理该变换器引入的所有新资源和效应. 但同样地, 在动作被执行之后, 它必须调用<em>完整</em>语言的管理者, 以便所有可能的计算都能被管理.</p>
+    <p>作为一个典型的语言片段, 考虑<cite>图<a href="#cbv-module">4.2</a></cite>, 它定义了Pure Scheme的传值<math><mi>&lambda;</mi></math>记号的解释. 语言变换器的签名是
+      <math display="block">
+        <mtable columnalign="left left" columnspacing="0">
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo><mi mathvariant="italic">CBVM</mi><mo>:</mo><mo stretchy="false">(</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo><mi mathvariant="bold">module</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="italic">Resources</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="italic">Admin</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <mrow>
+                          <msub><mi>&Copf;</mi><mi>x</mi></msub>
+                          <mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                        <mo>&xrarr;</mo>
+                        <mrow><mi>&Vopf;</mi><mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="italic">Interpreter</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <mrow><mi mathvariant="italic">exps</mi><mo>&times;</mo>
+                            <mrow><mi>&Eopf;</mi><mi mathvariant="italic">nv</mi></mrow>
+                          </mrow>
+                          <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo><mi mathvariant="bold">module</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="italic">Resources</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="italic">Admin</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <mrow>
+                          <msub><mi>&Copf;</mi><mi>x</mi></msub>
+                          <mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                        <mo>&xrarr;</mo>
+                        <mrow><mi>&Vopf;</mi><mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="italic">Interpreter</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <mrow><mi mathvariant="italic">exps</mi><mo>&times;</mo>
+                            <mrow><mi>&Eopf;</mi><mi mathvariant="italic">nv</mi></mrow>
+                          </mrow>
+                          <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mrow><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      其中<math><mrow><msub><mi>&Copf;</mi><mi>x</mi></msub><mo>=</mo><mrow><mi>&Vopf;</mi><mo largeop="false">&oplus;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow><mo largeop="false">&otimes;</mo><mi>&Eopf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 也就是说, 管理者只处理基本计算, 返回一个值和一个错误. 一旦所得到的语言模块被送入控制语言的语言变换器, 这一点就会改变. 后一个变换器的签名清楚地展示了这一变换:
+      <math display="block">
+        <mtable columnalign="left left" columnspacing="0">
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo><mi mathvariant="italic">controlM</mi><mo>:</mo><mo stretchy="false">(</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo><mi mathvariant="bold">module</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="italic">Resources</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="italic">Admin</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <mrow>
+                          <msub><mi>&Copf;</mi><mi>x</mi></msub>
+                          <mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                        <mo>&xrarr;</mo>
+                        <mrow><mi>&Vopf;</mi><mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="italic">Interpreter</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <mrow><mi mathvariant="italic">exps</mi><mo>&times;</mo>
+                            <mrow><mi>&Eopf;</mi><mi mathvariant="italic">nv</mi></mrow>
+                          </mrow>
+                          <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo><mi mathvariant="bold">module</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="italic">Resources</mi><mspace width="2ex"/><mi>&Ropf;</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="italic">Admin</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <mrow>
+                          <msub><mi>&Copf;</mi><mi>c</mi></msub>
+                          <mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                        <mo>&xrarr;</mo>
+                        <mrow><mi>&Vopf;</mi><mo>&times;</mo><mi>&Ropf;</mi></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="italic">Interpreter</mi><mspace width="2ex"/>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow>
+                          <mrow><mi mathvariant="italic">exps</mi><mo>&times;</mo>
+                            <mrow><mi>&Eopf;</mi><mi mathvariant="italic">nv</mi></mrow>
+                          </mrow>
+                          <mo>&xrarr;</mo><mi>&Copf;</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mrow><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      (其中<math><mrow><msub><mi>&Copf;</mi><mi>c</mi></msub><mo>=</mo><mrow><mi>&Vopf;</mi><mo largeop="false">&oplus;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow><mo largeop="false">&otimes;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Eopf;</mi><mo largeop="false">&oplus;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&xrarr;</mo><mi>&Copf;</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>). 现在管理者还按照<cite>图<a href="#control-spec">3.4.1</a></cite>中的规格处理控制消息. 关于语言实现的其余部分, 包括值构造子, <math><mi mathvariant="italic">Handler</mi></math>以及环境的定义, 我们请读者参阅附录B.</p>
+    <div class="fig" id="cbv-module"><b>图4.2. </b><b>[传值λ记号的模块]</b><pre><code>;; Syntax: e ::= (var x) | (lam x e) | (app e e)
+
+(define-const-structure (var x))
+(define-const-structure (lam x M))
+(define-const-structure (app M N))
+
+(define CBVM
+  (lambda (language)
+    (import ([language (InterpPrev Interpreter) Admin Resources])
+      (module (Interpreter Admin Resources)
+
+        ;; Semantics: V = Proc(V -> C)
+
+        (define-const-structure (Proc closure))
+        (define inProc make-Proc)
+
+        (define Interpreter
+          (lambda (exp env)
+            (match exp
+              [($ var x)
+               (inVal (env x))]
+              [($ lam x exp)
+               (inVal (inProc (lambda (v) (InterpTop exp (Extend env x v)))))]
+              [($ app exp1 exp2)
+               (Handler (InterpTop exp1 env)
+                 (lambda (f)
+                   (Handler (InterpTop exp2 env)
+                     (lambda (a)
+                       (match f
+                         [($ Proc g) (g a)]
+                         [_ (inExc 'error)])))))]
+              [exp (InterpPrev exp env)])))))))</code></pre></div>
+    <div class="fig" id="control-module"><b>图4.3. </b><b>[catch和throw的模块]</b><pre><code>;; Syntax: e ::= (catch x e) | (throw x e)
+
+(define-const-structure (catch x M))
+(define-const-structure (throw x N))
+
+(define controlM
+  (lambda (language)
+    (import ([language (InterpPrev Interpreter) (AdminPrev Admin) Resources])
+      (module (Interpreter Admin Resources)
+
+        ;; Semantics: V = K(V -> C); C = FX(V -> C, Con(V -> C))
+
+        (define-const-structure (K v->c))
+        (define inK make-K)
+
+        (define-const-structure (Con v->c))
+        (define inCon (lambda (x) (inCC (make-Con x))))
+
+        (define Interpreter
+          (lambda (exp env)
+            (match exp
+              [($ catch x exp)
+               (inCon
+                 (lambda (k)
+                   (Handler (InterpTop exp (Extend env x (inK k))) k)))]
+              [($ throw x exp)
+               (Handler (InterpTop exp env)
+                 (lambda (v)
+                   (match (env x)
+                     [($ K k) (inCon (lambda (kp) (k v)))]
+                     [_ (inExc 'error)])))]
+              [exp (InterpPrev exp env)])))
+
+        (define Admin
+          (lambda (comp resources)
+            (match comp
+              [($ FX continuation ($ Con r))
+               (AdminTop (r continuation) resources)]
+              [comp (AdminPrev comp resources)])))))))</code></pre></div>
+    <p>最后, 完整语言的实现由四个定义组成:
+      <ol>
+        <li>完整语言的模块, 通过以函数方式复合语言片段并把它们应用于基础模块来定义;</li>
+        <li>完整语言的解释器的一个全局定义;</li>
+        <li>完整资源集合的管理者的一个全局定义; 以及</li>
+        <li>程序的意义函数.</li>
+      </ol>
+      下面是Core Scheme的定义:<pre><code>(define CoreScheme (storeM (controlM (CBVM (arithmM baseM)))))
+
+;; The global interpreter:
+(define InterpTop (import ([CoreScheme Interpreter]) Interpreter))
+
+;; The complete administrator
+(define AdminTop (import ([CoreScheme Admin]) Admin))
+
+;; The Program Meaning Function:
+(define Program
+  (import ([CoreScheme Resources])
+    (lambda (P)
+      (AdminTop (InterpTop P Empty) Resources))))</code></pre>在<math><mi mathvariant="italic">CoreScheme</mi></math>的定义中, 函数复合的顺序是无关紧要的; 在这条链中省略一个语言片段, 就定义了Core Scheme的一个不含相应构造的子语言.</p>
     <h2>第5章 相关工作</h2>
+    <p><em>单子.</em> Moggi [21, 22, 20] 最近的把计算的概念表述为单子的工作, 由Wadler [38] 推广, 其部分动机是指称规格缺乏模块性, 以及由此导致的对计算之间的逻辑关系缺乏理解. 粗略地说, 一个单子对应于一个三元组, 它由一个把值的domain映射到计算的domain的domain构造子<math><mi>T</mi></math>, 一个从值到计算的注入<math><mi>&eta;</mi></math>, 以及一个用于计算的组合变换<math><mi>&mu;</mi></math>组成. 不同的单子表达不同风格的指称规格, 从而表达不同风格的计算. 一些典型的单子是存储传递单子, 延续传递单子, 以及用于非确定性算术的单子.</p>
+    <p>在单子上参数化指称直接模型, 会导向更灵活的语言规格. 一个<q>单子语义 (monadic semantics)</q>的参数化domain方程是
+      <math display="block">
+        <mrow><mi>&Vopf;</mi><mo>=</mo>
+          <mrow>
+            <msub><mi>&Nopf;</mi><mi>&bottom;</mi></msub>
+            <mo largeop="false">&oplus;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>&Vopf;</mi>
+                <msub><mo>&xrarr;</mo><mi>s</mi></msub>
+                <mrow><mi>T</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>&Vopf;</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>;</mtext></math>
+      数码的意义指派把一个数码映射到它在计算domain中的注入:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="script">M</mi>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mo lspace="0" rspace="0">&ulcorn;</mo><mi>n</mi><mo lspace="0" rspace="0">&urcorn;</mo></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mrow>
+            <mi>&rho;</mi></mrow>
+          <mo>=</mo>
+          <mrow><mi>&eta;</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      现在, 如果对于某个固定的domain<math><mi>&Aopf;</mi></math>, 有<math><mrow><mrow><mi>T</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&Vopf;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Aopf;</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&xrarr;</mo><mi>&Aopf;</mi></mrow></mrow></math>并且
+      <math display="block">
+        <mrow>
+          <mrow><mi>&eta;</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+            <mi>k</mi><mo>:</mo>
+            <mrow><mi>&Vopf;</mi><mo>&xrarr;</mo><mi>&Aopf;</mi></mrow>
+            <mo lspace="0">.</mo>
+            <mrow><mi>k</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      那么该语义是一个延续语义. 如果<math><mrow><mrow><mi>T</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&Vopf;</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mi>&Sopf;</mi><mi mathvariant="italic">to</mi></mrow><mo>&xrarr;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&Vopf;</mi><mo largeop="false">&otimes;</mo><mrow><mi>&Sopf;</mi><mi mathvariant="italic">to</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>并且
+      <math display="block">
+        <mrow>
+          <mrow><mi>&eta;</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow>
+            <munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder>
+            <mi>&sigma;</mi><mo>:</mo>
+            <mrow><mi>&Sopf;</mi><mi mathvariant="italic">to</mi></mrow>
+            <mo lspace="0">.</mo>
+            <mrow><mo stretchy="false">&lang;</mo>
+              <mrow><mi>n</mi><mo>,</mo><mi>&sigma;</mi></mrow>
+              <mo stretchy="false">&rang;</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      那么实例化该语义就得到一个存储传递语义. 一般而言, 给定一个在单子上参数化的直接语义, 很容易转向一个基于不同风格的语义, 但结果是, 一个数码会被指派不同的domain元素&mdash;&mdash;取决于所选择的单子.</p>
+    <p>不幸的是, 单子的组合带来了严重的困难. 由于单子不能被直接复合, Moggi [20:ch.4] 引入了单子构造子 (monad constructor) 的概念, 它们大致是单子变换器 (monad transformer), 并且可以组合. 然而, 以不同的顺序组合同样的两个单子构造子, 常常产生不同的结果. 一个典型的例子是异常单子与存储单子的组合. 一种组合在抛出异常的过程中撤销副作用, 另一种则不会.</p>
+    <p>为了克服与组合单子相关的问题, Steele [33] 引入了<em>伪单子 (pseudo-monad)</em>的想法, 它是Moggi的概念的一种放宽. 基于伪单子的函数复合, Steele展示了如何从语言片段的解释器构建语言的解释器. 第4章受到了他的方法的启发. 但伪单子和单子有同样的问题: 指称仍然不稳定, 组合也不对称. 目前还不清楚单子方法与我们的方法之间的权衡是什么.</p>
+    <p><em>维也纳指称语义学派.</em> Control Scheme的扩展直接语义与维也纳指称语义学派 [3, 4, 15:52&ndash;55] 建模跳转和标签的方法有关, 这一方法被Allison [2] 部分地重新发现. 实际上, 根据这一学派的思想对块结构语言中的标签和<code>goto</code>的处理, 可以被看作我们的技术的一个实例. 在他们的框架中, 一个语句指称一个状态变换器, 它要么返回一个新的状态, 要么返回一个句法标签 (与一个状态组合在一起). 返回一个状态对应于返回一个值; 返回一个标签是一个效应消息. 传播效应的责任落在语句的复合函数和其他<q>胶水</q>函数上. 当一个标签到达顶层时, 一个对应于我们的管理者的异常处理器实施相应的跳转. Blikle和Tarlecki [4] {译注: 原文误作Tarleki.} 表明, 通过使用VDM技术, 指称规格可以使用集合而非domain, 使用部分函数而非连续函数. 维也纳学派没有把这一技术应用于其他命令式语言构造的规格 [D. Bj&oslash;rner; 信件, 1990年6月5日].</p>
     <h2>第6章 结论</h2>
-    <h2>附录A. domain描述的记号</h2>
-    <p>本篇论文所呈现的语义定义依赖于domain构造子<math><mo>&otimes;</mo></math> (smash product), <math><mo>&oplus;</mo></math> (coalesced sum), <math><msub><mo>&sdot;</mo><mi>&bottom;</mi></msub></math> (lifting), <math><mo>&xrarr;</mo></math> (连续函数), </p>
+    <p>扩展直接语义是一种表述编程语言的指称规格的新方法. 与传统方法不同, 基于扩展直接语义的语言规格很容易用正交的语言构造来扩展. 最重要的是, 这些扩展保持核心语言中句法成分的指称.</p>
+    <p>尽管我们的阐释集中于函数式语言的扩展, 命令式语言也可以用类似的方式来规定. 一个类Algol语言的指称模型会很容易构造. 实际上, 鉴于存储是一个中央资源, 而不是一个被传来传去的第一级对象, 这个模型可能更接近一个实现.</p>
+    <p>对这两种指称规格方法的更全面的比较必须解决几个问题. 首先, 我们应该研究扩展直接模型是否像替代的延续语义和存储语义一样精确地刻画语言, 也就是说, 我们应该检查新模型是否具有不同的完全抽象 (full abstraction) 性质. 其次, 我们需要理解每种方法提供了什么实现上的优势. 最后, 我们应该研究语言的模块化逻辑的设计, 因为指称语义的存在理由 (raison d'&ecirc;tre) 在于它对于程序推理的有用性.</p>
+    <p><b>致谢.</b> 作者感谢Mitch Wand在POPL'89上关于扩展直接模型中指称的稳定性的有益讨论. Andrew Wright的软类型系统 (Soft Type System) 是验证语言变换器的类型性质的一个重要工具. 我们也感谢Dan Friedman, Brian Milnes, Amr Sabry和Steve Weeks对本文早期草稿的意见. Scheme代码是用Dorai Sitaram的SLaTeX排版的.</p>
+    <h2>附录A domain规格的记号</h2>
+    <p>本文中给出的语义定义依赖于domain构造子<math><mo largeop="false">&otimes;</mo></math> (粉碎积 (smash product)), <math><mo largeop="false">&oplus;</mo></math> (合并和 (coalesced sum)), <math><msub><mo>&sdot;</mo><mi>&bottom;</mi></msub></math> (提升 (lifting)), <math><mo>&xrarr;</mo></math> (连续函数) 以及<math><mo>&#8692;</mo></math> (有限连续函数). 在本附录中, 我们简要描述这些构造中的每一个以及相关的记号.</p>
+    <p>domain算子<math><mo largeop="false">&otimes;</mo></math>, <math><mo largeop="false">&oplus;</mo></math>和<math><msub><mo>&sdot;</mo><mi>&bottom;</mi></msub></math>由以下方程定义:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>&Aopf;</mi><mo largeop="false">&otimes;</mo><mi>&Bopf;</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>|</mo>
+                    <mrow>
+                      <mrow><mi>a</mi><mo>&in;</mo><mi>&Aopf;</mi></mrow>
+                      <mo>,</mo>
+                      <mrow><mi>b</mi><mo>&in;</mo><mi>&Bopf;</mi></mrow>
+                      <mo>,</mo>
+                      <mrow><mi>a</mi><mo>&ne;</mo><mi>&bottom;</mi></mrow>
+                      <mo>,</mo>
+                      <mrow><mi>b</mi><mo>&ne;</mo><mi>&bottom;</mi></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mo>&cup;</mo>
+                <mrow><mo stretchy="false">{</mo><mi>&bottom;</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>&Aopf;</mi><mo largeop="false">&oplus;</mo><mi>&Bopf;</mi></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">true</mi><mo>,</mo><mi>a</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>|</mo>
+                    <mrow><mi>a</mi><mo>&in;</mo>
+                      <mrow><mi>&Aopf;</mi><mo>&setminus;</mo>
+                        <mrow><mo stretchy="false">{</mo><mi>&bottom;</mi><mo stretchy="false">}</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mo>&cup;</mo>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">false</mi><mo>,</mo><mi>b</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>|</mo>
+                    <mrow><mi>b</mi><mo>&in;</mo>
+                      <mrow><mi>&Bopf;</mi><mo>&setminus;</mo>
+                        <mrow><mo stretchy="false">{</mo><mi>&bottom;</mi><mo stretchy="false">}</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+                <mo>&cup;</mo>
+                <mrow><mo stretchy="false">{</mo><mi>&bottom;</mi><mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <msub><mi>&Aopf;</mi><mi>&bottom;</mi></msub>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">{</mo><mi>&bottom;</mi><mo stretchy="false">}</mo></mrow>
+                <mo>&cup;</mo>
+                <mrow><mo stretchy="false">{</mo>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi mathvariant="monospace">true</mi><mo>,</mo><mi>a</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>|</mo>
+                    <mrow><mi>a</mi><mo>&in;</mo><mi>&Aopf;</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">}</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      值<math><mi mathvariant="monospace">true</mi></math>和<math><mi mathvariant="monospace">false</mi></math>在复合对象的构造中被用作<q>标签</q>; 无论<math><mi>a</mi></math>的值是什么 (包括<math><mrow><mi>a</mi><mo>=</mo><mi>&bottom;</mi></mrow></math>), 对象<math><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">true</mi><mo>,</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></math>和<math><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="monospace">false</mi><mo>,</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></math>都不同于<math><mi>&bottom;</mi></math>. 记号
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="monospace">inA</mi>
+            <mrow><mo stretchy="false">(</mo><mi>&Aopf;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo largeop="false">&oplus;</mo>
+          <mrow><mi mathvariant="monospace">inB</mi>
+            <mrow><mo stretchy="false">(</mo><mi>&Bopf;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      所指称的domain与
+      <math display="block">
+        <mrow><mi>&Aopf;</mi><mo largeop="false">&oplus;</mo><mi>&Bopf;</mi></mrow>
+        <mtext>;</mtext></math>
+      完全相同; 标签<math><mi mathvariant="monospace">inA</mi></math>和<math><mi mathvariant="monospace">inB</mi></math>隐式地定义了函数<math><mrow><mi mathvariant="monospace">inA</mi><mo>:</mo><mrow><mi>&Aopf;</mi><mo>&xrarr;</mo><mrow><mi>&Aopf;</mi><mo largeop="false">&oplus;</mo><mi>&Bopf;</mi></mrow></mrow></mrow></math>和<math><mrow><mi mathvariant="monospace">inB</mi><mo>:</mo><mrow><mi>&Bopf;</mi><mo>&xrarr;</mo><mrow><mi>&Aopf;</mi><mo largeop="false">&oplus;</mo><mi>&Bopf;</mi></mrow></mrow></mrow></math>, 其中
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="monospace">inA</mi>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo>{</mo>
+                <mtable columnalign="left left">
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">true</mi><mo>,</mo><mi>x</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mtd>
+                    <mtd>
+                      <mrow><mtext>如果</mtext>
+                        <mrow><mi>x</mi><mo>&in;</mo><mi>&Aopf;</mi></mrow>
+                      </mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mi>&bottom;</mi></mtd>
+                    <mtd><mtext>否则</mtext></mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="monospace">inB</mi>
+                <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mo>{</mo>
+                <mtable columnalign="left left">
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi mathvariant="monospace">false</mi><mo>,</mo><mi>x</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mtd>
+                    <mtd>
+                      <mrow><mtext>如果</mtext>
+                        <mrow><mi>x</mi><mo>&in;</mo><mi>&Bopf;</mi></mrow>
+                      </mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mi>&bottom;</mi></mtd>
+                    <mtd><mtext>否则</mtext></mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      最后, 记号
+      <math display="block">
+        <mrow><mi mathvariant="monospace">inA</mi>
+          <mrow><mo stretchy="false">(</mo><mi>&Aopf;</mi><mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      与
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="monospace">inA</mi>
+            <mrow><mo stretchy="false">(</mo><mi>&Aopf;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo largeop="false">&oplus;</mo>
+          <mrow><mi mathvariant="monospace">in&Phi;</mi>
+            <mrow><mo stretchy="false">(</mo><mi>&Phi;</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      的含义完全相同, 其中<math><mi>&Phi;</mi></math>是只包含发散元素<math><mi>&bottom;</mi></math>的domain.</p>
+    <p>二元domain构造<math><mo largeop="false">&otimes;</mo></math>和<math><mo largeop="false">&oplus;</mo></math>显然可以推广到任何有限元数<math><mrow><mi>n</mi><mo>></mo><mn>2</mn></mrow></math>. 在这种情况下, 我们使用<math><mi>n</mi></math>个不同的标签, 例如数字<math><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mo>&hellip;</mo><mo>,</mo><mrow><mi>n</mi><mo>&minus;</mo><mn>1</mn></mrow></mrow></math>. <math><mrow><msub><mi>&Aopf;</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>&Aopf;</mi><mi>n</mi></msub></mrow></math>的<math><mi>n</mi></math>元积写作
+      <math display="block">
+        <mrow>
+          <msub><mi>&Aopf;</mi><mn>1</mn></msub>
+          <mo largeop="false">&otimes;</mo><mo>&hellip;</mo><mo largeop="false">&otimes;</mo>
+          <msub><mi>&Aopf;</mi><mi>n</mi></msub>
+        </mrow>
+        <mtext>.</mtext></math>
+      类似地, 带有注入<math><mrow><msub><mi mathvariant="monospace">inA</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi mathvariant="monospace">inA</mi><mi>n</mi></msub></mrow></math>的<math><mrow><msub><mi>&Aopf;</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>&Aopf;</mi><mi>n</mi></msub></mrow></math>的<math><mi>n</mi></math>元和写作
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi mathvariant="monospace">inA</mi><mn>1</mn></msub>
+            <mrow><mo stretchy="false">(</mo>
+              <msub><mi>&Aopf;</mi><mn>1</mn></msub>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo largeop="false">&oplus;</mo><mo>&hellip;</mo><mo largeop="false">&oplus;</mo>
+          <mrow>
+            <msub><mi mathvariant="monospace">inA</mi><mi>n</mi></msub>
+            <mrow><mo stretchy="false">(</mo>
+              <msub><mi>&Aopf;</mi><mi>n</mi></msub>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+    </p>
+    <p>由于和中标签值的选择是任意的, 我们使用<em>模式匹配记号 (pattern matching notation)</em>来识别和的分量. 它也提供了一种把和投影到一个分量domain上的方便机制. 给定和
+      <math display="block">
+        <mrow>
+          <mrow>
+            <msub><mi mathvariant="monospace">inA</mi><mn>1</mn></msub>
+            <mrow><mo stretchy="false">(</mo>
+              <msub><mi>&Aopf;</mi><mn>1</mn></msub>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo largeop="false">&oplus;</mo><mo>&hellip;</mo><mo largeop="false">&oplus;</mo>
+          <mrow>
+            <msub><mi mathvariant="monospace">inA</mi><mi>n</mi></msub>
+            <mrow><mo stretchy="false">(</mo>
+              <msub><mi>&Aopf;</mi><mi>n</mi></msub>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+        <mtext>,</mtext></math>
+      表达式
+      <math display="block">
+        <mtable columnalign="left">
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="monospace">case</mi><mspace width="2ex"/><mi>y</mi><mspace width="2ex"/><mi mathvariant="monospace">of</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mspace width="1em"/>
+                <mtable columnalign="left center left">
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow>
+                          <msub><mi mathvariant="monospace">inA</mi><mn>1</mn></msub>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msub><mi>x</mi><mn>1</mn></msub>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mrow>
+                    </mtd>
+                    <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                    <mtd>
+                      <mrow>
+                        <msub><mi>e</mi><mn>1</mn></msub>
+                        <mo stretchy="false">]</mo></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mo>&hellip;</mo></mtd>
+                    <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                    <mtd>
+                      <mrow/>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow>
+                          <msub><mi mathvariant="monospace">inA</mi><mi>n</mi></msub>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msub><mi>x</mi><mi>n</mi></msub>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mrow>
+                    </mtd>
+                    <mtd><mo mathvariant="monospace">=&gt;</mo></mtd>
+                    <mtd>
+                      <mrow>
+                        <msub><mi>e</mi><mi>n</mi></msub>
+                        <mo stretchy="false">]</mo></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      的含义是:
+      <math display="block">
+        <mtable columnalign="left">
+          <mtr>
+            <mtd>
+              <mrow><mtext>如果</mtext><mi>y</mi><mtext>具有形式</mtext>
+                <mrow>
+                  <msub><mi mathvariant="monospace">inA</mi><mn>1</mn></msub>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>x</mi><mn>1</mn></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mtext>, 那么</mtext>
+                <msub><mi>e</mi><mn>1</mn></msub>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mtext>否则</mtext><mo>&hellip;</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mtext>否则如果</mtext><mi>y</mi><mtext>具有形式</mtext>
+                <mrow>
+                  <msub><mi mathvariant="monospace">inA</mi><mi>n</mi></msub>
+                  <mrow><mo stretchy="false">(</mo>
+                    <msub><mi>x</mi><mi>n</mi></msub>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mtext>, 那么</mtext>
+                <msub><mi>e</mi><mi>n</mi></msub>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mtext>否则</mtext><mi>&bottom;</mi><mtext>.</mtext></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      {译注: 原文第三行误作<math><mrow><msub><mi mathvariant="monospace">inA</mi><mn>1</mn></msub><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math>, 原文的case表达式末尾还多了两个右括号.} 每个子表达式<math><msub><mi>e</mi><mi>i</mi></msub></math>可以包含变量<math><msub><mi>x</mi><mi>i</mi></msub></math>, 以及在包围<math><mi mathvariant="monospace">case</mi></math>表达式的上下文中绑定的任何变量.</p>
+    <p>domain<math><mrow><mi>&Aopf;</mi><mo>&xrarr;</mo><mi>&Bopf;</mi></mrow></math>是所有满足对于所有链<math><mi>X</mi></math>都有<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&bigsqcup;</mo><mi>X</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo>&bigsqcup;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>的<em>连续</em>函数<math><mrow><mi>f</mi><mo>:</mo><mrow><mi>&Aopf;</mi><mo>&xrarr;</mo><mi>&Bopf;</mi></mrow></mrow></math>的集合. 连续函数的domain按集合包含排序 (把函数看作有序对的集合). 记号<math><mrow><munder accentunder="true"><mi>&lambda;</mi><mo>_</mo></munder><mi>x</mi><mo>:</mo><mi>&Aopf;</mi><mo lspace="0">.</mo><mi>e</mi><mo>:</mo><mi>&Bopf;</mi></mrow></math>定义了匿名函数<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>e</mi><mo>:</mo><mrow><mi>&Aopf;</mi><mo>&xrarr;</mo><mi>&Bopf;</mi></mrow></mrow></math>.</p>
+    <p><math><mrow><mi>&Aopf;</mi><msub><mo>&xrarr;</mo><mi>s</mi></msub><mi>&Bopf;</mi></mrow></math>表示从domain<math><mi>&Aopf;</mi></math>到domain<math><mi>&Bopf;</mi></math>的严格函数的domain. domain<math><mrow><mi>&Aopf;</mi><mo>&xrarr;</mo><mi>&Bopf;</mi></mrow></math>中的一个函数是严格的, 如果<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><msub><mi>&bottom;</mi><mi>&Aopf;</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><msub><mi>&bottom;</mi><mi>&Bopf;</mi></msub></mrow></math>.</p>
+    <p>有限函数domain构造<math><mrow><mi>&Aopf;</mi><mo>&#8692;</mo><mi>&Bopf;</mi></mrow></math>只对<em>平坦</em>domain<math><mi>&Aopf;</mi></math>有定义:
+      <math display="block">
+        <mrow>
+          <mrow><mi>&Aopf;</mi><mo>&#8692;</mo><mi>&Bopf;</mi></mrow>
+          <mo>=</mo>
+          <mrow><mo stretchy="false">{</mo>
+            <mrow>
+              <mrow><mi>S</mi><mo>&in;</mo>
+                <mrow><mi>&Aopf;</mi><mo>&times;</mo><mi>&Bopf;</mi></mrow>
+              </mrow>
+              <mo>|</mo>
+              <mrow>
+                <mrow><mi>S</mi><mtext>是有限的</mtext></mrow>
+                <mo>,</mo>
+                <mrow><mi>S</mi><mo>&in;</mo>
+                  <mrow><mi>&Aopf;</mi>
+                    <msub><mo>&xrarr;</mo><mi>s</mi></msub>
+                    <mi>&Bopf;</mi></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mo stretchy="false">}</mo></mrow>
+        </mrow>
+      </math>
+      给定两个有限函数<math><mrow><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><mo>&in;</mo><mrow><mi>&Aopf;</mi><mo>&#8692;</mo><mi>&Bopf;</mi></mrow></mrow></math>, <math><mrow><mi>f</mi><mo>&sqsube;</mo><mi>g</mi></mrow></math>, 如果要么 (<i>i</i>) <math><mi>f</mi></math>是<math><mi>&bottom;</mi></math>, 要么 (<i>ii</i>) <math><mi>f</mi></math>和<math><mi>g</mi></math>具有相同的定义域<math><mi>D</mi></math>, 并且对于所有<math><mrow><mi>d</mi><mo>&in;</mo><mi>D</mi></mrow></math>, <math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow><mo>&sqsube;</mo><mrow><mi>g</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 我们常常把<math><mrow><mi>&Aopf;</mi><mo>&#8692;</mo><mi>&Bopf;</mi></mrow></math>的元素解释为<math><mrow><mi>&Aopf;</mi><mo>&xrarr;</mo><mi>&Bopf;</mi></mrow></math>中的函数.</p>
+    <h2>附录B 存储模块和全局定义</h2>
+    <p>本节给出Core Scheme的模块化解释器的其余部分. <cite>图<a href="#handler-defs">B.1</a></cite>和<cite>图<a href="#env-defs">B.2</a></cite>包含全局定义, 即, handler的定义以及处理环境的函数的定义. <cite>图<a href="#arith-module">B.3</a></cite>是处理算术的语言片段; 一个类似的用于布尔表达式的片段因篇幅原因被省略了. 最后, <cite>图<a href="#store-module">B.4</a></cite>和<cite>图<a href="#store-module-2">B.5</a></cite> (第1部分和第2部分) 给出了引用单元模块. {译注: 原文此处只写了图14, 实际指图13和图14两部分.}</p>
+    <div class="fig" id="handler-defs"><b>图B.1. </b><b>[全局定义]</b><pre><code>;; Semantic Framework:
+;; V = &perp;
+;; C = Val(V) + Comp(V -> C, Exc)
+
+(define-const-structure (Val Num_n))
+(define inVal make-Val)
+
+(define-const-structure (FX V->C Receiver))
+(define inCC (lambda (x) (make-FX inVal x)))
+
+(define-const-structure (Exc num))
+(define inExc (lambda (x) (inCC (make-Exc x))))
+
+(define Handler
+  (lambda (computation consumer)
+    (match computation
+      [($ Val v) (consumer v)]
+      [($ FX continuation request)
+       (make-FX
+         (lambda (x) (Handler (continuation x) consumer)) request)])))</code></pre></div>
+    <div class="fig" id="env-defs"><b>图B.2. </b><b>[环境]</b><pre><code>;; Environments:
+(define Empty
+  (lambda (x)
+    (error 'env &quot;Impossible: an open program ~s&quot; x)))
+
+(define Extend
+  (lambda (env x v)
+    (match x
+      [(? symbol?) (match-lambda [(? symbol? y) (if (eq? x y) v (env y))])]
+      [else (error 'Extend &quot;not a variable: ~s&quot; x)])))</code></pre></div>
+    <div class="fig" id="arith-module"><b>图B.3. </b><b>[算术的模块]</b><pre><code>;; Syntax: e ::= (int n) | (add1 e) | (sub1 e)
+
+(define-const-structure (int n))
+(define-const-structure (add1 M))
+(define-const-structure (sub1 M))
+
+(define arithmM
+  (lambda (language)
+    (import ([language (InterpPrev Interpreter) Admin Resources])
+      (module (Interpreter Admin Resources)
+
+        ;; Semantics: V = Num(num)
+
+        (define-const-structure (Num num))
+        (define inNum make-Num)
+
+        (define Interpreter
+          (lambda (exp env)
+            (match exp
+              [($ int m) (inVal (inNum m))]
+              [($ add1 exp) (Handler (InterpTop exp env) (op add1))]
+              [($ sub1 exp) (Handler (InterpTop exp env) (op sub1))]
+              [exp (InterpPrev exp env)])))
+
+        (define op
+          (lambda (f)
+            (lambda (n)
+              (match n
+                [($ Num m) (inVal (inNum (f m)))]
+                [_ (inExc 'error)]))))))))</code></pre></div>
+    <div class="fig" id="store-module"><b>图B.4. </b><b>[引用单元的模块: 第1部分]</b><pre><code>;; Syntax e ::= (ref e) | (deref e) | (setref e e)
+
+(define-const-structure (ref x))
+(define-const-structure (deref M))
+(define-const-structure (setref M N))
+
+(define storeM
+  (lambda (language)
+    (import ([language
+              (InterpPrev Interpreter)
+              (AdminPrev Admin)
+              (ResPrev Resources)])
+      (module (Interpreter Admin Resources)
+
+        ;; Semantics:
+        ;; V = Loc(L)
+        ;; C = FX(V -> C, Ref(V) + Der(L) + Set(L, V))
+
+        (define-const-structure (Loc num))
+        (define inLoc make-Loc)
+
+        (define-const-structure (Ref v))
+        (define inRef (lambda (x) (inCC (make-Ref x))))
+
+        (define-const-structure (Der l))
+        (define inDer (lambda (l) (inCC (make-Der l))))
+
+        (define-const-structure (Set l v))
+        (define inSet (lambda (l v) (inCC (make-Set l v))))
+
+        (define Interpreter
+          (lambda (exp env)
+            (match exp
+              [($ ref exp) (Handler (InterpTop exp env) inRef)]
+              [($ deref exp)
+               (Handler (InterpTop exp env)
+                 (lambda (v)
+                   (match v
+                     [($ Loc l) (inDer l)]
+                     [_ (inExc 'error)])))]
+              [($ setref exp1 exp2)
+               (Handler (InterpTop exp1 env)
+                 (lambda (l)
+                   (Handler (InterpTop exp2 env)
+                     (lambda (v)
+                       (match l
+                         [($ Loc l) (inSet l v)]
+                         [_ (inExc 'error)])))))]
+              [exp (InterpPrev exp env)])))</code></pre></div>
+    <div class="fig" id="store-module-2"><b>图B.5. </b><b>[引用单元的模块: 第2部分]</b><pre><code>        (define Admin
+          (lambda (comp resources)
+            (let ([store (ExtractStore resources)])
+              (match comp
+                [($ FX continuation ($ Ref v))
+                 (AdminTop (continuation (inLoc (new store)))
+                   (cons (make-StoreRes (cons (cons (new store) v) store))
+                     resources))]
+                [($ FX continuation ($ Der l))
+                 (AdminTop (continuation (lookup store l)) resources)]
+                [($ FX continuation ($ Set l v))
+                 (AdminTop (continuation (inLoc l))
+                   (cons (make-StoreRes (update store l v)) resources))]
+                [comp (AdminPrev comp resources)]))))
+
+        (define-const-structure (StoreRes s))
+
+        (define Resources (cons (make-StoreRes '()) ResPrev))
+
+        (define ExtractStore
+          (lambda (resources)
+            (match resources
+              [(($ StoreRes s) . res) s]
+              [(_ . res) (ExtractStore res)]
+              ['() (error 'Extract &quot;impossible&quot;)] )))
+
+        (define new length)
+
+        (define lookup
+          (lambda (store l)
+            (let L ([store store]);; assq yields less precise types
+              (match store
+                [(((? number? m) . v) . s) (if (= m l) v (L s))]
+                ['() (error 'lookup &quot;impossible&quot;)]))))
+
+        (define update
+          (lambda (store l v)
+            (match store
+              [(((? number? m) . u) . s)
+               (if (= l m)
+                   (cons (cons l v) s)
+                   (cons (cons m u) (update s l v)))]
+              ['() (error 'update &quot;impossible&quot;)]))) ))))</code></pre></div>
   </body>
 </html>
