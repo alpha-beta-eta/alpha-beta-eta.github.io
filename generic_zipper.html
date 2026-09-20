@@ -1,0 +1,113 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>泛型Zipper</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>泛型Zipper: 遍历的上下文</h1>
+    <p>本文译自Oleg Kiselyov的<a href="https://okmij.org/ftp/continuations/zipper.html">Generic Zipper: the context of a traversal</a>.</p>
+    <ul>
+      <li><a href="#introduction">Zipper: 数据结构或其映射的导数</a></li>
+      <li><a href="#traversable">来自任意Traversable的Zipper</a></li>
+      <li><a href="#zipper-fs">基于Zipper的文件服务器/操作系统</a></li>
+      <li><a href="#context-OS">操作系统中的定界延续</a></li>
+      <li><a href="https://okmij.org/ftp/Haskell/polyvariadic.html#ZipN">双重泛型的zipWith, 适用于任意数目的任意容器</a></li>
+      <li><a href="#zipper-diff">穿行于若干数据结构以比较和标注它们</a></li>
+      <li><a href="#zipper2">带有若干个洞的Zipper</a></li>
+      <li><a href="https://okmij.org/ftp/Haskell/extensible/index.html#crossover">泛型交叉: 将两个zipper拉在一起</a></li>
+    </ul>
+    <h2 id="introduction">第1章 Zipper: 数据结构或其映射的导数</h2>
+    <p>Zipper是进入数据结构的一个函数式游标. 它让我们能够导航至深埋于树或者嵌套记录中的一个项并改变它, 而不使用变动 (mutation). 其结果是一个新的数据结构, 与旧的数据结构共享其大部分的组成成分. 后者仍然可用, 这容许了对于改变的即时回滚. 因此, zipper实现了对于数据结构的<em>写时复制</em>更新.</p>
+    <p>Zipper, 这进入数据结构的函数式游标, 自身也是一个数据结构, 其由原本的数据结构<em>导出</em>. 递归数据类型<code>D</code>的导出数据类型<code>D'</code>是恰带有一个洞的<code>D</code>. 填上这个洞&mdash;&mdash;对于洞的所有位置进行积分&mdash;&mdash;就给回了数据类型<code>D</code>. Zipper是数据类型的<em>导数</em>, 这基本上是在微积分的意义上说的. 作为数据类型的zipper这一观点是原本的呈现方式, 由Huet (JFP, 1997) 以及Hinze和Jeuring (JFP 2001) 描述; 数据结构的导数则由McBride阐发.</p>
+    <p>我们提倡一种不同的观点, 其强调的不是穿过数据结构导航至所欲的项并将其提取出来的结果, 而是导航的过程. 每个数据结构都带有一个枚举其组成成分的方法, 这个方法将数据结构表示为在枚举过程中访问的结点的<em>流</em>. 为了让用户能够聚焦于一个项并提交更新, 枚举过程应该在到达一个项时将控制交给 (yield) 用户. 协程 (co-routine) 恰好提供了正确的交出机制. 正如Chung-chieh Shan贴切地说的那样, <q>zipper是一个挂起的行走 (suspended walk)</q>.</p>
+    <p>数据类型导数式的zipper必然依赖于数据类型 (不同的数据类型具有不同的导数), 而挂起行走式的zipper则是数据类型不变的. 我们只需要一个将给定函数应用于数据结构的每个项的遍历过程. 通过提供会<code>yield</code>的映射函数, 就得到了zipper. 既然遍历过程可以泛型地处理许多数据类型 (想想<code>map</code>), 那么zipper也可以. 我们的zipper类型只依赖于遍历函数的接口.</p>
+    <p>Zipper的这两种观点是对偶的: 它们都将zipper视为数据结构遍历的上下文. 这个上下文可以以函数形式 (挂起, 遍历的定界延续) 呈现, 也可以以去函数化的形式, 即作为一个数据结构呈现.</p>
+    <dl>
+      <dt><b>参考文献</b></dt>
+      <dd>zipper数据结构 <a href="http://www.nist.gov/dads/HTML/zipper.html">&lt; http://www.nist.gov/dads/HTML/zipper.html &gt;</a>
+        <p>Ralf Hinze和Johan Jeuring: <cite>Weaving a Web</cite><br/>Journal of Functional Programming 11(6), pages 681 - 689, 2001. Technical report ICS Utrecht University, UU-CS-2001-33.</p>
+      </dd>
+    </dl>
+    <h2 id="traversable">第2章 来自任意Traversable的Zipper</h2>
+    <p>Huet的zipper必然依赖于所要遍历的数据类型: 毕竟, 不同的数据类型具有不同的导数. 与之相对, 我们的<q>挂起行走</q>式zipper对于任何数据类型都具有相同的形式. 此外, 我们的方法不仅对于(广义)代数数据类型泛型地适用, 也适用于抽象类型 (其结构是隐藏的) 以及根本不是数据类型的类型, 例如函数和动作. 所需要的只是支持<code>Data.Traversible</code>接口&mdash;&mdash;至少要提供类似于<code>mapM</code>的东西.</p>
+    <p>我们通过为<code>Data.Map</code>导出zipper来演示zipper就是挂起的遍历. 后者是Haskell中有限映射的标准抽象数据类型. 这个例子有点做作, 因为<code>Data.Map</code>具有非常丰富的接口, 有许多访问和更新映射的元素的方式. 另一方面, <code>Data.Map</code>是标准库中定义的唯一非平凡的<code>Traversable</code>实例. 我们推荐读者参考<code>Zipper1.lhs</code>以了解一个更有意思的zipper, 其在一个lambda演算项中上下行走. 进入嵌套映射 (这是文件系统的一个模型) 的zipper在下文的ZipperFS中描述.</p>
+    <pre><code>data Zipper t a = ZDone (t a)
+                | Z a (Maybe a -&gt; Zipper t a)
+
+make_zipper :: T.Traversable t =&gt; t a -&gt; Zipper t a
+make_zipper t = reset $ T.mapM f t &gt;&gt;= return . ZDone
+ where
+ f a = shift (\k -&gt; return $ Z a (k . maybe a id))
+</code></pre>
+    <p>以上寥寥数行就是实现zipper所需的全部. 活跃的<q>指针</q><code>Z a k</code>包含了映射的当前元素, 即所聚焦的元素, 以及用于向前移动的函数<code>k</code>. 对<code>k Nothing</code>求值会将游标带到下一个元素; 对<code>k v</code>求值会将当前元素替换为<code>v</code>并将游标向前移动. 下面的完整代码定义了函数<code>tmod</code>, 其交互式地遍历映射, 逐个显示元素, 并提供修改当前元素或者退出遍历的选项. 以下是一个交互的样例:<pre><code>Current element: 1
+Enter Return, q or the replacement value:
+
+Current element: 2
+Enter Return, q or the replacement value:
+
+Current element: 6
+Enter Return, q or the replacement value:
+42
+Current element: 24
+Enter Return, q or the replacement value:
+q
+Done:
+fromList [(1,1),(2,2),(3,42),(4,24),(5,120),(6,720),(7,5040),(8,40320),(9,362880),(10,3628800)]
+</code></pre>确实, 映射的第三个元素已被替换为<code>42</code>.</p>
+    <dl>
+      <dt><b>版本</b></dt>
+      <dd>当前版本为2011年2月.</dd>
+      <dt><b>参考文献</b></dt>
+      <dd><a href="https://okmij.org/ftp/Haskell/ZipperTraversable.hs">ZipperTraversable.hs</a> [3K]<br/>完整的Haskell 2010代码<br/>这份代码最初以<cite>Zippers from any traversable</cite>为题发表于Haskell-Cafe邮件列表, Tue, 31 Mar 2009 23:59:46 -0700 (PDT)
+        <p><a href="https://okmij.org/ftp/Haskell/Zipper1.lhs">Zipper1.lhs</a> [12K]<br/>作为定界延续的泛型zipper导论<br/>这份代码最初以<cite>Zipper as a delimited continuation</cite>为题发表于Haskell邮件列表, Wed, 27 Apr 2005 16:17:04 -0700 (PDT)<br/>新版本的代码演示了从一个不同的遍历函数导出zipper, 这个遍历函数具有更为直观的接口, 由Ron de Bruijn提出. zipper的声明和导航函数保持不变: 基于定界控制的zipper确实是泛型的. 新版本的代码依赖于Haskell中的定界控制库delimcc.</p>
+        <p>Chung-chieh Shan: <cite>From walking to zipping, Part 3: Caught in a zipper</cite><br/><a href="http://conway.rutgers.edu/~ccshan/wiki/blog/posts/WalkZip3/">&lt; http://conway.rutgers.edu/~ccshan/wiki/blog/posts/WalkZip3/ &gt;</a><br/>我们的<code>Data.Map</code>zipper只能向前移动. Chung-chieh Shan详细地解释了如何将任意的单向zipper变成双向的. 同样是泛型地.</p>
+        <p><a href="https://okmij.org/ftp/Scheme/misc.html#zipper">Scheme中的Zipper</a><br/>一个旧的导出, 使用call/cc实现定界控制以对挂起进行建模.</p>
+      </dd>
+    </dl>
+    <h2 id="zipper-fs">第3章 基于Zipper的文件服务器/操作系统</h2>
+    <p>我们呈现一个文件服务器/操作系统, 其线程和异常是通过定界延续实现的. 文件系统被建模为嵌套的有限映射, 依赖zipper进行导航和更新. 其结果看起来像是Unix文件系统, 但具有改进了的语义: 事务; 任何文件和目录操作的撤销; 快照; 为客户端静态地保证最强的隔离模式, 即可重复读 (repeatable read); 对文件和目录普遍的写时复制; 内置的遍历设施; 对于循环目录引用的符合预期的行为.</p>
+    <p>我们可以很容易地改变我们的文件服务器以支持NFS或者9P或者其他分布式文件系统协议. 我们可以遍历比仅以字符串为键的有限映射更为丰富的项. 特别地, 我们可以将lambda项用作我们的文件系统: 人们可以在<code>bash</code>中<code>cd</code>进一个lambda项.</p>
+    <p>ZipperFS的实现没有不安全的操作, 没有GHC线程, 更不用说Unix线程了, 也没有并发问题. 我们的线程甚至不能进行IO, 也不能变动任何全局状态&mdash;&mdash;而且<em>类型系统确保了这一点</em>. 因此, 我们演示了定界延续如何让我们静态地隔离效应, 即使整个程序最终运行于IO单子之中.</p>
+    <dl>
+      <dt><b>版本</b></dt>
+      <dd>当前版本为2011年2月.</dd>
+      <dt><b>参考文献</b></dt>
+      <dd><a href="https://okmij.org/ftp/continuations/ZFS/zfs-talk.pdf">zfs-talk.pdf</a> [98K]<br/>带有演示的扩充版报告. 它最初是作为Haskell Workshop 2005上的一个额外演示呈现的
+        <p><a href="https://okmij.org/ftp/continuations/ZFS/ZFS.hs">ZFS.hs</a> [18K]<br/>中断处理器, 调度循环, 以及shell的带注释源代码.<br/>这份代码已在FreeBSD和Linux上用GHC 6.4-6.10测试过.</p>
+        <p><a href="https://okmij.org/ftp/continuations/ZFS/ZipperM.hs">ZipperM.hs</a> [8K]<br/>嵌套Map上的Zipper, 带有路径累积和共享保持</p>
+        <p><a href="https://okmij.org/ftp/continuations/ZFS/LowLevelIO.hs">LowLevelIO.hs</a> [4K]<br/>低层次IO操作, 特别是<code>select</code><br/>(也被Iteratee库所使用)</p>
+      </dd>
+    </dl>
+    <h2 id="context-OS">第4章 操作系统中的定界延续</h2>
+    <p>[论文的摘要]</p>
+    <p><em>定界延续</em>是编程语言中定界求值上下文的含义. 我们表明, 它们为系统编程中出现的许多场景提供了统一的观点, 例如对系统服务的请求, 输入/输出的事件处理器, 进程的快照, 正在被读取和更新的文件系统, 以及Web页面. 明确地认识到定界延续的这些用途, 帮助我们设计一个由并发的, 隔离的事务构成的系统, 其中诸如快照, 撤销, 写时复制, 调和 (reconciliation), 以及介入 (interposition) 这样的理想特性都是默认就有的. 这也让我们能够利用来自编程语言研究的高效实现技术. Zipper文件系统是这些想法的原型.</p>
+    <p>与Chung-chieh Shan的合作工作.</p>
+    <p>Olivier Danvy非常好心地指出, 在进程, 作业等边界上定界的操作系统中的延续, 最早可以追溯到1974年Christopher Strachey和Christopher P. Wadsworth的开创性工作<q>Continuations: A mathematical semantics for handling full jumps.</q> Technical Monograph PRG-11, Programming Research Group, Oxford University Computing Laboratory, 1974. 重印于Higher-Order and Symbolic Computation, 2000, 13(1-2):135-152. 以下是他们论文中的脚注1:</p>
+    <blockquote>读者可能会问, 孤立地看待单个程序是否比孤立地看待单个命令更为合理. 答案当然是并不更合理, 而且恰如需要命令延续来解释程序内部的跳转一样, 为了给出操作系统的语义, 将需要更进一步的层级性的延续层次, 例如进程延续, 作业延续以及操作系统延续. 最外层 (或者可能是若干层) 根本不在机器内部, 而是通过操作员的干预实现的. 在本文中, 我们不再进一步讨论延续在操作系统语义中的使用, 因为这样做将需要对操作系统和程序之间的区别有一种比我们目前所拥有的更为完整的理解. 这也会使本文变得太长了...</blockquote>
+    <dl>
+      <dt><b>版本</b></dt>
+      <dd>当前版本为1.2, 2007年6月1日.</dd>
+      <dt><b>参考文献</b></dt>
+      <dd><a href="https://okmij.org/ftp/continuations/ZFS/context-OS.pdf">context-OS.pdf</a> [134K]<br/>Proc. CONTEXT2007: 6th International and Interdisciplinary Conference on Modeling and Using Context. Roskilde, Denmark, August 20-24, 2007. Lecture Notes in Artificial Intelligence 4635, pp. 291-302.
+        <p>在CONTEXT 2007上展示的海报, Roskilde U., Denmark, August 22, 2007.<br/><a href="http://www.cs.rutgers.edu/~ccshan/zipper/poster.ps">&lt; http://www.cs.rutgers.edu/~ccshan/zipper/poster.ps &gt;</a></p>
+      </dd>
+    </dl>
+    <h2 id="zipper-diff">第5章 穿行于若干数据结构以比较和标注它们</h2>
+    <p>穿行于两个数据结构以并排比较它们并标注存在差异的组成成分, 是zipper的一个更有意思也更实用的应用, 其突显了增量式的遍历和函数式的更新. 这个例子的动机来自于一个实际应用, 即忽略内联标记 (inline markup) 来比较两个XML文档. 为了处理大型XML文档, 处理必须原地完成, 以最小化DOM树 (SXML文档) 的复制和重建. 如果两个文档在模去内联标记的意义下是相同的, 那么比较过程原样返回原本的文档, 不复制DOM树或其分支. 这个例子是对<q>相同边缘问题 (same fringe problem)</q>的一个非平凡的推广&mdash;&mdash;我们不仅检测出单个差异, 还返回更新后的文档, 其中每个在字符内容上存在差异的段落都被标记了.</p>
+    <dl>
+      <dt><b>版本</b></dt>
+      <dd>当前版本为1.1, 2005年8月23日.</dd>
+      <dt><b>参考文献</b></dt>
+      <dd><a href="https://okmij.org/ftp/Scheme/xml.html#SXML-diff">带有更新游标的两个不可变SXML文档的联合处理</a></dd>
+    </dl>
+    <h2 id="zipper2">第6章 带有若干个洞的Zipper</h2>
+    <p>挂起对于一个项的遍历给了我们该项的zipper. 挂起对于该项的若干个并发遍历给了我们带有若干个洞的zipper. 并发遍历基于定界延续, 后者让我们将单线程程序视为协作式多线程的. 我们支持并发遍历的各种隔离模式: 从<q>未提交读 (uncommitted read)</q>到<q>可重复读 (repeatable read)</q>到<q>可串行化 (serializable)</q>&mdash;&mdash;甚至还有子事务. 我们既可以使用推模式 (push mode)&mdash;&mdash;一个游标将其更新广播给其他游标&mdash;&mdash;也可以使用拉模式 (pull mode). 游标可以决定在其自行选择的任意检查点广播累积的更新. 游标可以检查由其他游标做出的更新, 并且或许忽略其中一些&mdash;&mdash;或者以不同的顺序, 在其自身的更新之后应用它们. 我们多少有些可互换地使用zipper, 游标和事务这几个术语: zipper是一个游标, 其默认与其他游标隔离, 且其更新是可以即时撤回的.</p>
+    <dl>
+      <dt><b>版本</b></dt>
+      <dd>当前版本为2011年2月.</dd>
+      <dt><b>参考文献</b></dt>
+      <dd><a href="https://okmij.org/ftp/Haskell/Zipper2.lhs">Zipper2.lhs</a> [22K]<br/>详细的带注释代码, 最初以<cite>Two-hole zippers and transactions of various isolation modes</cite>为题发表于Haskell邮件列表, Tue, 10 May 2005 23:11:06 -0700 (PDT). 新版本的代码使用了<code>delimcc</code>库.</dd>
+    </dl>
+  </body>
+</html>

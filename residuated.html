@@ -1,0 +1,90 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>代数和逻辑中的剩余结构</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>代数和逻辑中的剩余结构</h1>
+    <h2>引论</h2>
+    <p>本书与代数 (大致可以理解为对于结构的研究) 和逻辑 (可以理解为对于推理的研究) 之间令人着迷且深刻的联系有关. 我们的关键主张是贯穿和绑定这两个分隔的领域的线索是<em>剩余结构</em>的概念.</p>
+    <p>我们不想在这个阶段给出形式化的定义, 先让我们考虑一些代数和逻辑中出现的剩余结构的例子吧.</p>
+    <p><b>逻辑代数. </b>对于集合<math><mi>A</mi></math>的任意子集<math><mrow><mi>X</mi><mo>,</mo><mi>Y</mi><mo>,</mo><mi>Z</mi></mrow></math>, 子集关系 (subsethood) <math><mo>&sube;</mo></math>, 交<math><mo>&cap;</mo></math>, 并<math><mo>&cup;</mo></math>与补<math><msup><mrow/><mi>c</mi></msup></math>之间有如下关系成立:
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>X</mi><mo>&cap;</mo><mi>Y</mi></mrow>
+            <mo>&sube;</mo><mi>Z</mi></mrow>
+          <mo>&xhArr;</mo>
+          <mrow><mi>X</mi><mo>&sube;</mo>
+            <mrow>
+              <msup><mi>Y</mi><mi>c</mi></msup>
+              <mo>&cup;</mo><mi>Z</mi></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      对于任意由<math><mi>A</mi></math>的子集构成的, 在<math><mo>&cap;</mo></math>, <math><mo>&cup;</mo></math>和<math><msup><mrow/><mi>c</mi></msup></math>下封闭的非空集合<math><mi>B</mi></math>, 结构<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>B</mi><mo>,</mo><mo>&cap;</mo><mo>,</mo><mo>&cup;</mo><mo>,</mo><msup><mrow/><mi>c</mi></msup><mo>,</mo><mi>&empty;</mi><mo>,</mo><mi>A</mi></mrow><mo stretchy="false">&rang;</mo></mrow></math>是一个Boole代数, 是源于George Boole关于思维规律的开创性工作的<q>逻辑代数</q>之一. 事实上, 根据Marshall Stone的一个定理, 每个Boole代数都容许这样一个表示, 并且可以被视为一个剩余结构, 其中被定义的运算<math><mrow><mrow><mi>Y</mi><mo>&rarr;</mo><mi>Z</mi></mrow><mo>&colone;</mo><mrow><msup><mi>Y</mi><mi>c</mi></msup><mo>&cup;</mo><mi>Z</mi></mrow></mrow></math>被称为<math><mo>&cap;</mo></math>的剩余 (residual). 更一般地, 对应于一大族非经典逻辑的代数容许在一个集合<math><mi>L</mi></math>上的一个格序 (lattice-order) <math><mo>&le;</mo></math>和二元运算<math><mo>&sdot;</mo></math>与<math><mo>&rarr;</mo></math>, 它们对<math><mi>L</mi></math>的所有元素<math><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow></math>满足
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow>
+            <mo>&le;</mo><mi>c</mi></mrow>
+          <mo>&xhArr;</mo>
+          <mrow><mi>a</mi><mo>&le;</mo>
+            <mrow><mi>b</mi><mo>&rarr;</mo><mi>c</mi></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      例如, 一个带有对于<math><mrow><mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow><mo>&colone;</mo><mrow><mi>a</mi><mo>&and;</mo><mi>b</mi></mrow></mrow></math>满足这一条件的二元运算<math><mo>&rarr;</mo></math>的有界分配格<math><mrow><mo stretchy="false">&lang;</mo><mrow><mi>L</mi><mo>,</mo><mo>&and;</mo><mo>,</mo><mo>&or;</mo><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">&rang;</mo></mrow></math>被称为一个Heyting代数, 而带有二元运算<math><mrow><mrow><mi>a</mi><mo>&sdot;</mo><mi>b</mi></mrow><mo>&colone;</mo><mrow><mi>max</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>0</mn><mo>,</mo><mrow><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mo>&minus;</mo><mn>1</mn></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>和<math><mrow><mrow><mi>a</mi><mo>&rarr;</mo><mi>b</mi></mrow><mo>=</mo><mrow><mi>min</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>,</mo><mrow><mrow><mn>1</mn><mo>&minus;</mo><mi>a</mi></mrow><mo>+</mo><mi>b</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 以及常数<math><mn>0</mn></math>和<math><mn>1</mn></math>的实单位区间<math><mrow><mo stretchy="false">[</mo><mrow><mn>0</mn><mo>,</mo><mn>1</mn></mrow><mo stretchy="false">]</mo></mrow></math>也满足这一条件, 并构成一个MV代数 (MV-algebra) 的一个重要实例. {译注: 实际上对于有界格, 如果其满足<math><mo>&and;</mo></math>和<math><mo>&rarr;</mo></math>之间的剩余条件, 那么它自动就是分配的.}</p>
+    <p><b>逻辑推论. </b>逻辑推论<math><mo>&vdash;</mo></math>, 合取<math><mo>&and;</mo></math>, 以及推出<math><mo>&rarr;</mo></math>在<em>经典命题逻辑</em>中由一个<q>演绎定理</q>联系起来, 该定理断言, 对于任意的公式<math><mrow><mi>&alpha;</mi><mo>,</mo><mi>&beta;</mi><mo>,</mo><mi>&gamma;</mi></mrow></math>, 我们有
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>&alpha;</mi><mo>&and;</mo><mi>&beta;</mi></mrow>
+            <mo>&vdash;</mo><mi>&gamma;</mi></mrow>
+          <mo>&xhArr;</mo>
+          <mrow><mi>&alpha;</mi><mo>&vdash;</mo>
+            <mrow><mi>&beta;</mi><mo>&rarr;</mo><mi>&gamma;</mi></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      其与Boole代数所满足的剩余条件的相似性当然并非巧合, 不过经典命题逻辑中的推论可以按照诸多不同的方式定义: 语义上可以藉由真值表, 集合, Boole代数, 句法上可以藉由公理系统, 相继式演算, tableau. 此外, 在其他非经典逻辑中, 推论与联结词之间也有类似的关系成立, 这些逻辑由各种各样的代数类和证明系统定义.</p>
+    <p><b>Lambek演算. </b><em>范畴文法</em>旨在通过给语言表达式指派文法范畴或类型来分析自然语言. 这些范畴或类型描述了表达式的句法角色, 例如名词, 动词, 名词短语, 动词短语或句子. 然后, 新的类型可以使用运算<math><mo>&sdot;</mo></math>, <math><mo>\</mo></math>, <math><mo lspace="0" rspace="0">/</mo></math>构造, 其中每当<math><mrow><mi>w</mi><mo>=</mo><mrow><mi>u</mi><mo>&it;</mo><mi>v</mi></mrow></mrow></math>且<math><mi>u</mi></math>具有类型<math><mi>&alpha;</mi></math>而<math><mi>v</mi></math>具有类型<math><mi>&beta;</mi></math>时<math><mi>w</mi></math>就具有类型<math><mrow><mi>&alpha;</mi><mo>&sdot;</mo><mi>&beta;</mi></mrow></math>, 每当表达式<math><mi>u</mi></math>具有类型<math><mi>&alpha;</mi></math>则表达式<math><mrow><mi>u</mi><mo>&it;</mo><mi>w</mi></mrow></math>具有类型<math><mi>&beta;</mi></math>的话<math><mi>w</mi></math>就具有类型<math><mrow><mi>&alpha;</mi><mo>\</mo><mi>&beta;</mi></mrow></math>, 类似地还可以刻画<math><mrow><mi>&beta;</mi><mo lspace="0" rspace="0">/</mo><mi>&alpha;</mi></mrow></math>. 类型的组合及其结果使用符号<math><mo>&rArr;</mo></math>来表达, 以得到诸如<math><mrow><mrow><mi>&alpha;</mi><mo>&sdot;</mo><mrow><mi>&alpha;</mi><mo>\</mo><mi>&beta;</mi></mrow></mrow><mo>&rArr;</mo><mi>&beta;</mi></mrow></math>或者<math><mrow><mrow><mrow><mi>&alpha;</mi><mo lspace="0" rspace="0">/</mo><mi>&beta;</mi></mrow><mo>&sdot;</mo><mi>&beta;</mi></mrow><mo>&rArr;</mo><mi>&alpha;</mi></mrow></math>. 如果允许假言推理, 那么对于所有的类型<math><mrow><mi>&alpha;</mi><mo>,</mo><mi>&beta;</mi><mo>,</mo><mi>&gamma;</mi></mrow></math>, 我们有
+      <math display="block">
+        <mrow>
+          <mrow><mi>&beta;</mi><mo>&rArr;</mo>
+            <mrow><mi>&alpha;</mi><mo>\</mo><mi>&gamma;</mi></mrow>
+          </mrow>
+          <mo>&xhArr;</mo>
+          <mrow>
+            <mrow><mi>&alpha;</mi><mo>&sdot;</mo><mi>&beta;</mi></mrow>
+            <mo>&rArr;</mo><mi>&gamma;</mi></mrow>
+          <mo>&xhArr;</mo>
+          <mrow><mi>&alpha;</mi><mo>&rArr;</mo>
+            <mrow><mi>&gamma;</mi><mo lspace="0" rspace="0">/</mo><mi>&beta;</mi></mrow>
+          </mrow>
+        </mrow>
+        <mtext>.</mtext></math>
+      这些观察引导Joachim Lambek发展了一个用于判定形如<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&rArr;</mo><mi>&alpha;</mi></mrow></math>的相继式的演算, 其中<math><mi mathvariant="normal">&Gamma;</mi></math>是任意有限的类型序列, <math><mi>&alpha;</mi></math>是任意类型. 后来, 这一演算被扩展了关于更多常量符号和格联结词 (lattice connective) 的规则, 给出了现在被称为完全Lambek演算 (full Lambek calculus) 的东西, 它是亚结构逻辑的一个基本例子.</p>
+    <p><b>环的理想. </b></p>
+    <p><b>格序群. </b></p>
+    <p>剩余结构的概念提供了把这些各不相同的例子联结在一起的纽带. 这样的结构反过来又可以使用推论关系的概念在一个统一的逻辑框架中加以研究: 推论关系是某个由公式, 等式或其他对象构成的集合中的元素 (的集合) 之间的一种关系, 它告诉我们<q>什么由什么推出</q>. 任何同一型的代数类都可以以一种自然的方式与等式上的一族推论关系相关联. 此外, 任何证明系统都通过在该系统中的可推导性, 产生公式, 相继式或更复杂对象上的一个推论关系.</p>
+    <p>代数类的推论关系与证明系统的推论关系可以通过一个自然的等价概念联系起来. 众所周知, 经由经典命题逻辑的一个公理系统所定义的公式上的推论关系, 既等价于Boole代数的等式推论关系, 也等价于由Gentzen的相继式演算LK的命题部分得到的相继式上的推论关系. 类似地, 本书中建立了剩余结构类的等式推论关系与由完全Lambek演算的扩张得到的相继式上的推论关系之间的等价.</p>
+    <p>等价概念所提供的代数与逻辑之间的桥梁为双方都带来了好处. 证明论方法可以被用来处理代数中的大量问题, 而通过研究相关联的代数类, 又能获得对逻辑系统的新认识. 事实上, 一个领域的结果常常可以借助所谓的<q>桥梁定理</q>被直接引入另一个领域. 特别地, 一个等式代数类的代数性质, 例如融合性 (amalgamation) 或由某个子类生成, 可以与一个等式推论关系的性质, 例如插值性 (interpolation) 或某条规则的可容许性 (admissibility), 联系起来. 一个合适的证明系统&mdash;&mdash;粗略地说, 是指其中的推导由已经出现在待证明结构中的元素构造而成的系统&mdash;&mdash;随后不仅可以被用来传递像可判定性这样的算法性质, 还可以通过为该系统证明一个对应的句法性质来建立代数性质.</p>
+    <p>在剩余结构的情形中, 代数与逻辑的相互作用所带来的好处远远超出了解决特定问题的方法的传递: 它们为理解那些最初针对特定代数类或逻辑系统所得到的结果提供了一个统摄性的概念. 值得注意的是, <math><mi>&ell;</mi></math>-群的某些基本结构定理只依赖于其他剩余格类所共有的纯序论性质, 而<math><mi>&ell;</mi></math>-群的一些为人熟知的性质, 例如可除性和可消性, 在许多非经典逻辑的代数的结构理论中起着关键作用. 特别地, 有界可除剩余格包含了直觉主义命题逻辑的代数 (Heyting代数), Łukasiewicz逻辑的代数 (MV-代数) 以及Hájek的基本模糊逻辑的代数 (BL-代数), 并且容许强有力的分解定理. 类似地, 在研究这些分解的不可约分量时, 可消性随处可见, 并且某些可消剩余格类可以&mdash;&mdash;经由范畴等价&mdash;&mdash;被看作基于<math><mi>&ell;</mi></math>-群的模态逻辑的代数语义.</p>
+    <h2>第1章 序与剩余</h2>
+    <p>剩余的关键思想出现于序, 代数和逻辑领域中若干条&mdash;&mdash;在概念上和历史上&mdash;&mdash;相互交织的研究脉络. 本章的目的是回顾这些领域中一些最相关的结果, 同时或许甚至能给有经验的读者提供一个关于它们之间联系的新视角.</p>
+    <h3>第1.1节 偏序集与格</h3>
+    <h3>第1.2节 剩余映射</h3>
+    <h2>第2章 证明系统</h2>
+    <h2>第3章 推论关系</h2>
+    <h2>第4章 结构理论</h2>
+    <h2>第5章 半线性和分配性</h2>
+    <h2>第6章 cancellativity</h2>
+    <h2>第7章 可除性</h2>
+    <h2>第8章 代数和逻辑之间的桥梁</h2>
+    <h2>第9章 有限嵌入和有限模型</h2>
+    <h2>附录A. 开放问题</h2>
+    <h2>附录B. 泛代数的基本问题</h2>
+  </body>
+</html>

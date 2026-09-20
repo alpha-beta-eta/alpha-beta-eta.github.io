@@ -26,3 +26,4 @@ div.frame {width: 60%;margin: auto;padding: 10px;border: 5px double black;break-
 .dashed {border: 2.5px dashed white;}
 .small-caps {font-variant: small-caps;}
 .emm {font-family: Segoe Script, KaiTi;}
+mtable.admissible > mtr:first-child > mtd {border-bottom: 1px dotted black;padding-bottom: 2px;}

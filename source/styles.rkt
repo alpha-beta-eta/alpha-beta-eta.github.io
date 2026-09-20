@@ -89,4 +89,7 @@
      (font-variant "small-caps"))
     (".emm"
      (font-family "Segoe Script, KaiTi"))
+    ("mtable.admissible > mtr:first-child > mtd"
+     (border-bottom "1px dotted black")
+     (padding-bottom "2px"))
     ))

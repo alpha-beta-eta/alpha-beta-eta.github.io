@@ -1,0 +1,1889 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Sax: 一种命令式中间语言</title>
+    <link href="styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h1>Sax: 一种命令式中间语言</h1>
+    <p>Frank Pfenning. 原文标题为<q>Lecture Notes on Sax: An Imperative Intermediate Language</q>, 是CMU 15-417/817: HOT Compilation的第1讲讲义, 2025年1月14日.</p>
+    <p>返回<a href="hot.html">HOT编译</a>的索引页面; 本文的译名见<a href="hot_glossary.html">术语翻译对照</a>.</p>
+    <h2 id="introduction">第1章 引论</h2>
+    <p>编写编译器的关键方面之一在于设计表示源语言和目标语言之间的步骤的合适<em>中间语言</em>. 源语言, 中间语言, 目标语言在整个学期将会逐渐演化, 因为你将会为愈来愈复杂的语言编写一系列编译器. 第一次lab的目标在于让你熟悉中间语言; 第二次lab的目标在于如何转换进和出这种语言.</p>
+    <p>所有 (或者应该说几乎所有?) 的编译器都依赖于中间语言. 在15-411编译器设计这门课里, 常用的中间语言是静态单赋值 (SSA) 或者LLVM. CMU开发的Standard ML编译器TIL [Tarditi et al., 2004] 使用了多个中间语言, 并且基于这样一个前提: 中间语言应该是有类型的, 一路向下直到有类型汇编语言 (TAL) [Morrisett et al., 2003] 为止.</p>
+    <p>Sax [DeYoung et al., 2020] 是这个领域中相对较新的成员. 它是相当高层次的, 这是就以下意义而言的: 作为Curry-Howard对应的一个实例, 它对应于一个基于某种形式的相继式演算的逻辑系统. 然而, 它又有着直观的命令式解释. 因为其相对高层次的本性, 定义和使用其亚结构变体是容易的, 探索如何高效地实现这些变体, 以及如何利用它们所保证的性质, 也是容易的.</p>
+    <p>我们不会一次性展示整个Sax, 而是从一个正的且线性的核心开始. 在这个语境下, 正的意味着语言是一阶的, 也就是说, 它没有任何高阶函数. 而这里的线性意味着不需要传统的垃圾回收, 因为所有的内存单元都可以在被读取时释放.</p>
+    <h2 id="positive-types">第2章 正类型与大值</h2>
+    <p>从使用者角度而言, 正类型的值是那些我们可以直接观察结构的值, 其包括布尔值, 自然数, 或者是元素具有可观察类型的列表或树, 等等. 反过来, 负类型的值是那些我们<em>不能</em>直接观察结构但是可以与之进行交互的值, 例如函数和对象.</p>
+    <p>编程语言理论已经建立了对于类型的构建块的基本理解. 与之对应的是, 证明论也确定了命题的构建块. 我们将几乎完全坚持编程语言的视角, 但是有时会将其和直觉主义(线性)命题联系起来.</p>
+    <p>我们对大值进行定型的基本判断是
+      <math display="block">
+        <mrow><mi>V</mi><mo>:</mo><mi>A</mi></mrow>
+      </math>
+      其表达了大值<math><mi>V</mi></math>具有类型<math><mi>A</mi></math>. 我们所观察的值并不包含任何变量, 因而我们无需使用任何上下文来描述其类型. 之所以我们将这些值称为<em>大的</em>, 是因为一个单独的值就包含了关于计算结果的所有信息.</p>
+    <p><b>序对. </b>对于序对的正类型我们记<math><mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow></math>.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>V</mi><mo>:</mo><mi>A</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow><mi>W</mi><mo>:</mo><mi>B</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>V</mi><mo>,</mo><mi>W</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>:</mo>
+              <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&otimes;</mi><mi>I</mi></mrow>
+        </mrow>
+      </math>
+      这个记号是借用自线性逻辑的, 将规则命名为<math><mrow><mi>&otimes;</mi><mi>I</mi></mrow></math>以指示这是一条<em>引入规则</em>也是如此. 在直觉主义逻辑中, 这是两种合取形式之一. 在具有按值调用语义的函数式语言 (ML语族) 中, 其被记为<code>A * B</code>, 这也是我们实际所采用的具体句法.</p>
+    <p><b>单位. </b>对于单位类型我们将其记为<math><mi mathvariant="bold">1</mi></math>, 其中只寓居着单位元素.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow/>
+                <mo stretchy="false">)</mo></mrow>
+              <mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+          </mfrac>
+          <mrow><mi mathvariant="bold">1</mi><mi>I</mi></mrow>
+        </mrow>
+      </math>
+      在常见的语言中, 单位类型通常记作<math><mi mathvariant="bold">unit</mi></math>; 在我们的具体句法中就记作<code>1</code>.</p>
+    <p><b>和. </b>对于类型<math><msub><mi>A</mi><mi>&ell;</mi></msub></math>的无交和我们记作<math><mrow><munder><mo>&sum;</mo><mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow></munder><mrow><mo stretchy="false">(</mo><mrow><mi>&ell;</mi><mo>:</mo><msub><mi>A</mi><mi>&ell;</mi></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 其中<em>标签</em><math><mi>&ell;</mi></math>是从一个有限索引集合<math><mrow><mi>L</mi><mo>&ne;</mo><mrow><mo stretchy="false">{</mo><mrow/><mo stretchy="false">}</mo></mrow></mrow></math>中取的. 在线性逻辑中, 二元的版本记作<math><mrow><mi>A</mi><mo form="infix" largeop="false">&oplus;</mo><mi>B</mi></mrow></math>, 其与直觉主义逻辑中的<math><mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow></math>是相同的. 为了简单起见, 我们避免了空和. 另外, 因为空和并不包含值, 故其编程应用有限. 我们一般使用<math><mi>&ell;</mi></math>和<math><mi>k</mi></math>代表标签.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>k</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mspace width="8ex"/>
+                <mrow><mi>V</mi><mo>:</mo>
+                  <msub><mi>A</mi><mi>k</mi></msub>
+                </mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi>k</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>V</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>:</mo>
+                <mrow>
+                  <munder><mo>&sum;</mo>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  </munder>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>&ell;</mi><mo>:</mo>
+                      <msub><mi>A</mi><mi>&ell;</mi></msub>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&oplus;</mi><mi>I</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow><mi>V</mi><mo>:</mo><mi>A</mi></mrow>
+              <mrow>
+                <mrow>
+                  <munder><mi mathvariant="sans-serif">inl</mi><mo>&UnderBar;</mo></munder>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>V</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>:</mo>
+                <mrow><mi>A</mi><mo form="infix" largeop="false">&oplus;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&oplus;</mi>
+              <msub><mi>I</mi><mn>1</mn></msub>
+            </mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow><mi>V</mi><mo>:</mo><mi>B</mi></mrow>
+              <mrow>
+                <mrow>
+                  <munder><mi mathvariant="sans-serif">inr</mi><mo>&UnderBar;</mo></munder>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>V</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>:</mo>
+                <mrow><mi>A</mi><mo form="infix" largeop="false">&oplus;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&oplus;</mi>
+              <msub><mi>I</mi><mn>2</mn></msub>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      右边我们展示了二元版本这一特殊情形, 其中<math><mrow><mrow><mi>A</mi><mo form="infix" largeop="false">&oplus;</mo><mi>B</mi></mrow><mover><mo>=</mo><mi mathvariant="normal">&Delta;</mi></mover><mrow><mrow><mo stretchy="false">(</mo><mrow><munder><mi mathvariant="sans-serif">inl</mi><mo>&UnderBar;</mo></munder><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow><mo>+</mo><mrow><mo stretchy="false">(</mo><mrow><munder><mi mathvariant="sans-serif">inr</mi><mo>&UnderBar;</mo></munder><mo>:</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 它们并非真的是语言的组成部分.</p>
+    <p>以这些值构造子, 我们已经可以表示诸如布尔<math><mrow><mrow><mo stretchy="false">(</mo><mrow><munder><mi mathvariant="sans-serif">false</mi><mo>&UnderBar;</mo></munder><mo>:</mo><mi mathvariant="bold">1</mi></mrow><mo stretchy="false">)</mo></mrow><mo>+</mo><mrow><mo stretchy="false">(</mo><mrow><munder><mi mathvariant="sans-serif">true</mi><mo>&UnderBar;</mo></munder><mo>:</mo><mi mathvariant="bold">1</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>这样的有限类型. 为了表示诸如列表和自然数这样的无限类型, 我们也需要递归.</p>
+    <p><b>等价递归类型. </b>我们没有添加用于构造递归类型的绑定构造子<math><mrow><mi>&mu;</mi><mi>&alpha;</mi><mo lspace="0">.</mo><mrow><mi>A</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>&alpha;</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 而是以顶层定义来表示递归类型, 例如
+      <math display="block">
+        <mrow><mi mathvariant="bold">type</mi><mspace width="2ex"/>
+          <mrow><mi mathvariant="sans-serif">nat</mi><mo>=</mo>
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                  <mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mo form="infix" largeop="false">&oplus;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                  <mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      {译注: 不要将其与二元和<math><mrow><mi>A</mi><mo form="infix" largeop="false">&oplus;</mo><mi>B</mi></mrow></math>混淆, 这个其实是和类型的某种具体句法.} 从现在开始, 我们对于和采用一种更贴近于我们的具体句法的记号.
+      <math display="block">
+        <mrow><mi mathvariant="bold">type</mi><mspace width="2ex"/>
+          <mrow><mi mathvariant="sans-serif">nat</mi><mo>=</mo>
+            <mrow><mi>&oplus;</mi>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow>
+                    <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                    <mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                  <mo>,</mo>
+                  <mrow>
+                    <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                    <mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      说这些类型是<em>等价递归的</em>是什么意思? 这意味着我们将这种定义视为元层次的<em>等式</em>, 而非需要强制的<em>同构</em>. 下一讲我们将会看到这种简单性是有代价的, 但是我相信这个代价非常值得付出.</p>
+    <p>因为类型定义是等价递归的, 所以我们有着诸如
+      <math display="block">
+        <mrow>
+          <mrow>
+            <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+            <mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow/>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+      </math>
+      这样的判断. 对于<math><mi mathvariant="sans-serif">nat</mi></math>这样的类型名称, 我们也没有单独的规则, 因为我们可以<q>悄无声息</q>地应用和的规则来导出以上的判断.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mfrac displaystyle="true">
+                    <mrow>
+                      <mfrac displaystyle="true">
+                        <mrow/>
+                        <mrow>
+                          <mrow><mo stretchy="false">(</mo>
+                            <mrow/>
+                            <mo stretchy="false">)</mo></mrow>
+                          <mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                      </mfrac>
+                      <mrow><mi mathvariant="bold">1</mi><mi>I</mi></mrow>
+                    </mrow>
+                    <mrow>
+                      <mrow>
+                        <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                        <mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow/>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+                  </mfrac>
+                  <mrow><mi>&oplus;</mi><mi>I</mi></mrow>
+                </mrow>
+                <mrow>
+                  <mrow>
+                    <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                        <mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow/>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+              </mfrac>
+              <mrow><mi>&oplus;</mi><mi>I</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                    <mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow>
+                        <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                        <mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow/>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+              <mo>:</mo><mi mathvariant="sans-serif">nat</mi></mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>I</mi></mrow>
+        </mrow>
+      </math>
+      以数学语言, 所有以这种方式定义的正类型都是<em>归纳的</em>. 这需要一个限制: 类型定义的右侧不应该是类型名称本身, 而是应该以某个构造子 (<math><mo form="infix" largeop="false">&otimes;</mo></math>, <math><mi mathvariant="bold">1</mi></math>, <math><mo form="infix" largeop="false">&oplus;</mo></math>) 开始. 这避免了形如<math><mrow><mi mathvariant="bold">type</mi><mspace width="2ex"/><mrow><mi>t</mi><mo>=</mo><mi>t</mi></mrow></mrow></math>的定义.</p>
+    <p>此外, 我们允许所有的类型定义都是互递归的, 假如我们使用显式类型构造子<math><mi>&mu;</mi></math>的话, 这可能会有点令人不快.</p>
+    <p>作为另一个例子, 自然数的列表可以定义为
+      <math display="block">
+        <mrow><mi mathvariant="bold">type</mi><mspace width="2ex"/>
+          <mrow><mi mathvariant="sans-serif">list</mi><mo>=</mo>
+            <mrow><mi>&oplus;</mi>
+              <mrow><mo stretchy="false">{</mo>
+                <mrow>
+                  <mrow>
+                    <munder><mi mathvariant="sans-serif">nil</mi><mo>&UnderBar;</mo></munder>
+                    <mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                  <mo>,</mo>
+                  <mrow>
+                    <munder><mi mathvariant="sans-serif">cons</mi><mo>&UnderBar;</mo></munder>
+                    <mo>:</mo>
+                    <mrow><mi mathvariant="sans-serif">nat</mi><mo form="infix" largeop="false">&otimes;</mo><mi mathvariant="sans-serif">list</mi></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">}</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </p>
+    <h2 id="memory">第3章 内存和小值</h2>
+    <p>到目前为止我们知道了我们想要表示大值, 但是我们也想要以某种方式在内存中表示大值, 以使得我们能够命令式地对其进行操作. 然而, 一个内存单元不能存放具有任意大小的值, 因而我们需要将大值分解为更小的部分. 我们的方法是使用一种抽象语义对象<math><mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>v</mi></mrow></math>, 其表示地址<math><mi>a</mi></math>处的内存单元存放着小值<math><mi>v</mi></math>. 一个小值要么是一对地址, 要么是单位值, 要么是一个标签连带着一个地址. 例如, 之前的例子里的数字二可以表示为
+      <math display="block">
+        <mtable columnalign="left">
+          <mtr>
+            <mtd><mi mathvariant="sans-serif">cell</mi></mtd>
+            <mtd><mn>0</mn></mtd>
+            <mtd>
+              <mrow>
+                <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi mathvariant="sans-serif">cell</mi></mtd>
+            <mtd><mn>1</mn></mtd>
+            <mtd>
+              <mrow>
+                <munder><mi mathvariant="sans-serif">succ</mi><mo>&UnderBar;</mo></munder>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mn>3</mn><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi mathvariant="sans-serif">cell</mi></mtd>
+            <mtd><mn>3</mn></mtd>
+            <mtd>
+              <mrow>
+                <munder><mi mathvariant="sans-serif">zero</mi><mo>&UnderBar;</mo></munder>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd><mi mathvariant="sans-serif">cell</mi></mtd>
+            <mtd><mn>4</mn></mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow/>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      这里我们用了整数来表示地址, 这对于真实内存而言实际上是典型的. 我们也假定了每个内存单元都有足够的空间用于存放任意的小值. 通常来说, 两个机器字就足以存放一对地址, 带标签的值, 以及单位值.</p>
+    <p>我们或许已经可以预见到这里的一些优化, 例如不分配一个显式的单元来存放单位值. 然而, 重要的是在这个阶段不要沉迷于这些考虑, 而是先实现直接的版本. 一方面, 它是有理论支撑的, 并且其实现应该是简单的, 因而比一个更复杂但可能经过优化的实现更有可能是正确的. 另一方面, 它为我们提供了一个基线, 使得我们之后可以测量优化实际上给我们带来了什么.</p>
+    <p>还有一点: 程序可被观察到的结果是它的大值, 而不是它精确的布局. 在上面的例子中, 我们跳过了地址<math><mn>2</mn></math>, 就是为了说明这一点. 因此, 在求值结束时, 需要一个小程序来遍历内存并打印出大值. 这个程序将依赖于对于内存布局的特定选择, 例如单位值是否被显式表示.</p>
+    <h2 id="typing-memory">第4章 对于内存进行定型</h2>
+    <p>我们如何给一个内存单元指派类型呢? 例如, 单元
+      <math display="block">
+        <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      定义了地址<math><mi>c</mi></math>处的小值, 并引用了地址<math><mi>a</mi></math>和<math><mi>b</mi></math>处的小值. 因此, 我们将其定型为
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow>
+            <mo>,</mo>
+            <mrow><mi>b</mi><mo>:</mo><mi>B</mi></mrow>
+          </mrow>
+          <mo>&vdash;</mo>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>::</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>c</mi><mo>:</mo>
+                <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      这与大值的定型有两处不同. 一是现在有了代表其他内存单元 (这里是<math><mi>a</mi></math>和<math><mi>b</mi></math>) 的类型的前件. 二是我们也为后件提供了一个地址 (这里是<math><mi>c</mi></math>), 以追踪小值存放在何处.</p>
+    <p>一般而言, 我们希望在程序执行时维持类型&mdash;&mdash;这是一个几乎普适的原则, 用以确保计算的结果满足关于其类型的原初期望. 因此, 一个写入内存单元的命令应该恰以结果单元的方式被定型. 这给出了以下规则.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow>
+                <mrow>
+                  <mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow>
+                  <mo>,</mo>
+                  <mrow><mi>b</mi><mo>:</mo><mi>B</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>c</mi><mo>:</mo>
+                      <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&otimes;</mi><mi>X</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi>&middot;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow/>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>c</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>X</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>k</mi><mo>&in;</mo><mi>L</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mrow>
+              <mrow><mi>a</mi><mo>:</mo>
+                <msub><mi>A</mi><mi>k</mi></msub>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                  <mrow><mi>k</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>c</mi><mo>:</mo>
+                    <mrow>
+                      <munder><mo>&sum;</mo>
+                        <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                      </munder>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&ell;</mi><mo>:</mo>
+                          <msub><mi>A</mi><mi>&ell;</mi></msub>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      我们将它们命名为<math><mi>X</mi></math>是因为如果忽略命令的话, 它们代表了逻辑公理.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow>
+                <mrow><mi>A</mi><mo>,</mo><mi>B</mi></mrow>
+                <mo>&vdash;</mo>
+                <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&otimes;</mi><mi>X</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi>&middot;</mi><mo>&vdash;</mo><mi mathvariant="bold">1</mi></mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>X</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi>A</mi><mo>&vdash;</mo>
+                <mrow><mi>A</mi><mo form="infix" largeop="false">&oplus;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&oplus;</mi>
+              <msub><mi>X</mi><mn>1</mn></msub>
+            </mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi>B</mi><mo>&vdash;</mo>
+                <mrow><mi>A</mi><mo form="infix" largeop="false">&oplus;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi>&oplus;</mi>
+              <msub><mi>X</mi><mn>2</mn></msub>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      于是这些规则保持了与逻辑规则的对应. 定型判断现在具有形式
+      <math display="block">
+        <mrow>
+          <munder>
+            <munder>
+              <mrow>
+                <mrow>
+                  <msub><mi>a</mi><mn>1</mn></msub>
+                  <mo>:</mo>
+                  <msub><mi>A</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <mrow>
+                  <msub><mi>a</mi><mi>n</mi></msub>
+                  <mo>:</mo>
+                  <msub><mi>A</mi><mi>n</mi></msub>
+                </mrow>
+              </mrow>
+              <mo>&UnderBrace;</mo></munder>
+            <mtext>从这里读取</mtext></munder>
+          <mo>&vdash;</mo>
+          <mrow><mi>P</mi><mo>::</mo>
+            <munder>
+              <munder>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>c</mi><mo>:</mo><mi>C</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&UnderBrace;</mo></munder>
+              <mtext>写入这里</mtext></munder>
+          </mrow>
+        </mrow>
+      </math>
+      其中<math><mrow><msub><mi>a</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>a</mi><mi>n</mi></msub></mrow></math>和<math><mi>c</mi></math>代表地址, 而<math><mi>P</mi></math>是一个要执行的命令. 我们常常将<math><mi>P</mi></math>视为一个<em>进程</em>, 因为 (正如我们将会看到的) 这个语言有着自然的并行解释. 如果我们想要强调顺序意义, 我们就说<em>命令</em>.</p>
+    <p>在我们的动态语义中, 语义对象有两种形式. <math><mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow></math>表示地址为<math><mi>c</mi></math>的单元存放着小值<math><mi>v</mi></math>. 我们也记<math><mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/><mi>P</mi></mrow></math>, 其意味着进程<math><mi>P</mi></math>正在执行. 于是, 写操作的动态语义的规定几乎是平凡的:
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>&xrarr;</mo>
+          <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <h2 id="reading">第5章 从内存中读取</h2>
+    <p>将小值写入内存很容易借由内存单元本身必须如何定型来解释. 那么读取呢? 例如, 当读取一个序对时, 我们将两个变量绑定到地址, 一个绑定到第一个分量, 另一个绑定到第二个分量. 相应的构造是
+      <math display="block">
+        <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+          <mrow>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mo>&rArr;</mo>
+            <mrow><mi>P</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      其中我们显式写出了<math><mi>P</mi></math>对于<math><mi>x</mi></math>和<math><mi>y</mi></math>的依赖.</p>
+    <p>我们可以看到, 如果<math><mrow><mi>c</mi><mo>:</mo><mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow></mrow></math>存放着一个小值<math><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></math>, 那么在我们执行<math><mi>P</mi></math>时, <math><mi>x</mi></math>应该被绑定到<math><mi>a</mi></math>, <math><mi>y</mi></math>应该被绑定到<math><mi>b</mi></math>. 我们将其记为
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>,</mo>
+            <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&rArr;</mo>
+                    <mrow><mi>P</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>&xrarr;</mo>
+          <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+            <mrow><mi>P</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+        </mrow>
+      </math>
+      这对于定型意味着什么呢? 当我们从<math><mi>c</mi></math>读取时, 我们使用了它, 然后在给<math><mi>P</mi></math>定型时我们就可以使用<math><mi>a</mi></math>和<math><mi>b</mi></math> (在程序中由<math><mi>x</mi></math>和<math><mi>y</mi></math>表示).
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi>P</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>c</mi><mo>:</mo>
+                  <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                </mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&rArr;</mo>
+                    <mrow><mi>P</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&otimes;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      这里, 我们用<math><mi>&delta;</mi></math>表示诸如<math><mrow><mi>d</mi><mo>:</mo><mi>D</mi></mrow></math>这样的东西, 它命名了<math><mi>P</mi></math>最终必须写入的地址. 我们常常将<math><mi>d</mi></math>称为<em>目的地</em>.</p>
+    <p>单位类型的情况是类似的, 但是并不绑定任何变量.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow/>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>,</mo>
+            <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow/>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&rArr;</mo><mi>P</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>&xrarr;</mo>
+          <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/><mi>P</mi></mrow>
+        </mrow>
+      </math>
+      而从定型的角度来看:
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow><mi>P</mi><mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>c</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow/>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&rArr;</mo><mi>P</mi></mrow>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi mathvariant="bold">1</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>为了读取和, 进程必须考虑所有可能的和项.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                    <mrow>
+                      <msub><mi>x</mi><mi>&ell;</mi></msub>
+                      <mo>:</mo>
+                      <msub><mi>A</mi><mi>&ell;</mi></msub>
+                    </mrow>
+                  </mrow>
+                  <mo>&vdash;</mo>
+                  <mrow>
+                    <mrow>
+                      <msub><mi>P</mi><mi>&ell;</mi></msub>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <msub><mi>x</mi><mi>&ell;</mi></msub>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mo>::</mo><mi>&delta;</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mo>&forall;</mo>
+                  <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>c</mi><mo>:</mo>
+                  <mrow>
+                    <munder><mo>&sum;</mo>
+                      <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                    </munder>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>&ell;</mi><mo>:</mo>
+                        <msub><mi>A</mi><mi>&ell;</mi></msub>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                  <msub>
+                    <mrow><mo stretchy="false">{</mo>
+                      <mrow>
+                        <mrow><mi>&ell;</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msub><mi>x</mi><mi>&ell;</mi></msub>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo>&rArr;</mo>
+                        <mrow>
+                          <msub><mi>P</mi><mi>&ell;</mi></msub>
+                          <mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msub><mi>x</mi><mi>&ell;</mi></msub>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mrow>
+                      <mo stretchy="false">}</mo></mrow>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  </msub>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      <math><mrow><mi>&oplus;</mi><mi>L</mi></mrow></math>规则对于<math><mi>L</mi></math>中的每个标签都有一个前提, 因此在命令执行期间正确的分支总是可用的.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow>
+              <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                <mrow><mi>k</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>,</mo>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/>
+                    <msub>
+                      <mrow><mo stretchy="false">{</mo>
+                        <mrow>
+                          <mrow><mi>&ell;</mi><mo>&af;</mo>
+                            <mrow><mo stretchy="false">(</mo>
+                              <msub><mi>x</mi><mi>&ell;</mi></msub>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                          <mo>&rArr;</mo>
+                          <mrow>
+                            <msub><mi>P</mi><mi>&ell;</mi></msub>
+                            <mo>&af;</mo>
+                            <mrow><mo stretchy="false">(</mo>
+                              <msub><mi>x</mi><mi>&ell;</mi></msub>
+                              <mo stretchy="false">)</mo></mrow>
+                          </mrow>
+                        </mrow>
+                        <mo stretchy="false">}</mo></mrow>
+                      <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                    </msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo>&xrarr;</mo>
+            <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+              <mrow>
+                <msub><mi>P</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>k</mi><mo>&in;</mo><mi>L</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>这些规则被称为<em>左规则</em>, 因为它们考虑的是前件的类型, 也就是说, 位于十字转门左侧的东西. 它们就是Gentzen的相继式演算 [Gentzen, 1935] 中的左规则, 读者可能对此有所了解.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi><mo>,</mo><mi>B</mi></mrow>
+                <mo>&vdash;</mo><mi>C</mi></mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                  <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo><mi>C</mi></mrow>
+            </mfrac>
+            <mrow><mi>&otimes;</mi><mi>L</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>C</mi></mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="bold">1</mi></mrow>
+                <mo>&vdash;</mo><mi>C</mi></mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>L</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                  <mo>&vdash;</mo><mi>C</mi></mrow>
+                <mspace width="8ex"/>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>B</mi></mrow>
+                  <mo>&vdash;</mo><mi>C</mi></mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                  <mrow><mi>A</mi><mo form="infix" largeop="false">&oplus;</mo><mi>B</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo><mi>C</mi></mrow>
+            </mfrac>
+            <mrow><mi>&oplus;</mi><mi>L</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      我们观察到, 从逻辑的角度来看, 我们保留了相继式演算的所有左规则, 而将右规则替换为了公理. 这就是为什么我们称其为<em>半公理相继式演算</em> (semi-axiomatic sequent calculus), 简称Sax.</p>
+    <h2 id="cut-identity">第6章 切和恒等</h2>
+    <p>我们还缺少相继式演算中的两条重要规则, 即切和恒等.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo><mi>A</mi></mrow>
+                <mspace width="8ex"/>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo><mi>A</mi></mrow>
+                  <mo>&vdash;</mo><mi>C</mi></mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="normal">&Delta;</mi></mrow>
+                <mo>&vdash;</mo><mi>C</mi></mrow>
+            </mfrac>
+            <mi mathvariant="normal">cut</mi></mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi>A</mi><mo>&vdash;</mo><mi>A</mi></mrow>
+            </mfrac>
+            <mi mathvariant="normal">id</mi></mrow>
+        </mrow>
+      </math>
+      它们在这里是什么意思呢? 原来, 切分配了一个新鲜的内存单元.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>P</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi>Q</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="normal">&Delta;</mi></mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <mrow><mi>P</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mspace width="2ex"/>
+                  <mrow><mi>Q</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">cut</mi></mrow>
+      </math>
+      我们既可以将其读作一个并行构造, 也可以将其读作一个顺序构造, 后者是并行程序的一种特定调度. 进程
+      <math display="block">
+        <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+            <mo stretchy="false">)</mo></mrow>
+          <mspace width="2ex"/>
+          <mrow><mi>P</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mspace width="2ex"/>
+          <mrow><mi>Q</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      分配一个新的单元<math><mi>a</mi></math> (在程序中以<math><mi>x</mi></math>指称) {译注: 原文此处写作<q>referred to as a in the program</q>, 应为笔误.} 并派生一个进程<math><mrow><mi>P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 其职责是写入<math><mi>a</mi></math>. 进程<math><mrow><mi>Q</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>将会从<math><mi>a</mi></math>读取. 我们的定型判断的解释在这里并没有留下多少余地. 注意<math><mi>a</mi></math>被称为一个<em>期值</em> (future) [Halstead, 1985, Pruiksma and Pfenning, 2022], 也是一个同步点: 如果<math><mrow><mi>Q</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>试图在<math><mrow><mi>P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>写入<math><mi>a</mi></math>之前从<math><mi>a</mi></math>读取, 那么<math><mrow><mi>Q</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>将会阻塞, 直到<math><mi>a</mi></math>被写入.</p>
+    <p>顺序解释完整地执行<math><mrow><mi>P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math> (也就是说, 直到它写入其目的地<math><mi>a</mi></math>为止), 然后才执行<math><mrow><mi>Q</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>. 于是, <math><mrow><mi>Q</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>永远无需检查<math><mi>a</mi></math>是否已经被写入, 因为它保证已经被写入了.</p>
+    <p>从动态语义的角度来看, 它不过就是
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mspace width="2ex"/>
+                  <mrow><mi>P</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mspace width="2ex"/>
+                  <mrow><mi>Q</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&xrarr;</mo>
+            <mrow>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mi>P</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>,</mo>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mi>Q</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow><mi>a</mi><mtext> 新鲜</mtext></mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>我们看到, 在动态语义的这种表述中, 状态里可以有不止一个<q>proc</q>对象. 抽象规则允许其中任何有可应用规则的对象进行转移. 当然, 存在一些方法可以形式化地强制<math><mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/><mrow><mi>P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>在<math><mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/><mrow><mi>Q</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>开始之前完成, 但是如果我们的关键性质 (例如标准的进展和保持) 并不依赖于此, 我们也可以让它保持非形式化. 某种程度上说, 任何与规则相容的策略对于实现而言都是允许的.</p>
+    <p>这种规定动态语义的方式被称为<em>亚结构操作语义</em> (substructural operational semantics, SSOS) [Pfenning, 2004, Pfenning and Simmons, 2009, Simmons, 2012], 它基于多重集重写 [Cervesato and Scedrov, 2009], 因为构成计算状态的语义对象的汇集被解释为一个多重集. 关于这一点, 下一讲会讲更多.</p>
+    <p>恒等规则只是通过在一步之内从一个单元读取并写入另一个单元, 将一个小值从一个单元移动到另一个单元.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow>
+              <mrow><mi>b</mi><mo>:</mo><mi>A</mi></mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>b</mi></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">id</mi></mrow>
+      </math>
+      其动态语义为
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>b</mi><mspace width="2ex"/><mi>v</mi></mrow>
+            <mo>,</mo>
+            <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>b</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>&xrarr;</mo>
+          <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>v</mi></mrow>
+        </mrow>
+      </math>
+    </p>
+    <h2 id="procedures">第7章 过程定义</h2>
+    <p>到目前为止, 我们的语言只有正类型, 那么如何可能定义过程呢? (我们说过程, 是因为执行它们是为了其对于存储的效应, 而不像函数那样接受一个参数并返回一个结果.) 我们在课上没有讨论这一点, 但是我们在现场编写的例子中用到了它.</p>
+    <p>这一点有些重要, 因为我们想要在允许第一级函数, 对象等之前定义一个一阶语言. 为了定义一个名为<math><mi>p</mi></math>的过程, 我们写
+      <math display="block">
+        <mrow>
+          <mrow><mi mathvariant="bold">proc</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>y</mi><mn>1</mn></msub>
+                <mo>:</mo>
+                <msub><mi>B</mi><mn>1</mn></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mspace width="2ex"/><mo>&hellip;</mo><mspace width="2ex"/>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow>
+                <msub><mi>y</mi><mi>n</mi></msub>
+                <mo>:</mo>
+                <msub><mi>B</mi><mi>n</mi></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+          <mo>=</mo>
+          <mrow><mi>P</mi><mo>&af;</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo>,</mo>
+                <msub><mi>y</mi><mn>1</mn></msub>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <msub><mi>y</mi><mi>n</mi></msub>
+              </mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+    </p>
+    <p>每个过程<math><mi>p</mi></math>首先接受一个目的地 (这里是<math><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow></math>), 然后是额外的参数<math><msub><mi>y</mi><mi>i</mi></msub></math>. 在执行时, <math><mi>x</mi></math>和所有的<math><msub><mi>y</mi><mi>i</mi></msub></math>都将被绑定到地址. 为了实现这一点, 我们有一个新的构造
+      <math display="block">
+        <mrow><mi mathvariant="bold">call</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/>
+          <msub><mi>b</mi><mn>1</mn></msub>
+          <mspace width="2ex"/><mo>&hellip;</mo><mspace width="2ex"/>
+          <msub><mi>b</mi><mi>n</mi></msub>
+        </mrow>
+      </math>
+      其中参数的数目, 位置和类型必须与过程定义中的那些相匹配.</p>
+    <p>就像类型定义那样, 过程定义可以是任意互递归的. 这与诸如Standard ML和OCaml这样的语言中以句法方式表达的(互)递归形式不同.</p>
+    <p>我们已经说过过程不是函数, 那么它们是什么呢? 原来, 它们是上下文模态类型论 [Nanevski et al., 2008] 意义下的<em>元变量</em>. 考虑对于某个元变量<math><mi>p</mi></math>的相继式
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow>
+              <msub><mi>y</mi><mn>1</mn></msub>
+              <mo>:</mo>
+              <msub><mi>B</mi><mn>1</mn></msub>
+            </mrow>
+            <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+            <mrow>
+              <msub><mi>y</mi><mi>n</mi></msub>
+              <mo>:</mo>
+              <msub><mi>B</mi><mi>n</mi></msub>
+            </mrow>
+          </mrow>
+          <mo>&vdash;</mo>
+          <mrow><mi>p</mi><mo>::</mo>
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math><mi>p</mi></math>的类型是什么? 它既依赖于所有的前件, 也依赖于后件. 在上下文模态类型论中, 我们可能会写
+      <math display="block">
+        <mrow><mi>p</mi><mo>::</mo>
+          <mrow><mi>A</mi>
+            <mrow><mo stretchy="false">[</mo>
+              <mrow>
+                <mrow>
+                  <msub><mi>y</mi><mn>1</mn></msub>
+                  <mo>:</mo>
+                  <msub><mi>B</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <mrow>
+                  <msub><mi>y</mi><mi>n</mi></msub>
+                  <mo>:</mo>
+                  <msub><mi>B</mi><mi>n</mi></msub>
+                </mrow>
+              </mrow>
+              <mo stretchy="false">]</mo></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      但是这里目的地<math><mi>x</mi></math>也必须被命名, 因此它也许可以写成
+      <math display="block">
+        <mrow><mi>p</mi><mo>::</mo>
+          <mrow><mo stretchy="false">(</mo>
+            <mrow>
+              <mrow>
+                <mrow>
+                  <msub><mi>y</mi><mn>1</mn></msub>
+                  <mo>:</mo>
+                  <msub><mi>B</mi><mn>1</mn></msub>
+                </mrow>
+                <mo>,</mo><mo>&hellip;</mo><mo>,</mo>
+                <mrow>
+                  <msub><mi>y</mi><mi>n</mi></msub>
+                  <mo>:</mo>
+                  <msub><mi>B</mi><mi>n</mi></msub>
+                </mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+            </mrow>
+            <mo stretchy="false">)</mo></mrow>
+        </mrow>
+      </math>
+      因此, <math><mi>p</mi></math>代表的是整个相继式的推导, 而不是诸如<math><mrow><mi>B</mi><mo>&rarr;</mo><mi>A</mi></mrow></math>这样的单个函数. 此外, <math><mi>p</mi></math>将是闭的, 意思是它的所有变量都将是<math><mi>x</mi></math>和<math><msub><mi>y</mi><mi>i</mi></msub></math>, 而没有其他东西. 正是这种闭的性质, 使得即便类型系统在其他方面是线性的, 我们也可以任意地重用这些过程定义.</p>
+    <p>我们将在下一讲中处理过程定义和调用的定型.</p>
+    <h2 id="sample-code">第8章 一些示例代码</h2>
+    <p>在具体句法中有一些选择要做. 我们将<math><mo form="infix" largeop="false">&oplus;</mo></math>简单地写成<code>+</code>, 将<math><mo form="infix" largeop="false">&otimes;</mo></math>写成<code>*</code>. 此外, 所有的标签都具有形式<code>'&lt;ident&gt;</code>. 注释具有形式<code>// ...\n</code>或<code>/* ... */</code>, 后者可以正确地嵌套. 另外, <code>read</code>的分支被括在花括号<code>{ ... }</code>中, 并且每个选项前面都有一条竖线<code>|</code>. 唯一的例外是只有单个分支的情况. 更多细节可以在Lab 1的规范中找到, 我们在课上现场编写了这些代码.</p>
+    <p>尽管句法本身使其无歧义, 我们还是使用缩进将写入新分配单元的命令与读取者区分开来. 下面的文件是<code>lec01.sax</code>.<pre><code>/* Lecture 1 */
+/* 15-{4,6,8}17 Spring 2025 */
+
+type nat = +{'zero : 1, 'succ : nat}
+
+type bin = +{'b0 : bin, 'b1 : bin, 'e : 1}
+
+// two = 'b0 'b1 'e ()
+
+proc zero (d : bin) =
+  cut u : 1
+    write u ()
+  write d 'e(u)
+
+proc one (d : bin) =
+  cut x : bin
+    call zero x
+  write d 'b1(x)
+
+proc succ (d : bin) (x : bin) =
+  read x {
+  | 'b0(x0) => write d 'b1(x0)
+  | 'b1(x1) => cut y : bin
+                  call succ y x1
+               write d 'b0(y)
+  | 'e(u) => read u ()
+             call one d
+  }
+
+proc two (d : bin) =
+  cut x : bin
+    call one x
+  call succ d x</code></pre></p>
+    <p>无参数过程 (那些只有一个目的地的过程) 可以被执行, 这里就是<code>zero</code>, <code>one</code>和<code>two</code>. 它们产生一个终态, 从中可以读出相应大值的表示. 相应的文件<code>lec01.sax.val</code>由编译器写出, 其内容如下.<pre><code>value zero = 'e ()
+value one = 'b1 'e ()
+value two = 'b0 'b1 'e ()</code></pre></p>
+    <h2 id="summary">第9章 总结</h2>
+    <p>我们还没有讨论这个系统的许多性质, 包括命令的<q>线性</q>意味着什么. 我们将在下一讲回到这一点. 以下是今天的规则的总结.</p>
+    <h3 id="summary-typing">第9.1节 定型</h3>
+    <p>假设有一个程序<math><mi mathvariant="normal">&Sigma;</mi></math>带有声明<math><mrow><mrow><mi mathvariant="bold">y</mi><mo>:</mo><mi mathvariant="bold">B</mi></mrow><mo>&vdash;</mo><mrow><mi>p</mi><mo>::</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. <math><mi>p</mi></math>的定义与过程的类型检查无关, 但是我们必须对照每个过程定义的类型检查该定义 (假设所有其他定义都满足其类型).
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow>
+                <mrow><mi>y</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi>y</mi></mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mi mathvariant="normal">id</mi></mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                  <mrow><mi>P</mi><mo>::</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mspace width="8ex"/>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Delta;</mi><mo>,</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  </mrow>
+                  <mo>&vdash;</mo>
+                  <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+                </mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi mathvariant="normal">&Delta;</mi></mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mspace width="2ex"/><mi>P</mi><mspace width="2ex"/><mi>Q</mi></mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mi mathvariant="normal">cut</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow/>
+              <mrow><mi>&middot;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow/>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>X</mi></mrow>
+          </mrow>
+          <mspace width="16ex"/>
+          <mrow>
+            <mfrac displaystyle="true">
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+              </mrow>
+              <mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi mathvariant="bold">1</mi></mrow>
+                </mrow>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                    <mrow>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow/>
+                        <mo stretchy="false">)</mo></mrow>
+                      <mo>&rArr;</mo><mi>Q</mi></mrow>
+                  </mrow>
+                  <mo>::</mo><mi>&delta;</mi></mrow>
+              </mrow>
+            </mfrac>
+            <mrow><mi mathvariant="bold">1</mi><mi>L</mi></mrow>
+          </mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow>
+              <mrow>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>z</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>z</mi><mo>:</mo>
+                    <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&otimes;</mi><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi>y</mi><mo>:</mo><mi>B</mi></mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow><mi>Q</mi><mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>z</mi><mo>:</mo>
+                  <mrow><mi>A</mi><mo form="infix" largeop="false">&otimes;</mo><mi>B</mi></mrow>
+                </mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>z</mi><mspace width="2ex"/>
+                  <mrow>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mo>&rArr;</mo><mi>Q</mi></mrow>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&otimes;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      {译注: 原文中这条规则的名字写作<math><mrow><mi>&otimes;</mi><mi>R</mi></mrow></math>, 应为笔误, 这里改正为<math><mrow><mi>&otimes;</mi><mi>L</mi></mrow></math>.}
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow><mo stretchy="false">(</mo>
+              <mrow><mi>k</mi><mo>&in;</mo><mi>L</mi></mrow>
+              <mo stretchy="false">)</mo></mrow>
+            <mrow>
+              <mrow><mi>y</mi><mo>:</mo>
+                <msub><mi>A</mi><mi>k</mi></msub>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                  <mrow><mi>k</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>:</mo>
+                    <msub>
+                      <mrow><mi>&oplus;</mi>
+                        <mrow><mo stretchy="false">{</mo>
+                          <mrow><mi>&ell;</mi><mo>:</mo>
+                            <msub><mi>A</mi><mi>&ell;</mi></msub>
+                          </mrow>
+                          <mo stretchy="false">}</mo></mrow>
+                      </mrow>
+                      <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                    </msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>X</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                    <mrow><mi>y</mi><mo>:</mo>
+                      <msub><mi>A</mi><mi>&ell;</mi></msub>
+                    </mrow>
+                  </mrow>
+                  <mo>&vdash;</mo>
+                  <mrow>
+                    <msub><mi>Q</mi><mi>&ell;</mi></msub>
+                    <mo>::</mo><mi>&delta;</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mo>&forall;</mo>
+                  <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mi>x</mi><mo>:</mo>
+                  <msub>
+                    <mrow><mi>&oplus;</mi>
+                      <mrow><mo stretchy="false">{</mo>
+                        <mrow><mi>&ell;</mi><mo>:</mo>
+                          <msub><mi>A</mi><mi>&ell;</mi></msub>
+                        </mrow>
+                        <mo stretchy="false">}</mo></mrow>
+                    </mrow>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  </msub>
+                </mrow>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/>
+                  <msub>
+                    <mrow><mo stretchy="false">{</mo>
+                      <mrow>
+                        <mrow><mi>&ell;</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msub><mi>y</mi><mi>&ell;</mi></msub>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                        <mo>&rArr;</mo>
+                        <msub><mi>Q</mi><mi>&ell;</mi></msub>
+                      </mrow>
+                      <mo stretchy="false">}</mo></mrow>
+                    <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                  </msub>
+                </mrow>
+                <mo>::</mo><mi>&delta;</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&oplus;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">y</mi><mo>:</mo><mi mathvariant="bold">B</mi></mrow>
+                    <mo>&vdash;</mo>
+                    <mrow><mi>p</mi><mo>::</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&in;</mo><mi mathvariant="normal">&Sigma;</mi></mrow>
+              <mspace width="8ex"/>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="bold">b</mi><mo lspace="0" rspace="0">/</mo><mi mathvariant="bold">y</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>::</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="bold">y</mi><mo>:</mo><mi mathvariant="bold">B</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow><mi mathvariant="bold">call</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi mathvariant="bold">b</mi></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>:</mo><mi>A</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mi mathvariant="normal">call</mi></mrow>
+      </math>
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mn>1</mn></msub>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <msub><mi>&eta;</mi><mn>1</mn></msub>
+                  <mo>::</mo>
+                  <msub><mi mathvariant="normal">&Delta;</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mn>2</mn></msub>
+                <mo>&vdash;</mo>
+                <mrow>
+                  <msub><mi>&eta;</mi><mn>2</mn></msub>
+                  <mo>::</mo>
+                  <msub><mi mathvariant="normal">&Delta;</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mn>1</mn></msub>
+                <mo>,</mo>
+                <msub><mi mathvariant="normal">&Gamma;</mi><mn>2</mn></msub>
+              </mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi>&eta;</mi><mn>1</mn></msub>
+                    <mo>,</mo>
+                    <msub><mi>&eta;</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <msub><mi mathvariant="normal">&Delta;</mi><mn>1</mn></msub>
+                    <mo>,</mo>
+                    <msub><mi mathvariant="normal">&Delta;</mi><mn>2</mn></msub>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow><mi>&middot;</mi><mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo><mi>&middot;</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+          <mspace width="16ex"/>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow>
+              <mrow><mi>y</mi><mo>:</mo><mi>A</mi></mrow>
+              <mo>&vdash;</mo>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>y</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>::</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+          </mfrac>
+        </mrow>
+      </math>
+    </p>
+    <h3 id="summary-dynamics">第9.2节 动态语义</h3>
+    <p>我们假定有一个环境<math><mi mathvariant="normal">&Sigma;</mi></math>带有定义<math><mrow><mrow><mi mathvariant="bold">proc</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="bold">y</mi></mrow><mo>=</mo><mrow><mi>Q</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>,</mo><mi mathvariant="bold">y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. 这些规则是多重集重写规则. 它们可以被顺序地应用, 方法是在切中总是先完全求值<math><mrow><mi>P</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math> (也就是说, 直到它写入<math><mi>a</mi></math>为止), 再求值<math><mrow><mi>Q</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>.</p>
+    <p>下面的规则是对于课上规则的一个小小的重构. 我们没有分别考虑每种小值<math><mi>v</mi></math>, 而是给出了一般的规则, 以及一种将小值传递给模式匹配构造的方式.
+      <math display="block">
+        <mtable columnalign="right center left left">
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="bold">write</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>v</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="bold">read</mi><mspace width="2ex"/><mi>c</mi><mspace width="2ex"/><mi>K</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>v</mi><mo>&triangleright;</mo><mi>K</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="bold">cut</mi><mspace width="2ex"/>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                    <mspace width="2ex"/>
+                    <mrow><mi>P</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                    <mspace width="2ex"/>
+                    <mrow><mi>Q</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                  <mrow><mi>P</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+                <mo>,</mo>
+                <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                  <mrow><mi>Q</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>a</mi><mtext> 新鲜</mtext></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>b</mi><mspace width="2ex"/><mi>v</mi></mrow>
+                <mo>,</mo>
+                <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi mathvariant="bold">id</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>b</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">cell</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi>v</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi mathvariant="bold">call</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>a</mi><mspace width="2ex"/><mi mathvariant="bold">b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="sans-serif">proc</mi><mspace width="2ex"/>
+                <mrow><mi>Q</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>a</mi><mo>,</mo><mi mathvariant="bold">b</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">proc</mi><mspace width="2ex"/><mi>p</mi><mspace width="2ex"/><mi>x</mi><mspace width="2ex"/><mi mathvariant="bold">y</mi></mrow>
+                    <mo>=</mo>
+                    <mrow><mi>Q</mi><mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>x</mi><mo>,</mo><mi mathvariant="bold">y</mi></mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo>&in;</mo><mi mathvariant="normal">&Sigma;</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      <math display="block">
+        <mtable columnalign="right center left">
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow/>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&triangleright;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow/>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&rArr;</mo><mi>Q</mi></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd><mi>Q</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mo>&triangleright;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&rArr;</mo>
+                  <mrow><mi>Q</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>Q</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>a</mi><mo>,</mo><mi>b</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mi>k</mi><mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+                </mrow>
+                <mo>&triangleright;</mo>
+                <msub>
+                  <mrow><mo stretchy="false">{</mo>
+                    <mrow>
+                      <mrow><mi>&ell;</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>y</mi><mi>&ell;</mi></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>&rArr;</mo>
+                      <mrow>
+                        <msub><mi>Q</mi><mi>&ell;</mi></msub>
+                        <mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>y</mi><mi>&ell;</mi></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo stretchy="false">}</mo></mrow>
+                  <mrow><mi>&ell;</mi><mo>&in;</mo><mi>L</mi></mrow>
+                </msub>
+              </mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow>
+                <msub><mi>Q</mi><mi>k</mi></msub>
+                <mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <h2>参考文献</h2>
+    <ul>
+      <li>Iliano Cervesato and Andre Scedrov. Relating state-based and process-based concurrency through linear logic. Information and Computation, 207(10):1044-1077, 2009年10月.</li>
+      <li>Henry DeYoung, Frank Pfenning, and Klaas Pruiksma. Semi-axiomatic sequent calculus. In Z. Ariola, editor, 5th International Conference on Formal Structures for Computation and Deduction (FSCD 2020), pages 29:1-29:22, Paris, France, 2020年6月. LIPIcs 167.</li>
+      <li>Gerhard Gentzen. Untersuchungen &uuml;ber das logische Schlie&szlig;en. Mathematische Zeitschrift, 39:176-210, 405-431, 1935. English translation in M. E. Szabo, editor, The Collected Papers of Gerhard Gentzen, pages 68-131, North-Holland, 1969.</li>
+      <li>Robert H. Halstead. Multilisp: A language for parallel symbolic computation. ACM Transactions on Programming Languages and Systems, 7(4):501-539, 1985年10月.</li>
+      <li>J. Gregory Morrisett, Karl Crary, Neal Glew, and David Walker. Stack-based typed assembly language. Journal of Functional Programming, 13(5):957-959, 2003.</li>
+      <li>Aleksandar Nanevski, Frank Pfenning, and Brigitte Pientka. Contextual modal type theory. Transactions on Computational Logic, 9(3), 2008.</li>
+      <li>Frank Pfenning. Substructural operational semantics and linear destination-passing style. In W.-N. Chin, editor, Proceedings of the 2nd Asian Symposium on Programming Languages and Systems (APLAS'04), page 196, Taipei, Taiwan, 2004年11月. Springer-Verlag LNCS 3302. Abstract of invited talk.</li>
+      <li>Frank Pfenning and Robert J. Simmons. Substructural operational semantics as ordered logic programming. In Proceedings of the 24th Annual Symposium on Logic in Computer Science (LICS 2009), pages 101-110, Los Angeles, California, 2009年8月. IEEE Computer Society Press.</li>
+      <li>Klaas Pruiksma and Frank Pfenning. Back to futures. Journal of Functional Programming, 32:e6, 2022.</li>
+      <li>Robert J. Simmons. Substructural Logical Specifications. PhD thesis, Carnegie Mellon University, 2012年11月. Available as Technical Report CMU-CS-12-142.</li>
+      <li>David Tarditi, Greg Morrisett, Perry Cheng, Chris Stone, Robert Harper, and Peter Lee. TIL: A type-directed optimizing compiler for ML. ACM SIGPLAN Notices, 39(4):554-567, 2004.</li>
+    </ul>
+  </body>
+</html>
