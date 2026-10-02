@@ -2099,7 +2099,28 @@
     <p>在本节中, 我们讨论幽灵所有权命题<math><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow><mi>&gamma;</mi></msup></math>的编码, 它同样不是内置概念. 如前所述, 这个命题允许我们拥有多个幽灵位置<math><mi>&gamma;</mi></math>, 并且每个位置都可以取值于不同的资源代数. 作为原语, Iris只提供单个全局幽灵位置, 其结构由使用者选定的单个全局资源代数描述. 然而, 通过选择合适的资源代数, 我们可以在Iris中定义命题<math><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow><mi>&gamma;</mi></msup></math>, 并在逻辑内部推导出图4中给出的它的规则.</p>
     <p>Iris对于幽灵所有权的原始构造是<math><mrow><mi mathvariant="sans-serif">Own</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>, 其规则给定于图6. 值得注意的是, 全局RA必须要是单位的, 这意味着其应该有一个单位元素<math><mi>&epsilon;</mi></math> (图3). 原因有两方面. 首先, 其允许我们有规则OWN-UNIT, 这可以用来证明GHOST-ALLOC. 其次, 单位RA享有这样的性质: 扩展序是自反的, <math><mrow><mo stretchy="false">|</mo><mi>&minus;</mi><mo stretchy="false">|</mo></mrow></math>函数是完全的. 这简化了第4章和第5章的模型构造. 注意到我们总是可以将一个RA转换为一个uRA, 通过以一个单位元素扩展它, 保持所有的保持框架更新.</p>
     <p>为了定义联结词<math><msup><mrow style="border: 0.8px dashed black; padding: 0px 4px;"><mi>a</mi></mrow><mi>&gamma;</mi></msup></math>, 我们需要初始化单个全局幽灵状态RA以一个幽灵cell的堆. </p>
+    <h3>第3.3节 朴素高阶幽灵状态的悖论</h3>
     <h2>第4章 一个Iris的模型</h2>
+    <p>在前面的几节中, 我们对Iris做了一个高层次的概览. 在本文的其余部分, 我们将更精确地给出Iris的定义, 并证明它是可靠的 (sound).</p>
+    <p>与许多先前关于分离逻辑的工作一样, 我们通过给出一个语义模型来证明Iris的可靠性. 从根本上说, 这样的证明分为三个步骤:
+      <ol>
+        <li>定义一个命题的语义domain, 并配以适当的蕴涵 (entailment) 概念.</li>
+        <li>定义一个解释函数, 将逻辑中的所有陈述映射到语义domain中的元素.</li>
+        <li>对于逻辑的每一条证明规则, 证明前提的语义解释蕴涵结论的语义解释.</li>
+      </ol>
+      在本节中, 我们处理第 (1) 步: 定义Iris命题的语义domain. 由于我们还没有确切地确定Iris的命题到底是什么, 这看起来可能有些困难. 不过, 在§2中, 我们已经直观地介绍了我们希望在Iris中表达的那类陈述. 这已足以让我们讨论Iris命题语义domain的构造. 接下来我们将自底向上地推进: 首先在§5中, 在这个语义domain之上构建Iris基础逻辑 (base logic); 然后在§6和§7中, 在基础逻辑之上构建我们在§2中见过的那些更高层的程序逻辑联结词.</p>
+    <p>如 §2 所示, Iris的主要特性之一是资源所有权 (resource ownership), 对于一个分离逻辑来说, 这并不令人意外. 建模分离逻辑命题的常用方法 (O'Hearn et al., 2001) 是将其视为资源上的谓词. 传统上<q>资源</q>指的是堆的一个片段, 而在我们的情形中, <q>资源</q>是用户可以通过自己选择的RA来定义的东西. 此外, 由于Iris是一个仿射 (affine) 分离逻辑 (另见§9.5), 这些谓词必须是单调的: 如果一个谓词对某个资源成立, 那么它对任何更大的资源也应当成立.</p>
+    <p>由此, 我们得到了对Iris命题语义domain的如下初步尝试:
+      <math display="block">
+        <mrow><mi>iProp</mi>
+          <mover><mo>=</mo><mi>def</mi></mover>
+          <mrow><mi>Res</mi>
+            <mover><mo>&rarr;</mo><mi>mon</mi></mover>
+            <mi>Prop</mi></mrow>
+        </mrow>
+      </math>
+      这里, <math><mi>Res</mi></math>是由用户选择的全局资源代数 (global resource algebra), <math><mi>Prop</mi></math>是外围元逻辑 (ambient meta-logic) 中的命题domain.</p>
+    <p>然而, 回想一下我们在§3.3中提到过, 为了编码Iris的一些高级特性 (如不变式), 我们需要高阶幽灵状态 (higher-order ghost state). 这意味着我们希望资源<math><mi>Res</mi></math>依赖于<math><mi>iProp</mi></math>, 而与此同时<math><mi>iProp</mi></math>又依赖于<math><mi>Res</mi></math>!</p>
     <h2>第5章 Iris基逻辑</h2>
     <h2>第6章 最弱前条件</h2>
   </body>
