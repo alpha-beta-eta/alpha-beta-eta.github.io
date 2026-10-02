@@ -672,8 +672,113 @@
     <p>显然, 这种重排是一个普遍的现象, 我们希望在许多具有不同语义解释的语言中研究它. 范畴论为语义domain的这种性质起了一个名字: 交换性 (commutativity). 此外, 范畴论还提供了一套语言, 用来描述各种各样效应的性质. 概率是单子 (monad) 的一个例子, 而这个单子是交换的. 因此, 这类改写对所有交换单子都成立.</p>
     <h3>第1.4节 泛化2: 高阶函数</h3>
     <p>函数式语言不只有let绑定和序对. 例如, OCaml还有高阶函数, 和类型 (sum types) 以及模式匹配. 这些特性可能很难刻画, 而范畴论为设计这些规约提供了一种典范的方式.</p>
-    <p>我们用高阶函数来说明这一原则:</p>
+    <p>我们用高阶函数来说明这一原则:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mi>A</mi><mo>,</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow><mi mathvariant="monospace">Unit</mi><mo>|</mo>
+                <mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+            </mtd>
+            <mtd><mo>&Colone;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow/>
+                  <mo stretchy="false">&rang;</mo></mrow>
+                <mo>|</mo>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">fst</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi mathvariant="monospace">snd</mi><mo>&af;</mo><mi>M</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>M</mi></mrow>
+                <mo>|</mo>
+                <mrow><mi>M</mi><mspace width="2ex"/><mi>N</mi></mrow>
+                <mo>|</mo><mi>x</mi></mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+    </p>
+    <p>函数类型<math><mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow></math>代表从<math><mi>A</mi></math>到<math><mi>B</mi></math>的函数. 函数是由lambda抽象规则<math><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>M</mi></mrow></math>引入的, 其定义了一个具有自由变量<math><mi>x</mi></math>的函数. {译注: 我不理解这里的自由变量是什么意思.} 函数由lambda应用规则<math><mrow><mi>M</mi><mspace width="2ex"/><mi>N</mi></mrow></math>消去, 其调用函数<math><mi>M</mi></math>以参数<math><mi>N</mi></math>.</p>
+    <p>沿用<math><mtext class="small-caps">Calc</mtext></math>最初的设定, 我们可以给<math><mtext class="small-caps">stlc</mtext></math>一个指称语义: 把每个类型对应到一个集合, 把每个项对应到集合之间的一个函数. 对于函数和函数应用, 语义如下:
+      <math display="block">
+        <mtable columnalign="right center left" displaystyle="true">
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>M</mi></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>v</mi><mo>&mapsto;</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo>
+                      <mrow><mo stretchy="false">(</mo>
+                        <mrow><mi>&gamma;</mi>
+                          <mrow><mo stretchy="false">[</mo>
+                            <mrow><mi>x</mi><mo>&mapsto;</mo><mi>v</mi></mrow>
+                            <mo stretchy="false">]</mo></mrow>
+                        </mrow>
+                        <mo stretchy="false">)</mo></mrow>
+                    </mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&LeftDoubleBracket;</mo>
+                <mrow><mi>M</mi><mspace width="2ex"/><mi>N</mi></mrow>
+                <mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+            </mtd>
+            <mtd><mo>=</mo></mtd>
+            <mtd>
+              <mrow><mi>&gamma;</mi><mo>&mapsto;</mo>
+                <mrow>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                  <mo>&af;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow>
+                      <mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>N</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow>
+                      <mo>&af;</mo><mi>&gamma;</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </math>
+      你应该注意到, 这个解释是否合法并不显然: 还需要论证<math><mrow><mo stretchy="false">(</mo><mrow><mi>v</mi><mo>&mapsto;</mo><mrow><mrow><mo stretchy="false">&LeftDoubleBracket;</mo><mi>M</mi><mo stretchy="false">&RightDoubleBracket;</mo></mrow><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>&gamma;</mi><mrow><mo stretchy="false">[</mo><mrow><mi>x</mi><mo>&mapsto;</mo><mi>v</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>本身可以表示为某个集合的元素. 这一点成立, 因为两个集合之间所有函数构成的集合本身可以表示为一个集合: 一个函数可以用它的图 (graph), 即输入输出序对的集合, 来表示, 而这本身就是一个集合.</p>
+    <p>我们再次沿着从<math><mtext class="small-caps">Calc</mtext></math>到<math><mtext class="small-caps">TinyPPL</mtext></math>的思路发问: 在概率编程语言的指称中, 能否同样表示一等函数 (first-class functions)? 一开始完全不清楚概率编程语言中的一等函数应该是什么形状, 也不清楚能否表示这样的对象. 在离散概率中可以表示一等函数, 但在连续概率中, 事情远没有这么直接: 这正是 [14] 研究的问题.</p>
+    <p>关键的想法是, 范畴论会给出一个一般的刻画, 说明一个语义domain支持一等函数意味着什么. 这样的对象称为指数对象 (exponential objects). 具有指数对象的范畴称为笛卡尔闭范畴 (Cartesian closed categories), 它们能够为简单类型lambda演算提供指称.</p>
     <h3>第1.5节 结语</h3>
+    <p>这引出一个问题: 一个数学对象必须具备什么样的结构, 才能用来解释一门程序设计语言? 对于这个问题, 范畴论 (除了其他许多作用之外) 给出了非常令人满意的回答. 我们将看到, 某些数学结构能够支持<q>高阶函数</q>, 能够赋予<q>自然数</q>含义, 能够表达<q>逻辑真值</q>, 并保证<q>不动点的存在</q>等性质. 范畴论为描述一个数学环境具有什么样的结构提供了一种形式语言. 不过在讲到那里之前, 我们会先看更多解释程序的例子.</p>
     <h2>第2章 范畴</h2>
     <p>作为元语言, 集合与函数作为纯函数式编程的模型最能发挥效用, 其程序被想成是一个黑盒, 对于每个输入有唯一确定的输出. 但是现实程序很少是纯函数式的: 野生的程序基本上都需要操纵资源 (指针, 文件, 锁), 与其环境进行交互 (输入和输出), 并使用复杂的控制流构造 (异常, 协程).</p>
     <p>范畴论提供了一种更换周遭 (ambient) 元语言的框架: 它给出一些系统化的技术, 用更适合建模实际编程特性的构造来取代集合与函数. 每个范畴都代表一种元语言的选择. 集合与函数属于集合范畴<math><mi mathvariant="monospace">Set</mi></math>, 我们稍后会遇到它. 把<math><mi mathvariant="monospace">Set</mi></math>换成其他范畴, 就能得到更适合建模编程语言特性的元语言:
@@ -695,6 +800,11 @@
         <li><math><mo>&compfn;</mo></math>是函数<math><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>,</mo><mi>f</mi><mo>,</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&compfn;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>,</mo><mi>g</mi><mo>,</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>,</mo><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow><mo>,</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, 其中<math><mrow><mi>f</mi><mo>&compfn;</mo><mi>g</mi></mrow></math>是<math><mi>f</mi></math>和<math><mi>g</mi></math>的通常函数复合, </li>
       </ul>
     </div>
+    <h3>第2.2节 获得对于范畴的直觉</h3>
+    <p>范畴的定义高度抽象, 实际中遇到的范畴可能与<math><mi mathvariant="monospace">FinSet</mi></math>大不相同. 随着学习的深入, 我们会看到, 正是这种抽象层次让我们能够以所谓<q>泛构造</q>的形式, 对元语言可能支持的各种<q>特性</q>给出简洁的公理化. 但要在这种抽象层次上工作, 心中最好有几个具体的例子. 大致说来, 思考范畴时, 有三类例子值得放在脑海中随时备用.</p>
+    <h4>第2.2.1小节 范畴作为图</h4>
+    <p>第一种视角对计算机科学家来说或许最顺手: 范畴是一种图. 对象是顶点, 态射是边. 此外, 范畴还带有一个复合运算, 它把两条首尾相接的边拼接成第三条边; 每个顶点<math><mi>A</mi></math>处还有一个恒等态射<math><msub><mi mathvariant="monospace">id</mi><mi>A</mi></msub></math>, 构成以该顶点为中心的自环. 范畴公理则是说: 边的拼接满足结合律, 并且与恒等态射拼接不产生任何效果. 这一视角提供了很好的直观图像, 也带来了大量例子. 事实上,</p>
+    <div class="tcomment"><b>译者注记. </b>实际上, 态射应该是路径. 路径可以复合, 边不太容易复合.</div>
     <h2>第3章 泛构造I: 积</h2>
     <h2>第4章 泛构造II: </h2>
   </body>
