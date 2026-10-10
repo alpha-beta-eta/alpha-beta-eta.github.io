@@ -4920,7 +4920,36 @@ and synth (Fst(M)) =
        | _ => NONE)
   | synth M = NONE</code></pre>在代码中, 我们利用了ML中模式匹配按顺序进行这一特点. 例如, 只要第一个参数不是序对, 或者第二个参数不是合取, 或者两者都不是, 就会进入<code>check M A</code>这一分支. 类似地, 在当前的语言片段中, 我们只能为第一投影和第二投影综合出类型.</p>
     <p>我们目前还无法实际运行它, 因为还没有任何基本情形, 比如<code>prop</code>的定义中就没有. 我们先来解决这个问题, 以便尝试一个简单的例子.</p>
-    <p><b>truth. </b></p>
+    <p><b>truth. </b>这里只有一条引入规则, 没有消去规则.
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow/>
+            <mrow>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <mrow/>
+                <mo stretchy="false">&rang;</mo></mrow>
+              <mo>&lArr;</mo><mi>&top;</mi></mrow>
+          </mfrac>
+          <mrow><mi>&top;</mi><mi>I</mi></mrow>
+        </mrow>
+      </math>
+      这意味着我们只需添加一种新的命题<code>True</code>, 以及一种新的项<code>Unit</code>, 还有<code>check</code>函数中的一个分支.<pre><code>(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Unit) (True) = true
+  | check M A = false
+
+and synth (Fst(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(A)
+       | _ => NONE)
+  | synth (Snd(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(B)
+       | _ => NONE)
+  | synth M = NONE</code></pre></p>
+    <p>现在我们可以问</p>
     <h2>第7章 相继式演算</h2>
     <h3>第7.1节 引论</h3>
     <p>在本讲中, 我们转向一种不同的证明演算呈现方式. 我们将相继式演算发展为自然演绎中证明搜索的形式系统. 除了能够帮助我们理解证明搜索之外, 相继式演算还使得证明过程中假设作用域的管理更加透明, 并且允许我们进行更多的证明论研究, 即关于证明的性质的证明.</p>

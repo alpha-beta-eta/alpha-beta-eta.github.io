@@ -2471,7 +2471,28 @@ and synth (Fst(M)) =
       "我们先来解决这个问题, "
       "以便尝试一个简单的例子.")
    (P (B "truth. ")
-      
+      "这里只有一条引入规则, 没有消去规则."
+      (MB (&rull $truthI
+                 (Check (tupa0) $truth)))
+      "这意味着我们只需添加一种新的命题" (Code "True")
+      ", 以及一种新的项" (Code "Unit")
+      ", 还有" (Code "check") "函数中的一个分支."
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Unit) (True) = true
+  | check M A = false
+
+and synth (Fst(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(A)
+       | _ => NONE)
+  | synth (Snd(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(B)
+       | _ => NONE)
+  | synth M = NONE"))
+   (P "现在我们可以问"
       )
    (H2. "相继式演算")
    (H3. "引论")
