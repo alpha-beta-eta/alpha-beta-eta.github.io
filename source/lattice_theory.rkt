@@ -167,6 +167,7 @@
   (Join $Join)
   (Meet $Meet))
 (define-@lized-op*
+  (@o+ &o+)
   (@o* &o*)
   (@cap &cap)
   (@meet &meet)
@@ -322,6 +323,7 @@
       ". 最小元和最大元并不一定存在, "
       "但是若存在则显然唯一 (对于偏序集而言).")
    ((Example)
+    
     )
    ((Definition)
     "设" (_ (setE (tu0 $P_i (_ $<= $i))) (∈ $i $I))
@@ -336,6 +338,7 @@
     "称为" (_ (setE (tu0 $P_i (_ $<= $i))) (∈ $i $I))
     "的直积.")
    ((Example)
+    
     )
    ((Definition)
     "设" $P "是一个偏序集, " (&sube $A $P)
@@ -381,16 +384,29 @@
             (∈ $x (&down $y)) ", 这等价于"
             (∈ $y (&up $x)) ", 由此得证. "
             "另外一种情形是类似的.")
-        (Li ""
-            )
-        )
-    )
+        (Li "根据1和2, 我们知道"
+            (&sube (UpperBound (LowerBound (UpperBound $A)))
+                   (UpperBound $A))
+            "和"
+            (&sube (LowerBound (UpperBound (LowerBound $A)))
+                   (LowerBound $A))
+            ". 另外, 如果再次应用2, 将"
+            (UpperBound $A) "代入" $A
+            ", 就会发现"
+            (&sube (UpperBound $A)
+                   (UpperBound (LowerBound (UpperBound $A))))
+            "; 将" (LowerBound $A) "代入" $A
+            ", 就会发现"
+            (&sube (LowerBound $A)
+                   (LowerBound (UpperBound (LowerBound $A))))
+            ".")))
    
    (H3. "格与完备格")
    ((Definition)
     "定义了上确界 (join) 和下确界 (meet), 不再赘述.")
    ((Remark)
     )
+   
    ((Definition)
     "设" $L "是一个偏序集."
     (Ol (Li "如果对于任意的" (∈ $x $y $L)
@@ -411,15 +427,17 @@
         (Li "吸收: "
             (&= (&join $a (@meet $a $b)) $a) ", "
             (&= (&meet $a (@join $a $b)) $a) ".")))
+   ((proof)
+    "根据上确界和下确界的定义很容易推出.")
    ((Example)
     (Ol (Li "每个链都是格, 例如实数集, 有理数集, 自然数集.")
         (Li "设" (tu0 $X (Open $X)) "是一个拓扑空间, 则"
             (tu0 (Open $X) $sube) "是一个格; 幂集"
             (powset $X) "作为" $X "上的离散拓扑自然也是一个格.")
-        (Li ""
-            )
-        )
-    )
+        (Li (tu0 $NN $\|) "是一个格, "
+            (&join $m $n) "是" $m "和" $n
+            "的最小公倍数, " (&meet $m $n)
+            "是" $m "和" $n "的最大公约数.")))
    ((Theorem)
     "设" $L "是一个偏序集, 那么"
     (Ol (Li $L "是一个格当且仅当" $L
@@ -429,6 +447,14 @@
     
     )
    ((Theorem)
+    "非空集合" $L "可以作为一个格当且仅当"
+    $L "上存在两个二元运算" $o* "和" $o+ "满足"
+    (Ol (Li (tu0 $L $o*) "和" (tu0 $L $o+)
+            "都是交换幂等半群;")
+        (Li $o* "和" $o+ "满足吸收律, 即"
+            (&= (&o* $x (@o+ $x $y)) $x
+                (&o+ $x (@o* $x $y))) ".")))
+   ((proof)
     
     )
    ((Definition)

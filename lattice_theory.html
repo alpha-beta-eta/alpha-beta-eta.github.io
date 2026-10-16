@@ -223,7 +223,7 @@
       <ol>
         <li>如果<math><mrow><mi>x</mi><mo>&in;</mo><msup><mi>B</mi><mi>u</mi></msup></mrow></math>, 那么<math><mrow><mi>B</mi><mo>&sube;</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>x</mi></mrow></mrow></math>, 又因为<math><mrow><mi>A</mi><mo>&sube;</mo><mi>B</mi></mrow></math>, 所以<math><mrow><mi>A</mi><mo>&sube;</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>x</mi></mrow></mrow></math>, 于是<math><mrow><mi>x</mi><mo>&in;</mo><msup><mi>A</mi><mi>u</mi></msup></mrow></math>. 另外一个的证明也是类似的.</li>
         <li>设<math><mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow></math>, 我们要证明<math><mrow><mi>x</mi><mo>&in;</mo><msup><msup><mi>A</mi><mi>u</mi></msup><mi>l</mi></msup></mrow></math>和<math><mrow><mi>x</mi><mo>&in;</mo><msup><msup><mi>A</mi><mi>l</mi></msup><mi>u</mi></msup></mrow></math>. <math><mrow><mi>x</mi><mo>&in;</mo><msup><msup><mi>A</mi><mi>u</mi></msup><mi>l</mi></msup></mrow></math>等价于<math><mrow><msup><mi>A</mi><mi>u</mi></msup><mo>&sube;</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>x</mi></mrow></mrow></math>. 对于任意的<math><mrow><mi>y</mi><mo>&in;</mo><msup><mi>A</mi><mi>u</mi></msup></mrow></math>, 我们知道<math><mrow><mi>A</mi><mo>&sube;</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>y</mi></mrow></mrow></math>. 又因为<math><mrow><mi>x</mi><mo>&in;</mo><mi>A</mi></mrow></math>, 所以<math><mrow><mi>x</mi><mo>&in;</mo><mrow><mi>&darr;</mi><mo>&af;</mo><mi>y</mi></mrow></mrow></math>, 这等价于<math><mrow><mi>y</mi><mo>&in;</mo><mrow><mi>&uarr;</mi><mo>&af;</mo><mi>x</mi></mrow></mrow></math>, 由此得证. 另外一种情形是类似的.</li>
-        <li></li>
+        <li>根据1和2, 我们知道<math><mrow><msup><msup><msup><mi>A</mi><mi>u</mi></msup><mi>l</mi></msup><mi>u</mi></msup><mo>&sube;</mo><msup><mi>A</mi><mi>u</mi></msup></mrow></math>和<math><mrow><msup><msup><msup><mi>A</mi><mi>l</mi></msup><mi>u</mi></msup><mi>l</mi></msup><mo>&sube;</mo><msup><mi>A</mi><mi>l</mi></msup></mrow></math>. 另外, 如果再次应用2, 将<math><msup><mi>A</mi><mi>u</mi></msup></math>代入<math><mi>A</mi></math>, 就会发现<math><mrow><msup><mi>A</mi><mi>u</mi></msup><mo>&sube;</mo><msup><msup><msup><mi>A</mi><mi>u</mi></msup><mi>l</mi></msup><mi>u</mi></msup></mrow></math>; 将<math><msup><mi>A</mi><mi>l</mi></msup></math>代入<math><mi>A</mi></math>, 就会发现<math><mrow><msup><mi>A</mi><mi>l</mi></msup><mo>&sube;</mo><msup><msup><msup><mi>A</mi><mi>l</mi></msup><mi>u</mi></msup><mi>l</mi></msup></mrow></math>.</li>
       </ol>
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
     </div>
@@ -245,11 +245,14 @@
         <li>吸收: <math><mrow><mrow><mi>a</mi><mo>&or;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&and;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>a</mi></mrow></math>, <math><mrow><mrow><mi>a</mi><mo>&and;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>&or;</mo><mi>b</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>a</mi></mrow></math>.</li>
       </ol>
     </div>
+    <div class="proof"><b>证明.</b> 根据上确界和下确界的定义很容易推出.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
     <div class="example"><b>例子1.2.1. </b>
       <ol>
         <li>每个链都是格, 例如实数集, 有理数集, 自然数集.</li>
         <li>设<math><mrow><mo stretchy="false">(</mo><mrow><mi>X</mi><mo>,</mo><mrow><mi mathvariant="script">O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>是一个拓扑空间, 则<math><mrow><mo stretchy="false">(</mo><mrow><mrow><mi mathvariant="script">O</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mo>&sube;</mo></mrow><mo stretchy="false">)</mo></mrow></math>是一个格; 幂集<math><mrow><mi>&Pscr;</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></mrow></math>作为<math><mi>X</mi></math>上的离散拓扑自然也是一个格.</li>
-        <li></li>
+        <li><math><mrow><mo stretchy="false">(</mo><mrow><mi>&Nopf;</mi><mo>,</mo><mo>|</mo></mrow><mo stretchy="false">)</mo></mrow></math>是一个格, <math><mrow><mi>m</mi><mo>&or;</mo><mi>n</mi></mrow></math>是<math><mi>m</mi></math>和<math><mi>n</mi></math>的最小公倍数, <math><mrow><mi>m</mi><mo>&and;</mo><mi>n</mi></mrow></math>是<math><mi>m</mi></math>和<math><mi>n</mi></math>的最大公约数.</li>
       </ol>
     </div>
     <div class="theorem"><b>定理1.2.2. </b>设<math><mi>L</mi></math>是一个偏序集, 那么
@@ -261,7 +264,15 @@
     <div class="proof"><b>证明.</b> 
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
     </div>
-    <div class="theorem"><b>定理1.2.3. </b></div>
+    <div class="theorem"><b>定理1.2.3. </b>非空集合<math><mi>L</mi></math>可以作为一个格当且仅当<math><mi>L</mi></math>上存在两个二元运算<math><mo displaystyle="false">&otimes;</mo></math>和<math><mo displaystyle="false">&oplus;</mo></math>满足
+      <ol>
+        <li><math><mrow><mo stretchy="false">(</mo><mrow><mi>L</mi><mo>,</mo><mo displaystyle="false">&otimes;</mo></mrow><mo stretchy="false">)</mo></mrow></math>和<math><mrow><mo stretchy="false">(</mo><mrow><mi>L</mi><mo>,</mo><mo displaystyle="false">&oplus;</mo></mrow><mo stretchy="false">)</mo></mrow></math>都是交换幂等半群;</li>
+        <li><math><mo displaystyle="false">&otimes;</mo></math>和<math><mo displaystyle="false">&oplus;</mo></math>满足吸收律, 即<math><mrow><mrow><mi>x</mi><mo displaystyle="false">&otimes;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo displaystyle="false">&oplus;</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>x</mi><mo>=</mo><mrow><mi>x</mi><mo displaystyle="false">&oplus;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo displaystyle="false">&otimes;</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</li>
+      </ol>
+    </div>
+    <div class="proof"><b>证明.</b> 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
     <div class="definition"><b>定义1.2.3. </b>设<math><mi>L</mi></math>是一个格, <math><mi>S</mi></math>是<math><mi>L</mi></math>的一个非空子集.
       <ol>
         <li>如果对于任意的<math><mrow><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>&in;</mo><mi>S</mi></mrow></math>都有<math><mrow><mrow><mrow><mi>x</mi><mo>&and;</mo><mi>y</mi></mrow><mo>,</mo><mrow><mi>x</mi><mo>&or;</mo><mi>y</mi></mrow></mrow><mo>&in;</mo><mi>S</mi></mrow></math>, 称<math><mi>S</mi></math>为<math><mi>L</mi></math>的子格.</li>

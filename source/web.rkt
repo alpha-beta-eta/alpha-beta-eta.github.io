@@ -239,12 +239,15 @@
          "cps.rkt"
          "residuated.rkt"
          "cv.rkt"
+         "type_theory_and_homotopy.rkt"
          
          )
 (define emitXml (emit XML))
 (define emitXml-thunk (emit-thunk XML))
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml type_theory_and_homotopy.html
+             "../type_theory_and_homotopy.html")
     (emitXml cv.html "../cv.html")
     (emitXml residuated.html
              "../residuated.html")
