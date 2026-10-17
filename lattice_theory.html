@@ -291,7 +291,7 @@
         <li><math><mi>L</mi></math>有最大元<math><mn>1</mn></math>且每个非空子集都有下确界.</li>
       </ol>
     </div>
-    <div class="proof"><b>证明.</b> 
+    <div class="proof"><b>证明.</b> 首先, 1和2, 3和4, 5和6显然都是等价的. 
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
     </div>
     <div class="corollary"><b>推论1.2.1. </b></div>
@@ -320,10 +320,37 @@
       </ol>
       则称<math><mi>g</mi></math>是<math><mi>P</mi></math>上的一个内部算子 (interior operator).</div>
     <p>设<math><mrow><mi>h</mi><mo>:</mo><mrow><mi>P</mi><mo>&rarr;</mo><mi>P</mi></mrow></mrow></math>是偏序集<math><mi>P</mi></math>上的一个自映射. 记<math><mrow><mrow><mi>Im</mi><mo>&af;</mo><mi>h</mi></mrow><mo>=</mo><mrow><mo stretchy="false">{</mo><mrow><mrow><mi>h</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>|</mo><mrow><mi>x</mi><mo>&in;</mo><mi>P</mi></mrow></mrow><mo stretchy="false">}</mo></mrow></mrow></math>. 当<math><mi>h</mi></math>是幂等的, 那么<math><mrow><mi>Im</mi><mo>&af;</mo><mi>h</mi></mrow></math>恰是<math><mi>h</mi></math>的所有不动点之集合. {译注: 实际上, 幂等性与<math><mrow><mi>Im</mi><mo>&af;</mo><mi>h</mi></mrow></math>是所有不动点之集合等价.} 幂等保序自映射也称为投影.</p>
-    <div class="theorem"><b>定理1.2.6. </b>设<math><mi>L</mi></math>是一个完备格, <math><mrow><mi>f</mi><mo>:</mo><mrow><mi>L</mi><mo>&rarr;</mo><mi>L</mi></mrow></mrow></math>是一个闭包算子, 则<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>也是一个完备格, 其中对于<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>的任意非空子集<math><mi>A</mi></math>都有<math><mrow><mrow><munder><mo>&Wedge;</mo><mi>f</mi></munder><mi>A</mi></mrow><mo>=</mo><mrow><mo>&Wedge;</mo><mi>A</mi></mrow></mrow></math>, <math><mrow><mrow><munder><mo>&Vee;</mo><mi>f</mi></munder><mi>A</mi></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&Vee;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</div>
-    <div class="proof"><b>证明.</b> 由幂等性可知<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>是<math><mi>f</mi></math>的不动点集合. 根据前述定理, <math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>是一个有界的偏序集. 设<math><mi>A</mi></math>是<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>的一个非空子集. 令<math><mrow><mi>a</mi><mo>=</mo><mrow><mo>&Wedge;</mo><mi>A</mi></mrow></mrow></math>, 如果<math><mrow><mi>a</mi><mo>&in;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></mrow></math>, 那么<math><mrow><mrow><munder><mo>&Wedge;</mo><mi>f</mi></munder><mi>A</mi></mrow><mo>=</mo><mrow><mo>&Wedge;</mo><mi>A</mi></mrow></mrow></math>. 
+    <div class="theorem"><b>定理1.2.6. </b>设<math><mi>L</mi></math>是一个完备格, <math><mrow><mi>f</mi><mo>:</mo><mrow><mi>L</mi><mo>&rarr;</mo><mi>L</mi></mrow></mrow></math>是一个闭包算子, 则<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>(在继承的序下)也是一个完备格, 其中对于<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>的任意子集<math><mi>A</mi></math>都有<math><mrow><mrow><munder><mo>&Wedge;</mo><mi>f</mi></munder><mi>A</mi></mrow><mo>=</mo><mrow><mo>&Wedge;</mo><mi>A</mi></mrow></mrow></math>, <math><mrow><mrow><munder><mo>&Vee;</mo><mi>f</mi></munder><mi>A</mi></mrow><mo>=</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&Vee;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</div>
+    <div class="proof"><b>证明.</b> 由幂等性可知<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>是<math><mi>f</mi></math>的不动点集合. 设<math><mi>A</mi></math>是<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>的一个子集. 令<math><mrow><mi>a</mi><mo>=</mo><mrow><mo>&Wedge;</mo><mi>A</mi></mrow></mrow></math>, 如果<math><mrow><mi>a</mi><mo>&in;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></mrow></math>, 那么<math><mrow><mrow><munder><mo>&Wedge;</mo><mi>f</mi></munder><mi>A</mi></mrow><mo>=</mo><mrow><mo>&Wedge;</mo><mi>A</mi></mrow></mrow></math>. 我们将要证明<math><mrow><mi>a</mi><mo>&in;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></mrow></math>, 即<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>a</mi></mrow></math>.
+      <math display="block">
+        <mrow>
+          <mrow>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>=</mo>
+            <mrow><mi>f</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mo>&Wedge;</mo><mi>A</mi></mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+          </mrow>
+          <mo>&le;</mo>
+          <mrow>
+            <mrow><mo>&Wedge;</mo>
+              <mrow><mi>f</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo>=</mo>
+            <mrow><mo>&Wedge;</mo><mi>A</mi></mrow>
+            <mo>=</mo><mi>a</mi></mrow>
+        </mrow>
+      </math>
+      而又根据<math><mi>f</mi></math>是闭包算子, 所以<math><mrow><mi>a</mi><mo>&le;</mo><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, 于是<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>a</mi></mrow></math>. 我们已经证明了一半, 接着我们还需要证明<math><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&Vee;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是<math><mi>A</mi></math>在<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>中的上确界, 如果<math><mi>A</mi></math>是<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>的任意一个子集. 显然, <math><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&Vee;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>是<math><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow></math>的一个上界, 也是<math><mi>A</mi></math>的一个上界. 因此, <math><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&Vee;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>在<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>中也是<math><mi>A</mi></math>的一个上界. 如果<math><mrow><mi>b</mi><mo>&in;</mo><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></mrow></math>也是<math><mi>A</mi></math>在<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>中的一个上界, 我们想要证明<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&Vee;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mi>b</mi></mrow></math>. 然而, 既然<math><mi>b</mi></math>在<math><mrow><mi>Im</mi><mo>&af;</mo><mi>f</mi></mrow></math>中是<math><mi>A</mi></math>的上界, 那么在<math><mi>L</mi></math>中自然也是<math><mi>A</mi></math>的上界. 换言之, <math><mrow><mrow><mo>&Vee;</mo><mi>A</mi></mrow><mo>&le;</mo><mi>b</mi></mrow></math>. 根据<math><mi>f</mi></math>的保序性质, 立即得到<math><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>&Vee;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>&le;</mo><mrow><mrow><mi>f</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>b</mi></mrow></mrow></math>. 
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
     </div>
+    <div class="tcomment"><b>译者注记. </b>上述证明用到了这样一个事实: 对于偏序集<math><mi>P</mi></math>, 对于其某个非空子集<math><mi>S</mi></math>, <math><mi>S</mi></math>继承了一个自然的偏序. 对于<math><mrow><mi>A</mi><mo>&sube;</mo><mi>S</mi></mrow></math>, 如果<math><mrow><mo>&Wedge;</mo><mi>A</mi></mrow></math>存在且<math><mrow><mrow><mo>&Wedge;</mo><mi>A</mi></mrow><mo>&in;</mo><mi>S</mi></mrow></math>, 那么<math><mrow><mo>&Wedge;</mo><mi>A</mi></mrow></math>在子偏序集<math><mi>S</mi></math>中也是<math><mi>A</mi></math>的最大下界. 类似的事实当然对于<math><mo>&Vee;</mo></math>也成立.</div>
     <div class="corollary"><b>推论1.2.2. </b></div>
     <div class="definition"><b>定义1.2.8. </b>设<math><mi>P</mi></math>是一个偏序集, <math><mrow><mi>S</mi><mo>&sube;</mo><mi>P</mi></mrow></math>.
       <ol>
