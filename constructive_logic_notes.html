@@ -5765,6 +5765,295 @@ fun even_or_odd x = case x of
     </p>
     <p>对于所有这些例子, 元理论性质的证明都是相当困难的. 对于判断<math><mrow><mi>M</mi><mo>:</mo><mi>A</mi></mrow></math>拥有推理规则无疑是重要的, 但这并不能立即给出这样的算法.</p>
     <h3>第6.2节 双向定型的一个算法</h3>
+    <math display="block">
+      <mtable columnalign="right center left" rowspacing="6ex">
+        <mtr>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow><mi>M</mi><mo>&rArr;</mo>
+                    <msup><mi>P</mi><mo>&prime;</mo></msup>
+                  </mrow>
+                  <mspace width="8ex"/>
+                  <mrow>
+                    <msup><mi>P</mi><mo>&prime;</mo></msup>
+                    <mo>=</mo><mi>P</mi></mrow>
+                </mrow>
+                <mrow><mi>M</mi><mo>&lArr;</mo><mi>P</mi></mrow>
+              </mfrac>
+              <msup><mi>&duarr;</mi><mo>&#8270;</mo></msup>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow><mi>M</mi><mo>&lArr;</mo><mi>A</mi></mrow>
+                  <mspace width="8ex"/>
+                  <mrow><mi>N</mi><mo>&lArr;</mo><mi>B</mi></mrow>
+                </mrow>
+                <mrow>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                  <mo>&lArr;</mo>
+                  <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                </mrow>
+              </mfrac>
+              <mrow><mi>&and;</mi><mi>I</mi></mrow>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow><mi>M</mi><mo>&rArr;</mo>
+                    <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">fst</mi><mo>&af;</mo><mi>M</mi></mrow>
+                    <mo>&rArr;</mo><mi>A</mi></mrow>
+                </mfrac>
+                <mrow><mi>&and;</mi>
+                  <msub><mi>E</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow><mi>M</mi><mo>&rArr;</mo>
+                    <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">snd</mi><mo>&af;</mo><mi>M</mi></mrow>
+                    <mo>&rArr;</mo><mi>B</mi></mrow>
+                </mfrac>
+                <mrow><mi>&and;</mi>
+                  <msub><mi>E</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mtable>
+                  <mtr>
+                    <mtd>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow/>
+                          <mrow><mi>x</mi><mo>&rArr;</mo><mi>A</mi></mrow>
+                        </mfrac>
+                        <mi>x</mi></mrow>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mo>&vellip;</mo></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mrow><mi>M</mi><mo>&lArr;</mo><mi>B</mi></mrow>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mrow>
+                  <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>M</mi></mrow>
+                  <mo>&lArr;</mo>
+                  <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                </mrow>
+              </mfrac>
+              <mrow><mi>&sup;</mi>
+                <msup><mi>I</mi><mi>x</mi></msup>
+              </mrow>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow><mi>M</mi><mo>&rArr;</mo>
+                    <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mspace width="8ex"/>
+                  <mrow><mi>N</mi><mo>&lArr;</mo><mi>A</mi></mrow>
+                </mrow>
+                <mrow>
+                  <mrow><mi>M</mi><mspace width="2ex"/><mi>N</mi></mrow>
+                  <mo>&rArr;</mo><mi>B</mi></mrow>
+              </mfrac>
+              <mrow><mi>&sup;</mi><mi>E</mi></mrow>
+            </mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow><mi>M</mi><mo>&lArr;</mo><mi>A</mi></mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">inl</mi><mo>&af;</mo><mi>M</mi></mrow>
+                    <mo>&lArr;</mo>
+                    <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                  </mrow>
+                </mfrac>
+                <mrow><mi>&or;</mi>
+                  <msub><mi>I</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow><mi>N</mi><mo>&lArr;</mo><mi>B</mi></mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">inr</mi><mo>&af;</mo><mi>N</mi></mrow>
+                    <mo>&lArr;</mo>
+                    <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                  </mrow>
+                </mfrac>
+                <mrow><mi>&or;</mi>
+                  <msub><mi>I</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow><mi>M</mi><mo>&rArr;</mo>
+                    <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mspace width="8ex"/>
+                  <mtable>
+                    <mtr>
+                      <mtd>
+                        <mrow>
+                          <mfrac displaystyle="true">
+                            <mrow/>
+                            <mrow><mi>u</mi><mo>&rArr;</mo><mi>A</mi></mrow>
+                          </mfrac>
+                          <mi>u</mi></mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd><mo>&vellip;</mo></mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi>N</mi><mo>&lArr;</mo><mi>C</mi></mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                  <mspace width="8ex"/>
+                  <mtable>
+                    <mtr>
+                      <mtd>
+                        <mrow>
+                          <mfrac displaystyle="true">
+                            <mrow/>
+                            <mrow><mi>w</mi><mo>&rArr;</mo><mi>B</mi></mrow>
+                          </mfrac>
+                          <mi>w</mi></mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd><mo>&vellip;</mo></mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi>P</mi><mo>&lArr;</mo><mi>C</mi></mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">case</mi><mo>&af;</mo>
+                    <mrow><mo stretchy="false">(</mo>
+                      <mrow><mi>M</mi><mo>,</mo>
+                        <mrow><mi>u</mi><mo lspace="0" rspace="0">.</mo><mi>N</mi></mrow>
+                        <mo>,</mo>
+                        <mrow><mi>w</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow>
+                      </mrow>
+                      <mo stretchy="false">)</mo></mrow>
+                  </mrow>
+                  <mo>&lArr;</mo><mi>C</mi></mrow>
+              </mfrac>
+              <mrow><mi>&or;</mi>
+                <msup><mi>E</mi>
+                  <mrow><mi>u</mi><mo>,</mo><mi>w</mi></mrow>
+                </msup>
+              </mrow>
+            </mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow/>
+                <mrow>
+                  <mrow><mo stretchy="false">&lang;</mo>
+                    <mrow/>
+                    <mo stretchy="false">&rang;</mo></mrow>
+                  <mo>&lArr;</mo><mi>&top;</mi></mrow>
+              </mfrac>
+              <mrow><mi>&top;</mi><mi>I</mi></mrow>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow><mtext>(没有</mtext>
+              <mrow><mi>&top;</mi><mi>E</mi></mrow>
+              <mtext>规则)</mtext></mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow><mtext>(没有</mtext>
+              <mrow><mi>&bottom;</mi><mi>I</mi></mrow>
+              <mtext>规则)</mtext></mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow><mi>M</mi><mo>&rArr;</mo><mi>&bottom;</mi></mrow>
+                <mrow>
+                  <mrow><mi mathvariant="bold">abort</mi><mo>&af;</mo><mi>M</mi></mrow>
+                  <mo>&lArr;</mo><mi>C</mi></mrow>
+              </mfrac>
+              <mrow><mi>&bottom;</mi><mi>E</mi></mrow>
+            </mrow>
+          </mtd>
+        </mtr>
+      </mtable>
+    </math>
     <p>双向定型规则具有特定的目标导向形式, 这允许我们算法性地阅读它们. 请参考图1以阅读这些规则.</p>
     <p>我们看到存在两种断言: <math><mrow><mi>M</mi><mo>&lArr;</mo><mi>A</mi></mrow></math>和<math><mrow><mi>M</mi><mo>&rArr;</mo><mi>A</mi></mrow></math>. 记号暗示了其具有以下解释:
       <ol>
@@ -6059,7 +6348,250 @@ datatype term =
           </mtr>
         </mtable>
       </math>
-    </p>
+      我们既已知项之表示, 那么该如何处理类型检查呢? 我们得到了以下情况:<pre><code>(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F ???) B
+  ...</code></pre>在<code>Lam</code>的情形中, 我们想要针对命题<math><mi>B</mi></math>检查<math><mi>&lambda;</mi></math>抽象的体. 为了访问这个体, 我们需要将<code>F : term -> term</code>应用于某个类型为<math><mi>A</mi></math>的项, 但我们并没有任何这样的项. 从直觉上, 这个项应该代表假设<math><mrow><mi>x</mi><mo>&rArr;</mo><mi>A</mi></mrow></math>, 尽管变量<math><mi>x</mi></math>的名字对于这个目的而言是无关紧要的. 因此我们创建一种新的项<code>Hyp(A)</code>, 代表一个类型为<math><mi>A</mi></math>的假设 (省略了名字, 因为它无关紧要). 然后我们将<code>Hyp(A)</code>代入绑定变量<math><mi>x</mi></math>, 这是通过ML中的函数应用来实现的.<pre><code>(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F (Hyp(A))) B
+  ...</code></pre>为了纳入假设<math><mrow><mi>x</mi><mo>&rArr;</mo><mi>A</mi></mrow></math>应当合成类型<math><mi>A</mi></math>这一事实, 我们在<code>synth</code>函数中添加一个关于假设的情形 (省略了已经存在的第一投影和第二投影的情形).<pre><code>and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) = ...
+  | synth (Snd(M)) = ...
+  | synth M = NONE</code></pre>剩下的是添加一个关于推出消去的情形, 也就是证明项的应用. 回忆:
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow><mi>M</mi><mo>&rArr;</mo>
+                <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow><mi>N</mi><mo>&lArr;</mo><mi>A</mi></mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi>M</mi><mspace width="2ex"/><mi>N</mi></mrow>
+              <mo>&rArr;</mo><mi>B</mi></mrow>
+          </mfrac>
+          <mrow><mi>&sup;</mi><mi>E</mi></mrow>
+        </mrow>
+      </math>
+      注意检查和合成的方向, 我们按照如下方式进行: 首先我们合成<math><mi>M</mi></math>的类型, 它必须具有<math><mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow></math>的形式. 从中我们提取出<math><mi>A</mi></math>, 然后针对<math><mi>A</mi></math>检查参数<math><mi>N</mi></math>. 如果它返回真, 我们就可以返回<math><mi>B</mi></math>作为合成的类型. 如果任何一步失败, 我们就返回<code>NONE</code>. 我们将其转写为以下代码:<pre><code>and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) = ...
+  | synth (Snd(M)) = ...
+  | synth (App(M,N)) =
+    (case synth M
+      of SOME(Imp(A,B)) => if check N A
+                           then SOME(B)
+                           else NONE
+       | _ => NONE)
+  | synth M = NONE</code></pre>现在我们可以尝试一些稍微更有挑战性的例子, 例如<math><mrow><mi>A</mi><mo>&sup;</mo><mi>A</mi></mrow></math>, <math><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo>&sup;</mo><mi>A</mi></mrow></math>和<math><mrow><mi>A</mi><mo>&sup;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>&sup;</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的证明项, 以及<math><mrow><mo>&not;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>x</mi></mrow><mo>&lArr;</mo><mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>.<pre><code>val A = Var(&quot;A&quot;)
+val B = Var(&quot;B&quot;)
+val C = Var(&quot;C&quot;)
+
+val () = assert (check (Lam(fn x => x)) (Imp(A,A)))
+val () = deny (check (Lam(fn x => x)) (Imp(A,B)))
+val () = assert (check (Lam(fn x => Fst(x))) (Imp(And(A,B),A)))
+val () = assert (check (Lam(fn x => Lam(fn y => x))) (Imp(A,Imp(B,A))))</code></pre></p>
+    <h3>第6.4节 析取</h3>
+    <p>对于析取, 我们只需记住其消去形式 (a) 引入了两个假设, 因此证明项有两个绑定变量, 以及 (b) 结论是一个验证. 我们还顺带加入了假 (它更简单), 以便更快地得到我们完整的语言.</p>
+    <math display="block">
+      <mrow>
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow><mi>M</mi><mo>&lArr;</mo><mi>A</mi></mrow>
+            <mrow>
+              <mrow><mi mathvariant="bold">inl</mi><mo>&af;</mo><mi>M</mi></mrow>
+              <mo>&lArr;</mo>
+              <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&or;</mi>
+            <msub><mi>I</mi><mn>1</mn></msub>
+          </mrow>
+        </mrow>
+        <mspace width="16ex"/>
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow><mi>N</mi><mo>&lArr;</mo><mi>B</mi></mrow>
+            <mrow>
+              <mrow><mi mathvariant="bold">inr</mi><mo>&af;</mo><mi>N</mi></mrow>
+              <mo>&lArr;</mo>
+              <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+            </mrow>
+          </mfrac>
+          <mrow><mi>&or;</mi>
+            <msub><mi>I</mi><mn>2</mn></msub>
+          </mrow>
+        </mrow>
+      </mrow>
+    </math>
+    <math display="block">
+      <mrow>
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi>M</mi><mo>&rArr;</mo>
+              <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+            </mrow>
+            <mspace width="8ex"/>
+            <mtable>
+              <mtr>
+                <mtd>
+                  <mrow>
+                    <mfrac displaystyle="true">
+                      <mrow/>
+                      <mrow><mi>u</mi><mo>&rArr;</mo><mi>A</mi></mrow>
+                    </mfrac>
+                    <mi>u</mi></mrow>
+                </mtd>
+              </mtr>
+              <mtr>
+                <mtd><mo>&vellip;</mo></mtd>
+              </mtr>
+              <mtr>
+                <mtd>
+                  <mrow><mi>N</mi><mo>&lArr;</mo><mi>C</mi></mrow>
+                </mtd>
+              </mtr>
+            </mtable>
+            <mspace width="8ex"/>
+            <mtable>
+              <mtr>
+                <mtd>
+                  <mrow>
+                    <mfrac displaystyle="true">
+                      <mrow/>
+                      <mrow><mi>w</mi><mo>&rArr;</mo><mi>B</mi></mrow>
+                    </mfrac>
+                    <mi>w</mi></mrow>
+                </mtd>
+              </mtr>
+              <mtr>
+                <mtd><mo>&vellip;</mo></mtd>
+              </mtr>
+              <mtr>
+                <mtd>
+                  <mrow><mi>P</mi><mo>&lArr;</mo><mi>C</mi></mrow>
+                </mtd>
+              </mtr>
+            </mtable>
+          </mrow>
+          <mrow>
+            <mrow><mi mathvariant="bold">case</mi><mo>&af;</mo>
+              <mrow><mo stretchy="false">(</mo>
+                <mrow><mi>M</mi><mo>,</mo>
+                  <mrow><mi>u</mi><mo lspace="0" rspace="0">.</mo><mi>N</mi></mrow>
+                  <mo>,</mo>
+                  <mrow><mi>w</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow>
+                </mrow>
+                <mo stretchy="false">)</mo></mrow>
+            </mrow>
+            <mo>&lArr;</mo><mi>C</mi></mrow>
+        </mfrac>
+        <mrow><mi>&or;</mi>
+          <msup><mi>E</mi>
+            <mrow><mi>u</mi><mo>,</mo><mi>w</mi></mrow>
+          </msup>
+        </mrow>
+      </mrow>
+    </math>
+    <math display="block">
+      <mrow>
+        <mfrac displaystyle="true">
+          <mrow><mi>M</mi><mo>&rArr;</mo><mi>&bottom;</mi></mrow>
+          <mrow>
+            <mrow><mi mathvariant="bold">abort</mi><mo>&af;</mo><mi>M</mi></mrow>
+            <mo>&lArr;</mo><mi>C</mi></mrow>
+        </mfrac>
+        <mrow><mi>&bottom;</mi><mi>E</mi></mrow>
+      </mrow>
+    </math>
+    <p>据此我们扩展命题和证明项.<pre><code>datatype prop =
+         And of prop * prop
+       | Imp of prop * prop
+       | Or of prop * prop
+       | True
+       | False
+       | Var of string
+
+fun Not A = Imp(A,False)
+
+datatype term =
+         Pair of term * term   (* &lt;M,N> *)
+       | Fst of term           (* fst M *)
+       | Snd of term           (* snd M *)
+       | Lam of term -> term   (* \x. M *)
+       | App of term * term    (* M N *)
+       | Inl of term           (* inl M *)
+       | Inr of term           (* inr M *)
+       | Case of term * (term -> term) * (term -> term)
+                               (* case (M, u.N, w.P) *)
+       | Unit                  (* &lt;> *)
+       | Abort of term         (* abort M *)
+       | Hyp of prop           (* _ : A *)</code></pre>我们注意到两件事: (1) 我们把否定作为一个记法定义 (notational definition) 引入, 它在ML中就只是一个定义, 以及 (2) 我们看到<code>case</code>表达式中的两个分支是如何由ML函数表示的. 幸运的是, 我们不需要更多的东西了. 注意<code>Case</code>构造子出现在<code>check</code>函数中, 因为该规则要求对<math><mi>C</mi></math>进行验证. 此外, 在两个分支中, 我们分别用假设<math><mi>A</mi></math>和<math><mi>B</mi></math>将其实例化.<pre><code>(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F (Hyp A)) B
+  | check (Inl(M)) (Or(A,B)) = check M A
+  | check (Inr(M)) (Or(A,B)) = check M B
+  | check (Case(M,F,G)) C =
+    (case synth M
+      of SOME(Or(A,B)) => check (F (Hyp A)) C
+                          andalso check (G (Hyp B)) C
+       | _ => false)
+  | check (Abort(M)) C =
+    (case synth M
+      of SOME(False) => true
+       | _ => false)
+  | check (Unit) (True) = true
+  | check M (Var(P)) =
+    (case synth M
+      of SOME(Var(P')) => P' = P
+       | _ => false)
+  | check M A = false
+
+and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(A)
+       | _ => NONE)
+  | synth (Snd(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(B)
+       | _ => NONE)
+  | synth (App(M,N)) =
+    (case synth M
+      of SOME(Imp(A,B)) => if check N A
+                           then SOME(B)
+                           else NONE
+       | _ => NONE)
+  | synth M = NONE</code></pre></p>
+    <p>最后一组例子指出了一件有趣的事情: 当从<math><mrow><mi>M</mi><mo>&rArr;</mo><mi>&bottom;</mi></mrow></math> (表示<math><mrow><mi>&bottom;</mi><mi>&darr;</mi></mrow></math>) 转到<math><mrow><mi>M</mi><mo>&lArr;</mo><mi>&bottom;</mi></mrow></math> (表示<math><mrow><mi>&bottom;</mi><mi>&uarr;</mi></mrow></math>) 时, 我们必须使用<math><mrow><mi>&bottom;</mi><mi>E</mi></mrow></math>规则, 而不是在这两个判断之间悄无声息地转换. 这是因为<math><mi>&bottom;</mi></math>不是一个命题变量, 尽管它可能看起来是原子的, 在它不能被分解的意义上.<pre><code>fun assert true = ()
+  | assert false = raise Fail &quot;assert&quot;
+fun deny true = raise Fail &quot;deny&quot;
+  | deny false = ()
+
+val A = Var(&quot;A&quot;)
+val B = Var(&quot;B&quot;)
+val C = Var(&quot;C&quot;)
+
+val () = assert (check (Pair(Unit,Unit)) (And(True,True)))
+val () = deny (check Unit (And(True,True)))
+val () = assert (check (Lam(fn x => x)) (Imp(A,A)))
+val () = deny (check (Lam(fn x => x)) (Imp(A,B)))
+val () = assert (check (Lam(fn x => Fst(x))) (Imp(And(A,B),A)))
+val () = assert (check (Lam(fn x => Lam(fn y => x))) (Imp(A,Imp(B,A))))
+val () = assert (check (Lam(fn x => Case(x, fn u => Inr u,
+                                            fn w => Inl w)))
+                       (Imp(Or(A,B),Or(B,A))))
+val () = deny (check (Lam(fn x => Case(x, fn u => Inr u,
+                                          fn w => Inl w)))
+                     (Imp(Or(A,B),Or(A,B))))
+val () = assert (check (Lam(fn x => Abort(App(Snd(x),Fst(x)))))
+                       (Not(And(A,Not(A)))))
+val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
+                     (Not(And(A,Not(A)))))</code></pre>最后一个正面的例子是对<math><mrow><mo>&not;</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>&and;</mo><mrow><mo>&not;</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>的一个验证, 用数学的方式写作<math><mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mrow><mi mathvariant="bold">abort</mi><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="bold">snd</mi><mo>&af;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow><mspace width="2ex"/><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="bold">fst</mi><mo>&af;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</p>
     <h2>第7章 相继式演算</h2>
     <h3>第7.1节 引论</h3>
     <p>在本讲中, 我们转向一种不同的证明演算呈现方式. 我们将相继式演算发展为自然演绎中证明搜索的形式系统. 除了能够帮助我们理解证明搜索之外, 相继式演算还使得证明过程中假设作用域的管理更加透明, 并且允许我们进行更多的证明论研究, 即关于证明的性质的证明.</p>

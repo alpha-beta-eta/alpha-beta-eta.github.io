@@ -248,6 +248,7 @@
     (~ #:attr* '((displaystyle "true"))
        (apply (&split n) j*) (car j1))))
 (define split16 (&split 16))
+(define split8 (&split 8))
 (define (&rull label . x*)
   (if label
       (: (apply &rule x*) label)
@@ -262,9 +263,11 @@
   (: $neg:id (^ $I u)))
 (define $negE (: $neg:id $E))
 (define $falsehood $bottom)
+(define $falsehoodI (: $falsehood $I))
 (define $falsehoodE (: $falsehood $E))
 (define $truth $top)
 (define $truthI (: $truth $I))
+(define $truthE (: $truth $E))
 (define $disj:id (Mi "&or;"))
 (define $conj:id (Mi "&and;"))
 (define $impl:id (Mi "&sup;"))
@@ -2961,6 +2964,72 @@ fun even_or_odd x = case x of
       "对于判断" (&: $M $A) "拥有推理规则无疑是重要的, "
       "但这并不能立即给出这样的算法.")
    (H3. "双向定型的一个算法")
+   (MB (set-attr*
+        (&Table
+         ($ (&rull
+             $duarr*
+             (Infer $M $P^)
+             (&= $P^ $P)
+             (Check $M $P)) $)
+         ((&rull
+           $conjI
+           (Check $M $A)
+           (Check $N $B)
+           (Check (tupa0 $M $N) (&conj $A $B)))
+          $ (split8
+             (&rull
+              $conjE1
+              (Infer $M (&conj $A $B))
+              (Infer (&fst $M) $A))
+             (&rull
+              $conjE2
+              (Infer $M (&conj $A $B))
+              (Infer (&snd $M) $B))))
+         ((&rull
+           (&implI $x)
+           (walk
+            (assume $x (Infer $x $A))
+            $..v
+            (Check $M $B))
+           (Check (Lam $x $M)
+                  (&impl $A $B)))
+          $ (&rull
+             $implE
+             (Infer $M (&impl $A $B))
+             (Check $N $A)
+             (Infer (App $M $N) $B)))
+         ((split8
+           (&rull
+            $disjI1
+            (Check $M $A)
+            (Check (&inl $M) (&disj $A $B)))
+           (&rull
+            $disjI2
+            (Check $N $B)
+            (Check (&inr $N) (&disj $A $B))))
+          $ (&rull
+             (&disjE $u $w)
+             (Infer $M (&disj $A $B))
+             (walk
+              (assume $u (Infer $u $A))
+              $..v
+              (Check $N $C))
+             (walk
+              (assume $w (Infer $w $B))
+              $..v
+              (Check $P $C))
+             (Check
+              (&case $M $u $N $w $P) $C)))
+         ((&rull $truthI
+                 (Check $unit $truth))
+          $ (: "(没有" $truthE "规则)"))
+         ((: "(没有" $falsehoodI "规则)")
+          $ (&rull
+             $falsehoodE
+             (Infer $M $falsehood)
+             (Check (&abort $M) $C))))
+        'columnalign "right center left"
+        'rowspacing "6ex"))
    (P "双向定型规则具有特定的目标导向形式, "
       "这允许我们算法性地阅读它们. "
       "请参考图1以阅读这些规则.")
@@ -3185,8 +3254,224 @@ datatype term =
             ((Lam $x (App (@snd $x) (@fst $x)))
              (Ms "Lam(fn x => App(Snd(x),Fst(x)))")))
            'columnalign "left"))
-      
-      )
+      "我们既已知项之表示, 那么该如何处理类型检查呢? "
+      "我们得到了以下情况:"
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F ???) B
+  ...")
+      "在" (Code "Lam")
+      "的情形中, 我们想要针对命题" $B "检查"
+      $lambda "抽象的体. 为了访问这个体, 我们需要将"
+      (Code "F : term -> term")
+      "应用于某个类型为" $A
+      "的项, 但我们并没有任何这样的项. "
+      "从直觉上, 这个项应该代表假设" (Infer $x $A)
+      ", 尽管变量" $x "的名字对于这个目的而言是无关紧要的. "
+      "因此我们创建一种新的项" (Code "Hyp(A)")
+      ", 代表一个类型为" $A
+      "的假设 (省略了名字, 因为它无关紧要). 然后我们将"
+      (Code "Hyp(A)") "代入绑定变量" $x
+      ", 这是通过ML中的函数应用来实现的."
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F (Hyp(A))) B
+  ...")
+      "为了纳入假设" (Infer $x $A)
+      "应当合成类型" $A
+      "这一事实, 我们在" (Code "synth")
+      "函数中添加一个关于假设的情形 "
+      "(省略了已经存在的第一投影和第二投影的情形)."
+      (CodeB "and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) = ...
+  | synth (Snd(M)) = ...
+  | synth M = NONE")
+      "剩下的是添加一个关于推出消去的情形, "
+      "也就是证明项的应用. 回忆:"
+      (MB (&rull
+           $implE
+           (Infer $M (&impl $A $B))
+           (Check $N $A)
+           (Infer (App $M $N) $B)))
+      "注意检查和合成的方向, 我们按照如下方式进行: "
+      "首先我们合成" $M "的类型, 它必须具有"
+      (&impl $A $B) "的形式. 从中我们提取出" $A
+      ", 然后针对" $A "检查参数" $N
+      ". 如果它返回真, 我们就可以返回" $B
+      "作为合成的类型. 如果任何一步失败, 我们就返回"
+      (Code "NONE") ". 我们将其转写为以下代码:"
+      (CodeB "and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) = ...
+  | synth (Snd(M)) = ...
+  | synth (App(M,N)) =
+    (case synth M
+      of SOME(Imp(A,B)) => if check N A
+                           then SOME(B)
+                           else NONE
+       | _ => NONE)
+  | synth M = NONE")
+      "现在我们可以尝试一些稍微更有挑战性的例子, 例如"
+      (&impl $A $A) ", "
+      (&impl (@conj $A $B) $A) "和"
+      (&impl $A (@impl $B $A))
+      "的证明项, 以及"
+      (&neg (@Check (Lam $x $x)
+                    (&impl $A $B)))
+      "."
+      (CodeB "val A = Var(&quot;A&quot;)
+val B = Var(&quot;B&quot;)
+val C = Var(&quot;C&quot;)
+
+val () = assert (check (Lam(fn x => x)) (Imp(A,A)))
+val () = deny (check (Lam(fn x => x)) (Imp(A,B)))
+val () = assert (check (Lam(fn x => Fst(x))) (Imp(And(A,B),A)))
+val () = assert (check (Lam(fn x => Lam(fn y => x))) (Imp(A,Imp(B,A))))"))
+   (H3. "析取")
+   (P "对于析取, 我们只需记住其消去形式 "
+      "(a) 引入了两个假设, 因此证明项有两个绑定变量, 以及 "
+      "(b) 结论是一个验证. 我们还顺带加入了假 (它更简单), "
+      "以便更快地得到我们完整的语言.")
+   (MB (split16
+        (&rull
+         $disjI1
+         (Check $M $A)
+         (Check (&inl $M) (&disj $A $B)))
+        (&rull
+         $disjI2
+         (Check $N $B)
+         (Check (&inr $N) (&disj $A $B)))))
+   (MB (&rull
+        (&disjE $u $w)
+        (Infer $M (&disj $A $B))
+        (walk
+         (assume $u (Infer $u $A))
+         $..v
+         (Check $N $C))
+        (walk
+         (assume $w (Infer $w $B))
+         $..v
+         (Check $P $C))
+        (Check
+         (&case $M $u $N $w $P) $C)))
+   (MB (&rull
+        $falsehoodE
+        (Infer $M $falsehood)
+        (Check (&abort $M) $C)))
+   (P "据此我们扩展命题和证明项."
+      (CodeB "datatype prop =
+         And of prop * prop
+       | Imp of prop * prop
+       | Or of prop * prop
+       | True
+       | False
+       | Var of string
+
+fun Not A = Imp(A,False)
+
+datatype term =
+         Pair of term * term   (* &lt;M,N> *)
+       | Fst of term           (* fst M *)
+       | Snd of term           (* snd M *)
+       | Lam of term -> term   (* \\x. M *)
+       | App of term * term    (* M N *)
+       | Inl of term           (* inl M *)
+       | Inr of term           (* inr M *)
+       | Case of term * (term -> term) * (term -> term)
+                               (* case (M, u.N, w.P) *)
+       | Unit                  (* &lt;> *)
+       | Abort of term         (* abort M *)
+       | Hyp of prop           (* _ : A *)")
+      "我们注意到两件事: "
+      "(1) 我们把否定作为一个记法定义 "
+      "(notational definition) 引入, "
+      "它在ML中就只是一个定义, 以及 "
+      "(2) 我们看到" (Code "case")
+      "表达式中的两个分支是如何由ML函数表示的. "
+      "幸运的是, 我们不需要更多的东西了. 注意"
+      (Code "Case") "构造子出现在"
+      (Code "check") "函数中, 因为该规则要求对"
+      $C "进行验证. 此外, 在两个分支中, "
+      "我们分别用假设" $A "和" $B "将其实例化."
+      (CodeB "(* check : term -> prop -> bool *)
+(* synth : term -> prop option *)
+fun check (Pair(M,N)) (And(A,B)) = check M A andalso check N B
+  | check (Lam(F)) (Imp(A,B)) = check (F (Hyp A)) B
+  | check (Inl(M)) (Or(A,B)) = check M A
+  | check (Inr(M)) (Or(A,B)) = check M B
+  | check (Case(M,F,G)) C =
+    (case synth M
+      of SOME(Or(A,B)) => check (F (Hyp A)) C
+                          andalso check (G (Hyp B)) C
+       | _ => false)
+  | check (Abort(M)) C =
+    (case synth M
+      of SOME(False) => true
+       | _ => false)
+  | check (Unit) (True) = true
+  | check M (Var(P)) =
+    (case synth M
+      of SOME(Var(P')) => P' = P
+       | _ => false)
+  | check M A = false
+
+and synth (Hyp(A)) = SOME(A)
+  | synth (Fst(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(A)
+       | _ => NONE)
+  | synth (Snd(M)) =
+    (case synth M
+      of SOME(And(A,B)) => SOME(B)
+       | _ => NONE)
+  | synth (App(M,N)) =
+    (case synth M
+      of SOME(Imp(A,B)) => if check N A
+                           then SOME(B)
+                           else NONE
+       | _ => NONE)
+  | synth M = NONE"))
+   (P "最后一组例子指出了一件有趣的事情: 当从"
+      (Infer $M $falsehood)
+      " (表示" (&use $falsehood)
+      ") 转到" (Check $M $falsehood)
+      " (表示" (&ver $falsehood)
+      ") 时, 我们必须使用" $falsehoodE
+      "规则, 而不是在这两个判断之间悄无声息地转换. "
+      "这是因为" $falsehood
+      "不是一个命题变量, "
+      "尽管它可能看起来是原子的, "
+      "在它不能被分解的意义上."
+      (CodeB "fun assert true = ()
+  | assert false = raise Fail &quot;assert&quot;
+fun deny true = raise Fail &quot;deny&quot;
+  | deny false = ()
+
+val A = Var(&quot;A&quot;)
+val B = Var(&quot;B&quot;)
+val C = Var(&quot;C&quot;)
+
+val () = assert (check (Pair(Unit,Unit)) (And(True,True)))
+val () = deny (check Unit (And(True,True)))
+val () = assert (check (Lam(fn x => x)) (Imp(A,A)))
+val () = deny (check (Lam(fn x => x)) (Imp(A,B)))
+val () = assert (check (Lam(fn x => Fst(x))) (Imp(And(A,B),A)))
+val () = assert (check (Lam(fn x => Lam(fn y => x))) (Imp(A,Imp(B,A))))
+val () = assert (check (Lam(fn x => Case(x, fn u => Inr u,
+                                            fn w => Inl w)))
+                       (Imp(Or(A,B),Or(B,A))))
+val () = deny (check (Lam(fn x => Case(x, fn u => Inr u,
+                                          fn w => Inl w)))
+                     (Imp(Or(A,B),Or(A,B))))
+val () = assert (check (Lam(fn x => Abort(App(Snd(x),Fst(x)))))
+                       (Not(And(A,Not(A)))))
+val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
+                     (Not(And(A,Not(A)))))")
+      "最后一个正面的例子是对"
+      (&neg (@conj $A (&neg $A)))
+      "的一个验证, 用数学的方式写作"
+      (Lam $x (&abort (@App (@snd $x) (@fst $x)))) ".")
    (H2. "相继式演算")
    (H3. "引论")
    (P "在本讲中, 我们转向一种不同的证明演算呈现方式. "
