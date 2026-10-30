@@ -270,4 +270,7 @@
       (Ol (Li "探究防御性编程转contract的可能性;")
           (Li "考虑如何搭建测试环境以为client作准备;")
           (Li "考虑既已作成的工具如何融合到PR流程.")))
+   (H2. "2026年10月30日")
+   (P "A map_reduce is a homomorphism between "
+      "collection monoids.")
    ))
