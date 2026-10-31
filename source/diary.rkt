@@ -273,4 +273,18 @@
    (H2. "2026年10月30日")
    (P "A map_reduce is a homomorphism between "
       "collection monoids.")
+   ((definition)
+    "一个元组" (tu0 $M $0 $* $I $g)
+    "是一个collection monoid, 如果"
+    (Ol (Li (tu0 $M $0 $*) "是一个monoid;")
+        (Li (func $g $I $M) ".")))
+   ((definition)
+    "对于两个collection monoid "
+    (&= $A (tu0 $M_1 $0_A $* $I $g_1)) "和"
+    (&= $B (tu0 $M_2 $0_B $d* $I $g_2))
+    ", 称" (func $h $A $B)
+    "是一个collection monoid同态, 如果"
+    (Ol (Li $h "是一个monoid同态;")
+        (Li (&= (&compose $h $g_1) $g_2) ".")))
+   
    ))

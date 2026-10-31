@@ -131,5 +131,6 @@
     (TITLE "Edinburgh LCF" "lcf.html")
     (TITLE "如何编写金融合约" "contract.html")
     (TITLE "编程习题集" "exercises_in_programming.html")
+    (TITLE "幺半群的并行乐趣 (AI翻译)" "map_monoid_reduce.html")
     
     )))
