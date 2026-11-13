@@ -141,6 +141,7 @@
          "ski.rkt"
          "cmu15150.rkt"
          "extensible_spec.rkt"
+         "extensible_modern.rkt"
          "language_cognitive.rkt"
          "papers_plan.rkt"
          "having_an_effect.rkt"
@@ -263,6 +264,8 @@
     (emitXml dsh.html "../dsh.html")
     (emitXml extensible_spec.html
              "../extensible_spec.html")
+    (emitXml extensible_modern.html
+             "../extensible_modern.html")
     (emitXml locally_nameless.html
              "../locally_nameless.html")
     (emitXml abstract_sl.html

@@ -182,6 +182,14 @@
     (,else
      (error 'ConjL2 "the antecedent ~s you choose is not a conjunction"
             prop))))
+;FalsehoodL : int -> command
+(define ((FalsehoodL i) conclusion)
+  (match-define (sequent ante* succ) conclusion)
+  (define prop (list-ref ante* i))
+  (if (eq? prop 'bot)
+      '()
+      (error 'FalsehoodL "the antecedent ~s you choose is not a falsehood"
+             prop)))
 (define Γ_1 (_ Γ $1))
 (define Γ_2 (_ Γ $2))
 (define $~> (Mo "&zigrarr;"))
@@ -297,7 +305,10 @@
 (define (reify-type t)
   (define (reify t)
     (match t
-      ((-> ,t1 ,t2) (&impl (@reify t1) (@reify t2)))
+      ((-> ,t1 ,t2)
+       (if (eq? t2 'bot)
+           (&neg (@reify t1))
+           (&impl (@reify t1) (@reify t2))))
       ((conj ,t1 ,t2) (&conj (@reify t1) (@reify t2)))
       ((disj ,t1 ,t2) (&disj (@reify t1) (@reify t2)))
       (bot $bottom)
@@ -305,7 +316,10 @@
       (,else t)))
   (define (@reify t)
     (match t
-      ((-> ,t1 ,t2) (@impl (@reify t1) (@reify t2)))
+      ((-> ,t1 ,t2)
+       (if (eq? t2 'bot)
+           (&neg (@reify t1))
+           (@impl (@reify t1) (@reify t2))))
       ((conj ,t1 ,t2) (@conj (@reify t1) (@reify t2)))
       ((disj ,t1 ,t2) (@disj (@reify t1) (@reify t2)))
       (bot $bottom)
@@ -657,6 +671,8 @@
 (define CONJR (refine ConjR $conjR))
 (define (CONJL1 n) (refine (ConjL1 n) $conjL1))
 (define (CONJL2 n) (refine (ConjL2 n) $conjL2))
+(define (FALSEHOODL n)
+  (refine (FalsehoodL n) $falsehoodL))
 (define constructive_logic_notes.html
   (TnTmPrelude
    #:title "构造性逻辑讲义"
@@ -4720,6 +4736,158 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
     (B "弱化. ")
     "如果" (Sequent Γ $C) ", 那么"
     (Sequent Γ $A $C) ".")
+   ((proof)
+    "我们为给定的对于" (Sequent Γ $C)
+    "的推导中的每个相继式都添加这未使用的前件. "
+    "从形式化的角度而言, 这会是给定的推导的结构上的归纳. "
+    "一个重要的观察在于推导的结构并没有改变.")
+   ((tcomment)
+    "这里作者想要证明的是, 如果" $D_1
+    "是" (Sequent Γ $C) "的一个推导, "
+    "那么给该推导的每个相继式的前件添加"
+    $A "的推导" (&= $D_2 (app $D_1 (&+ $A)))
+    "也是相继式演算里的一个合法推导, "
+    "且显然这个推导树的根是"
+    (Sequent Γ $A $C) ".")
+   (P "以此定理, 刚才所说的合取情形的另一条路即"
+      (let* (($i.h. (Mi "i.h."))
+             (i.h. (λ (A) (app $i.h. A)))
+             (i.h.A1 (&rull:dotted
+                      (i.h. $A_1)
+                      (Sequent Γ $A_1 $A_1)))
+             (i.h.A2 (&rull:dotted
+                      (i.h. $A_2)
+                      (Sequent Γ $A_2 $A_2)))
+             (weaken1 (&rull:dotted
+                       $weaken
+                       i.h.A1
+                       (Sequent
+                        Γ (&conj $A_1 $A_2) $A_1 $A_1)))
+             (weaken2 (&rull:dotted
+                       $weaken
+                       i.h.A2
+                       (Sequent
+                        Γ (&conj $A_1 $A_2) $A_2 $A_2))))
+        (Ul (Li (&= $A (&conj $A_1 $A_2)) ", 那么"
+                (MB (state-render
+                     (<< (initialize
+                          (sequent
+                           (list Γ `(conj ,$A_1 ,$A_2))
+                           `(conj ,$A_1 ,$A_2)))
+                         (CONJR 0)
+                         ((CONJL1 1) 0)
+                         ((CONJL2 1) 1)
+                         )))
+                "其中左侧省略号我们可以使用"
+                (MB weaken1)
+                "补完, 右侧省略号可以使用"
+                (MB weaken2)
+                "补完. {译注: 原文写的是错的, "
+                "整个结构都乱了.}"))))
+   (P "identity定理是每个单独联结词的局部完备性质的全局版本. "
+      "局部完备性表明一个联结词可以被重新验证, "
+      "根据一个给予我们使用它的许可的证明, "
+      "这直接对应于" (Sequent $A $A)
+      ". 我们可以辨认出局部扩展其实体现在了"
+      "identity定理的归纳证明的每个情形之中.")
+   (H3. "可推导性与可容许性的对比")
+   (P "我们称一个规则是" (Em "可推导的 (derivable)")
+      ", 如果其在演算之中拥有一个封闭形式的推导. "
+      "例如, 以下规则"
+      (MB (&rule
+           (Sequent Γ $A)
+           (Sequent Γ $B)
+           (Sequent
+            Γ (&neg (@conj $A $B)) $C)))
+      "是可推导的, 因为其有如下推导"
+      (let* ((Ld (&rull
+                  $conjR
+                  (Sequent Γ $A)
+                  (Sequent Γ $B)
+                  (Sequent Γ (&conj $A $B))))
+             (Rd (&rull
+                  $falsehoodL
+                  (Sequent Γ $falsehood $C))))
+        (MB (&rull $implL
+                   Ld Rd
+                   (Sequent
+                    Γ (&neg (@conj $A $B)) $C))))
+      "其中我们省略了一些我们并不打算使用的前件. "
+      "可推导规则的良好性质在于其在我们的语言"
+      "或者逻辑的任意扩展之中也会是可推导的, "
+      "只要既存的联结词的意义并不改变 "
+      "(因而联结词的规则不会改变)."
+      (Blockquote
+       (Em "可推导规则: 一旦有效, 总是有效.")))
+   ((tcomment)
+    "其实严格来说以上的不是可推导规则, "
+    "因为如果我们试图进行推导, 会得到"
+    (MB (state-render
+         (<< (initialize
+              (sequent
+               (list Γ `(-> (conj ,$A ,$B) bot))
+               $C))
+             ((IMPLL 1) 0)
+             ((FALSEHOODL 2) 1)
+             (CONJR 0)
+             )))
+    "然后我们发现我们需要弱化, "
+    "但是弱化只是可容许的, 不是可推导的. "
+    "所以, 严格来说, 以下才是可推导规则:"
+    (MB (&rule
+         (Sequent
+          Γ (&neg (@conj $A $B)) $A)
+         (Sequent
+          Γ (&neg (@conj $A $B)) $B)
+         (Sequent
+          Γ (&neg (@conj $A $B)) $C)))
+    "不过, 或许作者只是懒得写了.")
+   (P "另一方面, identity定理体现了一个(没有前提的)"
+      (Em "可容许规则 (admissible rule)") "."
+      (MB (&rull:dotted
+           $id:rule
+           (Sequent Γ $A $A)))
+      "区别在于, 可容许规则的每个实例都有一个推导, "
+      "但对于不同的实例, 这个推导可能并不相同. "
+      "可容许规则是通过元理论推理确立的, "
+      "这意味着每当我们扩展语言时, 都必须重新考虑它."
+      (Blockquote
+       (Em "可容许规则: 一证再证.")))
+   (P "除了弱化 (它表达的是我们不必使用某个前件) 之外, 还有"
+      (Em "收缩 (contraction)")
+      ", 它表达的是我们可以多次使用某个前件. "
+      "这意味着一个前件只要有一份就足够了.")
+   ((tcomment)
+    "恒等规则, 弱化规则, 收缩规则都是可容许规则, 但不是可推导规则.")
+   ((theorem #:n "3")
+    (B "收缩. ")
+    "如果" (Sequent Γ $A $A $C) ", 那么"
+    (Sequent Γ $A $C) ". 简而言之, 即"
+    (MB (&rull:dotted
+         $contract
+         (Sequent Γ $A $A $C)
+         (Sequent Γ $A $C)))
+    "是可容许的.")
+   ((proof)
+    
+    )
+   (H3. "切的可容许性")
+   (P "切定理 (cut theorem) 是逻辑最基本的性质之一. "
+      "由于它的核心地位, 我们将花一些时间来讨论它的证明. "
+      "在课上, 我们是逐步建立起这个证明及其所需的归纳原理的; "
+      "这里我们按照数学中的惯例, 直接给出最终结果. "
+      "这个证明适合在逻辑框架中形式化; "
+      "细节可参见授课教师的一篇论文Pfenning [2000].")
+   ((theorem #:n "4")
+    (B "切的可容许性. ")
+    "如果" (Sequent Γ $A) "且" (Sequent Γ $A $C)
+    ", 那么" (Sequent Γ $C) ". 换言之, 即"
+    (MB (&rull:dotted
+         $cut
+         (Sequent Γ $A)
+         (Sequent Γ $A $C)
+         (Sequent Γ $C)))
+    "是可容许的.")
    ((proof)
     
     )

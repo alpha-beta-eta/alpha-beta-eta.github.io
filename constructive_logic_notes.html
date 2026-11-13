@@ -2884,15 +2884,13 @@ fun even_or_odd x = case x of
                               <mfrac displaystyle="true">
                                 <mrow/>
                                 <mrow>
-                                  <mrow>
+                                  <mrow><mo>&not;</mo>
                                     <mrow><mo stretchy="false">(</mo>
                                       <mrow><mi>A</mi><mo>&or;</mo>
-                                        <mrow><mo stretchy="false">(</mo>
-                                          <mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow>
-                                          <mo stretchy="false">)</mo></mrow>
+                                        <mrow><mo>&not;</mo><mi>A</mi></mrow>
                                       </mrow>
                                       <mo stretchy="false">)</mo></mrow>
-                                    <mo>&sup;</mo><mi>&bottom;</mi></mrow>
+                                  </mrow>
                                   <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
                               </mfrac>
                               <mi>u</mi></mrow>
@@ -2903,15 +2901,13 @@ fun even_or_odd x = case x of
                                   <mfrac displaystyle="true">
                                     <mrow/>
                                     <mrow>
-                                      <mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow>
+                                      <mrow><mo>&not;</mo><mi>A</mi></mrow>
                                       <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
                                   </mfrac>
                                   <mi>v</mi></mrow>
                                 <mrow>
                                   <mrow><mi>A</mi><mo>&or;</mo>
-                                    <mrow><mo stretchy="false">(</mo>
-                                      <mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow>
-                                      <mo stretchy="false">)</mo></mrow>
+                                    <mrow><mo>&not;</mo><mi>A</mi></mrow>
                                   </mrow>
                                   <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
                               </mfrac>
@@ -2925,11 +2921,9 @@ fun even_or_odd x = case x of
                         <mrow><mi>&sup;</mi><mi>E</mi></mrow>
                       </mrow>
                       <mrow>
-                        <mrow>
-                          <mrow><mo stretchy="false">(</mo>
-                            <mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow>
-                            <mo stretchy="false">)</mo></mrow>
-                          <mo>&sup;</mo><mi>&bottom;</mi></mrow>
+                        <mrow><mo>&not;</mo>
+                          <mrow><mo>&not;</mo><mi>A</mi></mrow>
+                        </mrow>
                         <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
                     </mfrac>
                     <mrow><mi>&sup;</mi>
@@ -2946,15 +2940,13 @@ fun even_or_odd x = case x of
                               <mfrac displaystyle="true">
                                 <mrow/>
                                 <mrow>
-                                  <mrow>
+                                  <mrow><mo>&not;</mo>
                                     <mrow><mo stretchy="false">(</mo>
                                       <mrow><mi>A</mi><mo>&or;</mo>
-                                        <mrow><mo stretchy="false">(</mo>
-                                          <mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow>
-                                          <mo stretchy="false">)</mo></mrow>
+                                        <mrow><mo>&not;</mo><mi>A</mi></mrow>
                                       </mrow>
                                       <mo stretchy="false">)</mo></mrow>
-                                    <mo>&sup;</mo><mi>&bottom;</mi></mrow>
+                                  </mrow>
                                   <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
                               </mfrac>
                               <mi>u</mi></mrow>
@@ -2969,9 +2961,7 @@ fun even_or_odd x = case x of
                                   <mi>w</mi></mrow>
                                 <mrow>
                                   <mrow><mi>A</mi><mo>&or;</mo>
-                                    <mrow><mo stretchy="false">(</mo>
-                                      <mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow>
-                                      <mo stretchy="false">)</mo></mrow>
+                                    <mrow><mo>&not;</mo><mi>A</mi></mrow>
                                   </mrow>
                                   <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
                               </mfrac>
@@ -2985,7 +2975,7 @@ fun even_or_odd x = case x of
                         <mrow><mi>&sup;</mi><mi>E</mi></mrow>
                       </mrow>
                       <mrow>
-                        <mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow>
+                        <mrow><mo>&not;</mo><mi>A</mi></mrow>
                         <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
                     </mfrac>
                     <mrow><mi>&sup;</mi>
@@ -2998,19 +2988,15 @@ fun even_or_odd x = case x of
               <mrow><mi>&sup;</mi><mi>E</mi></mrow>
             </mrow>
             <mrow>
-              <mrow>
-                <mrow><mo stretchy="false">(</mo>
-                  <mrow>
-                    <mrow><mo stretchy="false">(</mo>
-                      <mrow><mi>A</mi><mo>&or;</mo>
-                        <mrow><mo stretchy="false">(</mo>
-                          <mrow><mi>A</mi><mo>&sup;</mo><mi>&bottom;</mi></mrow>
-                          <mo stretchy="false">)</mo></mrow>
-                      </mrow>
-                      <mo stretchy="false">)</mo></mrow>
-                    <mo>&sup;</mo><mi>&bottom;</mi></mrow>
-                  <mo stretchy="false">)</mo></mrow>
-                <mo>&sup;</mo><mi>&bottom;</mi></mrow>
+              <mrow><mo>&not;</mo>
+                <mrow><mo>&not;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>A</mi><mo>&or;</mo>
+                      <mrow><mo>&not;</mo><mi>A</mi></mrow>
+                    </mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
               <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
           </mfrac>
           <mrow><mi>&sup;</mi>
@@ -9255,6 +9241,494 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
     </div>
     <p>上述最后两种情形中的有趣一点在于我们应用了归纳假设于更多的前件, 例如在合取的情形下是<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>&and;</mo><msub><mi>A</mi><mn>2</mn></msub></mrow></mrow></math>. {译注: 它指的是<q>周遭前件上下文</q>的扩大.} 作为另一条路, 我们也可以只以<math><mi mathvariant="normal">&Gamma;</mi></math>应用归纳假设, 得到<math><mrow><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><msub><mi>A</mi><mn>1</mn></msub></mrow><mo>&xrArr;</mo><msub><mi>A</mi><mn>1</mn></msub></mrow></math>, 然后应用<em>弱化</em>, 添加前件<math><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>&and;</mo><msub><mi>A</mi><mn>2</mn></msub></mrow></math>. 让我们将此观察分离为相继式演算的另一重要性质.</p>
     <div class="theorem"><b>定理2. </b><b>弱化. </b>如果<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>C</mi></mrow></math>, 那么<math><mrow><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow><mo>&xrArr;</mo><mi>C</mi></mrow></math>.</div>
+    <div class="proof"><b>证明.</b> 我们为给定的对于<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>C</mi></mrow></math>的推导中的每个相继式都添加这未使用的前件. 从形式化的角度而言, 这会是给定的推导的结构上的归纳. 一个重要的观察在于推导的结构并没有改变.
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <div class="tcomment"><b>译者注记. </b>这里作者想要证明的是, 如果<math><msub><mi>D</mi><mn>1</mn></msub></math>是<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>C</mi></mrow></math>的一个推导, 那么给该推导的每个相继式的前件添加<math><mi>A</mi></math>的推导<math><mrow><msub><mi>D</mi><mn>2</mn></msub><mo>=</mo><mrow><msub><mi>D</mi><mn>1</mn></msub><mo>&af;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>+</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>也是相继式演算里的一个合法推导, 且显然这个推导树的根是<math><mrow><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow><mo>&xrArr;</mo><mi>C</mi></mrow></math>.</div>
+    <p>以此定理, 刚才所说的合取情形的另一条路即
+      <ul>
+        <li><math><mrow><mi>A</mi><mo>=</mo><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>&and;</mo><msub><mi>A</mi><mn>2</mn></msub></mrow></mrow></math>, 那么
+          <math display="block">
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow>
+                    <mfrac displaystyle="true">
+                      <mtable>
+                        <mtr>
+                          <mtd><mo>&vellip;</mo></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow>
+                              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                                <mrow>
+                                  <msub><mi>A</mi><mn>1</mn></msub>
+                                  <mo>&and;</mo>
+                                  <msub><mi>A</mi><mn>2</mn></msub>
+                                </mrow>
+                                <mo>,</mo>
+                                <msub><mi>A</mi><mn>1</mn></msub>
+                              </mrow>
+                              <mo>&xrArr;</mo>
+                              <msub><mi>A</mi><mn>1</mn></msub>
+                            </mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                      <mrow>
+                        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                          <mrow>
+                            <msub><mi>A</mi><mn>1</mn></msub>
+                            <mo>&and;</mo>
+                            <msub><mi>A</mi><mn>2</mn></msub>
+                          </mrow>
+                        </mrow>
+                        <mo>&xrArr;</mo>
+                        <msub><mi>A</mi><mn>1</mn></msub>
+                      </mrow>
+                    </mfrac>
+                    <mrow><mi>&and;</mi>
+                      <msub><mi>L</mi><mn>1</mn></msub>
+                    </mrow>
+                  </mrow>
+                  <mspace width="8ex"/>
+                  <mrow>
+                    <mfrac displaystyle="true">
+                      <mtable>
+                        <mtr>
+                          <mtd><mo>&vellip;</mo></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow>
+                              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                                <mrow>
+                                  <msub><mi>A</mi><mn>1</mn></msub>
+                                  <mo>&and;</mo>
+                                  <msub><mi>A</mi><mn>2</mn></msub>
+                                </mrow>
+                                <mo>,</mo>
+                                <msub><mi>A</mi><mn>2</mn></msub>
+                              </mrow>
+                              <mo>&xrArr;</mo>
+                              <msub><mi>A</mi><mn>2</mn></msub>
+                            </mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                      <mrow>
+                        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                          <mrow>
+                            <msub><mi>A</mi><mn>1</mn></msub>
+                            <mo>&and;</mo>
+                            <msub><mi>A</mi><mn>2</mn></msub>
+                          </mrow>
+                        </mrow>
+                        <mo>&xrArr;</mo>
+                        <msub><mi>A</mi><mn>2</mn></msub>
+                      </mrow>
+                    </mfrac>
+                    <mrow><mi>&and;</mi>
+                      <msub><mi>L</mi><mn>2</mn></msub>
+                    </mrow>
+                  </mrow>
+                </mrow>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                    <mrow>
+                      <msub><mi>A</mi><mn>1</mn></msub>
+                      <mo>&and;</mo>
+                      <msub><mi>A</mi><mn>2</mn></msub>
+                    </mrow>
+                  </mrow>
+                  <mo>&xrArr;</mo>
+                  <mrow>
+                    <msub><mi>A</mi><mn>1</mn></msub>
+                    <mo>&and;</mo>
+                    <msub><mi>A</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+              </mfrac>
+              <mrow><mi>&and;</mi><mi>R</mi></mrow>
+            </mrow>
+          </math>
+          其中左侧省略号我们可以使用
+          <math display="block">
+            <mrow>
+              <mtable class="admissible" displaystyle="true">
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mtable class="admissible" displaystyle="true">
+                        <mtr>
+                          <mtd>
+                            <mrow/>
+                          </mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow>
+                              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                                <msub><mi>A</mi><mn>1</mn></msub>
+                              </mrow>
+                              <mo>&xrArr;</mo>
+                              <msub><mi>A</mi><mn>1</mn></msub>
+                            </mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                      <mrow><mi>i.h.</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>A</mi><mn>1</mn></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                        <mrow>
+                          <msub><mi>A</mi><mn>1</mn></msub>
+                          <mo>&and;</mo>
+                          <msub><mi>A</mi><mn>2</mn></msub>
+                        </mrow>
+                        <mo>,</mo>
+                        <msub><mi>A</mi><mn>1</mn></msub>
+                      </mrow>
+                      <mo>&xrArr;</mo>
+                      <msub><mi>A</mi><mn>1</mn></msub>
+                    </mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+              <mi mathvariant="monospace">weaken</mi></mrow>
+          </math>
+          补完, 右侧省略号可以使用
+          <math display="block">
+            <mrow>
+              <mtable class="admissible" displaystyle="true">
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mtable class="admissible" displaystyle="true">
+                        <mtr>
+                          <mtd>
+                            <mrow/>
+                          </mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow>
+                              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                                <msub><mi>A</mi><mn>2</mn></msub>
+                              </mrow>
+                              <mo>&xrArr;</mo>
+                              <msub><mi>A</mi><mn>2</mn></msub>
+                            </mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                      <mrow><mi>i.h.</mi><mo>&af;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <msub><mi>A</mi><mn>2</mn></msub>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                        <mrow>
+                          <msub><mi>A</mi><mn>1</mn></msub>
+                          <mo>&and;</mo>
+                          <msub><mi>A</mi><mn>2</mn></msub>
+                        </mrow>
+                        <mo>,</mo>
+                        <msub><mi>A</mi><mn>2</mn></msub>
+                      </mrow>
+                      <mo>&xrArr;</mo>
+                      <msub><mi>A</mi><mn>2</mn></msub>
+                    </mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+              <mi mathvariant="monospace">weaken</mi></mrow>
+          </math>
+          补完. {译注: 原文写的是错的, 整个结构都乱了.}</li>
+      </ul>
+    </p>
+    <p>identity定理是每个单独联结词的局部完备性质的全局版本. 局部完备性表明一个联结词可以被重新验证, 根据一个给予我们使用它的许可的证明, 这直接对应于<math><mrow><mi>A</mi><mo>&xrArr;</mo><mi>A</mi></mrow></math>. 我们可以辨认出局部扩展其实体现在了identity定理的归纳证明的每个情形之中.</p>
+    <h3>第8.3节 可推导性与可容许性的对比</h3>
+    <p>我们称一个规则是<em>可推导的 (derivable)</em>, 如果其在演算之中拥有一个封闭形式的推导. 例如, 以下规则
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+            <mspace width="8ex"/>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>B</mi></mrow>
+          </mrow>
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+              <mrow><mo>&not;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo>&xrArr;</mo><mi>C</mi></mrow>
+        </mfrac>
+      </math>
+      是可推导的, 因为其有如下推导
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+                    <mspace width="8ex"/>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                    <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                  </mrow>
+                </mfrac>
+                <mrow><mi>&and;</mi><mi>R</mi></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow/>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>&bottom;</mi></mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                </mfrac>
+                <mrow><mi>&bottom;</mi><mi>L</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mo>&not;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>&xrArr;</mo><mi>C</mi></mrow>
+          </mfrac>
+          <mrow><mi>&sup;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      其中我们省略了一些我们并不打算使用的前件. 可推导规则的良好性质在于其在我们的语言或者逻辑的任意扩展之中也会是可推导的, 只要既存的联结词的意义并不改变 (因而联结词的规则不会改变).
+      <blockquote><em>可推导规则: 一旦有效, 总是有效.</em></blockquote>
+    </p>
+    <div class="tcomment"><b>译者注记. </b>其实严格来说以上的不是可推导规则, 因为如果我们试图进行推导, 会得到
+      <math display="block">
+        <mrow>
+          <mfrac displaystyle="true">
+            <mrow>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow>
+                    <mtable>
+                      <mtr>
+                        <mtd><mo>&vellip;</mo></mtd>
+                      </mtr>
+                      <mtr>
+                        <mtd>
+                          <mrow>
+                            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                              <mrow><mo>&not;</mo>
+                                <mrow><mo stretchy="false">(</mo>
+                                  <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                                  <mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                            </mrow>
+                            <mo>&xrArr;</mo><mi>A</mi></mrow>
+                        </mtd>
+                      </mtr>
+                    </mtable>
+                    <mspace width="8ex"/>
+                    <mtable>
+                      <mtr>
+                        <mtd><mo>&vellip;</mo></mtd>
+                      </mtr>
+                      <mtr>
+                        <mtd>
+                          <mrow>
+                            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                              <mrow><mo>&not;</mo>
+                                <mrow><mo stretchy="false">(</mo>
+                                  <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                                  <mo stretchy="false">)</mo></mrow>
+                              </mrow>
+                            </mrow>
+                            <mo>&xrArr;</mo><mi>B</mi></mrow>
+                        </mtd>
+                      </mtr>
+                    </mtable>
+                  </mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mo>&not;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                    </mrow>
+                    <mo>&xrArr;</mo>
+                    <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                  </mrow>
+                </mfrac>
+                <mrow><mi>&and;</mi><mi>R</mi></mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow/>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mo>&not;</mo>
+                        <mrow><mo stretchy="false">(</mo>
+                          <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                          <mo stretchy="false">)</mo></mrow>
+                      </mrow>
+                      <mo>,</mo><mi>&bottom;</mi></mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                </mfrac>
+                <mrow><mi>&bottom;</mi><mi>L</mi></mrow>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mo>&not;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>&xrArr;</mo><mi>C</mi></mrow>
+          </mfrac>
+          <mrow><mi>&sup;</mi><mi>L</mi></mrow>
+        </mrow>
+      </math>
+      然后我们发现我们需要弱化, 但是弱化只是可容许的, 不是可推导的. 所以, 严格来说, 以下才是可推导规则:
+      <math display="block">
+        <mfrac displaystyle="true">
+          <mrow>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mo>&not;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>&xrArr;</mo><mi>A</mi></mrow>
+            <mspace width="8ex"/>
+            <mrow>
+              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                <mrow><mo>&not;</mo>
+                  <mrow><mo stretchy="false">(</mo>
+                    <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                    <mo stretchy="false">)</mo></mrow>
+                </mrow>
+              </mrow>
+              <mo>&xrArr;</mo><mi>B</mi></mrow>
+          </mrow>
+          <mrow>
+            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+              <mrow><mo>&not;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mrow>
+            <mo>&xrArr;</mo><mi>C</mi></mrow>
+        </mfrac>
+      </math>
+      不过, 或许作者只是懒得写了.</div>
+    <p>另一方面, identity定理体现了一个(没有前提的)<em>可容许规则 (admissible rule)</em>.
+      <math display="block">
+        <mrow>
+          <mtable class="admissible" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow/>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                  <mo>&xrArr;</mo><mi>A</mi></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+          <mi mathvariant="monospace">id</mi></mrow>
+      </math>
+      区别在于, 可容许规则的每个实例都有一个推导, 但对于不同的实例, 这个推导可能并不相同. 可容许规则是通过元理论推理确立的, 这意味着每当我们扩展语言时, 都必须重新考虑它.
+      <blockquote><em>可容许规则: 一证再证.</em></blockquote>
+    </p>
+    <p>除了弱化 (它表达的是我们不必使用某个前件) 之外, 还有<em>收缩 (contraction)</em>, 它表达的是我们可以多次使用某个前件. 这意味着一个前件只要有一份就足够了.</p>
+    <div class="tcomment"><b>译者注记. </b>恒等规则, 弱化规则, 收缩规则都是可容许规则, 但不是可推导规则.</div>
+    <div class="theorem"><b>定理3. </b><b>收缩. </b>如果<math><mrow><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi><mo>,</mo><mi>A</mi></mrow><mo>&xrArr;</mo><mi>C</mi></mrow></math>, 那么<math><mrow><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow><mo>&xrArr;</mo><mi>C</mi></mrow></math>. 简而言之, 即
+      <math display="block">
+        <mrow>
+          <mtable class="admissible" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi><mo>,</mo><mi>A</mi></mrow>
+                  <mo>&xrArr;</mo><mi>C</mi></mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                  <mo>&xrArr;</mo><mi>C</mi></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+          <mi mathvariant="monospace">contract</mi></mrow>
+      </math>
+      是可容许的.</div>
+    <div class="proof"><b>证明.</b> 
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
+    <h3>第8.4节 切的可容许性</h3>
+    <p>切定理 (cut theorem) 是逻辑最基本的性质之一. 由于它的核心地位, 我们将花一些时间来讨论它的证明. 在课上, 我们是逐步建立起这个证明及其所需的归纳原理的; 这里我们按照数学中的惯例, 直接给出最终结果. 这个证明适合在逻辑框架中形式化; 细节可参见授课教师的一篇论文Pfenning [2000].</p>
+    <div class="theorem"><b>定理4. </b><b>切的可容许性. </b>如果<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow></math>且<math><mrow><mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow><mo>&xrArr;</mo><mi>C</mi></mrow></math>, 那么<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>C</mi></mrow></math>. 换言之, 即
+      <math display="block">
+        <mrow>
+          <mtable class="admissible" displaystyle="true">
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+                  <mspace width="8ex"/>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>C</mi></mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+          <mi mathvariant="monospace">cut</mi></mrow>
+      </math>
+      是可容许的.</div>
     <div class="proof"><b>证明.</b> 
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
     </div>
