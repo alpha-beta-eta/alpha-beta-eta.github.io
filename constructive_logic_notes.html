@@ -9732,6 +9732,329 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
     <div class="proof"><b>证明.</b> 
       <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
     </div>
+    <h3>第8.5节 切消</h3>
+    <h3>第8.6节 总结</h3>
+    <p>我们来总结一下相继式演算的规则, 其中可容许规则用虚线标出. 在演算的某些版本中, 比如Gentzen [1935] 最初的版本, 这些规则是原始规则. 它们在不含这些规则的演算中是可容许的, 这一事实是一个例子, 说明蛋糕可以既留着, 又吃掉 {译注: 英语谚语<q>you can't have your cake and eat it, too</q>的反用, 意即鱼与熊掌可以兼得.}.</p>
+    <p><b>留着蛋糕: </b>如果你想在相继式演算之中, 或者关于相继式演算, 推导一个定理, 你可以自由地使用切和恒等. 这是因为这些规则是可容许的: 结论的推导是存在的, 尽管它可能比使用切的那个推导长得多.</p>
+    <p><b>吃掉蛋糕: </b>如果你想在相继式演算之中, 或者关于相继式演算, 推导一个定理, 你并不需要考虑切规则或一般的恒等规则. 这是因为每个可推导的相继式都可以不用二者中的任何一个而推导出来. 如果你想设计甚至实现系统的搜索过程, 这一点尤其有用, 因为切作为一条规则, 会引入一个任意的命题<math><mi>A</mi></math>, 因而产生的分支极多. 如前所述, 除了这条规则之外, 其他所有规则都满足子公式性质, 只是把你试图证明的相继式中的命题分解开来.</p>
+    <math display="block">
+      <mtable columnalign="right center left" rowspacing="6ex">
+        <mtr>
+          <mtd>
+            <mrow>
+              <mtable class="admissible" displaystyle="true">
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+                      <mspace width="8ex"/>
+                      <mrow>
+                        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                        <mo>&xrArr;</mo><mi>C</mi></mrow>
+                    </mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>C</mi></mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+              <mi mathvariant="monospace">cut</mi></mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mtable class="admissible" displaystyle="true">
+                <mtr>
+                  <mtd>
+                    <mrow/>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                      <mo>&xrArr;</mo><mi>A</mi></mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+              <mi mathvariant="monospace">id</mi></mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mtable class="admissible" displaystyle="true">
+                <mtr>
+                  <mtd>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>C</mi></mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                      <mo>&xrArr;</mo><mi>C</mi></mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+              <mi mathvariant="monospace">weaken</mi></mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mtable class="admissible" displaystyle="true">
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi><mo>,</mo><mi>A</mi></mrow>
+                      <mo>&xrArr;</mo><mi>C</mi></mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                      <mo>&xrArr;</mo><mi>C</mi></mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+              <mi mathvariant="monospace">contract</mi></mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow/>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>P</mi></mrow>
+                  <mo>&xrArr;</mo><mi>P</mi></mrow>
+              </mfrac>
+              <msup><mi mathvariant="monospace">id</mi><mo>&#8270;</mo></msup>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+                  <mspace width="8ex"/>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>B</mi></mrow>
+                </mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                  <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                </mrow>
+              </mfrac>
+              <mrow><mi>&and;</mi><mi>R</mi></mrow>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                      <mo>,</mo><mi>A</mi></mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                    </mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                </mfrac>
+                <mrow><mi>&and;</mi>
+                  <msub><mi>L</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                      <mo>,</mo><mi>B</mi></mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                    </mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                </mfrac>
+                <mrow><mi>&and;</mi>
+                  <msub><mi>L</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>A</mi></mrow>
+                  <mo>&xrArr;</mo><mi>B</mi></mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                  <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                </mrow>
+              </mfrac>
+              <mrow><mi>&sup;</mi><mi>R</mi></mrow>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                    </mrow>
+                    <mo>&xrArr;</mo><mi>A</mi></mrow>
+                  <mspace width="8ex"/>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                        <mo stretchy="false">]</mo></mrow>
+                      <mo>,</mo><mi>B</mi></mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                </mrow>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                    <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mo>&xrArr;</mo><mi>C</mi></mrow>
+              </mfrac>
+              <mrow><mi>&sup;</mi><mi>L</mi></mrow>
+            </mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                    <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                  </mrow>
+                </mfrac>
+                <mrow><mi>&or;</mi>
+                  <msub><mi>R</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+              <mspace width="8ex"/>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>B</mi></mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                    <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                  </mrow>
+                </mfrac>
+                <mrow><mi>&or;</mi>
+                  <msub><mi>R</mi><mn>2</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                        <mo stretchy="false">]</mo></mrow>
+                      <mo>,</mo><mi>A</mi></mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                  <mspace width="8ex"/>
+                  <mrow>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                      <mrow><mo stretchy="false">[</mo>
+                        <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                        <mo stretchy="false">]</mo></mrow>
+                      <mo>,</mo><mi>B</mi></mrow>
+                    <mo>&xrArr;</mo><mi>C</mi></mrow>
+                </mrow>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                    <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+                  </mrow>
+                  <mo>&xrArr;</mo><mi>C</mi></mrow>
+              </mfrac>
+              <mrow><mi>&or;</mi><mi>L</mi></mrow>
+            </mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow/>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>&top;</mi></mrow>
+              </mfrac>
+              <mrow><mi>&top;</mi><mi>R</mi></mrow>
+            </mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow><mtext>(没有</mtext>
+              <mrow><mi>&top;</mi><mi>L</mi></mrow>
+              <mtext>规则)</mtext></mrow>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mrow><mtext>(没有</mtext>
+              <mrow><mi>&bottom;</mi><mi>R</mi></mrow>
+              <mtext>规则)</mtext></mrow>
+          </mtd>
+          <mtd>
+            <mrow/>
+          </mtd>
+          <mtd>
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow/>
+                <mrow>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo><mi>&bottom;</mi></mrow>
+                  <mo>&xrArr;</mo><mi>C</mi></mrow>
+              </mfrac>
+              <mrow><mi>&bottom;</mi><mi>L</mi></mrow>
+            </mrow>
+          </mtd>
+        </mtr>
+      </mtable>
+    </math>
+    <p>和上一讲一样, 我们给一些冗余的前件加了[括号], 但如果去掉它们, 就会破坏与验证之间的紧密联系.</p>
+    <h3>参考文献</h3>
     <h2>第9章 证明和验证</h2>
     <p>逻辑基础的验证主义进路用各个联结词的引入规则来解释其意义, 再由引入规则为消去规则提供辩护. 那么, 一个命题的意义又是什么呢? 它由该命题的验证给出, 而验证本质上是把各个联结词的意义复合起来, 因为一个验证仅由引入 (自底向上阅读) 和经过辩护的消去 (自顶向下阅读) 构建而成. 验证的重要之处在于, 它只由我们试图证明的命题的子公式组成.</p>
     <p>一般的证明没有这一性质, 因为通过证明<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>和<math><mrow><mrow><mi>A</mi><mo>&sup;</mo><mi>C</mi></mrow><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>来证明<math><mrow><mi>C</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>是完全合法的, 在这种情况下<math><mi>A</mi></math>在<math><mi>C</mi></math>的证明中充当了某种引理.</p>

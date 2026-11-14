@@ -271,6 +271,7 @@
   (make-monospace "right"))
 (define $id:rule
   (make-monospace "id"))
+(define $id:rule* (&* $id:rule))
 (define $succ
   (make-monospace "succ"))
 (define (&succ A)
@@ -4891,6 +4892,111 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
    ((proof)
     
     )
+   (H3. "切消")
+   
+   (H3. "总结")
+   (P "我们来总结一下相继式演算的规则, 其中可容许规则用虚线标出. "
+      "在演算的某些版本中, 比如Gentzen [1935] 最初的版本, 这些规则是原始规则. "
+      "它们在不含这些规则的演算中是可容许的, "
+      "这一事实是一个例子, 说明蛋糕可以既留着, 又吃掉 {译注: 英语谚语"
+      (Q "you can't have your cake and eat it, too")
+      "的反用, 意即鱼与熊掌可以兼得.}.")
+   (P (B "留着蛋糕: ")
+      "如果你想在相继式演算之中, 或者关于相继式演算, "
+      "推导一个定理, 你可以自由地使用切和恒等. "
+      "这是因为这些规则是可容许的: "
+      "结论的推导是存在的, "
+      "尽管它可能比使用切的那个推导长得多.")
+   (P (B "吃掉蛋糕: ")
+      "如果你想在相继式演算之中, 或者关于相继式演算, "
+      "推导一个定理, 你并不需要考虑切规则或一般的恒等规则. "
+      "这是因为每个可推导的相继式都可以不用二者中的任何一个而推导出来. "
+      "如果你想设计甚至实现系统的搜索过程, 这一点尤其有用, "
+      "因为切作为一条规则, 会引入一个任意的命题" $A
+      ", 因而产生的分支极多. 如前所述, 除了这条规则之外, "
+      "其他所有规则都满足子公式性质, "
+      "只是把你试图证明的相继式中的命题分解开来.")
+   (MB (set-attr*
+        (&Table
+         ((&rull:dotted
+           $cut
+           (Sequent Γ $A) (Sequent Γ $A $C)
+           (Sequent Γ $C))
+          $ (&rull:dotted
+             $id:rule
+             (Sequent Γ $A $A)))
+         ((&rull:dotted
+           $weaken
+           (Sequent Γ $C)
+           (Sequent Γ $A $C))
+          $ (&rull:dotted
+             $contract
+             (Sequent Γ $A $A $C)
+             (Sequent Γ $A $C)))
+         ($ (&rull
+             $id:rule*
+             (Sequent
+              Γ $P $P)) $)
+         ((&rull
+           $conjR
+           (Sequent Γ $A)
+           (Sequent Γ $B)
+           (Sequent Γ (&conj $A $B)))
+          $ (split8
+             (&rull
+              $conjL1
+              (Sequent Γ (&conj $A $B) $A $C)
+              (Sequent Γ (&conj $A $B) $C))
+             (&rull
+              $conjL2
+              (Sequent Γ (&conj $A $B) $B $C)
+              (Sequent Γ (&conj $A $B) $C))))
+         ((&rull
+           $implR
+           (Sequent Γ $A $B)
+           (Sequent Γ (&impl $A $B)))
+          $ (&rull
+             $implL
+             (Sequent
+              Γ (&impl $A $B) $A)
+             (Sequent
+              Γ (bra0 (&impl $A $B))
+              $B $C)
+             (Sequent
+              Γ (&impl $A $B) $C)))
+         ((split8
+           (&rull
+            $disjR1
+            (Sequent Γ $A)
+            (Sequent Γ (&disj $A $B)))
+           (&rull
+            $disjR2
+            (Sequent Γ $B)
+            (Sequent Γ (&disj $A $B))))
+          $ (&rull
+             $disjL
+             (Sequent
+              Γ (bra0 (&disj $A $B))
+              $A $C)
+             (Sequent
+              Γ (bra0 (&disj $A $B))
+              $B $C)
+             (Sequent
+              Γ (&disj $A $B) $C)))
+         ((&rull $truthR
+                 (Sequent Γ $truth))
+          $ (: "(没有" $truthL "规则)"))
+         ((: "(没有" $falsehoodR "规则)")
+          $ (&rull
+             $falsehoodL
+             (Sequent
+              Γ $falsehood $C))))
+        'columnalign "right center left"
+        'rowspacing "6ex"))
+   (P "和上一讲一样, 我们给一些冗余的前件加了[括号], "
+      "但如果去掉它们, 就会破坏与验证之间的紧密联系.")
+   (H3 "参考文献")
+   
    (H2. "证明和验证")
    (P "逻辑基础的验证主义进路用各个联结词的引入规则来解释其意义, "
       "再由引入规则为消去规则提供辩护. "
