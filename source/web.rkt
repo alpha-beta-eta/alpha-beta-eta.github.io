@@ -256,12 +256,13 @@
          "dsh0.rkt"
          "dsh1.rkt"
          "dsh2.rkt"
-         
+         "ai.rkt"
          )
 (define emitXml (emit XML))
 (define emitXml-thunk (emit-thunk XML))
 (define (emit-web)
   (parameterize ([replace? #t])
+    (emitXml ai.html "../ai.html")
     (emitXml dsh2.html "../dsh2.html")
     (emitXml dsh1.html "../dsh1.html")
     (emitXml dsh0.html "../dsh0.html")
