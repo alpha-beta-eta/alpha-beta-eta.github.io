@@ -85,7 +85,8 @@
       (cond
         [(zero? n) m]
         [else (+ 1 (sum (- n 1) m))]))))"))
-   (P "这显然不是sum的定义. 这有点微妙, "
+   (P "这显然不是" (Code "sum")
+      "的定义. 这有点微妙, "
       "不过下面这个表达式的值是什么?"
       (CodeB "((potentially-recursive-sum *) 3 8)")
       "它是" 17 ". 这当然不是" $3 "和"
@@ -94,6 +95,63 @@
       (CodeB "((potentially-recursive-sum (lambda (x y) y)) 3 8)")
       "它是" $9 ". 要让这个程序得出预期的值" 11
       ", 一种方式是对于以下表达式求值."
+      (CodeB "((potentially-recursive-sum sum) 3 8)"))
+   (P "但是, 我们还没有" (Code "sum")
+      ". 因此, 我们改为编写一个程序" (Code "fix")
+      ", 它以" (Code "potentially-recursive-sum")
+      "为参数, 并把它变成" (Code "sum") ". 程序如下."
+      (CodeB "(define fix
+  (lambda (potentially-recursive-sum)
+    (letrec
+      ([sum
+         (potentially-recursive-sum
+           (lambda (n m)
+             (sum n m)))])
+      sum)))")
+      "当然, 我们可以选用更通用的名字."
+      (CodeB "(define fix
+  (lambda (potentially-recursive-function)
+    (letrec
+      ([function
+         (potentially-recursive-function
+           (lambda (n m)
+             (function n m)))])
+      function)))")
+      "或者让它适用于任意数目参数的过程."
+      (CodeB "(define fix
+  (lambda (potentially-recursive-function)
+    (letrec
+      ([function
+         (potentially-recursive-function
+           (lambda args
+             (apply function args)))])
+      function)))")
+      "现在, 使用一个像上面任何一个这样的" (Code "fix")
+      "算子, 就能让我们把一个潜在递归的程序变成递归的. 因此,"
+      (CodeB "> (let ([sum (fix potentially-recursive-sum)])
+    (sum 3 8))")
+      "的确求值为了" 11 ".")
+   (H2. "潜在递归eval")
+   (P "我们将以一种需要用这个" (Code "fix")
+      "才能使其递归的风格来编写我们的解释器. "
+      "实际上, 我们已经可以开始设想它的样子了: "
+      "它接受它自己的求值器, 并且它当然不是递归的."
+      (CodeB "(define potentially-recursive-eval
+  (lambda (eval)
+    (lambda (exp env)
+      (match exp
+        [,int (guard (integer? int)) (... int)]
+        [,bool (guard (boolean? bool)) (... bool)]
+        [,var (guard (symbol? var)) (apply-env env var)]
+        [(zero? ,e1) ...]
+        [(+ ,e1 ,e2) ...]
+        [(- ,e1 ,e2) ...]
+        [(* ,e1 ,e2) ...]
+        [(if ,test-exp ,then-exp ,else-exp) ...]
+        [(lambda ,formals ,body) (... `(closure ,formals ,body ,env))]
+        [(,rator ,rands ...)
+         (... (eval rator env)
+              (map (lambda (x) (eval x env)) `(,rands ...)))]))))")
       
       )
    ))
