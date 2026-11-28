@@ -10321,9 +10321,9 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
         <li>如果<math><mrow><mi>A</mi><mi>&uarr;</mi></mrow></math>, 那么<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>.</li>
       </ol>
       这些定理合在一起表明, 从可证明性的角度来看, 自然演绎, 相继式演算和验证这三个系统是完全一致的. 当然, 证明的结构 (我们非常关心它, 因为它们与程序相关) 在这三个系统中是大不相同的.</p>
-    <p>由<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>走到<math><mrow><mi>A</mi><mi>&uarr;</mi></mrow></math>的这一性质常被称为规范化, 因为我们可以把<math><mrow><mi>A</mi><mi>&uarr;</mi></mrow></math>的推导看作<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明的一种规范形式. 这在一定程度上指的是这样一个观察: 一个验证不能被(局部地)化简.</p>
+    <p>由<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>走到<math><mrow><mi>A</mi><mi>&uarr;</mi></mrow></math>的这一性质常被称为<em>规范化</em>, 因为我们可以把<math><mrow><mi>A</mi><mi>&uarr;</mi></mrow></math>的推导看作<math><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>的证明的一种规范形式. 这在一定程度上指的是这样一个观察: 一个验证不能被(局部地)归约.</p>
     <h3>第9.2节 从自然演绎到相继式演算</h3>
-    <p>我们来说明如何把任意一个自然演绎翻译到相继式演算. 这有时被称为相继式演算相对于自然演绎的完全性. 如果我们把自然演绎理解为定义了(直觉主义的!)真, 那么就可以把它简称为相继式演算的完全性.</p>
+    <p>我们来说明如何把任意一个自然演绎翻译到相继式演算. 这有时被称为<em>相继式演算相对于自然演绎的完全性</em>. 如果我们把自然演绎理解为定义了(直觉主义的!)真, 那么就可以把它简称为<em>相继式演算的完全性</em>.</p>
     <p>提醒一下, 这个相继式演算不包含切规则, 并且只包含对于原子命题而言的恒等规则. 作为弥补, 我们已经证明了以下性质的可容许性:
       <math display="block">
         <mrow>
@@ -10406,8 +10406,331 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
         </mrow>
       </math>
       正因为已知它们是可容许的, 当我们想构造一个相继式推导时就可以自由地使用它们.</p>
-    <p>在自然演绎和相继式演算中, 我们都从假定出发进行推理: 在自然演绎中是假设, 在相继式中是前件. 我们需要在定理的陈述中把它们考虑进来, 上面无条件的版本则作为特例由此得出. 在今天的各个定理的陈述中, 我们把<math><mrow><mrow><msub><mi>A</mi><mn>1</mn></msub><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow><mo>,</mo><mo>&hellip;</mo><mo>,</mo><mrow><msub><mi>A</mi><mi>n</mi></msub><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></mrow></math>简写为<math><mrow><mi mathvariant="normal">&Gamma;</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>, 其他判断也类似. 对于相继式, 我们一般省略显式的<q>前件</q>和<q>后件</q>判断.</p>
-    <div class="theorem"><b>定理1. </b><b>从自然演绎到相继式演算. </b></div>
+    <p>在自然演绎和相继式演算中, 我们都从假定出发进行推理: 在自然演绎中是<em>假设</em>, 在相继式中是<em>前件</em>. 我们需要在定理的陈述中把它们考虑进来, 上面无条件的版本则作为特例由此得出. 在今天的各个定理的陈述中, 我们把<math><mrow><mrow><msub><mi>A</mi><mn>1</mn></msub><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow><mo>,</mo><mo>&hellip;</mo><mo>,</mo><mrow><msub><mi>A</mi><mi>n</mi></msub><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></mrow></math>简写为<math><mrow><mi mathvariant="normal">&Gamma;</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></math>, 其他判断也类似. 对于相继式, 我们一般省略显式的<q>前件</q>和<q>后件</q>判断.</p>
+    <div class="theorem"><b>定理1. </b><b>从自然演绎到相继式演算. </b>如果<math><mtable><mtr><mtd><mrow><mi mathvariant="normal">&Gamma;</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></mtd></mtr><mtr><mtd><mtable><mtr><mtd><mi mathvariant="script">D</mi></mtd></mtr><mtr><mtd><mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow></mtd></mtr></mtable></mtd></mtr></mtable></math>, 那么<math><mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow></math>.</div>
+    <div class="proof"><b>证明.</b> 根据<math><mi mathvariant="script">D</mi></math>上的规则归纳. 我们会呈现一些具有代表性的情形; 而剩下的情形则具有类似的模式.
+      <ul>
+        <li>
+          <math display="block">
+            <mrow><mi mathvariant="script">D</mi><mo>=</mo>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mrow>
+                    <mtable>
+                      <mtr>
+                        <mtd>
+                          <mrow><mi mathvariant="normal">&Gamma;</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mtd>
+                      </mtr>
+                      <mtr>
+                        <mtd>
+                          <mtable>
+                            <mtr>
+                              <mtd>
+                                <msub><mi mathvariant="script">D</mi><mn>1</mn></msub>
+                              </mtd>
+                            </mtr>
+                            <mtr>
+                              <mtd>
+                                <mrow>
+                                  <msub><mi>A</mi><mn>1</mn></msub>
+                                  <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                              </mtd>
+                            </mtr>
+                          </mtable>
+                        </mtd>
+                      </mtr>
+                    </mtable>
+                    <mspace width="8ex"/>
+                    <mtable>
+                      <mtr>
+                        <mtd>
+                          <mrow><mi mathvariant="normal">&Gamma;</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                        </mtd>
+                      </mtr>
+                      <mtr>
+                        <mtd>
+                          <mtable>
+                            <mtr>
+                              <mtd>
+                                <msub><mi mathvariant="script">D</mi><mn>2</mn></msub>
+                              </mtd>
+                            </mtr>
+                            <mtr>
+                              <mtd>
+                                <mrow>
+                                  <msub><mi>A</mi><mn>2</mn></msub>
+                                  <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                              </mtd>
+                            </mtr>
+                          </mtable>
+                        </mtd>
+                      </mtr>
+                    </mtable>
+                  </mrow>
+                  <mrow>
+                    <mrow>
+                      <msub><mi>A</mi><mn>1</mn></msub>
+                      <mo>&and;</mo>
+                      <msub><mi>A</mi><mn>2</mn></msub>
+                    </mrow>
+                    <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                </mfrac>
+                <mrow><mi>&and;</mi><mi>I</mi></mrow>
+              </mrow>
+            </mrow>
+          </math>
+          其中<math><mrow><mi>A</mi><mo>=</mo><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>&and;</mo><msub><mi>A</mi><mn>2</mn></msub></mrow></mrow></math>. 在这种情形下, 我们仅需将归纳假设应用于<math><msub><mi mathvariant="script">D</mi><mn>1</mn></msub></math>和<math><msub><mi mathvariant="script">D</mi><mn>2</mn></msub></math>, 然后以合取的右规则模拟合取引入.
+          <math display="block">
+            <mrow>
+              <mfrac displaystyle="true">
+                <mrow>
+                  <mtable>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi>IH</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msub><mi mathvariant="script">D</mi><mn>1</mn></msub>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                          <msub><mi>A</mi><mn>1</mn></msub>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                  <mspace width="8ex"/>
+                  <mtable>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi>IH</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msub><mi mathvariant="script">D</mi><mn>2</mn></msub>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                          <msub><mi>A</mi><mn>2</mn></msub>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mrow>
+                <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                  <mrow>
+                    <msub><mi>A</mi><mn>1</mn></msub>
+                    <mo>&and;</mo>
+                    <msub><mi>A</mi><mn>2</mn></msub>
+                  </mrow>
+                </mrow>
+              </mfrac>
+              <mrow><mi>&and;</mi><mi>R</mi></mrow>
+            </mrow>
+          </math>
+        </li>
+        <li>
+          <math display="block">
+            <mrow><mi mathvariant="script">D</mi><mo>=</mo>
+              <mrow>
+                <mfrac displaystyle="true">
+                  <mtable>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi mathvariant="normal">&Gamma;</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mtable>
+                          <mtr>
+                            <mtd>
+                              <msup><mi mathvariant="script">D</mi><mo>&prime;</mo></msup>
+                            </mtd>
+                          </mtr>
+                          <mtr>
+                            <mtd>
+                              <mrow>
+                                <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                                <mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                            </mtd>
+                          </mtr>
+                        </mtable>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                  <mrow><mi>A</mi><mspace width="2ex"/><mi mathvariant="italic">true</mi></mrow>
+                </mfrac>
+                <mrow><mi>&and;</mi>
+                  <msub><mi>E</mi><mn>1</mn></msub>
+                </mrow>
+              </mrow>
+            </mrow>
+          </math>
+          又一次, 我们应用归纳假设以构造一个相继式证明.
+          <math display="block">
+            <mtable>
+              <mtr>
+                <mtd>
+                  <mtable>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi>IH</mi><mo>&af;</mo>
+                          <mrow><mo stretchy="false">(</mo>
+                            <msup><mi mathvariant="script">D</mi><mo>&prime;</mo></msup>
+                            <mo stretchy="false">)</mo></mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                          <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                        </mrow>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                </mtd>
+              </mtr>
+              <mtr>
+                <mtd><mo>&vellip;</mo></mtd>
+              </mtr>
+              <mtr>
+                <mtd>
+                  <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+                </mtd>
+              </mtr>
+            </mtable>
+          </math>
+          我们注意到我们现在还没有一条规则用以完成这个证明! 这应该并不令人意外, 因为在我们构造相继式演算时, 我们将自然演绎的消去规则翻译为了相继式演算中的左规则. 但是, 这里的<math><mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow></math>出现在相继式的右侧.<br/>幸运的是, 我们拥有一些强大的原理, 而这里有用的是切的可容许性, 这能够让合取出现在相继式的左侧.
+          <math display="block">
+            <mrow>
+              <mtable class="admissible" displaystyle="true">
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mtable>
+                        <mtr>
+                          <mtd>
+                            <mrow><mi>IH</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">(</mo>
+                                <msup><mi mathvariant="script">D</mi><mo>&prime;</mo></msup>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                              <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                            </mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                      <mspace width="8ex"/>
+                      <mtable>
+                        <mtr>
+                          <mtd><mo>&vellip;</mo></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow>
+                              <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                                <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                              </mrow>
+                              <mo>&xrArr;</mo><mi>A</mi></mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                    </mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+              <mi mathvariant="monospace">cut</mi></mrow>
+          </math>
+          现在我们可以完成这个(推导的)构造, 左规则后面跟着(可容许的)identity规则.
+          <math display="block">
+            <mrow>
+              <mtable class="admissible" displaystyle="true">
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <mtable>
+                        <mtr>
+                          <mtd>
+                            <mrow><mi>IH</mi><mo>&af;</mo>
+                              <mrow><mo stretchy="false">(</mo>
+                                <msup><mi mathvariant="script">D</mi><mo>&prime;</mo></msup>
+                                <mo stretchy="false">)</mo></mrow>
+                            </mrow>
+                          </mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd>
+                            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo>
+                              <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                            </mrow>
+                          </mtd>
+                        </mtr>
+                      </mtable>
+                      <mspace width="8ex"/>
+                      <mrow>
+                        <mfrac displaystyle="true">
+                          <mrow>
+                            <mtable class="admissible" displaystyle="true">
+                              <mtr>
+                                <mtd>
+                                  <mrow/>
+                                </mtd>
+                              </mtr>
+                              <mtr>
+                                <mtd>
+                                  <mrow>
+                                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                                      <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                                      <mo>,</mo><mi>A</mi></mrow>
+                                    <mo>&xrArr;</mo><mi>A</mi></mrow>
+                                </mtd>
+                              </mtr>
+                            </mtable>
+                            <mi mathvariant="monospace">id</mi></mrow>
+                          <mrow>
+                            <mrow><mi mathvariant="normal">&Gamma;</mi><mo>,</mo>
+                              <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+                            </mrow>
+                            <mo>&xrArr;</mo><mi>A</mi></mrow>
+                        </mfrac>
+                        <mrow><mi>&and;</mi>
+                          <msub><mi>L</mi><mn>1</mn></msub>
+                        </mrow>
+                      </mrow>
+                    </mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow><mi mathvariant="normal">&Gamma;</mi><mo>&xrArr;</mo><mi>A</mi></mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+              <mi mathvariant="monospace">cut</mi></mrow>
+          </math>
+        </li>
+        <li></li>
+      </ul>
+      <div class="qed"><math><mo>&EmptySmallSquare;</mo></math></div>
+    </div>
     <h3>第9.3节 从相继式演算到验证</h3>
     <h3>第9.4节 从验证到证明</h3>
     <h3>第9.5节 经典相继式演算</h3>
@@ -10449,11 +10772,168 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
     <p>尽管有这种很强的对应和相互影响, 我们也必须注意到一些差异. 今天我们研究三个差异中的两个, 另一个留到下一讲.
       <ol>
         <li>证明归约, 尤其是我们迄今只用局部归约来看待它的方式, 只要某个联结词的引入后面紧跟着它的消去, 就可以使用. 用编程语言的话说, 这对应于把解构子直接作用于构造子. 但编程语言需要更多: 我们还需要规定一种归约的<q>策略</q>或<q>纪律</q>, 让计算以可预测的方式进行. 这是因为我们非常关心计算的代价, 比如时间或空间上的代价, 而在直觉主义数学的早期, 这并不怎么受关注.</li>
-        <li>对于编程语言, 我们必须决定计算的哪些结果可以直接观察, 哪些不可以. 几乎所有语言, 包括ML或Haskell这样的函数式语言, 都对于函数采取外延观点, 也就是说我们不能直接观察函数的结构. 我们只能应用函数, 再观察其结果. 另一方面, 布尔值或自然数这类具体类型的值是可以直接观察的, 因而本质上是内涵的. 证明论中也有相应的概念, 我们会在课程后面再回到它们.</li>
-        <li>类型和程序都会用到递归, 而我们还没有从证明论的角度考虑过递归. 我们把对它们的研究推迟到下一讲, 不过在本讲结尾会朝这个方向迈出第一步.</li>
+        <li>对于编程语言, 我们必须决定计算的哪些结果可以直接观察, 哪些不可以. 几乎所有语言, 包括ML或Haskell这样的函数式语言, 都对于函数采取外延观点, 也就是说我们不能直接观察函数的结构. 我们只能应用函数, 再观察其结果. 另一方面, 布尔值或自然数这类具体类型的值是可以直接观察的, 因而本质上是内涵的. 证明论中也有相应的概念, 我们会在课程后面再回到它们. {译注: 我感觉这里的叙述和我的直觉是截然相反的.}</li>
+        <li>类型和程序都会用到递归, 而我们还没有从证明论的角度考虑过递归. 我们把对它们的研究推迟到下一讲, 不过在本讲结尾会朝这个方向迈出最初的几步.</li>
       </ol>
     </p>
     <h3>第10.2节 归约</h3>
+    <p>回忆一下局部归约的步骤, 我们于证明项上将其写成<math><mrow><mi>M</mi><mo>&xrarr;</mo><msup><mi>M</mi><mo>&prime;</mo></msup></mrow></math>.
+      <math display="block">
+        <mtable>
+          <mtr>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mtext>归约</mtext></mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mtext>类型</mtext></mtd>
+            <mtd><mtext>命题</mtext></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow><mi>&lambda;</mi><mi>x</mi><mo lspace="0">.</mo><mi>M</mi></mrow>
+                  <mo stretchy="false">)</mo></mrow>
+                <mspace width="2ex"/><mi>N</mi></mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow><mi>N</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+                <mo>&af;</mo><mi>M</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mi>A</mi><mo>&rarr;</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mi>A</mi><mo>&sup;</mo><mi>B</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="bold">fst</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd><mi>M</mi></mtd>
+            <mtd>
+              <mrow><mi>A</mi><mo>&times;</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mi>A</mi><mo>&and;</mo><mi>B</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="bold">snd</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">&lang;</mo>
+                  <mrow><mi>M</mi><mo>,</mo><mi>N</mi></mrow>
+                  <mo stretchy="false">&rang;</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd><mi>N</mi></mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="bold">case</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">inl</mi><mo>&af;</mo><mi>M</mi></mrow>
+                    <mo>,</mo>
+                    <mrow><mi>x</mi><mo lspace="0" rspace="0">.</mo><mi>N</mi></mrow>
+                    <mo>,</mo>
+                    <mrow><mi>y</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow><mi>M</mi><mo lspace="0" rspace="0">/</mo><mi>x</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+                <mo>&af;</mo><mi>N</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mi>A</mi><mo>+</mo><mi>B</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow><mi>A</mi><mo>&or;</mo><mi>B</mi></mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="bold">case</mi><mo>&af;</mo>
+                <mrow><mo stretchy="false">(</mo>
+                  <mrow>
+                    <mrow><mi mathvariant="bold">inr</mi><mo>&af;</mo><mi>M</mi></mrow>
+                    <mo>,</mo>
+                    <mrow><mi>x</mi><mo lspace="0" rspace="0">.</mo><mi>N</mi></mrow>
+                    <mo>,</mo>
+                    <mrow><mi>y</mi><mo lspace="0" rspace="0">.</mo><mi>P</mi></mrow>
+                  </mrow>
+                  <mo stretchy="false">)</mo></mrow>
+              </mrow>
+            </mtd>
+            <mtd><mo>&xrarr;</mo></mtd>
+            <mtd>
+              <mrow>
+                <mrow><mo stretchy="false">[</mo>
+                  <mrow><mi>M</mi><mo lspace="0" rspace="0">/</mo><mi>y</mi></mrow>
+                  <mo stretchy="false">]</mo></mrow>
+                <mo>&af;</mo><mi>P</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mo stretchy="false">&lang;</mo>
+                <mrow/>
+                <mo stretchy="false">&rang;</mo></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mtext>没有归约</mtext></mtd>
+            <mtd><mi mathvariant="bold">1</mi></mtd>
+            <mtd><mi>&top;</mi></mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow><mi mathvariant="bold">abort</mi><mo>&af;</mo><mi>M</mi></mrow>
+            </mtd>
+            <mtd>
+              <mrow/>
+            </mtd>
+            <mtd><mtext>没有归约</mtext></mtd>
+            <mtd><mi mathvariant="bold">0</mi></mtd>
+            <mtd><mi>&bottom;</mi></mtd>
+          </mtr>
+        </mtable>
+      </math>
+      {译注: 其实最后两行我也不太明白, 我理解其义, 但是不觉得放在这里很合适.} <math><mrow><mo stretchy="false">&lang;</mo><mrow/><mo stretchy="false">&rang;</mo></mrow></math>之所以没有归约, 是因为类型<math><mi mathvariant="bold">1</mi></math>没有解构子. <math><mrow><mi mathvariant="bold">abort</mi><mo>&af;</mo><mi>M</mi></mrow></math>之所以没有归约, 是因为类型<math><mi mathvariant="bold">0</mi></math>没有构造子.</p>
+    <p>如果将归约想成是项上的二元判断, 那么以上表格中的规则就都是公理, 意即其为没有前提的规则. 这些公理本身还不足以定义计算. 例如, 在定义</p>
     <h3>第10.3节 观察</h3>
     <h3>第10.4节 归约和值</h3>
     <h3>第10.5节 自然数</h3>

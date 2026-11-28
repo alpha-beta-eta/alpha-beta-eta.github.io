@@ -1,6 +1,8 @@
 #lang racket
 (provide constructive_logic_notes.html)
 (require SMathML)
+(define $IH (Mi "IH"))
+(define (&IH x) (app $IH x))
 (define (&rule:dotted #:space [n 8] . j*)
   (let-values (((j* j1) (split-at-right j* 1)))
     (Mtable #:attr* '((class "admissible") (displaystyle "true"))
@@ -5139,23 +5141,27 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
       "当然, 证明的结构 (我们非常关心它, 因为它们与程序相关) "
       "在这三个系统中是大不相同的.")
    (P "由" (&true $A) "走到" (&ver $A)
-      "的这一性质常被称为规范化, 因为我们可以把"
+      "的这一性质常被称为" (Em "规范化")
+      ", 因为我们可以把"
       (&ver $A) "的推导看作" (&true $A)
       "的证明的一种规范形式. "
       "这在一定程度上指的是这样一个观察: "
-      "一个验证不能被(局部地)化简.")
+      "一个验证不能被(局部地)归约.")
    (H3. "从自然演绎到相继式演算")
    (P "我们来说明如何把任意一个自然演绎翻译到相继式演算. "
-      "这有时被称为相继式演算相对于自然演绎的完全性. "
-      "如果我们把自然演绎理解为定义了(直觉主义的!)真, "
-      "那么就可以把它简称为相继式演算的完全性.")
+      "这有时被称为"
+      (Em "相继式演算相对于自然演绎的完全性")
+      ". 如果我们把自然演绎理解为定义了(直觉主义的!)真, "
+      "那么就可以把它简称为"
+      (Em "相继式演算的完全性") ".")
    (P "提醒一下, 这个相继式演算不包含切规则, "
       "并且只包含对于原子命题而言的恒等规则. "
       "作为弥补, 我们已经证明了以下性质的可容许性:"
       (MB (split16
            (&rull:dotted
             $cut
-            (Sequent Γ $A) (Sequent Γ $A $C)
+            (Sequent Γ $A)
+            (Sequent Γ $A $C)
             (Sequent Γ $C))
            (&rull:dotted
             $id:rule
@@ -5171,9 +5177,11 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
             (Sequent Γ $A $C))))
       "正因为已知它们是可容许的, "
       "当我们想构造一个相继式推导时就可以自由地使用它们.")
-   (P "在自然演绎和相继式演算中, 我们都从假定出发进行推理: "
-      "在自然演绎中是假设, 在相继式中是前件. "
-      "我们需要在定理的陈述中把它们考虑进来, "
+   (P "在自然演绎和相继式演算中, "
+      "我们都从假定出发进行推理: "
+      "在自然演绎中是" (Em "假设")
+      ", 在相继式中是" (Em "前件")
+      ". 我们需要在定理的陈述中把它们考虑进来, "
       "上面无条件的版本则作为特例由此得出. "
       "在今天的各个定理的陈述中, 我们把"
       (&cm (&true $A_1) $..h (&true $A_n))
@@ -5182,7 +5190,76 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
       (Q "前件") "和" (Q "后件") "判断.")
    ((theorem #:n "1")
     (B "从自然演绎到相继式演算. ")
-    
+    "如果" (walk (&true Γ) (label $D:script (&true $A)))
+    ", 那么" (Sequent Γ $A) ".")
+   ((proof)
+    "根据" $D:script "上的规则归纳. "
+    "我们会呈现一些具有代表性的情形; "
+    "而剩下的情形则具有类似的模式."
+    (Ul (Li (MB (&= $D:script
+                    (&rull
+                     $conjI
+                     (walk (&true Γ)
+                           (label $D:script_1 (&true $A_1)))
+                     (walk (&true Γ)
+                           (label $D:script_2 (&true $A_2)))
+                     (&true (&conj $A_1 $A_2)))))
+            "其中" (&= $A (&conj $A_1 $A_2))
+            ". 在这种情形下, 我们仅需将归纳假设应用于"
+            $D:script_1 "和" $D:script_2
+            ", 然后以合取的右规则模拟合取引入."
+            (MB (&rull
+                 $conjR
+                 (label (&IH $D:script_1)
+                        (Sequent Γ $A_1))
+                 (label (&IH $D:script_2)
+                        (Sequent Γ $A_2))
+                 (Sequent Γ (&conj $A_1 $A_2)))))
+        (Li (MB (&= $D:script
+                    (&rull
+                     $conjE1
+                     (walk (&true Γ)
+                           (label $D:script^
+                                  (&true (&conj $A $B))))
+                     (&true $A))))
+            "又一次, 我们应用归纳假设以构造一个相继式证明."
+            (MB (walk (label (&IH $D:script^)
+                             (Sequent Γ (&conj $A $B)))
+                      $..v
+                      (Sequent Γ $A)))
+            "我们注意到我们现在还没有一条规则用以完成这个证明! "
+            "这应该并不令人意外, "
+            "因为在我们构造相继式演算时, "
+            "我们将自然演绎的消去规则翻译为了"
+            "相继式演算中的左规则. "
+            "但是, 这里的" (&conj $A $B)
+            "出现在相继式的右侧." (Br)
+            "幸运的是, 我们拥有一些强大的原理, "
+            "而这里有用的是切的可容许性, "
+            "这能够让合取出现在相继式的左侧."
+            (MB (&rull:dotted
+                 $cut
+                 (label (&IH $D:script^)
+                        (Sequent Γ (&conj $A $B)))
+                 (walk $..v
+                       (Sequent Γ (&conj $A $B) $A))
+                 (Sequent Γ $A)))
+            "现在我们可以完成这个(推导的)构造, "
+            "左规则后面跟着(可容许的)identity规则."
+            (MB (&rull:dotted
+                 $cut
+                 (label (&IH $D:script^)
+                        (Sequent Γ (&conj $A $B)))
+                 (&rull
+                  $conjL1
+                  (&rull:dotted
+                   $id:rule
+                   (Sequent Γ (&conj $A $B) $A $A))
+                  (Sequent Γ (&conj $A $B) $A))
+                 (Sequent Γ $A))))
+        (Li ""
+            )
+        )
     )
    
    (H3. "从相继式演算到验证")
@@ -5233,13 +5310,49 @@ val () = deny (check (Lam(fn x => Abort(App(Fst(x),Snd(x)))))
               "另一方面, 布尔值或自然数这类具体类型的值"
               "是可以直接观察的, 因而本质上是内涵的. "
               "证明论中也有相应的概念, "
-              "我们会在课程后面再回到它们.")
+              "我们会在课程后面再回到它们. "
+              "{译注: 我感觉这里的叙述和我的直觉是截然相反的.}")
           (Li "类型和程序都会用到递归, "
               "而我们还没有从证明论的角度考虑过递归. "
               "我们把对它们的研究推迟到下一讲, "
-              "不过在本讲结尾会朝这个方向迈出第一步.")))
+              "不过在本讲结尾会朝这个方向迈出最初的几步.")))
    (H3. "归约")
-   
+   (P "回忆一下局部归约的步骤, "
+      "我们于证明项上将其写成"
+      (&--> $M $M^) "."
+      (MB (&Table
+           ($ "归约" $ "类型" "命题")
+           ((App (@Lam $x $M) $N)
+            $-->
+            (subst $N $x $M)
+            (&-> $A $B) (&impl $A $B))
+           ((&fst (tupa0 $M $N))
+            $--> $M
+            (&c* $A $B) (&conj $A $B))
+           ((&snd (tupa0 $M $N))
+            $--> $N $ $)
+           ((&case (&inl $M) $x $N $y $P)
+            $--> (subst $M $x $N)
+            (&+ $A $B) (&disj $A $B))
+           ((&case (&inr $M) $x $N $y $P)
+            $--> (subst $M $y $P) $ $)
+           ($unit $ "没有归约"
+            $Unit $truth)
+           ((&abort $M) $ "没有归约"
+            $Void $falsehood)))
+      "{译注: 其实最后两行我也不太明白, "
+      "我理解其义, 但是不觉得放在这里很合适.} "
+      $unit "之所以没有归约, 是因为类型"
+      $Unit "没有解构子. " (&abort $M)
+      "之所以没有归约, 是因为类型"
+      $Void "没有构造子.")
+   (P "如果将归约想成是项上的二元判断, "
+      "那么以上表格中的规则就都是公理, "
+      "意即其为没有前提的规则. "
+      "这些公理本身还不足以定义计算. "
+      "例如, 在定义"
+      
+      )
    (H3. "观察")
    
    (H3. "归约和值")
